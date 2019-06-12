@@ -1,0 +1,732 @@
+<!doctype html>
+<html lang="ko">
+<head>
+	<meta charset="utf-8" />
+	<title>(주)유비원 스타일 가이드</title>
+	<link type="text/css" rel="stylesheet" href="./css/shCoreDefault.css"/>
+	<link type="text/css" rel="stylesheet" href="./css/style.css"/>
+	<link type="text/css" rel="stylesheet" href="./css/jquery.mCustomScrollbar.css"/>
+	<script type="text/javascript" src="./js/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="./js/html5.js"></script>
+	<script type="text/javascript" src="./js/shCore.js"></script>
+	<script type="text/javascript" src="./js/shBrushJScript.js"></script>
+	<script type="text/javascript" src="./js/shBrushCss.js"></script>
+	<script type="text/javascript" src="./js/shBrushXml.js"></script>
+	<script type="text/javascript" src="./js/jquery.mCustomScrollbar.concat.min.js"></script>
+	<script type="text/javascript">
+		jQuery(function(){
+		   jQuery('a[href^=#]').click(function() {
+			  var speed = 500;  // 스크롤 속도
+			  var href= jQuery(this).attr("href");
+			  var target = jQuery(href == "#" || href == "" ? 'html' : href);
+			  var position = target.offset().top;
+			  jQuery('body,html').animate({scrollTop:position}, speed, 'swing');
+			  return false;
+		   });
+		}); //부드럽게 페이지내 이동위해 사용
+		SyntaxHighlighter.all(); //syntaxhighlighter
+	</script>
+</head>
+
+<body>
+	<!-- S : wrap -->
+	<div id="wrap">
+		<!-- S : header-->
+		<div id="header">
+			<header class="gd-header">
+				<h1>
+					<a href="index.html"><img src="./images/h1_logo.png" alt="ubone" /></a>
+					<strong class="gd-ver">Style Guide
+						<strong class="ver">Ver1.0</strong>
+					</strong>
+				</h1>
+			</header>
+		</div>
+		<!-- E : header-->
+		<div id="container">
+			<!-- S : lnb-->
+			<div id="lnb">
+				<div class="lnb-inner">
+					<div class="tit-rcnt">
+						<h2>CSS Guide</h2>
+						<!-- <span class="rcnt"><a href="#"><img src="./images/btn_all_view.png" alt="전체보기" /></a></span> -->
+					</div>
+					<nav class="gd-nav">
+						<div class="menu">
+							<ul>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="index.html"><strong>공통</strong></a>
+								</li>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="list.html"><strong>목록화면</strong></a></li>
+								<li class="sub-open">
+									<button class="fold">하위메뉴 있음</button>
+									<a href="detail.html"><strong>상세화면</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="detail.html#gd03-1"><strong>상태바</strong></a></li>
+											<li><a href="detail.html#gd03-2"><strong>기본 테이블</strong></a></li>
+											<li><a href="detail.html#gd03-3"><strong>변형 테이블</strong></a></li>
+										</ul>
+									</div>
+								</li>
+								<li class="sub-open">
+									<button class="fold">하위메뉴 있음</button>
+									<a href="etc.html"><strong>기타</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="etc.html#gd04-1"><strong>통계</strong></a></li>
+											<li><a href="etc.html#gd04-2"><strong>탭&amp;파일첨부&amp;페이징</strong></a></li>
+											<li><a href="etc.html#gd04-3"><strong>설명문구</strong></a></li>
+											<li><a href="etc.html#gd04-4"><strong>로딩바</strong></a></li>
+											<li><a href="etc.html#gd04-5"><strong>그래프컬러 가이드</strong></a></li>
+										</ul>
+									</div>
+								</li>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="popup.html"><strong>팝업</strong></a>
+								</li>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="button.html"><strong>버튼</strong></a>
+								</li>
+								<li class="sub-open">
+									<button class="fold">하위메뉴 있음</button>
+									<a href="board.html"><strong>게시판</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="board.html#gd07-1"><strong>목록</strong></a></li>
+											<li><a href="board.html#gd07-2"><strong>상세</strong></a></li>
+											<li><a href="board.html#gd07-3"><strong>등록</strong></a></li>
+										</ul>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</nav>
+				</div>
+			</div>
+			<!-- E : lnb -->
+			<!-- S : content -->
+			<div id="content">
+				<!-- S : 기타 -->
+				<section class="section" id="gd04">
+					<article class="article-cnt" id="gd04-1">
+						<div class="h3-tit">
+							<h3>기타_통계</h3>
+						</div>
+						<div class="sub-desc01">
+							<p>셀이 길어질 경우 스크롤이 생기며, <strong class="gd-txt-color01">셀의 넓이 단위는 px</strong>로 컨트롤 해준다.</p>
+						</div>
+
+						<div class="h4-tit">
+							<h4>소계&amp; 합계 테이블</h4>
+						</div>
+						<div class="sub-desc01">
+							<p>소계와 합계 두가지만 있을 경우 사용. <strong class="gd-txt-color01">th의 텍스트는 볼드처리</strong>한다.</p>
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+							<img src="./images/ex/ex_stats01.gif" alt="통계 예시 화면 - 소계, 합계 테이블">
+						</div>
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<div class="stats_wrap">
+									<table class="ub-control table stats">
+										<colgroup>
+											<col width="" />
+											<col width="" />
+											<col width="" />
+											<col width="" />
+											<col width="" />
+											<col width="" />
+										</colgroup>
+										<thead>
+											<tr>
+												<th><strong>상담유형1</strong></th>
+												<th><strong>상담유형2</strong></th>
+												<th><strong>상담유형3</strong></th>
+												<th><strong>합계</strong></th>
+												<th><strong>불만</strong></th>
+												<th><strong>칭찬</strong></th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr class="bg01">
+												<th colspan="3"><strong>합계</strong></th>
+												<td>85%</td>
+												<td>1,209</td>
+												<td>1,209</td>
+											</tr>
+											<tr>
+												<th rowspan="3">품질</th>
+												<th colspan="2" class="bg02"><strong>소계</strong></th>
+												<td class="bg01">62%</td>
+												<td class="bg02">206</td>
+												<td class="bg02">206</td>
+											</tr>
+											<tr>
+												<th rowspan="2">외관</th>
+												<th class="bg02"><strong>소계</strong></th>
+												<td class="bg01">54%</td>
+												<td class="bg02">102</td>
+												<td class="bg02">206</td>
+											</tr>
+											<tr>
+												<th><strong>녹발셍</strong></th>
+												<td class="bg01">100%</td>
+												<td>64</td>
+												<td>206</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</pre>
+						</div>
+						<div class="sub-desc02">
+							<p>
+								통계는 숫자 위주이므로 tbody> td 텍스트의 <strong class="gd-txt-color01">기본 정렬은 오른쪽</strong>이며, 필요에 따라 text-left, text-center로 정렬한다.
+							</p>
+						</div>
+
+						<div class="h4-tit">
+							<h4>변형테이블</h4>
+						</div>
+						<div class="sub-desc01">
+							<p>배경컬러가 여러개 필요한 경우 디자이너에게 요청 (합계, 소계 포함하여 기본 6컬러 제공함 - bg01, bg02....) </p>
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+							<img src="./images/ex/ex_stats02.gif" alt="통계 예시 화면 - 변형 테이블">
+						</div>
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<div class="stats_wrap">
+									<table class="ub-control table stats">
+										<colgroup>
+											<col width="100px">
+											<col width="200px">
+											<col width="100px">
+											<col width="100px">
+											<col width="100px">
+											<col width="100px">
+											<col width="100px">
+											<col width="100px">
+											<col width="100px">
+											<col width="100px">
+											<col width="100px">
+											<col width="100px">
+											<col width="100px">
+											<col width="100px">
+											<col width="100px">
+											<col width="100px">
+										</colgroup>
+										<thead>
+											<tr>
+												<th rowspan="2"><strong>유형</strong></th>
+												<th rowspan="2"><strong>직전<br>8분기<br>평균</strong></th>
+												<th rowspan="2"><strong>직전<br>4분기<br>평균</strong></th>
+												<th rowspan="2"><strong>직전<br>2분기<br>평균</strong></th>
+												<th rowspan="2"><strong>직전<br>평균</strong></th>
+												<th rowspan="2"><strong>당분기</strong></th>
+												<th colspan="3"><strong>2013년</strong></th>
+												<th colspan="4"><strong>2014년</strong></th>
+												<th><strong>2015년</strong></th>
+												<th rowspan="2"><strong>합계</strong></th>
+												<th rowspan="2"><strong>비중</strong></th>
+											</tr>
+											<tr>
+												<th><strong>2분기</strong></th>
+												<th><strong>분기</strong></th>
+												<th><strong>4분기</strong></th>
+												<th><strong>1분기</strong></th>
+												<th><strong>2분기</strong></th>
+												<th><strong>3분기</strong></th>
+												<th><strong>4분기</strong></th>
+												<th><strong>1분기</strong></th>
+											</tr>
+										</thead>
+										<tfoot>
+											<tr>
+												<th class="bg01"><strong>합계</strong></th>
+												<td class="bg01">1,800</td>
+												<td class="bg01">1,800</td>
+												<td class="bg01">1,800</td>
+												<td class="bg01">1,800</td>
+												<td class="bg01">1,800</td>
+												<td class="bg01">1,800</td>
+												<td class="bg01">1,800</td>
+												<td class="bg01">1,800</td>
+												<td class="bg01">1,800</td>
+												<td class="bg01">1,800</td>
+												<td class="bg01">1,800</td>
+												<td class="bg01">1,800</td>
+												<td class="bg01">1,800</td>
+												<td class="bg01">3,600</td>
+												<td class="bg01">100.0%</td>
+											</tr>
+										</tfoot>
+										<tbody>
+											<tr>
+												<th><a href="#" class="tlink">보험가입</a></th>
+												<td></td>
+												<td>4.110,300</td>
+												<td>300</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td class="color1">50</td>
+												<td>100</td>
+												<td><a href="#" class="link-color01">100</a></td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td class="bg02">600</td>
+												<td class="bg01">16.7%</td>
+											</tr>
+											<tr>
+												<th class="bg04">계약유지</th>
+												<td>300</td>
+												<td>300</td>
+												<td>300</td>
+												<td><a href="#" class="link-color02">100</a></td>
+												<td>100</td>
+												<td>100</td>
+												<td></td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td class="bg02">600</td>
+												<td class="bg01">16.7%</td>
+											</tr>
+											<tr>
+												<th class="bg05">재지급</th>
+												<td><a href="#">300</a></td>
+												<td>300</td>
+												<td>300</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td>50</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td class="bg02">600</td>
+												<td class="bg01">16.7%</td>
+											</tr>
+											<tr>
+												<th class="bg06">보험금</th>
+												<td>300</td>
+												<td>300</td>
+												<td>300</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td>50</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td class="bg02">600</td>
+												<td class="bg01">16.7%</td>
+											</tr>
+											<tr>
+												<th class="bg7">서비스 및 기타</th>
+												<td>300</td>
+												<td>300</td>
+												<td>300</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td>50</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td class="bg02">600</td>
+												<td class="bg01">16.7%</td>
+											</tr>
+											<tr>
+												<th>금융사고</th>
+												<td>300</td>
+												<td>300</td>
+												<td>300</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td>50</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td class="bg02">600</td>
+												<td class="bg01">16.7%</td>
+											</tr>
+											<tr>
+												<th>칭찬건의</th>
+												<td>300</td>
+												<td>300</td>
+												<td>300</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td>50</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td>100</td>
+												<td class="bg02">600</td>
+												<td class="bg01">16.7%</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</pre>
+						</div>
+
+						<div class="sub-desc02">
+							<p>배경컬러가 여러개 필요한 경우, 디자이너에게 요청하도록 한다. </p>
+						</div>
+					</article>
+					<article class="article-cnt" id="gd04-2">
+						<div class="h3-tit">
+							<h3>기타_탭&amp;파일첨부&amp;페이징</h3>
+						</div>
+
+						<div class="h4-tit">
+							<h4>탭</h4>
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+							<img src="./images/ex/ex_tab.gif" alt="탭 예시 화면">
+						</div>
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<div id="tabs" name="tabs" class="ub-control tab ui-tabs ui-widget ui-widget-content ui-corner-all">
+									<ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" role="tablist">
+										<li class="ui-state-default ui-corner-top ui-tabs-active ui-state-active" aria-controls="tab_item_COM0000" role="tab" tabindex="0" aria-labelledby="ui-id-1" aria-selected="true">
+											<a href="#tab_item_COM0000" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-1">
+												<label>처리이력</label><span class="ico-new"></span>
+											</a>
+										</li>
+										<li class="ui-state-default ui-corner-top" aria-controls="tab_item_COM0002" role="tab" tabindex="-1" aria-labelledby="ui-id-2" aria-selected="false">
+											<a href="#tab_item_COM0002" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-2"><label>통보이력</label></a>
+										</li>
+									</ul>
+								</div>
+								<div id="tab_item_COM0000" class="ub-tab-content ui-tabs-panel ui-widget-content ui-corner-bottom" aria-labelledby="ui-id-1" role="tabpanel" aria-expanded="true" aria-hidden="false" style="display: block;"><input type="hidden" value="/screen/COM0000.ub?ID_VOC=VOC_150320_00102&amp;ID_SUB_VOC=001"><iframe frameborder="0" name="tabFrame_tab_item_COM0000" scrolling="no" style="width: 100%; margin: 0px; padding: 0px; border: 0px; height: 328px;" src="/screen/COM0000.ub?ID_VOC=VOC_150320_00102&amp;ID_SUB_VOC=001"></iframe></div>
+								<div id="tab_item_COM0002" class="ub-tab-content ui-tabs-panel ui-widget-content ui-corner-bottom" aria-labelledby="ui-id-2" role="tabpanel" aria-expanded="false" aria-hidden="true" style="display: none;"><input type="hidden" value="/screen/COM0002.ub?ID_VOC=VOC_150320_00102&amp;ID_SUB_VOC=001"><iframe frameborder="0" name="tabFrame_tab_item_COM0002" scrolling="no" style="width: 100%; margin: 0px; padding: 0px; border: 0px; height: 527px;"></iframe></div>
+							</pre>
+						</div>
+
+						<div class="h4-tit">
+							<h4>파일첨부</h4>
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+							<img src="./images/ex/ex_file.gif" alt="파일첨부 예시 화면">
+						</div>
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<div class="ub-layout file-up">
+									<input type="text" class="ub-control input-text" id="fileName" style="width:300px;" />
+									<span id="fileUp" class="ub-control button inner icon">
+										<a title="파일업로드" href="#none"><span></span>파일업로드</a>
+										<input type="file" class="ub-control file" onchange="document.getElementById('fileName').value=this.value" />
+									</span>
+								</div>
+							</pre>
+						</div>
+
+						<div class="h4-tit">
+							<h4>페이징</h4>
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+							<img src="./images/ex/ex_paging.gif" alt="페이징 예시 화면">
+						</div>
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<div class="ub-layout pagging">
+									<div id="page" name="page" class="ub-control pagging" for="list" formid="searchForm" function="fnSearch">
+										<span class="total-count">전체:382</span>
+										<a title="first" href="#none" class="ub-control button imgBtn img-pagging-first" param=""></a>
+										<a title="prev" href="#none" class="ub-control button imgBtn img-pagging-prev" param="10"></a>
+										<em param="11" class="num">11</em>
+										<a param="12" class="num">12</a>
+										<a param="13" class="num">13</a>
+										<a param="14" class="num">14</a>
+										<a param="15" class="num">15</a>
+										<a param="16" class="num">16</a>
+										<a param="17" class="num">17</a>
+										<a param="18" class="num">18</a>
+										<a param="19" class="num">19</a>
+										<a param="20" class="num">20</a>
+										<a title="next" href="#none" class="ub-control button imgBtn img-pagging-next" param="21"></a>
+										<a title="last" href="#none" class="ub-control button imgBtn img-pagging-last" param="39"></a>
+									</div>
+								</div>
+							</pre>
+						</div>
+
+					</article>
+					<article class="article-cnt" id="gd04-3">
+						<div class="h3-tit">
+							<h3>기타_설명문구</h3>
+						</div>
+						<div class="h4-tit">
+							<h4>설명문구1</h4>
+						</div>
+						<div class="sub-desc01">
+							<p>테이블이나 컨텐트 <strong class="gd-txt-color01">하단에 설명문구가 있을 경우</strong> 사용한다</p>
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+							<img src="./images/ex/ex_phrase01.gif" alt="컨텐츠 하단에 설명문구가 있을시에 예시 화면">
+						</div>
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<div class="ub-layout phrase">
+									<label class="ub-control label">
+										<strong class="label-txt01">
+											<strong class="line">단체계약은 콜센터상담이력 제외</strong>, <strong class="txt-color02">관련화면(BAK0909)</strong>으로 조회가능
+										</strong>
+									</label>
+								</div>
+							</pre>
+						</div>
+						<div class="sub-desc02">
+							<p>테이블이나 컨텐트하단에 있을시에 <strong class="gd-txt-color01">div에 한번 감싸</strong>서 사용</p>
+						</div>
+					</article>
+					<article class="article-cnt">
+						<div class="h4-tit">
+							<h4>설명문구2</h4>
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+							<img src="./images/ex/ex_phrase02.gif" alt="타이틀과 같은 선상에 설명문구가 있을시 예시 화면">
+						</div>
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<!-- 예시1 -->
+								<h2 class="ub-control title">타이틀
+									<label class="ub-control label">
+										<span class="label-txt02">고객등급</span>
+									</label>
+									<div class="ub-layout button inner" style="text-align:right;">
+										<label class="ub-control label"><strong class="label-txt01">담당자</strong></label>
+										<select class="ub-control select" style="width:100px;">
+											<option></option>
+										</select>
+									</div>
+								</h2>
+								<!-- //예시1 -->
+								<!-- 예시2 -->
+								<h2 class="ub-control title hfold">타이틀
+									<div class="ub-layout button inner" style="text-align:right;">
+										<label class="ub-control label"><strong class="label-txt01"><strong class="line">단체계약은 콜센터상담이력 제외</strong>, <strong class="txt-color02">관련화면(BAK0909)</strong>으로 조회가능</strong></label>
+									</div>
+									<span class="ico-fold on"></span>
+								</h2>
+								<!-- //예시2 -->
+							</pre>
+						</div>
+					</article>
+					<article class="article-cnt" id="gd04-4">
+						<div class="h3-tit">
+							<h3>기타_로딩바</h3>
+						</div>
+						<div class="h4-tit">
+							<h4>원형 로딩바</h4>
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+							<img src="./images/ex/ex_loadingbar01.gif" alt="원형 로딩바 예시 화면">
+						</div>
+						<div class="sub-desc02">
+							<p>이미지 위치 - WebContent\page\images\common\loading_bar.gif</p>
+						</div>
+
+						<div class="h4-tit">
+							<h4>일자형 로딩바</h4>
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+							<img src="./images/ex/ex_loadingbar02.gif" alt="일자형 로딩바 예시 화면">
+						</div>
+						<div class="sub-desc02">
+							<p>이미지 위치 - WebContent\page\images\common\loadingbar.gif</p>
+						</div>
+					</article>
+					<article class="article-cnt" id="gd04-5">
+						<div class="h3-tit">
+							<h3>기타_그래프컬러 가이드</h3>
+						</div>
+						<div class="h4-tit">
+							<h4>그래프컬러1</h4>
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면" /></h5>
+							<img src="./images/ex/ex_graph01.gif" alt="막대그래프 예시" />
+						</div>
+
+						<div class="h5-tit">
+							<h5>Color Guide</h5>
+						</div>
+						<div class="box01">
+							<div class="inner-box">
+								<ul>
+									<li>
+										<strong class="stit01">X,Y축 텍스트</strong>: 맑은고딕 12px #444444
+									</li>
+									<li>
+										<strong class="stit01">배경색</strong>: #f4f4f4
+									</li>
+									<li>
+										<strong class="stit01">그래프 바깥라인</strong>: #b5b5b5
+									</li>
+									<li>
+										<strong class="stit01">그래프 안쪽라인</strong>: #e4e4e4
+									</li>
+								<ul>
+							</div>
+							<div class="inner-box">
+								<ul>
+									<li>
+										<strong class="stit02">color1</strong>: #1fafab
+									</li>
+									<li>
+										<strong class="stit02">color2</strong>: #2781c6
+									</li>
+									<li>
+										<strong class="stit02">color3</strong>: #7387df
+									</li>
+									<li>
+										<strong class="stit02">color4</strong>: #b17ed5
+									</li>
+									<li>
+										<strong class="stit02">color5</strong>: #c877b0
+									</li>
+								<ul>
+							</div>
+							<div class="inner-box">
+								<ul>
+									<li>
+										<strong class="stit02">color6</strong>: #d26770
+									</li>
+									<li>
+										<strong class="stit02">color7</strong>: #e48927
+									</li>
+									<li>
+										<strong class="stit02">color8</strong>: #e7c115
+									</li>
+									<li>
+										<strong class="stit02">color9</strong>: #a4b73d
+									</li>
+									<li>
+										<strong class="stit02">color10</strong>: #4ea94e
+									</li>
+								<ul>
+							</div>
+						</div>
+						<div class="sub-desc02">
+							<p><strong>순차적</strong> 컬러칩 (막대 등 컬러 동일)<br />단, <strong class="gd-txt-color01">프로젝트에 따라 컬러가 다르게 사용될 수 있으므로, 확인 후 적용</strong> 바랍니다.</p>
+						</div>
+
+						<div class="h4-tit">
+							<h4>그래프컬러2</h4>
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면" /></h5>
+							<img src="./images/ex/ex_graph02.gif" alt="원형그래프 예시" />
+						</div>
+
+						<div class="h5-tit">
+							<h5>Color Guide</h5>
+						</div>
+						<div class="box01">
+							<div class="inner-box">
+								<ul>
+									<li>
+										<strong>텍스트</strong>: 맑은고딕 12px
+									</li>
+								<ul>
+							</div>
+							<div class="inner-box">
+								<ul>
+									<li>
+										<strong class="stit02">color1</strong> #9a5233
+									</li>
+									<li>
+										<strong class="stit02">color2</strong>: #df951f
+									</li>
+									<li>
+										<strong class="stit02">color3</strong>: #8557a1
+									</li>
+									<li>
+										<strong class="stit02">color4</strong>: #319d78
+									</li>
+									<li>
+										<strong class="stit02">color5</strong>: #ca3b78
+									</li>
+								<ul>
+							</div>
+							<div class="inner-box">
+								<ul>
+									<li>
+										<strong class="stit02">color6</strong>: #2c77c5
+									</li>
+									<li>
+										<strong class="stit02">color7</strong>: #859f1b
+									</li>
+									<li>
+										<strong class="stit02">color8</strong>: #d36049
+									</li>
+									<li>
+										<strong class="stit02">color9</strong>: #585ba0
+									</li>
+									<li>
+										<strong class="stit02">color10</strong>: #3d97c2
+									</li>
+								<ul>
+							</div>
+						</div>
+
+						<div class="sub-desc02">
+							<p><strong>비순차적</strong> 컬러칩 (라인, 파이그래프 컬러 동일)<br />단, <strong class="gd-txt-color01">프로젝트에 따라 컬러가 다르게 사용될 수 있으므로, 확인 후 적용</strong> 바랍니다.</p>
+						</div>
+					</article>
+				</section>
+				<!-- E : 기타 -->
+			</div>
+			<!-- E : content -->
+		</div><!-- E : container -->
+	</div><!-- E : wrap -->
+</body>
+</html>

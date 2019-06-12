@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="FaqManageInquiry">
+
+
+	<!-- FAQ목록 조회 -->
+	
+	<sql id="getFaqList_base">
+	
+	SELECT 
+		<if test="ORDER_COLUMN == null or ORDER_COLUMN == ''">
+			ROW_NUMBER() OVER( order by DT_REG DESC ) AS ROWNUM /* ROWNUM */
+		</if>
+		<if test="ORDER_COLUMN != null and ORDER_COLUMN != ''">
+			ROW_NUMBER() OVER( order by ${ORDER_COLUMN} ${ORDER_ASC} ) AS ROWNUM /* ROWNUM */
+		</if>
+		, SUB.*
+	  FROM (
+				<!-- 업무 관련 쿼리 :: Begin -->	
+				SELECT ID_BULLETIN												/* 게시판ID		 */
+					 , TP_CATEGORY												/* 카테고리 	 */
+					 , DS_TITLE													/* 제목 		 */
+					 , ID_REG_EMP												/* 최초등록자    */
+					 , (SELECT USER_NM
+		                  	 FROM SYS_USER SYSU
+		                  	WHERE ID_REG_EMP = SYSU.USER_ID) AS NM_REG_EMP 
+					 , CONVERT(VARCHAR(10), DT_REG,120)+' '+CONVERT(VARCHAR(5),DT_REG,114) AS DT_REG 				/* 최초 등록일시 */
+				  FROM TBS_BULLETIN
+				 WHERE 1 = 1
+				   AND TP_BULLETIN = '01' 										/* (01:FAQ) 	 */
+				<if test="DT_REG_START != null and DT_REG_START != ''">
+				   <![CDATA[
+				   AND DT_REG >= CAST (#{DT_REG_START} + ' 00:00:00' AS DATETIME)  		/* 기간검색(FROM) 	 */
+				   ]]>
+				</if>
+				<if test="DT_REG_END != null and DT_REG_END != ''">
+				   <![CDATA[
+				   AND DT_REG <= CAST (#{DT_REG_END} + ' 23:59:59' AS DATETIME)    		/* 기간검색(TO)		 */
+				   ]]>
+				</if>
+				<if test="ID_REG_EMP != null and ID_REG_EMP != ''">
+				   AND ID_REG_EMP = #{ID_REG_EMP} 															/* 등록자			 */
+				</if>
+				<if test="DS_TITLE != null and DS_TITLE != ''">
+				   AND (DS_TITLE LIKE '%' + #{DS_TITLE} + '%' OR DS_CONTENT LIKE '%' + #{DS_TITLE} + '%') 	/* 제목+내용		 */
+				</if>
+				<if test="TP_CATEGORY != null and TP_CATEGORY != ''">
+				   AND TP_CATEGORY = #{TP_CATEGORY} 														/* 카테고리			 */
+				</if>
+				   And FG_DEL = 'N'
+				<!-- 업무 관련 쿼리 :: End -->
+		) SUB
+	</sql>
+	
+	<!-- FAQ목록 조회 -->
+	<select id="getFaqList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getFaqList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- FAQ목록 조회 - count -->
+	<select id="getFaqList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getFaqList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- FAQ목록 조회 - paging -->
+	<select id="getFaqList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getFaqList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	
+	<!-- FAQ상세 조회 -->
+	
+	<select id="getFaqDetail" parameterType="map" resultType="lmap">
+	
+		SELECT TB.TP_CATEGORY																		/* 카테고리		*/
+			 , TB.DS_TITLE        																	/* 제목			*/
+			 , TB.DS_CONTENT																		/* 내용			*/
+			 , TB.DS_CONT_DTL     																	/* 상세내용		*/
+			 , CONVERT(VARCHAR(10),TB.DT_REG,120)+' '+CONVERT(VARCHAR(5),TB.DT_REG,114) AS DT_REG	/* 등록일       */
+			 , TB.ID_REG_EMP																		/* 최초등록자	*/
+			 , SUR.USER_NM AS NM_REG_EMP															/* 최초등록자명 */
+			 , CONVERT(VARCHAR(10),TB.DT_UPT,120)+' '+CONVERT(VARCHAR(5),TB.DT_UPT,114) AS DT_UPT/* 최종수정일   */
+			 , TB.ID_UPT_EMP																		/* 최종수정자   */
+			 , SUU.USER_NM AS NM_UPT_EMP															/* 최종수정자명 */
+			 , TB.ID_REG_DEPT																		/* 최초등록부서 */
+			 , SDR.DEPT_NM AS NM_REG_DEPT															/* 최초등록부서명*/
+			 , TB.ID_UPT_DEPT																		/* 최종등록부서 */
+			 , SDU.DEPT_NM AS NM_UPT_DEPT															/* 최종등록부서명*/
+		  FROM TBS_BULLETIN TB
+		  LEFT JOIN SYS_USER SUR
+		    ON TB.ID_REG_EMP=SUR.USER_ID
+		  LEFT JOIN SYS_USER SUU
+		    ON TB.ID_UPT_EMP=SUU.USER_ID
+		  LEFT JOIN SYS_DEPARTMENT SDR
+		    ON TB.ID_REG_DEPT=SDR.DEPT_ID
+		  LEFT JOIN SYS_DEPARTMENT SDU
+		    ON TB.ID_UPT_DEPT=SDU.DEPT_ID
+		 WHERE 1 = 1
+		   AND TP_BULLETIN = '01' 							/* (01:FAQ)게시판구분 */
+		   AND ID_BULLETIN = #{ID_BULLETIN}  				/* 게시판ID			  */
+	</select>
+	
+	<!--
+		Query id    : CustomerManageInquiry.getLoginProgramAccess
+		Description : login 프로그램 권한 조회
+	-->
+	<select id="getLoginProgramAccessList" parameterType="map" resultType="lmap">
+	
+		SELECT ROLE_ID
+		  FROM AP_ROLE_GROUP
+		 WHERE USER_ID=#{user.id}
+		 GROUP BY ROLE_ID
+ 
+	</select>
+
+</mapper>

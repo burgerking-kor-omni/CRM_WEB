@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="APM0015" screenType="detail" screenLayoutType="Default" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>APMD /  서비스 상세 Main Tab</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0015</fileName>
+  <functions/>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

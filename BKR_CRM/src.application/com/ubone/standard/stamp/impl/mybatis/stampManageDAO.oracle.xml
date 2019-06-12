@@ -1,0 +1,603 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="stampManageDAO">
+	<!--
+		QueryId     : stampManageDAO.getProdList
+		Description : 상품명 자동완성 조회하는 쿼리
+	 -->
+	<select id="getMenuAutoComplete" parameterType="map" resultType="lmap">
+		SELECT OMO.MENU_CD
+		     , OMO.MENU_NM
+		     , OMO_1.MENU_CD AS SUB_CATEGORY_ID
+		     , OMO_1.MENU_NM AS SUB_CATEGORY
+		     , OMO_2.MENU_CD AS MAIN_CATEGORY_ID
+		     , OMO_2.MENU_NM AS MAIN_CATEGORY
+		     , CASE WHEN OMO.MENU_TYPE = '1' THEN '킹오더 > '
+		     		ELSE '딜리버리 > ' END AS MENU_TYPE
+		  FROM OMNI.OMNI_MENU_ORG OMO
+		  LEFT OUTER JOIN OMNI.OMNI_MENU_ORG OMO_1
+		    ON OMO.UP_MENU_CD = OMO_1.MENU_CD
+		   AND OMO_1.DEPTH = 2
+		  LEFT OUTER JOIN OMNI.OMNI_MENU_ORG OMO_2
+		    ON OMO_1.UP_MENU_CD = OMO_2.MENU_CD
+		   AND OMO_2.DEPTH = 1
+		 WHERE OMO.DEPTH = 3
+		   AND OMO.USE_YN = 1
+		 <if test="MENU_NAME != null and MENU_NAME != ''">
+				AND (OMO.MENU_NM LIKE '%'||#{MENU_NAME}||'%' /* 메뉴명 */
+					OR OMO.MENU_CD LIKE '%'||#{MENU_NAME}||'%')
+		</if>
+		ORDER BY OMO.MENU_TYPE DESC, OMO.MENU_NM ASC
+	</select>
+	
+	<!--
+		QueryId     : stampManageDAO.checkStampMenu
+		Description : 상품 유효성 체크
+	 -->
+	<select id="checkStampMenu" parameterType="map" resultType="lmap">
+		SELECT COUNT(*) AS CNT
+		  FROM CRMADMIN.TBS_STAMP_ROLE TSR
+		  LEFT OUTER JOIN CRMADMIN.TBS_STAMP TS
+		    ON TS.NO_STAMP = TSR.NO_STAMP
+		 WHERE TS.TP_SET = '02'
+		   AND TS.FG_DEL = 'N'
+		   AND TSR.ID_MENU = #{CD_MENU}
+		   AND TSR.CD_GRADE = #{CD_GRADE}
+		   AND #{DT_APPLY_START} >= TO_CHAR(TS.DT_APPLY_START, 'YYYY-MM-DD')
+		   AND TO_CHAR(TS.DT_APPLY_END, 'YYYY-MM-DD') >= #{DT_APPLY_END}
+	</select>
+
+
+
+
+	<!--
+		QueryId     : stampManageDAO.insertTbsStamp
+		Description : 스템프 적립기준 마스터 등록
+	 -->
+	<insert id="insertTbsStamp" parameterType="map">
+		<selectKey keyProperty="NO_STAMP" resultType="String" order="BEFORE">
+			SELECT CRMADMIN.SEQ_TBS_STAMP.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO CRMADMIN.TBS_STAMP
+		(
+			  NO_STAMP		/* 스템프일련번호      */
+			, TP_SET			/* 설정구분(기본,이벤트) */
+			, DS_TITLE		/* 제목           */
+			, DT_APPLY_START	/* 적용시작기간       */
+			, DT_APPLY_END	/* 적용종료기간       */
+			, FG_DEL			/* 삭제여부         */
+			, DT_REG			/* 최초등록일시       */
+			, ID_REG_USER		/* 최초등록자        */
+			, DT_UPT			/* 최근수정일시       */
+			, ID_UPT_USER		/* 최근수정자        */
+			, FG_USE
+		)
+		VALUES
+		(
+		 	  #{NO_STAMP}		/* 스템프일련번호      */
+			, '02'				/* 설정구분(기본,이벤트) */
+			, #{DS_TITLE}		/* 제목           */
+			, TO_DATE(#{DT_APPLY_START},'YYYY-MM-DD')	/* 적용시작기간       */
+			, TO_DATE(#{DT_APPLY_END} || ' 235959','YYYY-MM-DD HH24MISS')		/* 적용종료기간       */
+			, 'N'				/* 삭제여부         */
+			, SYSDATE			/* 최초등록일시       */
+			, #{user.id}		/* 최초등록자        */
+			, SYSDATE			/* 최근수정일시       */
+			, #{user.id}		/* 최근수정자        */
+			, #{FG_USE_MAIN}
+		)
+		
+	</insert>
+	
+	<!--
+		QueryId     : stampManageDAO.insertStampRole
+		Description : 스템프 적립기준 메뉴 등록
+	 -->
+	<insert id="insertStampRole" parameterType="map">
+		INSERT INTO CRMADMIN.TBS_STAMP_ROLE
+		(
+			  NO_STAMP	/* 스템프일련번 */
+			, ID_MENU		/* 상품ID   */
+			, CD_GRADE	/* 회원등급코드 */
+			, NM_MENU		/* 상품명    */
+			, CNT_ACCML	/* 적립갯수   */
+			, FG_USE		/* 사용여부   */
+			, DT_REG		/* 최초등록일시 */
+			, ID_REG_USER	/* 최초등록자  */
+			, DT_UPT		/* 최근수정일시 */
+			, ID_UPT_USER	/* 최근수정자  */
+					
+		)
+		VALUES
+		(
+			  #{NO_STAMP}	/* 스템프일련번 */
+			, #{CD_MENU}	/* 상품ID   */
+			, #{CD_GRADE}	/* 회원등급코드 */
+			, #{NM_MENU}	/* 상품명    */
+			, #{CNT_ACCML}	/* 적립갯수   */
+			, #{FG_USE}		/* 사용여부   */
+			, SYSDATE		/* 최초등록일시       */
+			, #{user.id}	/* 최초등록자        */
+			, SYSDATE		/* 최근수정일시       */
+			, #{user.id}	/* 최근수정자        */
+		)
+	</insert>
+	
+	<!--
+		QueryId     : stampManageDAO.insertStampExStore
+		Description : 스템프 적립기준 메뉴 등록
+	 -->
+	<insert id="insertStampExStore" parameterType="map">
+		<selectKey keyProperty="NO_STAMP_EXCEPT_STORE" resultType="String" order="BEFORE">
+			SELECT CRMADMIN.SEQ_TBS_STAMP_EXCEPT_STORE.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO CRMADMIN.TBS_STAMP_EXCEPT_STORE
+		(
+			  NO_STAMP				/* 스템프일련번호     */
+			, NO_STAMP_EXCEPT_STORE	/* 스템프제외매장일련번호 */
+			, ID_STORE				/* 매장ID   */
+			, NM_STORE				/* 매장명    */
+			, DT_REG					/* 최초등록일시 */
+			, ID_REG_USER				/* 최초등록자  */
+			, DT_UPT					/* 최근수정일시 */
+			, ID_UPT_USER				/* 최근수정자  */
+		
+		)
+		VALUES
+		(
+			  #{NO_STAMP}				/* 스템프일련번호     */
+			, #{NO_STAMP_EXCEPT_STORE}	/* 스템프제외매장일련번호 */
+			, #{ID_STORE}				/* 매장ID   */
+			, #{NM_STORE}				/* 매장명    */
+			, SYSDATE		/* 최초등록일시       */
+			, #{user.id}	/* 최초등록자        */
+			, SYSDATE		/* 최근수정일시       */
+			, #{user.id}	/* 최근수정자        */
+		)
+	</insert>
+	
+	<!--
+		QueryId     : stampManageDAO.insertStampStnd
+		Description : 스템프 적립기준 채널 등록
+	 -->
+	<insert id="insertStampStnd" parameterType="map">
+		INSERT INTO CRMADMIN.TBS_STAMP_STND
+		(
+			  NO_STAMP		/*스템프일련번호  */
+			, CD_MTH_PURCHS	/*구매방법코드   */
+			, CD_ORDER_CHNN	/*주문채널구분코드 */
+			
+		)
+		VALUES
+		(
+			  #{NO_STAMP}		/*스템프일련번호  */
+			, #{CD_MTH_PURCHS}	/*구매방법코드   */
+			, #{CD_ORDER_CHNN}	/*주문채널구분코드 */
+		)
+	</insert>
+	
+	<!--
+		QueryId     : stampManageDAO.getTbsStamp
+		Description : 스템프 마스터 상세 조회
+	 -->
+	<select id="getTbsStamp" parameterType="map" resultType="lmap">
+		SELECT CASE WHEN TS.TP_SET = '01' THEN '기본'
+					ELSE '이벤트' END AS TP_SET
+			 , TS.DS_TITLE
+			 , TO_CHAR(TS.DT_APPLY_START, 'YYYY-MM-DD') AS DT_APPLY_START
+			 , TO_CHAR(TS.DT_APPLY_END, 'YYYY-MM-DD') AS DT_APPLY_END
+			 , TS.FG_DEL
+			 , TS.FG_USE
+		  FROM CRMADMIN.TBS_STAMP TS
+		 WHERE NO_STAMP = #{NO_STAMP}
+	</select>
+	
+	<!--
+		QueryId     : stampManageDAO.getStampStnd
+		Description : 스템프 구입방법/채널 조회
+	 -->
+	<select id="getStampStnd" parameterType="map" resultType="lmap">
+		SELECT CD_MTH_PURCHS || CD_ORDER_CHNN AS CD_MTH_CHNN  /* 구매방법코드 + 주문채널구분코드*/
+		  FROM CRMADMIN.TBS_STAMP_STND
+		 WHERE NO_STAMP = #{NO_STAMP}
+	</select>
+	
+	<!--
+		QueryId     : stampManageDAO.getStampRole
+		Description : 스템프 적립기준 메뉴 조회
+	 -->
+	<select id="getStampRole" parameterType="map" resultType="lmap">
+		SELECT DISTINCT TSR.ID_MENU
+             ,  TSR.NM_MENU AS NM_MENU
+             , '' AS SUB
+             , '' AS MAIN
+             , TSR.CD_GRADE
+             , TSR.CD_GRADE AS NM_GRADE
+             , TSR.CNT_ACCML
+             , TSR.FG_USE
+             , TSR.CD_GRADE ||'/'|| TSR.ID_MENU ||'/'|| TSR.NM_MENU ||'/'|| TSR.CNT_ACCML ||'/'|| TSR.FG_USE AS STR_MENU
+          FROM CRMADMIN.TBS_STAMP_ROLE TSR
+		 WHERE NO_STAMP = #{NO_STAMP}
+	  ORDER BY NM_MENU ASC
+	</select>
+	
+	<!--
+		QueryId     : stampManageDAO.getStampRecode
+		Description : 스템프 변경이력 조회
+	 -->
+	<select id="getStampRecode" parameterType="map" resultType="lmap">
+		SELECT NO_STAMP_RECODE
+			 , DS_TITLE
+			 , CASE WHEN TP_SET = '01' THEN '기본'
+			 		ELSE '이벤트' END AS TP_SET
+			 , TO_CHAR(DT_APPLY_START,'YYYY-MM-DD') ||' ~ '||TO_CHAR(DT_APPLY_END,'YYYY-MM-DD') AS DT_APPLY
+			 , TO_CHAR(DT_UPT, 'YYYY-MM-DD') AS DT_UPT
+			 , ID_UPT_USER
+			 , SU.USER_NM AS NM_UPT_USER
+			 , TSR.FG_USE
+		  FROM CRMADMIN.TBS_STAMP_RECODE TSR
+		  LEFT OUTER JOIN CRMADMIN.SYS_USER SU
+		    ON SU.USER_ID = TSR.ID_UPT_USER
+		 WHERE NO_STAMP = #{NO_STAMP}
+		 ORDER BY DT_UPT DESC
+	</select>
+
+	<!--
+		QueryId     : stampManageDAO.updateTbsStamp
+		Description : 스템프 마스터 수정
+	 -->
+	<update id="updateTbsStamp" parameterType="map">
+		update crmadmin.TBS_STAMP
+		   set DS_TITLE			= #{DS_TITLE}
+			 , DT_APPLY_START	= TO_DATE(#{DT_APPLY_START},'YYYY-MM-DD')
+			 , DT_APPLY_END		= TO_DATE(#{DT_APPLY_END} || ' 235959', 'YYYY-MM-DD HH24MISS')
+			 , FG_USE			= #{FG_USE_MAIN}
+			 , DT_UPT			= SYSDATE
+			 , ID_UPT_USER		= #{user.id}
+		 WHERE NO_STAMP = #{NO_STAMP}
+	</update>
+	
+	<!--
+		QueryId     : stampManageDAO.deleteStampStnd
+		Description : 스템프 적립채널 삭제
+	 -->
+	<delete id="deleteStampStnd" parameterType="map">
+		DELETE FROM CRMADMIN.TBS_STAMP_STND
+			  WHERE NO_STAMP = #{NO_STAMP}
+	</delete>
+	
+	<!--
+		QueryId     : stampManageDAO.deleteStampRole
+		Description : 스템프 적립 메뉴 삭제
+	 -->
+	<delete id="deleteStampRole" parameterType="map">
+		DELETE FROM CRMADMIN.TBS_STAMP_ROLE
+			  WHERE NO_STAMP = #{NO_STAMP}
+	</delete>
+	
+	<!--
+		QueryId     : stampManageDAO.deleteStampExStore
+		Description : 스템프 제외매장 삭제
+	 -->
+	<delete id="deleteStampExStore" parameterType="map">
+		DELETE FROM CRMADMIN.TBS_STAMP_EXCEPT_STORE
+			  WHERE NO_STAMP = #{NO_STAMP}
+	</delete>
+	
+	<!--
+		QueryId     : stampManageDAO.insertStampRecode
+		Description : 스템프 수정이력 등록 
+	 -->
+	<insert id="insertStampRecode" parameterType="map">
+		<selectKey keyProperty="NO_STAMP_RECODE" resultType="String" order="BEFORE">
+			SELECT CRMADMIN.SEQ_TBS_STAMP_RECODE.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO CRMADMIN.TBS_STAMP_RECODE
+		(
+			  NO_STAMP_RECODE
+			, NO_STAMP
+			, TP_SET
+			, DS_TITLE
+			, DT_APPLY_START
+			, DT_APPLY_END
+			, FG_DEL
+			, FG_USE
+			, DT_DEL
+			, DT_REG
+			, ID_REG_USER
+			, DT_UPT
+			, ID_UPT_USER
+
+		)
+		SELECT 
+			   #{NO_STAMP_RECODE}
+			 , NO_STAMP
+			 , TP_SET
+			 , DS_TITLE
+			 , DT_APPLY_START
+			 , DT_APPLY_END
+			 , FG_DEL
+			 , FG_USE
+			 , DT_DEL
+			 , DT_REG
+			 , ID_REG_USER
+			 , DT_UPT
+			 , ID_UPT_USER
+		  FROM CRMADMIN.TBS_STAMP
+		 WHERE NO_STAMP = #{NO_STAMP}
+	</insert>
+	
+	<!--
+		QueryId     : stampManageDAO.insertStndRecode
+		Description : 스템프 수정이력 적립채널 등록 
+	 -->
+	<insert id="insertStndRecode" parameterType="map">
+		INSERT INTO CRMADMIN.TBS_STAMP_STND_RECODE
+		(
+			  NO_STAMP_RECODE
+			, NO_STAMP
+			, CD_MTH_PURCHS
+			, CD_ORDER_CHNN
+			
+		)
+		SELECT 
+			  #{NO_STAMP_RECODE}
+			, NO_STAMP
+			, CD_MTH_PURCHS
+			, CD_ORDER_CHNN
+		  FROM CRMADMIN.TBS_STAMP_STND
+		 WHERE NO_STAMP = #{NO_STAMP}
+	</insert>
+	
+	<!--
+		QueryId     : stampManageDAO.insertRoleRecode
+		Description : 스템프 수정이력 적립메뉴 등록 
+	 -->
+	<insert id="insertRoleRecode" parameterType="map">
+		INSERT INTO CRMADMIN.TBS_STAMP_ROLE_RECODE
+		(
+			  NO_STAMP_RECODE
+			, NO_STAMP
+			, ID_MENU
+			, CD_GRADE
+			, NM_MENU
+			, CNT_ACCML
+			, FG_USE
+			, DT_REG
+			, ID_REG_USER
+			, DT_UPT
+			, ID_UPT_USER
+			
+		)
+		SELECT 
+			 #{NO_STAMP_RECODE}
+			 , NO_STAMP
+			 , ID_MENU
+			 , CD_GRADE
+			 , NM_MENU
+			 , CNT_ACCML
+			 , FG_USE
+			 , DT_REG
+			 , ID_REG_USER
+			 , DT_UPT
+			 , ID_UPT_USER
+		  FROM CRMADMIN.TBS_STAMP_ROLE
+		 WHERE NO_STAMP = #{NO_STAMP}
+	</insert>
+	
+	<!--
+		QueryId     : stampManageDAO.insertExceptStoreRecode
+		Description : 스템프 수정이력 제외매장 등록 
+	 -->
+	<insert id="insertExceptStoreRecode" parameterType="map">
+		INSERT INTO CRMADMIN.TBS_STAMP_EXCEPT_STORE_RECODE
+		(
+			  NO_STAMP_RECODE
+			, NO_STAMP
+			, NO_STAMP_EXCEPT_STORE
+			, ID_STORE
+			, NM_STORE
+			, DT_REG
+			, ID_REG_USER
+			, DT_UPT
+			, ID_UPT_USER
+		
+		)
+		SELECT #{NO_STAMP_RECODE}
+			 , NO_STAMP
+			 , NO_STAMP_EXCEPT_STORE
+			 , ID_STORE
+			 , NM_STORE
+			 , DT_REG
+			 , ID_REG_USER
+			 , DT_UPT
+			 , ID_UPT_USER
+		  FROM CRMADMIN.TBS_STAMP_EXCEPT_STORE
+		 WHERE NO_STAMP = #{NO_STAMP}
+	</insert>
+	
+
+	<!--
+		QueryId     : stampManageDAO.getTbsStampRecord
+		Description : 스템프 이력 상세 조회
+	 -->
+	<select id="getTbsStampRecord" parameterType="map" resultType="lmap">
+		SELECT CASE WHEN TS.TP_SET = '01' THEN '기본'
+					ELSE '이벤트' END AS TP_SET
+			 , TS.DS_TITLE
+			 , TO_CHAR(TS.DT_APPLY_START, 'YYYY-MM-DD') AS DT_APPLY_START
+			 , TO_CHAR(TS.DT_APPLY_END, 'YYYY-MM-DD') AS DT_APPLY_END
+			 , REGSU.USER_NM AS NM_REG_USER
+			 , TO_CHAR(TS.DT_REG, 'YYYY-MM-DD') AS DT_REG
+			 , UPDSU.USER_NM AS NM_UPT_USER
+			 , TO_CHAR(TS.DT_UPT, 'YYYY-MM-DD') AS DT_UPT
+			 , TS.FG_DEL
+		  FROM CRMADMIN.TBS_STAMP_RECODE TS
+		  LEFT OUTER JOIN CRMADMIN.SYS_USER REGSU
+		    ON REGSU.USER_ID = TS.ID_REG_USER
+		  LEFT OUTER JOIN CRMADMIN.SYS_USER UPDSU
+		    ON UPDSU.USER_ID = TS.ID_UPT_USER
+		 WHERE NO_STAMP_RECODE = #{NO_STAMP_RECODE}
+	</select>	
+	
+	<!--
+		QueryId     : stampManageDAO.getStampRoleRecord
+		Description : 스템프 적립메뉴 이력 조회 
+	 -->
+	<select id="getStampRoleRecord" parameterType="map" resultType="lmap">
+		SELECT DISTINCT TSR.ID_MENU
+             , CASE WHEN NVL(OMO.MENU_TYPE, MAIN2.MENU_TYPE) = '2' THEN '(딜리버리) '
+                    WHEN NVL(OMO.MENU_TYPE, MAIN2.MENU_TYPE) = '1' THEN '(킹오더) '
+                    ELSE '(데이터 없음) ' END
+                 || TSR.NM_MENU AS NM_MENU
+             , NVL(SUB.MENU_CD, TSR.ID_MENU) AS SUB
+             , NVL(MAIN.MENU_CD, MAIN2.MENU_CD) AS MAIN
+             , TSR.CD_GRADE
+             , TSR.CD_GRADE AS NM_GRADE
+             , TSR.CNT_ACCML
+             , TSR.FG_USE
+             , TSR.CD_GRADE ||'/'|| TSR.ID_MENU ||'/'|| TSR.NM_MENU ||'/'|| TSR.CNT_ACCML ||'/'|| TSR.FG_USE AS STR_MENU
+          FROM CRMADMIN.TBS_STAMP_ROLE_RECODE TSR
+          LEFT OUTER JOIN OMNI.OMNI_MENU_ORG OMO
+            ON OMO.MENU_CD = TSR.ID_MENU
+           AND OMO.CMP_CD = 'BKR'
+           AND OMO.SALES_ORG_CD = '1000'
+           AND OMO.USE_YN = '1'
+           AND OMO.DEPTH = 3 
+          LEFT OUTER JOIN OMNI.OMNI_MENU_ORG SUB
+            ON SUB.MENU_CD = OMO.UP_MENU_CD
+           AND SUB.CMP_CD = 'BKR'
+           AND SUB.SALES_ORG_CD = '1000'
+           AND SUB.USE_YN = '1'
+           AND SUB.DEPTH = 2 
+          LEFT OUTER JOIN OMNI.OMNI_MENU_ORG MAIN
+            ON MAIN.MENU_CD = SUB.UP_MENU_CD
+           AND MAIN.CMP_CD = 'BKR'
+           AND MAIN.SALES_ORG_CD = '1000'
+           AND MAIN.USE_YN = '1'
+           AND MAIN.UP_MENU_CD != MAIN.MENU_CD 
+           AND MAIN.DEPTH = 1
+          LEFT OUTER JOIN OMNI.OMNI_MENU_ORG SUB2
+            ON SUB.MENU_CD IS NULL
+           AND SUB2.MENU_CD = TSR.ID_MENU
+           AND SUB2.CMP_CD = 'BKR'
+           AND SUB2.SALES_ORG_CD = '1000'
+           AND SUB2.USE_YN = '1'
+          LEFT OUTER JOIN OMNI.OMNI_MENU_ORG MAIN2
+            ON MAIN2.MENU_CD = SUB2.UP_MENU_CD
+           AND MAIN2.CMP_CD = 'BKR'
+           AND MAIN2.SALES_ORG_CD = '1000'
+           AND MAIN2.USE_YN = '1'
+		 WHERE NO_STAMP_RECODE = #{NO_STAMP_RECODE}
+	  ORDER BY NM_MENU ASC
+	</select>
+	
+	<!--
+		QueryId     : stampManageDAO.getStampStndRecord
+		Description : 스템프 적립채널 이력 조회 
+	 -->
+	<select id="getStampStndRecord" parameterType="map" resultType="lmap">
+		SELECT CD_MTH_PURCHS || CD_ORDER_CHNN AS CD_MTH_CHNN  /* 구매방법코드 + 주문채널구분코드*/
+		  FROM CRMADMIN.TBS_STAMP_STND_RECODE
+		 WHERE NO_STAMP_RECODE = #{NO_STAMP_RECODE}
+	</select>
+	
+	<!--
+		QueryId     : stampManageDAO.deleteStamp
+		Description : 스템프 기준관리 삭제처리
+	 -->
+	<update id="deleteStamp" parameterType="map">
+		UPDATE CRMADMIN.TBS_STAMP
+		   SET FG_DEL = 'Y'
+		   	 , DT_DEL = SYSDATE
+		   	 , DT_UPT = SYSDATE
+		   	 , ID_UPT_USER = #{user.id}
+		 WHERE NO_STAMP = #{NO_STAMP}
+	</update>
+	
+	<!--
+		QueryId     : stampManageDAO.insertStampReward
+		Description : 스템프 혜택 쿠폰 등록
+	 -->
+	<insert id="insertStampReward" parameterType="map">
+		<selectKey keyProperty="NO_TBS_STAMP_REWARD" resultType="String" order="BEFORE">
+			SELECT CRMADMIN.SEQ_TBS_STAMP_REWARD.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO CRMADMIN.TBS_STAMP_REWARD
+		(
+			  NO_TBS_STAMP_REWARD
+			, CNT_STAMP_REWARD
+			, CD_COUPON
+			, NM_COUPON
+			, ORDER_NO
+			, FG_USE
+			, DT_REG
+			, ID_REG_USER
+			, DT_UPT
+			, ID_UPT_USER
+		)
+		VALUES
+		(
+			  #{NO_TBS_STAMP_REWARD}
+			, #{CNT_STAMP_REWARD}
+			, #{CD_COUPON}
+			, #{NM_COUPON}
+			, #{ORDER_NO}
+			, 'Y'
+			, SYSDATE
+			, #{user.id}
+			, SYSDATE
+			, #{user.id}
+		)
+		
+	</insert>
+
+
+	<!--
+		QueryId     : stampManageDAO.deleteStampReward
+		Description : 스템프 혜택 쿠폰 삭제처리
+	 -->
+	<update id="deleteStampReward">
+		UPDATE CRMADMIN.TBS_STAMP_REWARD
+		   SET FG_USE = 'N'
+		   	 , DT_UPT = SYSDATE
+		   	 , ID_UPT_USER = #{user.id}
+	</update>
+	
+	<select id="getStampReward" parameterType="map" resultType="lmap">
+		SELECT TSR.CNT_STAMP_REWARD
+			 , TSR.CD_COUPON
+			 , TSR.NM_COUPON
+			 , TO_CHAR(TC.DT_EXPIRY_START,'YYYY-MM-DD') ||' ~ '|| TO_CHAR(TC.DT_EXPIRY_END,'YYYY-MM-DD') AS DT_EXPIRY
+			 , TSR.ORDER_NO
+			 , TSR.CD_COUPON ||'/'||TSR.NM_COUPON AS STR_COUPON
+		  FROM CRMADMIN.TBS_STAMP_REWARD TSR
+		  LEFT OUTER JOIN CRMADMIN.TBS_COUPON TC
+		    ON TC.CD_COUPON = TSR.CD_COUPON
+		 WHERE TSR.FG_USE = 'Y'
+	  ORDER BY TSR.ORDER_NO ASC
+	</select>
+	
+	
+	<!--
+		QueryId     : stampManageDAO.getUpMenuCode
+		Description : 스템프 기준메뉴 상위 코드 조회
+	 -->
+	<select id="getUpMenuCode" parameterType="map" resultType="lmap">
+		SELECT OMO1.MENU_CD AS MAIN
+		     , OMO1.MENU_NM AS MAIN_NM
+		     , OMO2.MENU_CD AS SUB
+		     , OMO2.MENU_NM AS SUB_NM
+		  FROM OMNI.OMNI_MENU_ORG OMO3
+		  INNER JOIN OMNI.OMNI_MENU_ORG OMO2
+		     ON OMO2.MENU_CD = OMO3.UP_MENU_CD
+		    AND OMO2.DEPTH = 2
+		  INNER JOIN OMNI.OMNI_MENU_ORG OMO1
+		     ON OMO1.MENU_CD = OMO2.UP_MENU_CD
+		    AND OMO1.DEPTH = 1
+		 WHERE OMO3.MENU_CD = #{MENU_CD}
+		   AND OMO3.DEPTH = 3
+	</select>
+</mapper>
+ 

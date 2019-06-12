@@ -1,0 +1,100 @@
+/* reset */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {margin:0; padding:0; border:0; font-size:100%; font:inherit; vertical-align:baseline;}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {display:block;}
+audio, canvas, progress, video {display:inline-block; vertical-align:baseline;}
+blockquote:before, blockquote:after,
+q:before, q:after {content:''; content:none;}
+
+h1,h2,h3,h4,h5,h6 {font-weight:bold;}
+ol, ul {list-style:none;}
+blockquote, q {quotes:none;}
+blockquote:before, blockquote:after,q:before, q:after {content:'';content:none;}
+table {border-collapse:collapse;border-spacing:0;}
+img,fieldset{border:0}
+em,address{font-style:normal}
+a {text-decoration:none}
+strong {font-weight:bold;}
+
+/* 가이드용 css */
+html, body {height:100%;}
+body,input,textarea,select,button,table{font-family:'돋움',Dotum,AppleGothic,sans-serif; font-size:12px; color:#555;}
+body {line-height:1; background:url('../images/bg_container.png') repeat 0 0;}
+#wrap {position:relative;}
+#header {width:100%; height:45px; position:fixed; left:0; right:0; top:0; z-index:10; background:url('../images/bg_header.gif') repeat-x 0 0;}
+#header h1 {padding:10px 0 0 22px;}
+#header .gd-ver {font-family:tahoma; color:#fff; font-size:15px;}
+#header .ver {color:#90feff; font-size:11px;}
+#container {position:relative; overflow:hidden;}
+#lnb {padding-left:20px; padding-right:26px; width:162px; height:100%; position:fixed; top:45px; left:0; bottom:0; z-index:10; background:url('../images/bg_lnb_wrap.gif') repeat-y 199px 0;}
+#content {margin-right:30px; margin-left:230px; min-width:1000px;}
+
+/* lnb */
+#lnb .tit-rcnt {padding-top:15px; padding-bottom:6px; border-bottom:1px solid #00aedb; position:relative;}
+#lnb .tit-rcnt h2 {color:#00aedb; font-size:14px;}
+#lnb .tit-rcnt .rcnt {position:absolute; top:12px; right:0;}
+
+#lnb .menu {margin-bottom:30px;}
+#lnb .menu ul > li {font-size:13px; border-top:1px solid #ddd;}
+#lnb .menu ul > li:first-child {border-top:0;}
+#lnb .menu ul > li strong {display:inline-block; margin-left:5px; padding:8px 0 7px 0;}
+#lnb .menu ul > li a {color:#555;}
+#lnb .menu ul > li .fold {margin-left:7px; width:9px; height:9px; border:0; display:inline-block; vertical-align:middle; font-size:0; line-height:0; background:url('../images/menu.gif') no-repeat 0 100%;}
+#lnb .menu ul .sub-open .fold {background-position:0 0;}
+#lnb .menu ul .sub-depth {padding:3px 0 3px 20px; border-top:1px solid #ddd; background:#f8f8f8;}
+#lnb .menu ul .sub-depth li {font-size:12px; line-height:1.66; border:0;}
+#lnb .menu ul .sub-depth li a strong {padding:0 0 0 8px; font-weight:normal; background:url('../images/bul_dash.gif') no-repeat 0 7px;}
+#lnb .menu ul li.on a,
+#lnb .menu ul li a:hover,
+#lnb .menu ul li.on a strong,
+#lnb .menu ul li a:hover strong {color:#0090cc; font-weight:bold; text-decoration:underline;}
+
+/* 스타일용 css */
+.section {padding:56px 0 20px;}
+.section.show {display:block;}
+.h3-tit {margin-bottom:15px; border-bottom:1px solid #c6c6c6;}
+.h3-tit h3 {padding:0 0 10px 13px; font-size:14px; background:url('../images/ico_tit01.png') no-repeat 3px 0;}
+.h4-tit {margin-bottom:5px;}
+.h4-tit h4 {padding:0 0 5px 14px; font-size:12px; color:#0090cc; background:url('../images/ico_tit02.png') no-repeat 0 1px;}
+.h5-tit h5 {margin-bottom:5px; padding-left:6px; font-size:14px;}
+.article-cnt {margin-left:8px;}
+.article-cnt .h3-tit {margin-left:-8px;}
+.ex-view {margin-bottom:20px; padding:30px 20px 25px; border:1px solid #d8d8d8; position:relative; text-align:center; background:#fff;}
+.ex-view h5 {position:absolute; top:-1px; left:-1px;}
+.source {margin-bottom:25px;}
+.source h5 {margin-bottom:5px; padding-left:6px; font-size:14px;}
+.sub-desc01 {margin-left:10px; margin-bottom:15px; line-height:1.5;}
+.sub-desc02 {margin-bottom:30px; padding:10px 15px; line-height:1.5; border:1px dashed #c7d0de; background:#e9f0fb;}
+.list-txt01 {margin-left:10px; margin-bottom:10px;}
+.list-txt01 li {padding-left:10px; text-indent:-10px; line-height:1.4;}
+.box01 {margin-bottom:10px; padding:15px 30px; border:1px solid #d8d8d8; background:#fff; overflow:hidden;}
+.inner-box {float:left; padding-right:20px;}
+.inner-box li {line-height:1.6;}
+.inner-box strong {display:inline-block;}
+.inner-box .stit01 {width:100px;}
+.inner-box .stit02 {width:55px;}
+
+.gd-tbl {margin-bottom:15px;}
+.gd-tbl thead th {color:#333; border-bottom:1px solid #c7c7c7; border-bottom:1px solid #e3e3e3; background:#f7f7f7;}
+.gd-tbl tbody td {border-bottom:1px solid #e2e2e2;}
+
+.ir {font-size:0; line-height:0; text-indent:-999em;}
+.gd-txt-color01 {color:#f12c2c;}
+.g-line {text-decoration:underline;}
+.txt-color01 {color:#db472a;}
+.txt-color02 {color:#4b6aa9;}
+
+.font-type {font-family:'Malgun Gothic', '맑은 고딕';}

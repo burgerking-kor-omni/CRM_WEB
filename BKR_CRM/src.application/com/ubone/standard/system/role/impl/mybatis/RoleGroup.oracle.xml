@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="RoleGroup">
+		
+	<!-- 담당업무(시스템관리) 목록 조회 -->
+	<sql id="getRoleGroupList_base">
+ 		SELECT   ROLE_ID 
+ 		         , ROLE_ID AS ROLE_NM 
+ 		         , G.GRP_MAP_ID_1 AS ID_COMP
+                 , C.NM_COMP AS NM_COMP
+                 , G.GRP_MAP_ID_2 AS ID_CHN
+                 , G.GRP_MAP_ID_2 AS NM_CHN
+                 , COUNT ( * ) AS USR_CNT
+            FROM   AP_ROLE_GROUP G, SYS_COMPANY C
+           WHERE G.GRP_MAP_ID_1  = C.CD_COMP(+)
+        <if test="CD_BRAND != null and CD_BRAND != ''"> 
+		 	AND G.GRP_MAP_ID_1 = #{CD_BRAND}
+		</if>
+		<if test="CD_ROLE != null and CD_ROLE != ''"> 
+		 	AND ROLE_ID = #{CD_ROLE}
+		</if>
+		<if test="TP_CHNN_SYSTEM != null and TP_CHNN_SYSTEM != ''"> 
+		 	AND G.GRP_MAP_ID_2 = #{TP_CHNN_SYSTEM}
+		</if>
+		GROUP BY   ROLE_ID, GRP_MAP_ID_1,C.NM_COMP , GRP_MAP_ID_2
+        ORDER BY   ROLE_ID, GRP_MAP_ID_1,C.NM_COMP , GRP_MAP_ID_2 ASC
+        
+	</sql>
+	
+	<!-- 담당업무(시스템관리) 목록 조회 -->
+	<select id="getRoleGroupList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getRoleGroupList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 담당업무(시스템관리) 목록 조회 - count -->
+	<select id="getRoleGroupList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getRoleGroupList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 담당업무(시스템관리) 목록 조회 - paging -->
+	<select id="getRoleGroupList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getRoleGroupList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!-- 담당업무(시스템관리) 목록 상세 -->
+	<select id="getRoleGroupDetail" parameterType="map" resultType="lmap">
+		SELECT   ROLE_GRP_ID,
+		         ROLE_ID,
+		         GRP_MAP_ID_1,
+		         (SELECT NM_COMP FROM SYS_COMPANY WHERE CD_COMP = GRP_MAP_ID_1) as NM_COMP,
+		         GRP_MAP_ID_2,
+		         USER_ID,
+		         DESCRIPTION,
+		         REG_USER_ID,
+		         REG_DATETIME,
+		         UPD_USER_ID,
+		         UPD_DATETIME
+		  FROM   AP_ROLE_GROUP
+		  WHERE  1 = 1
+		  <if test="ROLE_GRP_ID != null and ROLE_GRP_ID != ''">
+		  	AND ROLE_GRP_ID = #{ROLE_GRP_ID}
+		  </if>
+		  <if test="ROLE_ID != null and ROLE_ID != ''">
+		  	AND ROLE_ID = #{ROLE_ID}
+		  </if>
+		  <if test="GRP_MAP_ID_1 != null and GRP_MAP_ID_1 != ''">
+		  	AND GRP_MAP_ID_1 = #{GRP_MAP_ID_1}
+		  </if>
+		  <if test="GRP_MAP_ID_2 != null and GRP_MAP_ID_2 != ''">
+		  	AND GRP_MAP_ID_2 = #{GRP_MAP_ID_2}
+		  </if>
+    </select>
+    
+    <!-- 권한그룹 유저목록  -->
+	<select id="getAuthGroupUserList" parameterType="map" resultType="lmap">
+			SELECT   ROLE_GRP_ID,
+			         ROLE_ID,
+			         GRP_MAP_ID_1,
+			         GRP_MAP_ID_2,
+			         G.USER_ID,
+			         DESCRIPTION,
+			         REG_USER_ID,
+			         REG_DATETIME,
+			         UPD_USER_ID,
+			         UPD_DATETIME,
+			         USR.USER_ID,
+			         USR.USER_NM,
+			         SRT.DEPT_NM,
+			         USR.EMP_NO,
+			         (SELECT   CODE_NAME
+			            FROM   SYS_CODE
+			           WHERE   CODE_CATEGORY_ID = 'POSITION_CD'
+			                   AND CODE = USR.POSITION_CD)
+			            POSITION_NM,
+			         (SELECT   CODE_NAME
+			            FROM   SYS_CODE
+			           WHERE   CODE_CATEGORY_ID = 'INCUMBENT_USER_CD'
+			                   AND CODE = USR.INCUMBENT_CD)
+			            INCUMBENT_CD
+			  FROM   AP_ROLE_GROUP G, SYS_USER USR, SYS_DEPARTMENT SRT
+			 WHERE   1 = 1
+			         AND G.USER_ID = USR.USER_ID(+)
+			         AND USR.DEPT_ID = SRT.DEPT_ID
+		  <if test="ROLE_ID != null and ROLE_ID != ''">
+		  	AND ROLE_ID = #{ROLE_ID}
+		  </if>
+		  <if test="GRP_MAP_ID_1 != null and GRP_MAP_ID_1 != ''">
+		  	AND GRP_MAP_ID_1 = #{GRP_MAP_ID_1}
+		  </if>
+		  <if test="GRP_MAP_ID_2 != null and GRP_MAP_ID_2 != ''">
+		  	AND GRP_MAP_ID_2 = #{GRP_MAP_ID_2}
+		  </if>
+		  </select>
+		  
+		  <insert id="insertAuthGroup" parameterType="map">
+       		   <selectKey resultType="String" keyProperty="ROLE_GRP_ID" order="BEFORE">
+   					SELECT SEQ_AP_ROLE_GROUP.NEXTVAL  as ROLE_GRP_ID FROM DUAL
+  				</selectKey>
+       				INSERT INTO AP_ROLE_GROUP (
+       							  ROLE_GRP_ID,
+                                  ROLE_ID,
+                                  GRP_MAP_ID_1,
+                                  GRP_MAP_ID_2,
+                                  USER_ID,
+                                  DESCRIPTION,
+                                  REG_USER_ID,
+                                  REG_DATETIME,
+                                  UPD_USER_ID,
+                                  UPD_DATETIME)
+					  VALUES   (#{ROLE_GRP_ID},
+					            #{ROLE_ID},
+					            #{GRP_MAP_ID_1},
+					            #{GRP_MAP_ID_2},
+					            #{USER_ID},
+					            #{DESCRIPTION},
+					            #{user.id},
+					            CURRENT_TIMESTAMP,
+					            #{user.id},
+					            CURRENT_TIMESTAMP)
+   </insert>
+   <update id="deleteAuthGroup" parameterType="map">
+       		   	DELETE FROM AP_ROLE_GROUP
+       		     WHERE ROLE_ID = #{ROLE_ID}
+		  	       AND GRP_MAP_ID_1 = #{GRP_MAP_ID_1}
+		  	     <if test="GRP_MAP_ID_2 != null and GRP_MAP_ID_2 != ''">
+				   AND GRP_MAP_ID_2 = #{GRP_MAP_ID_2}
+				</if>
+		  
+   </update>
+   
+   <update id="deleteAuthGroupForUser" parameterType="map">
+       		   	DELETE FROM AP_ROLE_GROUP
+       		     WHERE USER_ID = #{USER_ID}
+   </update>
+   <!-- 사용자별 권한그룹 목록  -->
+	<select id="getAuthGroupListForUser" parameterType="map" resultType="lmap">
+		SELECT   ROLE_GRP_ID,
+		         ROLE_ID,
+		         GRP_MAP_ID_1,
+		         GRP_MAP_ID_2,
+		         USER_ID,
+		         (SELECT NM_COMP FROM SYS_COMPANY WHERE CD_COMP = GRP_MAP_ID_1) AS NM_COMP,
+		         (SELECT CODE_NAME FROM SYS_CODE WHERE CODE_CATEGORY_ID = 'TP_CHNN_SYSTEM' AND CODE = GRP_MAP_ID_2) AS NM_CHN,
+		         (SELECT ROLE_NAME FROM AP_ROLE WHERE ROLE_ID = G.ROLE_ID) ROLE_NM
+          FROM   AP_ROLE_GROUP G
+         WHERE   1 = 1
+	  	   AND G.USER_ID = #{USER_ID}
+		  </select>
+</mapper>
+

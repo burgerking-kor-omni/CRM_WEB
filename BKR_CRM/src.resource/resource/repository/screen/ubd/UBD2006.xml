@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="UBD2006" screenType="register" screenLayoutType="Board" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>UB-Board Notice 답변 수정 화면</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/ubd/</filePath>
+  <fileName>UBD2006</fileName>
+  <functions>
+    <function id="FNCUBD0003" isStartFunction="false" functionName="게시판 정보 조회 호출" serviceId="SVCUBD0003" alias="INQUIRY"/>
+    <function id="FNCUBD0010" isStartFunction="false" functionName="게시판 게시물 수정 호출" serviceId="SVCUBD0010" alias="UPDATE"/>
+    <function id="FNCUBD0002" isStartFunction="true"  functionName="게시판 수정화면용 게시물 상세 조회 호출" serviceId="SVCUBD0002" alias="USERDEFINED2"/>
+    <function id="FNCUBD0015" isStartFunction="false" functionName="게시물 첨부파일 조회 호출" serviceId="SVCUBD0015" alias="USERDEFINED7"/>    
+  </functions>
+  <defaultParameters/>
+</screenBuilder>

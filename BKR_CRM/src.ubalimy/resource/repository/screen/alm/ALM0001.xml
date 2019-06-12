@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="ALM0001" screenType="complex" screenLayoutType="Default" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>알리미 발송 /  화면관리 목록</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/alm/</filePath>
+  <fileName>ALM0001</fileName>
+  <functions>
+    <function id="FNCALM0001" isStartFunction="false" functionName="접속자 목록 조회 호출" serviceId="SVCALM0001" alias="INQUIRY"/>
+  	<function id="FNCALM0002" isStartFunction="false" functionName="알리미 통보 등록" serviceId="SVCALM0002" alias="REGIST"/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

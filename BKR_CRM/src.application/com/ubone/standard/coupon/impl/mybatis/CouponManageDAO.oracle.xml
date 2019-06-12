@@ -1,0 +1,979 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CouponManageDAO">
+
+	<!--
+		QueryId     : CouponManageDAO.insertDauPinConfig
+		Description : 다우 핀 가져오기 설정 등록
+	 -->
+	 <insert id="insertDauPinConfig" parameterType="map">
+	 	<selectKey keyProperty="NO_DAUPIN_COFIG" resultType="String" order="BEFORE">
+			SELECT SEQ_TBS_DAUPIN_CONFIG.NEXTVAL FROM DUAL
+		</selectKey>
+	 	INSERT INTO CRMADMIN.TBS_DAUPIN_CONFIG
+	 	(
+	 		NO_DAUPIN_COFIG ,
+			VAL_LIMIT_PIN ,
+			VAL_BRING_PIN ,
+			VAL_BRING_PIN_MANUAL ,
+			VAL_FIRST_PIN,
+			FG_USE ,
+			DT_REG ,
+			ID_REG_EMP ,
+			DT_UPT ,
+			ID_UPT_EMP
+	 	)
+	 	VALUES
+	 	(
+	 		#{NO_DAUPIN_COFIG} ,
+			REPLACE(#{VAL_LIMIT_PIN},',','') ,
+			REPLACE(#{VAL_BRING_PIN},',','') ,
+			REPLACE(#{VAL_BRING_PIN_MANUAL},',','') ,
+			REPLACE(#{VAL_FIRST_PIN},',',''),
+			'Y' ,
+			SYSDATE ,
+			#{user.id} ,
+			SYSDATE ,
+			#{user.id}
+	 	)
+	 </insert>
+
+	<!--
+		QueryId     : CouponManageDAO.getDauPinConfig
+		Description : 다우 핀 가져오기 설정 조회
+	 -->
+	<select id="getDauPinConfig" resultType="lmap">
+		SELECT  NO_DAUPIN_COFIG ,
+				VAL_LIMIT_PIN ,
+				VAL_BRING_PIN ,
+				VAL_BRING_PIN_MANUAL ,
+				VAL_FIRST_PIN
+		   FROM CRMADMIN.TBS_DAUPIN_CONFIG
+		  WHERE FG_USE = 'Y'
+	</select>
+	
+	<!--
+		QueryId     : CouponManageDAO.delDauPinConfig
+		Description : 기존 다우 핀 설정 삭제처리
+	 -->
+	<update id="delDauPinConfig" parameterType="map">
+		UPDATE CRMADMIN.TBS_DAUPIN_CONFIG
+		   SET FG_USE = 'N'
+		     , DT_UPT = SYSDATE
+		     , ID_UPT_EMP = #{user.id}
+		 WHERE FG_USE = 'Y'
+	</update>
+
+
+	<!--
+		QueryId     : CouponManageDAO.getCouponList
+		Description : 쿠폰 마스터 목록 조회
+	 -->
+	<sql id="getCouponList_base">
+		SELECT CD_COUPON
+			 , CD_COUPON_OBJ
+			 , NM_COUPON
+			 , DS_COUPON
+			 , NO_COUPON_ORDER
+			 , TP_EXPIRY_DATE
+			 , TO_CHAR(DT_EXPIRY_START,'YYYY-MM-DD') AS DT_EXPIRY_START
+			 , TO_CHAR(DT_EXPIRY_END,'YYYY-MM-DD') AS DT_EXPIRY_END
+			 , TO_CHAR(DT_EXPIRY_START,'YYYY-MM-DD') ||' ~ '|| TO_CHAR(DT_EXPIRY_END,'YYYY-MM-DD') AS DT_EXPIRY
+			 , FG_PUB
+			 , CD_COUPON_TARGET
+			 , CD_SALE_POLICY
+			 , VAL_SALE_POLICY
+			 , VAL_LIMIT_PRICE
+			 , TP_MEMBER
+			 , TO_CHAR(TC.DT_REG, 'YYYY-MM-DD') AS DT_REG
+			 , ID_REG_USER
+			 , TO_CHAR(TC.DT_UPT, 'YYYY-MM-DD') AS DT_UPT
+			 , ID_UPT_USER
+			 , TDC.VAL_BRING_PIN_MANUAL AS CNT_DAUPIN
+		  FROM CRMADMIN.TBS_COUPON TC
+		  LEFT OUTER JOIN CRMADMIN.TBS_DAUPIN_CONFIG TDC
+		    ON TDC.FG_USE = 'Y'
+		   AND CD_COUPON_OBJ IN ('3','4')
+		 WHERE 1 = 1
+		  	<if test="DT_EXPIRY_END != null and DT_EXPIRY_END != ''">
+		  		 AND TO_DATE(#{DT_EXPIRY_END}||' 235959','YYYY-MM-DD HH24MISS') >= DT_EXPIRY_START
+		  	</if>
+		  	<if test="DT_EXPIRY_START != null and DT_EXPIRY_START != ''">
+		  		AND DT_EXPIRY_END >= TO_DATE(#{DT_EXPIRY_START}||' 000000','YYYY-MM-DD HH24MISS')
+		  	</if>
+		  	<if test="DT_EXPIRY_START_ORDER != null and DT_EXPIRY_START_ORDER != ''">
+		  		AND TO_CHAR(DT_EXPIRY_START,'YYYY-MM-DD') = #{DT_EXPIRY_START_ORDER}
+		  	</if>
+		  	<if test="DT_EXPIRY_END_ORDER != null and DT_EXPIRY_END_ORDER != ''">
+		  		AND #{DT_EXPIRY_END_ORDER} = TO_CHAR(DT_EXPIRY_END,'YYYY-MM-DD')
+		  	</if>
+		  	<if test="DT_START_REG != null and DT_START_REG != ''">
+		  		AND TC.DT_REG >= TO_DATE(#{DT_START_REG}||' 000000','YYYY-MM-DD HH24MISS')
+		  	</if>
+		  	<if test="DT_END_REG != null and DT_END_REG != ''">
+		  		AND TO_DATE(#{DT_END_REG}||' 235959','YYYY-MM-DD HH24MISS') >= TC.DT_REG
+		  	</if>
+		  	<if test="CD_COUPON_OBJ != null and CD_COUPON_OBJ != ''">
+		  		AND CD_COUPON_OBJ =#{CD_COUPON_OBJ}
+		  	</if>
+		  	<if test="CD_COUPON != null and CD_COUPON != ''">
+		  		AND CD_COUPON =#{CD_COUPON}
+		  	</if>
+		  	<if test="NM_COUPON != null and NM_COUPON != ''">
+		  		AND UPPER(NM_COUPON) LIKE '%'||UPPER(#{NM_COUPON})||'%'
+		  	</if>
+		  	<if test='CD_CUP_STATUS == "01"'>
+		  		AND SYSDATE BETWEEN DT_EXPIRY_START AND DT_EXPIRY_END
+		  	</if>
+		  	<if test='CD_CUP_STATUS == "02"'>
+		  		AND SYSDATE > DT_EXPIRY_END
+		  	</if>
+		  ORDER BY CD_COUPON_OBJ, NO_COUPON_ORDER ASC
+	</sql>
+	
+	<!-- 쿠폰 마스터 목록 조회 -->
+	<select id="getCouponList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getCouponList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 쿠폰 마스터 목록 조회 - count -->
+	<select id="getCouponList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getCouponList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 쿠폰 마스터 목록 조회 - paging -->
+	<select id="getCouponList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getCouponList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		QueryId     : CouponManageDAO.getPinStatus
+		Description : 쿠폰 핀 현황 조회
+	 -->
+	<select id="getPinStatus" parameterType="map" resultType="lmap">
+		SELECT B.CODE_NAME AS CD_COUPON_OBJ
+			 , A.NM_COUPON
+			 , A.NO_REQ
+			 , TO_CHAR(DT_EXPIRY_START, 'YYYY-MM-DD') AS DT_EXPIRY_START
+			 , TO_CHAR(DT_EXPIRY_END, 'YYYY-MM-DD') AS DT_EXPIRY_END
+			 , TO_CHAR(DT_EXPIRY_START, 'YYYY-MM-DD') ||' ~ '||TO_CHAR(DT_EXPIRY_END, 'YYYY-MM-DD') AS DT_EXPIRY
+			 , CASE WHEN SYSDATE BETWEEN DT_EXPIRY_START AND DT_EXPIRY_END THEN '진행중'
+			 		ELSE '종료' END AS CD_STATUS
+			 , (SELECT COUNT(*) FROM CRMADMIN.TBS_COUPON_PIN WHERE CD_COUPON=A.CD_COUPON) AS CNT_ALLPIN
+			 , (SELECT COUNT(*) FROM CRMADMIN.TBS_COUPON_PIN WHERE CD_COUPON=A.CD_COUPON AND DT_PUBLISH IS NOT NULL) AS CNT_PUBLISH
+			 , (SELECT COUNT(*) FROM CRMADMIN.TBS_COUPON_PIN WHERE CD_COUPON=A.CD_COUPON AND DT_PUBLISH IS NOT NULL AND STATUS='A') AS CNT_USE
+			 , NVL(TDR.NO_DAUPIN_REQ, '0') AS YN_FLAG
+		  FROM CRMADMIN.TBS_COUPON A
+		  LEFT OUTER JOIN CRMADMIN.SYS_CODE B
+		    ON B.CODE_CATEGORY_ID = 'CD_COUPON_OBJ'
+		   AND A.CD_COUPON_OBJ = B.CODE
+		  LEFT OUTER JOIN CRMADMIN.TBS_DAUPIN_REQ TDR
+            ON TDR.CD_COUPON = A.CD_COUPON
+           AND TDR.DAUPIN_STATUS != '99'
+		 WHERE A.CD_COUPON = #{CD_COUPON}
+	</select>
+	
+	<!--
+		QueryId     : CouponManageDAO.getMemberID
+		Description : 쿠폰 핀 발행 대상 조회
+	 -->
+	<select id="getMemberID" parameterType="map" resultType="lmap">
+		SELECT ID_MEMBER
+			 , NM_MEMBER
+		  FROM CRMADMIN.TBS_MEMBER
+		 WHERE DS_EMAIL = #{DS_EMAIL_SEARCH}
+	</select>
+	
+	<!--
+		QueryId     : CouponManageDAO.publishCouponDau
+		Description : 다우 쿠폰 핀 발행 
+	 -->
+	<update id="publishCouponDau" parameterType="map">
+		UPDATE CRMADMIN.TBS_COUPON_PIN
+		   SET ID_MEMBER=#{ID_MEMBER}
+        	 , DT_PUBLISH=SYSDATE
+		WHERE
+			NO_PIN=(SELECT MIN(NO_PIN) 
+					  FROM CRMADMIN.TBS_COUPON_PIN 
+					 WHERE DT_PUBLISH IS NULL 
+					   AND CD_COUPON = #{CD_COUPON})
+	</update>
+	
+	<!--
+		QueryId     : CouponManageDAO.publishCouponBkr
+		Description : 자체 쿠폰 핀 발행 
+	 -->
+	<insert id="publishCouponBkr" parameterType="map">
+		<selectKey keyProperty="NO_PIN" resultType="String" order="BEFORE">
+			SELECT SEQ_TBS_COUPON_PIN.NEXTVAL FROM DUAL 
+		</selectKey>
+		INSERT INTO CRMADMIN.TBS_COUPON_PIN
+		(
+			  NO_PIN
+			, CD_COUPON
+			, ID_MEMBER
+			, STATUS
+			, DT_PUBLISH
+			, DT_REG
+			, DT_EXPIRY_START
+			, DT_EXPIRY_END
+		)
+	   SELECT 
+			  #{NO_PIN}*1
+			, #{CD_COUPON}
+			, #{ID_MEMBER}
+			, 'N'
+			, SYSDATE
+			, SYSDATE
+			, CASE WHEN TP_EXPIRY_DATE = '00' THEN DT_EXPIRY_START
+				   ELSE SYSDATE END
+			, CASE WHEN TP_EXPIRY_DATE = '00' THEN DT_EXPIRY_END 
+				   ELSE TO_DATE(TO_CHAR(SYSDATE + TP_EXPIRY_DATE,'YYYY-MM-DD')|| ' 235959' , 'YYYY-MM-DD HH24MISS') END
+		 FROM TBS_COUPON
+		WHERE CD_COUPON = #{CD_COUPON}
+	</insert>
+	
+	<!--
+		QueryId     : CouponManageDAO.checkOverCoupon
+		Description : 쿠폰 중복 발행여부 체크
+	 -->
+	<select id="checkOverCoupon" parameterType="map" resultType="lmap">
+		SELECT COUNT(*) AS CNT
+		  FROM CRMADMIN.TBS_COUPON_PIN
+		 WHERE CD_COUPON = #{CD_COUPON}
+		   AND ID_MEMBER = #{ID_MEMBER}
+	</select>
+	
+	<!--
+		QueryId     : CouponManageDAO.insertCoupon
+		Description : 쿠폰 마스터 등록
+	 -->
+	<insert id="insertCoupon" parameterType="map">
+		<selectKey keyProperty="CD_COUPON" resultType="String" order="BEFORE">
+			SELECT SEQ_TBS_COUPON.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO CRMADMIN.TBS_COUPON
+		(
+			  CD_COUPON
+			, CD_COUPON_OBJ
+			, NM_COUPON
+			, DS_COUPON
+			, NO_COUPON_ORDER
+			, TP_EXPIRY_DATE
+			, DT_EXPIRY_START
+			, DT_EXPIRY_END
+			, FG_PUB
+			, NO_REQ
+			, CD_GOODS
+			, NM_GOODS
+			, IMG_GOODS
+			, CD_COUPON_TARGET
+			, CD_SALE_POLICY
+			, VAL_SALE_POLICY
+			, VAL_LIMIT_PRICE
+			, PRODUCT_PK
+			, PRODUCT_PK_REAL
+			, TP_MEMBER
+			, DT_REG
+			, ID_REG_USER
+			, DT_UPT
+			, ID_UPT_USER
+			, NM_CUP_MENU
+			, REAL_CUP_PRICE
+			, SALE_CUP_PRICE
+			, SALE_CUP_RATE
+			
+		)
+		values
+		(
+			  #{CD_COUPON}
+			, #{CD_COUPON_OBJ}
+			, #{NM_COUPON}
+			, #{DS_COUPON}
+			, (SELECT NVL(MAX(NO_COUPON_ORDER),0)+1 
+				 FROM CRMADMIN.TBS_COUPON 
+				WHERE CD_COUPON_OBJ = #{CD_COUPON_OBJ}
+				  AND #{DT_EXPIRY_START} =  TO_CHAR(DT_EXPIRY_START,'YYYY-MM-DD')
+  				  AND #{DT_EXPIRY_END} =  TO_CHAR(DT_EXPIRY_END,'YYYY-MM-DD')
+				)
+			, #{TP_EXPIRY_DATE}
+			, TO_DATE(#{DT_EXPIRY_START}||' 000000', 'YYYY-MM-DD HH24MISS')
+			, TO_DATE(#{DT_EXPIRY_END}||' 235959' , 'YYYY-MM-DD HH24MISS')
+			, #{FG_PUB}
+			, #{NO_REQ}
+			, #{CD_GOODS}
+			, #{NM_GOODS}
+			, #{IMG_GOODS}
+			, #{CD_COUPON_TARGET}
+			, CASE WHEN #{CD_COUPON_TARGET} = '2' THEN '1'
+					ELSE #{CD_SALE_POLICY} END
+			, TO_NUMBER(REPLACE(#{VAL_SALE_POLICY},',',''))
+			, TO_NUMBER(REPLACE(#{VAL_LIMIT_PRICE},',',''))
+			, #{PRODUCT_PK}
+			, #{PRODUCT_PK_REAL}
+			, #{TP_MEMBER}
+			, SYSDATE
+			, #{user.id}
+			, SYSDATE
+			, #{user.id}
+			, #{NM_CUP_MENU}
+			, REPLACE(#{REAL_CUP_PRICE},',','')
+			, REPLACE(#{SALE_CUP_PRICE},',','')
+			, #{SALE_CUP_RATE}
+		)
+	</insert>
+	
+
+
+	
+	
+	<!--
+		QueryId     : CouponManageDAO.insertStoreEx
+		Description : 쿠폰 제외 매장 등록
+	 -->
+	<insert id="insertStoreEx" parameterType="map">
+		<selectKey keyProperty="NO_STORE_EXCEPT" resultType="String" order="BEFORE">
+			SELECT SEQ_TBS_COUPON_STORE_EXCEPT.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO CRMADMIN.TBS_COUPON_STORE_EXCEPT
+		(
+			  NO_STORE_EXCEPT	/* 제외매장PK */
+			, ID_STORE_EXCEPT	/* 제외매장코드 */
+			, NM_STORE_EXCEPT	/* 제외매장명 */
+			, CD_COUPON			/* 쿠폰코드   */
+			
+		)
+		VALUES
+		(
+			  #{NO_STORE_EXCEPT}	/* 제외매장PK */
+			, #{ID_STORE_EXCEPT}	/* 제외매장코드 */
+			, #{NM_STORE_EXCEPT}
+			, #{CD_COUPON}			/* 쿠폰코드   */
+		)
+	</insert>
+	
+	<!--
+		QueryId     : CouponManageDAO.deleteStoreEx
+		Description : 제외 매장 삭제
+	 -->
+	<delete id="deleteStoreEx" parameterType="map">
+		DELETE FROM CRMADMIN.TBS_COUPON_STORE_EXCEPT
+		 WHERE CD_COUPON = #{CD_COUPON}
+	</delete>
+	
+	
+	<!--
+		QueryId     : CouponManageDAO.getMenuList
+		Description : 상품 찾기 팝업
+	 -->
+	<sql id="getMenuList_base">
+		SELECT DISTINCT
+			  OMA.CMP_CD
+			, OMA.SALES_ORG_CD
+			, OMA.MENU_TYPE
+			, OMA.MENU_CD
+			, CASE WHEN OMO_MAIN.MENU_NM IS NULL THEN '' 
+				   ELSE OMO_MAIN.MENU_NM||'>'||OMO_SUB.MENU_NM END AS MAIN_MENU_NM
+			, OMA.MENU_NM
+			, OMA.MENU_EN_NM
+			, OMA.MENU_DESC
+			, OMA.MENU_CMPNN
+			, OMA.ORIGIN_INFO
+			, OMA.MENU_IMG_PATH
+			, OMA.SET_YN
+			, OMA.DRINK_CHANGE_YN
+			, OMA.SIDE_CHANGE_YN
+			, OMA.CONDIMENT_CHANGE_YN
+			, OMA.OPTION_RECOMMEND_YN
+			, OMA.USE_YN
+			, OMA.L_SET_YN
+			, OMA.MANAGE_TYPE
+			, TO_CHAR(OMO.REG_DATE, 'YYYY-MM-DD') AS REG_DATE
+			, MMP.DINE_IN_PRC
+		 FROM OMNI.OMNI_MENU_APP OMA
+		 LEFT OUTER JOIN OMNI.OMNI_MENU_ORG OMO
+		   ON OMA.MENU_CD = OMO.MENU_CD
+		  AND OMO.DEPTH = 3
+		 LEFT OUTER JOIN OMNI.OMNI_MENU_ORG OMO_SUB
+		   ON OMO.UP_MENU_CD = OMO_SUB.MENU_CD
+		  AND OMO_SUB.DEPTH = 2
+		 LEFT OUTER JOIN OMNI.OMNI_MENU_ORG OMO_MAIN
+		   ON OMO_SUB.UP_MENU_CD = OMO_MAIN.MENU_CD
+		  AND OMO_MAIN.DEPTH = 1
+		 LEFT OUTER JOIN OMNI.MST_MENU_PRC MMP
+		   ON MMP.MENU_CD = OMA.MENU_CD
+		  AND MMP.FNSH_DT = '99991231'
+		WHERE 1=1
+			<if test="USE_YN != '' and USE_YN != null">
+				AND OMA.USE_YN = #{USE_YN}
+			</if>
+			<if test="MANAGE_TYPE != '' and MANAGE_TYPE != null">
+				AND OMA.MANAGE_TYPE  = #{MANAGE_TYPE}
+			</if>
+			<if test="MENU_TYPE != '' and MENU_TYPE != null">
+				 AND OMA.MENU_TYPE = #{MENU_TYPE}
+			</if>
+			<if test="MENU_CATEGORY_1 != '' and MENU_CATEGORY_1 != null">
+				AND OMO_MAIN.MENU_CD = #{MENU_CATEGORY_1}
+			</if>
+			<if test="MENU_CATEGORY_2 != '' and MENU_CATEGORY_2 != null">
+				AND OMO_SUB.MENU_CD = #{MENU_CATEGORY_2}
+			</if>
+			<if test="MENU_CD != '' and MENU_CD != null">
+				AND OMA.MENU_CD LIKE '%'||#{MENU_CD}||'%'
+			</if>
+			<if test="MENU_NM!= '' and MENU_NM != null">
+				AND OMA.MENU_NM LIKE '%'||#{MENU_NM}||'%'
+			</if>
+		ORDER BY OMA.MENU_NM ASC
+	</sql>
+	
+	<!-- 상품 목록 조회 -->
+	<select id="getMenuList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getMenuList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 상품 목록 조회 - count -->
+	<select id="getMenuList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getMenuList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 상품 목록 조회 - paging -->
+	<select id="getMenuList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getMenuList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		QueryId     : CouponManageDAO.updateCouponOrder
+		Description : 쿠폰 순서 수정
+	 -->
+	<update id="updateCouponOrder" parameterType="map">
+		UPDATE CRMADMIN.TBS_COUPON
+		   SET NO_COUPON_ORDER = #{NO_COUPON_ORDER}
+		 WHERE CD_COUPON = #{CD_COUPON}
+		   AND TO_CHAR(DT_EXPIRY_START,'YYYY-MM-DD') = #{DT_EXPIRY_START}
+		   AND TO_CHAR(DT_EXPIRY_END,'YYYY-MM-DD') = #{DT_EXPIRY_END}
+	</update>
+	
+	
+	<!--
+		QueryId     : CouponManageDAO.checkDauPinStatus
+		Description : 다우 쿠폰 핀 발행여부 
+	 -->
+	<select id="checkDauPinStatus" parameterType="map" resultType="String">
+		SELECT CASE WHEN COUNT(NO_DAUPIN_REQ) = 0 THEN 'Y'
+					ELSE 'N' END AS YN_CHECK
+		  FROM CRMADMIN.TBS_DAUPIN_REQ
+		 WHERE NO_REQ = #{NO_REQ}
+		   AND CD_COUPON = #{CD_COUPON}
+		   AND VALID_START = REPLACE(#{DT_EXPIRY_START},'-','')
+		   AND VALID_END = REPLACE(#{DT_EXPIRY_END},'-','')
+		   AND DAUPIN_STATUS != '99'
+	</select>
+	
+	<insert id="insertDauPin" parameterType="map">
+		<selectKey keyProperty="NO_DAUPIN_REQ" resultType="String" order="BEFORE">
+			SELECT SEQ_TBS_DAUPIN_REQ.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO CRMADMIN.TBS_DAUPIN_REQ
+		(
+			  NO_DAUPIN_REQ		/* 다우핀 발행요청 PK                */
+			, NO_REQ			/* 쿠폰계약번호                     */
+			, CD_COUPON			/* 쿠폰PK                       */
+			, CNT_PIN			/* 발행 요청 핀수                   */
+			, VALID_START		/* 쿠폰유효기간 시작일                 */
+			, VALID_END			/* 쿠폰유효기간 종료일                 */
+			, COOPER_ORDER		/* 제휴처 주문번호                   */
+			, DAUPIN_STATUS		/* 상태(01:발행 신청,02:발행중,99:완료)  */
+			, DT_REG			/* 최초등록일시                     */
+			, ID_REG_USER		/* 최초등록자                      */
+			, DT_UPT			/* 최근수정일시                     */
+			, ID_UPT_USER		/* 최근수정자                      */
+						
+		)
+		SELECT
+			  TO_NUMBER(#{NO_DAUPIN_REQ})		/* 다우핀 발행요청 PK */
+			, NO_REQ				/* 쿠폰계약번호 */
+			, TO_NUMBER(REPLACE(#{CD_COUPON},',',''))			/* 쿠폰PK */
+			, TO_NUMBER(REPLACE(#{CNT_PIN},',',''))			/* 발행 요청 핀수 */
+
+			, CASE WHEN TP_EXPIRY_DATE = '00' THEN REPLACE(#{DT_EXPIRY_START},'-','')	
+				   ELSE TO_CHAR(SYSDATE, 'YYYYMMDD')END 	/* 쿠폰유효기간 시작일 */
+			, CASE WHEN TP_EXPIRY_DATE = '00' THEN REPLACE(#{DT_EXPIRY_END},'-','')
+				   ELSE TO_CHAR(SYSDATE + TP_EXPIRY_DATE, 'YYYYMMDD') END /* 쿠폰유효기간 종료일  */
+
+			, #{COOPER_ORDER}		/* 제휴처 주문번호 */
+			, '01'					/* 상태(01:발행 신청,02:발행중,99:완료)  */
+			, SYSDATE				/* 최초등록일시 */
+			, #{user.id}			/* 최초등록자    */
+			, SYSDATE				/* 최근수정일시 */
+			, #{user.id}			/* 최근수정자    */
+		FROM CRMADMIN.TBS_COUPON
+	   WHERE CD_COUPON = #{CD_COUPON}
+	</insert>
+
+	<!--
+		QueryId     : CouponManageDAO.getCouponDetail
+		Description : 쿠폰 마스터 상세 조회 
+	 -->
+	<select id="getCouponDetail" parameterType="map" resultType="lmap">
+		SELECT TC.CD_COUPON        /* 쿠폰코드           */
+             , TC.CD_COUPON_OBJ    /* 대상(딜리버리, 킹오더 등)*/
+             , OBJ.CODE_NAME AS NM_COUPON_OBJ
+             , TC.NM_COUPON        /* 쿠폰명            */
+             , TC.DS_COUPON        /* 쿠폰설명           */
+             , TC.NO_COUPON_ORDER    /* 쿠폰순서           */
+             , TO_CHAR(TC.DT_EXPIRY_START,'YYYY-MM-DD') AS DT_EXPIRY_START    /* 유효기간시작일        */
+             , TO_CHAR(TC.DT_EXPIRY_END,'YYYY-MM-DD') AS DT_EXPIRY_END    /* 유효기간종료일        */
+<!--              , EXPIRY.CODE_NAME AS TP_EXPIRY_DATE    /* 유효기간구분         */ -->
+			 , TC.TP_EXPIRY_DATE
+             , CASE WHEN TC.TP_EXPIRY_DATE = '00' THEN '( '||TO_CHAR(TC.DT_EXPIRY_START,'YYYY-MM-DD') ||' ~ ' || TO_CHAR(TC.DT_EXPIRY_END,'YYYY-MM-DD') || ' )'
+				   ELSE '' END AS DT_PIN_EXPIRY		/* 쿠폰 핀 유효기간 */
+             , TC.FG_PUB            /* 발행여부           */
+             , TC.CD_GOODS            /* 다우상품코드         */
+             , TC.NM_GOODS            /* 다우상품명          */
+             , TC.IMG_GOODS        /* 다우상품이미지        */
+             , TC.CD_COUPON_TARGET    /* 쿠폰대상(금액,상품)    */
+<!--              , TARGET.CODE_NAME AS CD_COUPON_TARGET /* 쿠폰대상(금액,상품)    */ -->
+             , TC.CD_SALE_POLICY    /* 할인정책           */
+<!--              , POLICY.CODE_NAME AS CD_SALE_POLICY /* 할인정책           */ -->
+             , TC.VAL_SALE_POLICY    /* 할인금액           */
+             , TC.VAL_LIMIT_PRICE    /* 최소주문금액         */
+             , TC.PRODUCT_PK        /* 할인상품           */
+             , OMA.MENU_NM AS NM_PROD /* 할인상품           */
+             , TC.PRODUCT_PK_REAL     /* 실제판매상품         */
+             , OMA_REAL.MENU_NM AS NM_PROD_REAL /* 실제판매상품         */
+             , TC.TP_MEMBER        /* 대상회원구분         */
+<!--              , TP_MEM.CODE_NAME AS TP_MEMBER /* 대상회원구분         */ -->
+             , TO_CHAR(TC.DT_REG,'YYYY-MM-DD') AS DT_REG /* 최초등록일시         */
+             , TC.ID_REG_USER        /* 최초등록자          */
+             , TO_CHAR(TC.DT_UPT,'YYYY-MM-DD') AS DT_UPT /* 최근수정일시         */
+             , TC.ID_UPT_USER        /* 최근수정자          */
+             , TC.NO_REQ            /* 다우계약번호         */
+             , SA_LIST.ATTACH_ID AS IMG_LIST    /* 목록 이미지 */
+             , SA_DTL.ATTACH_ID  AS IMG_DTL        /* 상세 이미지 */
+             , SA_RWD.ATTACH_ID  AS IMG_RWD        /* 리워드 이미지 */
+             , TCP.CNT_PIN
+             , TC.NM_CUP_MENU
+             , TC.REAL_CUP_PRICE
+             , TC.SALE_CUP_PRICE
+             , TC.SALE_CUP_RATE
+          FROM CRMADMIN.TBS_COUPON TC
+          LEFT OUTER JOIN (SELECT COUNT(*) AS CNT_PIN
+          					 FROM CRMADMIN.TBS_COUPON_PIN
+          					WHERE CD_COUPON = #{CD_COUPON}
+          				  ) TCP
+          	ON 1=1
+          LEFT OUTER JOIN CRMADMIN.SYS_CODE OBJ
+            ON OBJ.CODE = TC.CD_COUPON_OBJ
+           AND OBJ.CODE_CATEGORY_ID = 'CD_COUPON_OBJ'
+          
+          LEFT OUTER JOIN CRMADMIN.SYS_CODE TARGET
+            ON TARGET.CODE = TC.CD_COUPON_TARGET
+           AND TARGET.CODE_CATEGORY_ID = 'CD_COUPON_TARGET'
+          
+          LEFT OUTER JOIN CRMADMIN.SYS_CODE POLICY
+            ON POLICY.CODE = TC.CD_SALE_POLICY
+           AND POLICY.CODE_CATEGORY_ID = 'CD_SALE_POLICY'
+          
+          LEFT OUTER JOIN CRMADMIN.SYS_CODE TP_MEM
+            ON TP_MEM.CODE = TC.TP_MEMBER
+           AND TP_MEM.CODE_CATEGORY_ID = 'TP_MEMBER'
+           
+          LEFT OUTER JOIN CRMADMIN.SYS_CODE EXPIRY
+            ON EXPIRY.CODE = TC.TP_EXPIRY_DATE
+           AND EXPIRY.CODE_CATEGORY_ID = 'TP_EXPIRY_DATE'
+
+          LEFT OUTER JOIN OMNI.OMNI_MENU_APP OMA
+            ON OMA.MENU_CD = TO_CHAR(TC.PRODUCT_PK)
+
+          LEFT OUTER JOIN OMNI.OMNI_MENU_APP OMA_REAL
+            ON OMA_REAL.MENU_CD = TO_CHAR(TC.PRODUCT_PK_REAL)
+
+          LEFT OUTER JOIN (SELECT SAL.ATTACH_ID, BIZ_KEY
+                             FROM CRMADMIN.SYS_ATTACH_LINK  SAL
+                            INNER JOIN CRMADMIN.SYS_ATTACH SA
+                               ON SA.ATTACH_ID = SAL.ATTACH_ID
+                            WHERE BIZ_TP = 'COUPON'
+                              AND SA.ATTACH_TYPE = 'IMG_APP') SA_LIST
+            ON SA_LIST.BIZ_KEY = TC.CD_COUPON
+          LEFT OUTER JOIN (SELECT SAL.ATTACH_ID, BIZ_KEY
+                             FROM CRMADMIN.SYS_ATTACH_LINK  SAL
+                            INNER JOIN CRMADMIN.SYS_ATTACH SA
+                               ON SA.ATTACH_ID = SAL.ATTACH_ID
+                            WHERE BIZ_TP = 'COUPON'
+                              AND SA.ATTACH_TYPE = 'IMG_WEB') SA_DTL
+            ON SA_DTL.BIZ_KEY = TC.CD_COUPON
+           LEFT OUTER JOIN (SELECT SAL.ATTACH_ID, BIZ_KEY
+                             FROM CRMADMIN.SYS_ATTACH_LINK  SAL
+                            INNER JOIN CRMADMIN.SYS_ATTACH SA
+                               ON SA.ATTACH_ID = SAL.ATTACH_ID
+                            WHERE BIZ_TP = 'COUPON'
+                              AND SA.ATTACH_TYPE = 'IMG_REWARD') SA_RWD
+            ON SA_RWD.BIZ_KEY = TC.CD_COUPON
+		 WHERE CD_COUPON = #{CD_COUPON}
+	</select>
+	
+	<!--
+		QueryId     : CouponManageDAO.updateCouponDetail
+		Description : 쿠폰 마스터 상세 조회 
+	 -->
+	<update id="updateCouponDetail" parameterType="map">
+		UPDATE CRMADMIN.TBS_COUPON
+		   SET NM_COUPON = #{NM_COUPON}
+			 , DS_COUPON = #{DS_COUPON}
+			 , CD_COUPON_TARGET = #{CD_COUPON_TARGET}
+			 , CD_SALE_POLICY = CASE WHEN #{CD_COUPON_TARGET} = '2' THEN '1'
+									 ELSE #{CD_SALE_POLICY} END
+			 , VAL_SALE_POLICY = TO_NUMBER(REPLACE(#{VAL_SALE_POLICY},',',''))
+			 , VAL_LIMIT_PRICE = TO_NUMBER(REPLACE(#{VAL_LIMIT_PRICE},',',''))
+			 , PRODUCT_PK = #{PRODUCT_PK}
+			 , PRODUCT_PK_REAL = #{PRODUCT_PK_REAL}
+			 , DT_EXPIRY_START = TO_DATE(#{DT_EXPIRY_START}||'000000', 'YYYY-MM-DDHH24MISS')
+			 , DT_EXPIRY_END = TO_DATE(#{DT_EXPIRY_END}||' 235959', 'YYYY-MM-DD HH24MISS')
+			 , TP_EXPIRY_DATE = #{TP_EXPIRY_DATE}
+			 , TP_MEMBER = #{TP_MEMBER}
+			 , NM_CUP_MENU = #{NM_CUP_MENU}
+			 , REAL_CUP_PRICE = REPLACE(#{REAL_CUP_PRICE},',','')
+             , SALE_CUP_PRICE = REPLACE(#{SALE_CUP_PRICE},',','')
+             , SALE_CUP_RATE  = REPLACE(#{SALE_CUP_RATE},',','')
+			 , FG_PUB = #{FG_PUB}
+			 , DT_UPT = SYSDATE
+			 , ID_UPT_USER = #{user.id}
+		 WHERE CD_COUPON = #{CD_COUPON}
+	</update>
+
+	<update id="deleteCouponDetail" parameterType="map">
+		UPDATE CRMADMIN.TBS_COUPON
+		   SET FG_PUB = 'N'
+		   	 , DT_UPT = SYSDATE
+		   	 , ID_UPT_USER = #{user.id}
+		 WHERE CD_COUPON = #{CD_COUPON}
+	</update>
+	
+	<!--
+		QueryId     : CouponManageDAO.getRewardCouponList
+		Description : 리워드 쿠폰 현황  조회 
+	 -->
+	<sql id="getRewardCouponList_base">
+		SELECT   TC.CD_COUPON
+               , TC.NM_COUPON
+               , TO_CHAR(TC.DT_EXPIRY_START,'YYYY-MM-DD') ||' ~ '|| TO_CHAR(TC.DT_EXPIRY_END,'YYYY-MM-DD') AS DT_EXPIRY
+               , NVL(ALL_CUP.CNT, 0) AS ALL_CUP /* 전체 쿠폰 발급수 */
+               , NVL(ALL_MEM.CNT, 0) AS ALL_MEM /* 발급회원수 */
+               , NVL(CUP_A.CNT  , 0) AS CNT_A
+               , NVL(CUP_A_M.CNT, 0) AS CNT_A_M
+               , NVL(CUP_N.CNT  , 0) AS CNT_N
+               , NVL(CUP_N_M.CNT, 0) AS CNT_N_M
+	        FROM CRMADMIN.TBS_COUPON TC
+	        LEFT OUTER JOIN (SELECT COUNT(NO_PIN) AS CNT ,CD_COUPON
+	                           FROM CRMADMIN.TBS_COUPON_PIN
+	                       GROUP BY CD_COUPON) ALL_CUP
+	          ON ALL_CUP.CD_COUPON= TC.CD_COUPON
+	        LEFT OUTER JOIN (SELECT COUNT(CD_COUPON) AS CNT, CD_COUPON FROM (
+	                              SELECT COUNT(ID_MEMBER) AS CNT , CD_COUPON
+	                                FROM CRMADMIN.TBS_COUPON_PIN
+	                               WHERE ID_MEMBER IS NOT NULL
+	                                 AND DT_PUBLISH IS NOT NULL
+	                            GROUP BY CD_COUPON,ID_MEMBER)
+	                        GROUP BY CD_COUPON) ALL_MEM
+	          ON ALL_MEM.CD_COUPON = TC.CD_COUPON
+	        LEFT OUTER JOIN (SELECT COUNT(NO_PIN) AS CNT ,CD_COUPON
+	                           FROM CRMADMIN.TBS_COUPON_PIN
+	                            WHERE STATUS != 'N'
+	                       GROUP BY CD_COUPON,STATUS) CUP_A
+	          ON CUP_A.CD_COUPON = TC.CD_COUPON
+	        LEFT OUTER JOIN (SELECT COUNT(CD_COUPON) AS CNT, CD_COUPON
+	                             FROM (
+	                                SELECT COUNT(ID_MEMBER) AS CNT ,CD_COUPON
+	                                FROM CRMADMIN.TBS_COUPON_PIN
+	                               WHERE STATUS != 'N'
+	                                 AND ID_MEMBER IS NOT NULL
+	                            GROUP BY CD_COUPON, ID_MEMBER
+	                            )
+	                         GROUP BY CD_COUPON) CUP_A_M
+	          ON CUP_A_M.CD_COUPON = TC.CD_COUPON
+	        LEFT OUTER JOIN (SELECT COUNT(NO_PIN) AS CNT ,CD_COUPON
+	                           FROM CRMADMIN.TBS_COUPON_PIN
+	                            WHERE STATUS = 'N'
+	                       GROUP BY CD_COUPON) CUP_N
+	          ON CUP_N.CD_COUPON = TC.CD_COUPON
+	        LEFT OUTER JOIN (SELECT COUNT(CD_COUPON) AS CNT, CD_COUPON
+	                             FROM (
+	                                SELECT COUNT(ID_MEMBER) AS CNT ,CD_COUPON
+	                                FROM CRMADMIN.TBS_COUPON_PIN
+	                               WHERE STATUS = 'N'
+	                                 AND ID_MEMBER IS NOT NULL
+	                            GROUP BY CD_COUPON, ID_MEMBER
+	                            )
+	                         GROUP BY CD_COUPON ) CUP_N_M
+	          ON CUP_N_M.CD_COUPON = TC.CD_COUPON
+	       WHERE TC.CD_COUPON_OBJ = 4
+	       <if test="DT_END != null and DT_END != ''">
+	       	 AND #{DT_END} >= TO_CHAR(DT_EXPIRY_START, 'YYYY-MM-DD')
+	       </if>
+	       <if test="DT_START != null and DT_START != ''">
+	       	 AND TO_CHAR(DT_EXPIRY_END, 'YYYY-MM-DD') >= #{DT_START}
+	       </if>
+	</sql>
+	<!-- 리워드 쿠폰 현황 목록 조회 -->
+	<select id="getRewardCouponList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getRewardCouponList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 리워드 쿠폰 현황 목록 조회 - count -->
+	<select id="getRewardCouponList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getRewardCouponList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 리워드 쿠폰 현황 목록 조회 - paging -->
+	<select id="getRewardCouponList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getRewardCouponList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		QueryId     : CouponManageDAO.getStampList
+		Description : 스탬프 목록  조회 
+	 -->
+	<sql id="getStampList_base">
+		SELECT TS.NO_STAMP
+			 , TS.TP_SET
+			 , TS.DS_TITLE
+			 , TO_CHAR(TS.DT_APPLY_START, 'YYYY-MM-DD') ||' ~ '||TO_CHAR(TS.DT_APPLY_END, 'YYYY-MM-DD') AS DT_APPLY
+			 , NVL(TSR.CNT, 0) ||' 개' AS CNT_ROLE
+			 , TS.FG_USE
+			 , SU.USER_NM AS NM_USER_REG
+			 , TO_CHAR(TS.DT_REG,'YYYY-MM-DD') AS DT_REG
+		  FROM CRMADMIN.TBS_STAMP TS
+		  LEFT OUTER JOIN (SELECT COUNT(NO_STAMP) AS CNT
+		  						, NO_STAMP FROM (
+		  											SELECT NO_STAMP, ID_MENU
+		  											  FROM CRMADMIN.TBS_STAMP_ROLE
+		  										  GROUP BY NO_STAMP,ID_MENU
+		  										 )
+                           GROUP BY NO_STAMP) TSR
+			ON TS.NO_STAMP = TSR.NO_STAMP
+		  LEFT OUTER JOIN CRMADMIN.SYS_USER SU
+			ON SU.USER_ID = TS.ID_REG_USER
+		 where FG_DEL = 'N'
+		 <if test="DT_END != null and DT_END != ''">
+		 	AND #{DT_END} >= TO_CHAR(TS.DT_APPLY_START, 'YYYY-MM-DD')
+		 </if>
+		 <if test="DT_START != null and DT_START != ''">
+		 	AND TO_CHAR(TS.DT_APPLY_END, 'YYYY-MM-DD') >= #{DT_START}
+		 </if>
+		 <if test="DS_TITLE != null and DS_TITLE != ''">
+		 	AND TS.DS_TITLE LIKE '%'||#{DS_TITLE}||'%'
+		 </if>
+		 <if test="FG_USE != null and FG_USE != ''">
+		 	AND TS.FG_USE = #{FG_USE}
+		 </if>
+	  ORDER BY TP_SET ASC, DT_REG DESC
+	</sql>
+	
+	<!-- 스탬프 목록 조회 -->
+	<select id="getStampList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getStampList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 스탬프 목록 조회 - count -->
+	<select id="getStampList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getStampList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 스탬프 목록 조회 - paging -->
+	<select id="getStampList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getStampList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	
+	<!--
+		QueryId     : CouponManageDAO.reInsertCoupon
+		Description : 쿠폰 마스터 재등록
+	 -->
+	<insert id="reInsertCoupon" parameterType="map">
+		<selectKey keyProperty="CD_COUPON_NEW" resultType="String" order="BEFORE">
+			SELECT SEQ_TBS_COUPON.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO CRMADMIN.TBS_COUPON
+		(
+			  CD_COUPON           /* 쿠폰코드            */
+			, CD_COUPON_OBJ       /* 대상(딜리버리, 킹오더 등) */
+			, NM_COUPON           /* 쿠폰명             */
+			, DS_COUPON           /* 쿠폰설명            */
+			, NO_COUPON_ORDER     /* 쿠폰순서            */
+			, TP_EXPIRY_DATE      /* 유효기간구분          */
+			, DT_EXPIRY_START     /* 유효기간시작일         */
+			, DT_EXPIRY_END       /* 유효기간종료일         */
+			, FG_PUB              /* 발행여부            */
+			, CD_GOODS            /* 다우상품코드          */
+			, NM_GOODS            /* 다우상품명           */
+			, IMG_GOODS           /* 다우상품이미지         */
+			, CD_COUPON_TARGET    /* 쿠폰대상(금액,상품)     */
+			, CD_SALE_POLICY      /* 할인정책            */
+			, VAL_SALE_POLICY     /* 할인금액            */
+			, VAL_LIMIT_PRICE     /* 최소주문금액          */
+			, PRODUCT_PK          /* 할인상품            */
+			, PRODUCT_PK_REAL     /* 실제판매상품          */
+			, TP_MEMBER           /* 대상회원구분          */
+			, DT_REG              /* 최초등록일시          */
+			, ID_REG_USER         /* 최초등록자           */
+			, DT_UPT              /* 최근수정일시          */
+			, ID_UPT_USER         /* 최근수정자           */
+			, NO_REQ              /* 다우계약번호          */
+			, NM_CUP_MENU
+			, REAL_CUP_PRICE
+			, SALE_CUP_PRICE
+			, SALE_CUP_RATE
+			
+
+		)
+	SELECT	#{CD_COUPON_NEW}      /* 쿠폰코드            */
+			, CD_COUPON_OBJ       /* 대상(딜리버리, 킹오더 등) */
+			, NM_COUPON           /* 쿠폰명             */
+			, DS_COUPON           /* 쿠폰설명            */
+			, (SELECT NVL(MAX(NO_COUPON_ORDER),0)+1 
+				 FROM CRMADMIN.TBS_COUPON 
+				WHERE CD_COUPON_OBJ = TC.CD_COUPON_OBJ
+				  AND #{DT_EXPIRY_START} = TO_CHAR(DT_EXPIRY_START,'YYYY-MM-DD')
+				  AND #{DT_EXPIRY_END} = TO_CHAR(DT_EXPIRY_END,'YYYY-MM-DD')
+			  )     /* 쿠폰순서            */
+			, TP_EXPIRY_DATE      /* 유효기간구분          */
+			, TO_DATE(#{DT_EXPIRY_START}||'000000', 'YYYY-MM-DDHH24MISS')  /* 유효기간시작일         */
+			, TO_DATE(#{DT_EXPIRY_END}||'235959', 'YYYY-MM-DDHH24MISS')    /* 유효기간종료일         */
+			, 'Y'	              /* 발행여부            */
+			, CD_GOODS            /* 다우상품코드          */
+			, NM_GOODS            /* 다우상품명           */
+			, IMG_GOODS           /* 다우상품이미지         */
+			, CD_COUPON_TARGET    /* 쿠폰대상(금액,상품)     */
+			, CD_SALE_POLICY      /* 할인정책            */
+			, VAL_SALE_POLICY     /* 할인금액            */
+			, VAL_LIMIT_PRICE     /* 최소주문금액          */
+			, PRODUCT_PK          /* 할인상품            */
+			, PRODUCT_PK_REAL     /* 실제판매상품          */
+			, TP_MEMBER           /* 대상회원구분          */
+			, SYSDATE             /* 최초등록일시          */
+			, #{user.id}          /* 최초등록자           */
+			, SYSDATE             /* 최근수정일시          */
+			, #{user.id}          /* 최근수정자           */
+			, NO_REQ              /* 다우계약번호          */
+			, NM_CUP_MENU
+			, REAL_CUP_PRICE
+			, SALE_CUP_PRICE
+			, SALE_CUP_RATE
+		   FROM	CRMADMIN.TBS_COUPON TC
+		  WHERE CD_COUPON = #{CD_COUPON}
+	</insert>
+	
+	<!--
+		QueryId     : CouponManageDAO.getAttachCount
+		Description : 첨부파일 개수 조회
+	 -->
+	<select id="getAttachCount" parameterType="map" resultType="lmap">
+		SELECT SA.ATTACH_ID
+		  FROM CRMADMIN.SYS_ATTACH SA
+		  LEFT OUTER JOIN CRMADMIN.SYS_ATTACH_LINK SAL
+            ON SAL.ATTACH_ID = SA.ATTACH_ID
+         WHERE SAL.BIZ_KEY = #{CD_COUPON}
+           AND SAL.BIZ_TP = 'COUPON'
+	</select>
+	
+	
+	<!--
+		QueryId     : CouponManageDAO.insertAttach
+		Description : 첨부파일 재등록
+	 -->
+	<insert id="insertAttach" parameterType="map">
+		INSERT INTO CRMADMIN.SYS_ATTACH
+		(
+			  ATTACH_ID
+			, FILE_NM
+			, FILE_PATH
+			, FILE_SIZE
+			, REG_DT
+			, CONTENT_TYPE
+			, ATTACH_TYPE
+			, ATTACH_SUB_TYPE
+			, FILE_CONTENT
+						
+		)
+	   SELECT #{ATTACH_ID_NEW}
+			, SA.FILE_NM
+            , SA.FILE_PATH
+            , SA.FILE_SIZE
+            , SYSDATE
+            , SA.CONTENT_TYPE
+            , SA.ATTACH_TYPE
+            , SA.ATTACH_SUB_TYPE
+            , SA.FILE_CONTENT
+         FROM CRMADMIN.SYS_ATTACH SA
+        WHERE ATTACH_ID = #{ATTACH_ID}
+	</insert>
+	
+	<!--
+		QueryId     : CouponManageDAO.insertAttachLink
+		Description : 첨부파일Link 재등록
+	 -->
+	<insert id="insertAttachLink" parameterType="map">
+		INSERT INTO CRMADMIN.SYS_ATTACH_LINK
+		(
+			  ATTACH_LINK_ID
+			, ATTACH_ID
+			, BIZ_TP
+			, BIZ_KEY
+		)
+		VALUES
+		(
+			  #{ATTACH_LINK_ID}
+		    , #{ATTACH_ID_NEW}
+		    , 'COUPON'
+		    , #{CD_COUPON_NEW}
+		)
+	</insert>
+	
+	<!--
+		QueryId     : CouponManageDAO.reinsertStoreEx
+		Description : 첨부파일 재등록
+	 -->
+	<insert id="reinsertStoreEx" parameterType="map">
+		INSERT INTO CRMADMIN.TBS_COUPON_STORE_EXCEPT
+		(
+			  NO_STORE_EXCEPT
+			, ID_STORE_EXCEPT
+			, NM_STORE_EXCEPT
+			, CD_COUPON
+			
+		)
+	   SELECT SEQ_TBS_COUPON_STORE_EXCEPT.NEXTVAL
+			, ID_STORE_EXCEPT
+			, NM_STORE_EXCEPT
+			, #{CD_COUPON_NEW}
+		 FROM CRMADMIN.TBS_COUPON_STORE_EXCEPT
+		WHERE CD_COUPON = #{CD_COUPON}
+	</insert>
+</mapper>
+ 

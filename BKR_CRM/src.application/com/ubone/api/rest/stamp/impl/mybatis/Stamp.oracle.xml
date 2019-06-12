@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ApiStamp">
+
+	<!--
+		QueryId     : ApiStamp.getStampUse
+		Description : 스템프 사용가능 정보 확인
+	 -->
+	<select id="getStampUse" parameterType="map" resultType="lmap">
+		SELECT *
+		  FROM CRMADMIN.TBS_STAMP TS
+		 WHERE TS.FG_DEL = 'N' 
+		   AND TS.FG_USE = 'Y'
+		   AND TS.DT_APPLY_START <![CDATA[<=]]> SYSDATE
+		   AND TS.DT_APPLY_END >= SYSDATE
+
+	</select>
+	
+	<!--
+		QueryId     : ApiStamp.chkOrderStamp
+		Description : 기 등록 주문 확인
+	 -->
+	<select id="chkOrderStamp" parameterType="map" resultType="lmap">
+		SELECT ORDER_NO
+		  FROM CRMADMIN.TBS_MEMBER_STAMP_RECORD
+		 WHERE ORDER_NO = #{ORDER_NO}
+
+	</select>
+
+	<!--
+		QueryId     : ApiStamp.getMemberGrade
+		Description : 회원 등급 조회
+	 -->
+	<select id="getMemberGrade" parameterType="map" resultType="lmap">
+		SELECT ID_MEMBER
+		     , DS_EMAIL
+		     , CD_GRADE
+		     , CNT_STAMP
+		     , TRUNC(CNT_STAMP / 5) AS FIVE_COUPON
+		     , TRUNC(CNT_STAMP / 10) AS TEN_COUPON
+		  FROM CRMADMIN.TBS_MEMBER
+		 WHERE 1 = 1
+		<if test="ID_MEMBER != null and ID_MEMBER != ''">
+		   AND ID_MEMBER = #{ID_MEMBER}
+		</if>
+		<if test="BRCD_MEMBER != null and BRCD_MEMBER != ''">
+		   AND BRCD_MEMBER = #{BRCD_MEMBER}
+		</if>
+
+	</select>
+	
+	<!--
+		QueryId     : ApiStamp.getStampExcept
+		Description : 스템프 적립 가능매장 확인
+	 -->
+	<select id="getStampExcept" parameterType="map" resultType="lmap">
+		SELECT TS.NO_STAMP
+		     , TSES.ID_STORE
+		     , TSES.NM_STORE
+		  FROM CRMADMIN.TBS_STAMP TS
+		 INNER JOIN CRMADMIN.TBS_STAMP_EXCEPT_STORE TSES
+		    ON TSES.NO_STAMP = TS.NO_STAMP
+		 WHERE TS.FG_DEL = 'N'
+		   AND TS.FG_USE = 'Y'
+		   AND TS.TP_SET = #{TP_SET}
+		   AND TS.DT_APPLY_START <![CDATA[<=]]> SYSDATE
+		   AND TS.DT_APPLY_END >= SYSDATE
+		   AND TSES.ID_STORE = #{ID_STORE}
+
+	</select>
+	
+	<!--
+		QueryId     : ApiStamp.getCntStamp
+		Description : 스템프 적립건수 조회
+	 -->
+	<select id="getCntStamp" parameterType="map" resultType="lmap">
+		SELECT CNT_ACCML * TO_NUMBER(#{CNT_BUY}) AS CNT_STAMP
+		  FROM CRMADMIN.TBS_STAMP TS
+		 INNER JOIN CRMADMIN.TBS_STAMP_STND TSS
+		    ON TS.NO_STAMP = TSS.NO_STAMP
+		 INNER JOIN CRMADMIN.TBS_STAMP_ROLE TSR
+		    ON TS.NO_STAMP = TSR.NO_STAMP
+		 WHERE TS.FG_DEL = 'N'
+		   AND TS.FG_USE = 'Y'
+		   AND TSR.FG_USE = 'Y'
+		   AND TS.TP_SET = #{TP_SET}
+		   AND TS.DT_APPLY_START <![CDATA[<=]]> SYSDATE
+		   AND TS.DT_APPLY_END >= SYSDATE
+		   AND TSS.CD_MTH_PURCHS = #{CD_MTH_PURCHS}
+		   AND TSS.CD_ORDER_CHNN = #{CD_ORDER_CHNN}
+		   AND TSR.ID_MENU = #{ID_MENU}
+		   AND TSR.CD_GRADE = #{CD_GRADE}
+
+	</select>
+	
+	<!--
+		QueryId     : ApiStamp.getStampRecord
+		Description : 회원 스탬프 이력 조회
+	 -->
+	<select id="getStampRecord" parameterType="map" resultType="lmap">
+		SELECT TM.ID_MEMBER                    /* 회원PK */
+			 , MOD(TM.CNT_STAMP, 10) AS CNT_STAMP /* 스템프개수 */
+			 , TMSR.NO_MEMBER_STAMP_RECORD     /* 회원스템프이력 일련번호 */
+			 , TMSR.ORDER_NO                   /* 주문번호 */
+			 , TMSR.CD_INCREMENT               /* 증가/차감코드 */
+			 , TMSR.TP_INCREMENT               /* 증가/차감구분 */
+			 , TMSR.FG_EVENT                   /* 이벤트여부 */
+			 , TMSR.CNT_STAMP_INCRE            /* 증가/차감스탬프갯수 */
+			 , TMSR.CNT_STAMP_STACK            /* 누적스탬프갯수 */
+			 , TMSR.YN_STMAP_LAST              /* 최종스탬프여부 */
+			 , TMSR.DT_REG                     /* 최초등록일시 */
+			 , TMSR.ID_REG_USER                /* 최초등록자 */
+			 , TMSR.DT_UPT                     /* 최근수정일시 */
+			 , TMSR.ID_UPT_USER                /* 최근수정자 */
+		  FROM CRMADMIN.TBS_MEMBER TM
+		 INNER JOIN CRMADMIN.TBS_MEMBER_STAMP_RECORD TMSR
+		    ON TM.ID_MEMBER = TMSR.ID_MEMBER
+		   AND TMSR.YN_STMAP_LAST = 'Y'
+		 WHERE TM.ID_MEMBER = #{ID_MEMBER}
+
+	</select>
+	
+	<!--
+		QueryId     : ApiStamp.getStampOrderRecord
+		Description : 회원스템프 차감을 위한 기존 이력 조회
+	 -->
+	<select id="getStampOrderRecord" parameterType="map" resultType="lmap">
+		SELECT TM.ID_MEMBER                    /* 회원PK */
+			 , TM.DS_EMAIL                     /* 회원이메일 */
+			 , TM.CNT_STAMP                    /* 스템프개수 */
+			 , TMSR.NO_MEMBER_STAMP_RECORD     /* 회원스템프이력 일련번호 */
+			 , TMSR.ORDER_NO                   /* 주문번호 */
+			 , TMSR.STOR_CD                    /* 주문매장 */
+			 , TMSR.CD_INCREMENT               /* 증가/차감코드 */
+			 , TMSR.TP_INCREMENT               /* 증가/차감구분 */
+			 , TMSR.FG_EVENT                   /* 이벤트여부 */
+			 , TMSR.CNT_STAMP_INCRE            /* 증가/차감스탬프갯수 */
+			 , TMSR.CNT_STAMP_STACK            /* 누적스탬프갯수 */
+			 , TMSR.YN_STMAP_LAST              /* 최종스탬프여부 */
+			 , TMSR.DT_REG                     /* 최초등록일시 */
+			 , TMSR.ID_REG_USER                /* 최초등록자 */
+			 , TMSR.DT_UPT                     /* 최근수정일시 */
+			 , TMSR.ID_UPT_USER                /* 최근수정자 */
+		  FROM CRMADMIN.TBS_MEMBER TM
+		 INNER JOIN CRMADMIN.TBS_MEMBER_STAMP_RECORD TMSR
+		    ON TM.ID_MEMBER = TMSR.ID_MEMBER
+		 WHERE TM.ID_MEMBER = #{ID_MEMBER}
+		   AND TMSR.ORDER_NO = #{ORDER_NO}
+
+	</select>
+	
+	<!--
+		QueryId     : ApiStamp.getMemberRewardCnt
+		Description : 발행된 리워드 쿠폰 갯수 조회
+	 -->
+	<select id="getMemberRewardCnt" parameterType="map" resultType="lmap">
+		SELECT A.CODE AS TP_REWARD
+		     , NVL(B.CNT, 0) AS CNT
+		  FROM CRMADMIN.SYS_CODE A
+		  LEFT OUTER JOIN (SELECT TP_REWARD, COUNT(*) AS CNT
+		                     FROM CRMADMIN.TBS_MEMBER_STAMP_REWARD
+		                    WHERE ID_MEMBER = #{ID_MEMBER}
+		                    GROUP BY TP_REWARD
+		                   ) B
+		    ON A.CODE = B.TP_REWARD
+		 WHERE CODE_CATEGORY_ID = 'TP_REWARD' 
+
+	</select>
+	
+	<!--
+		QueryId     : ApiStamp.getMemberRewardOrder
+		Description : 주문번호로 적립된 리워드 쿠폰 존재여부 확인
+	 -->
+	<select id="getMemberRewardOrder" parameterType="map" resultType="lmap">
+		SELECT ID_MEMBER                  /* 회원PK */
+			 , NO_MEMBER_STAMP_REWARD     /* 회원스템프리워드일련번호 */
+			 , ORDER_NO                   /* 주문번호 */
+			 , TP_REWARD                  /* 리워드구분(5개,10개) */
+			 , CD_COUPON                  /* 쿠폰코드 */
+			 , DT_ACT_STAMP_EXCHANGE      /* 스템프교환가능일자 */
+			 , DT_STAMP_ISSUE             /* 스템프발급일자 */
+			 , FG_ISSUE                   /* 발급여부 */
+			 , DT_REG                     /* 최초등록일시 */
+			 , ID_REG_USER                /* 최초등록자 */
+			 , DT_UPT                     /* 최근수정일시 */
+			 , ID_UPT_USER                /* 최근수정자 */
+		  FROM CRMADMIN.TBS_MEMBER_STAMP_REWARD
+		 WHERE ORDER_NO = #{ORDER_NO}
+
+	</select>
+	
+	<!--
+		QueryId     : ApiStamp.getStampAfterRecord
+		Description : 스템프 이후 적립여부 확인
+	 -->
+	<select id="getStampAfterRecord" parameterType="map" resultType="lmap">
+		SELECT NO_MEMBER_STAMP_RECORD    /* 회원스템프이력일련번호 */
+             , ORDER_NO                    /* 주문번호 */
+             , ID_MEMBER                /* 회원PK */
+             , CD_INCREMENT                /* 증/차감코드 */
+             , TP_INCREMENT                /* 증/차감구분(스템프전환,상품구입 등) */
+             , FG_EVENT                    /* 이벤트여부 */
+             , CNT_STAMP_INCRE            /* 증/차감스템프갯수 */
+             , CNT_STAMP_STACK            /* 누적스템프갯수 */
+             , YN_STMAP_LAST            /* 최종스템프여부 */
+             , STOR_CD                    /* 주문매장 */
+             , DT_REG                    /* 최초등록일시 */
+		  FROM CRMADMIN.TBS_MEMBER_STAMP_RECORD A
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+		   AND CD_INCREMENT = '01'
+		   AND DT_REG >= (SELECT DT_REG
+		                    FROM CRMADMIN.TBS_MEMBER_STAMP_RECORD A
+		                   WHERE ID_MEMBER = #{ID_MEMBER}
+		                     AND ORDER_NO = #{ORDER_NO}) 
+
+	</select>
+	
+	<!--
+		QueryId     : ApiStamp.getUseRewardCoupon
+		Description : 리워드 쿠폰 사용여부 조회
+	 -->
+	<select id="getUseRewardCoupon" parameterType="map" resultType="lmap">
+		SELECT NVL(TCP.STATUS, 'N') AS FG_USE
+		  FROM CRMADMIN.TBS_MEMBER_STAMP_REWARD TMSR
+		  LEFT OUTER JOIN CRMADMIN.TBS_COUPON_PIN  TCP
+		    ON TCP.NO_MEMBER_STAMP_REWARD = TMSR.NO_MEMBER_STAMP_REWARD
+		   AND TCP.CD_COUPON = TMSR.CD_COUPON
+		   AND TCP.ID_MEMBER = TMSR.ID_MEMBER
+		   AND TCP.STATUS <![CDATA[<>]]> 'C'
+		   AND TCP.DT_USE >= (SELECT DT_REG
+								FROM CRMADMIN.TBS_MEMBER_STAMP_RECORD A
+							   WHERE ID_MEMBER = #{ID_MEMBER}
+								 AND ORDER_NO = #{ORDER_NO}
+								 AND CD_INCREMENT = '01')
+		 WHERE TMSR.ID_MEMBER = #{ID_MEMBER}
+
+	</select>
+	
+	<!--
+		QueryId     : ApiStamp.getRewardMax
+		Description : 최근 적립된 리워드 조회
+	 -->
+	<select id="getRewardMax" parameterType="map" resultType="lmap">
+		SELECT MAX(NO_MEMBER_STAMP_REWARD) AS NO_MEMBER_STAMP_REWARD
+		  FROM CRMADMIN.TBS_MEMBER_STAMP_REWARD
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+		   AND TP_REWARD = #{TP_REWARD}
+
+	</select>
+	
+	<!-- ************************************************************** -->
+	<!-- ************************************************************** -->
+	<!-- ************************************************************** -->
+	
+	<!--
+		QueryId     : ApiStamp.updateMemberStampPlus
+		Description : 회원스템프적립
+	 -->
+	<update id="updateMemberStampPlus" parameterType="map">
+		UPDATE CRMADMIN.TBS_MEMBER
+		   SET CNT_STAMP = CNT_STAMP + TO_NUMBER(#{CNT_STAMP})
+		     , DT_CHNG_GRADE = SYSDATE
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+
+	</update>
+	
+	<!--
+		QueryId     : ApiStamp.updateMemberStampMinus
+		Description : 회원스템프차감
+	 -->
+	<update id="updateMemberStampMinus" parameterType="map">
+		UPDATE CRMADMIN.TBS_MEMBER
+		   SET CNT_STAMP = CNT_STAMP - TO_NUMBER(#{CNT_STAMP})
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+
+	</update>
+	
+	<!--
+		QueryId     : ApiStamp.updateStampRecord
+		Description : 회원의 기존 스템프 이력 수정
+	 -->
+	<update id="updateStampRecord" parameterType="map">
+		UPDATE CRMADMIN.TBS_MEMBER_STAMP_RECORD
+		   SET YN_STMAP_LAST = 'N'
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+
+	</update>
+	
+	<!--
+		QueryId     : ApiStamp.insertStampRecord
+		Description : 회원스템프이력 저장
+	 -->
+	<insert id="insertStampRecord" parameterType="map">
+		<selectKey keyProperty="SEQ_TBS_MEMBER_STAMP_RECORD" resultType="String" order="BEFORE">
+			SELECT CRMADMIN.SEQ_TBS_MEMBER_STAMP_RECORD.NEXTVAL FROM DUAL 
+		</selectKey>
+		
+		INSERT INTO CRMADMIN.TBS_MEMBER_STAMP_RECORD
+		(
+			   NO_MEMBER_STAMP_RECORD     /* 회원스템프이력 일련번호 */
+			 , ID_MEMBER                  /* 회원PK */
+			 , ORDER_NO                   /* 주문번호 */
+			 , CD_INCREMENT               /* 증가/차감코드 */
+			 , TP_INCREMENT               /* 증가/차감구분 */
+			 , FG_EVENT                   /* 이벤트여부 */
+			 , CNT_STAMP_INCRE            /* 증가/차감스탬프갯수 */
+			 , CNT_STAMP_STACK            /* 누적스탬프갯수 */
+			 , YN_STMAP_LAST              /* 최종스탬프여부 */
+			 , DT_REG                     /* 최초등록일시 */
+			 , ID_REG_USER                /* 최초등록자 */
+			 , DT_UPT                     /* 최근수정일시 */
+			 , ID_UPT_USER                /* 최근수정자 */
+			 , STOR_CD                    /* 주문매장 */
+		) VALUES (
+		       #{SEQ_TBS_MEMBER_STAMP_RECORD}
+			 , #{ID_MEMBER}
+			 , #{ORDER_NO}
+			 , #{CD_INCREMENT}
+			 , #{TP_INCREMENT}
+			 , #{FG_EVENT}
+			 , #{CNT_STAMP_INCRE}
+			 , TO_NUMBER(#{CNT_STAMP_STACK})
+			 , 'Y'
+			 , SYSDATE
+			 , #{ID_MEMBER}
+		     , SYSDATE
+		     , #{ID_MEMBER}
+		     , #{STOR_CD}
+		)
+		    
+	</insert>
+	
+	<!--
+		QueryId     : ApiStamp.insertMemberstampReward
+		Description : 회원 스템프 리워드 저장
+	 -->
+	<insert id="insertMemberstampReward" parameterType="map">
+		<selectKey keyProperty="SEQ_TBS_MEMBER_STAMP_REWARD" resultType="String" order="BEFORE">
+			SELECT CRMADMIN.SEQ_TBS_MEMBER_STAMP_REWARD.NEXTVAL FROM DUAL 
+		</selectKey>
+		
+		INSERT INTO CRMADMIN.TBS_MEMBER_STAMP_REWARD
+		(
+			   ID_MEMBER                  /* 회원PK */
+			 , NO_MEMBER_STAMP_REWARD     /* 회원스템프리워드일련번호 */
+			 , ORDER_NO                   /* 주문번호 */
+			 , TP_REWARD                  /* 리워드구분(5개,10개) */
+			 , CD_COUPON                  /* 쿠폰코드 */
+			 , DT_ACT_STAMP_EXCHANGE      /* 스템프교환가능일자 */
+			 , DT_STAMP_ISSUE             /* 스템프발급일자 */
+			 , FG_ISSUE                   /* 발급여부 */
+			 , DT_REG                     /* 최초등록일시 */
+			 , ID_REG_USER                /* 최초등록자 */
+			 , DT_UPT                     /* 최근수정일시 */
+			 , ID_UPT_USER                /* 최근수정자 */
+		) VALUES (
+		       #{ID_MEMBER}
+			 , #{SEQ_TBS_MEMBER_STAMP_REWARD}
+			 , #{ORDER_NO}
+			 , #{TP_REWARD}
+			 , NULL
+			 , SYSDATE + 1
+			 , NULL
+			 , 'N'
+			 , SYSDATE
+			 , #{ID_MEMBER}
+		     , SYSDATE
+		     , #{ID_MEMBER}
+		)
+		    
+	</insert>
+	
+	<!--
+		QueryId     : ApiStamp.deleteMemberReward
+		Description : 회원리워드쿠폰 삭제
+	 -->
+	<delete id="deleteMemberReward" parameterType="map">
+		DELETE CRMADMIN.TBS_MEMBER_STAMP_REWARD
+		 WHERE NO_MEMBER_STAMP_REWARD = #{NO_MEMBER_STAMP_REWARD}
+
+	</delete>
+	
+	<!--
+		QueryId     : ApiStamp.updateRewardCoupon
+		Description : 리워드 쿠폰 취소 처리
+	 -->
+	<update id="updateRewardCoupon" parameterType="map">
+		UPDATE CRMADMIN.TBS_COUPON_PIN
+		   SET STATUS = 'C'
+		 WHERE NO_MEMBER_STAMP_REWARD = #{NO_MEMBER_STAMP_REWARD}
+
+	</update>
+	
+</mapper>
+ 

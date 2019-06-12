@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+	<!--
+		================================================================================
+		Message Resource 관련 Configuration
+		================================================================================
+	-->
+<!-- 	<bean id="propertiesMessageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource"> -->
+<!--         <property name="defaultEncoding" value="UTF-8"/> -->
+<!--         <property name="cacheSeconds" value="0"/> -->
+<!--         <property name="fallbackToSystemLocale" value="false"/> -->
+<!-- 		<property name="basenames"> -->
+<!-- 			<list> -->
+<!-- 				<value>classpath:resource/message/button-common</value> -->
+<!-- 				<value>classpath:resource/message/label-common</value> -->
+<!-- 				<value>classpath:resource/message/message-common</value> -->
+<!-- 				<value>classpath:resource/message/message-error</value> -->
+<!-- 				<value>classpath:resource/message/apmd-resource</value> -->
+<!-- 			</list> -->
+<!-- 		</property> -->
+<!--     </bean> -->
+
+<!--     <bean id="messageSource" class="com.ubone.framework.message.DatabaseDrivenMessageSource"> -->
+<!--     	<constructor-arg ref="messageRepository"/> -->
+<!--         <property name="parentMessageSource" ref="propertiesMessageSource"/> -->
+<!--     </bean>	 -->
+    
+<!--     <bean id="messageRepository" class="com.ubone.framework.repository.message.JdbcMessageRepository" parent="frameworkRepository" /> -->
+    
+	
+	<bean id="messageLoader" class="com.ubone.framework.message.MessageLoader" init-method="initilize">
+		<!-- 
+			메세지를 DB에서 사용하지 않는 경우에는 주석 처리한다. 활성화 되어 있을 경우 Properties 파일에 존재하지 않는 메세지 호출시마다 DB를 검색하는 쿼리를 실행함.
+		 -->
+		<property name="messageRepository">
+			<bean class="com.ubone.framework.repository.message.JdbcMessageRepository" parent="frameworkRepository"/>
+		</property>
+    </bean>	
+	
+	<!--
+		Java8을 사용할 경우 MessageSource를 변경한다.
+	 	<bean id="messageSource" class="com.ubone.framework.message.ReloadableResourceBundleMessageSource">
+	 -->
+	<bean id="messageSource" class="com.ubone.framework.message.MessageSource">
+		<property name="defaultEncoding" value="UTF-8"/>
+		<property name="basenames">
+			<list>
+				<value>classpath:resource/message/button-common</value>
+				<value>classpath:resource/message/label-common</value>
+				<value>classpath:resource/message/message-common</value>
+				<value>classpath:resource/message/message-error</value>
+				<value>classpath:resource/message/apmd-resource</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="messageSourceAccessor" class="org.springframework.context.support.MessageSourceAccessor">
+    	<constructor-arg ref="messageSource"/>
+	</bean>
+
+	<!-- Locale 변경 인터셉터 -->
+<!-- 	<bean id="localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor"> -->
+<!-- 		<property name="paramName" value="app_lang" /> -->
+<!-- 	</bean> -->
+
+	<bean id="localeChangeInterceptor" class="com.ubone.framework.web.WebLocaleChangeInterceptor">
+		<property name="isUpdateUserLangCd" value="true"/>
+		<property name="paramName" value="app_lang" />
+	</bean>
+
+	<bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver">
+		<property name="defaultLocale" value="${framework.locale.default.language}"/><!-- 초기언어코드는 config.xml 파일에 정의되어 있음 -->
+	</bean>
+	
+    <bean id="messageService" class="com.ubone.framework.message.MessageService">
+        <property name="messageSource" ref="messageSource" />
+    </bean>
+</beans>

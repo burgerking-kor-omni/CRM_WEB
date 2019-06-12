@@ -1,0 +1,24 @@
+1. 불특정 다수의 element 집합 만들기
+   -> layout1, layout2 와 같이 공통점이 없는 다수의 대상을 선택할 경우
+      $('#layout, #layout') 형식으로 ','문자를 사용하여 필요로 하는 대상을 나열하거나 
+      $('#layout').add('#layout') 형식으로 add 유틸메소드를 사용하여 대상을 덧붙힌다.
+      
+2. 다수의 스타일 적용
+   -> $('#id').css('top', 1).css('left', 1) 처럼 다수의 스타일 속성을 설정할 경우
+      $('#id').css({
+      	'top': 1,
+      	'left' : 1
+      }) 형식으로 동일 메소드 반복호출을 줄일 수 있다.
+      
+3. url 이동이나 각종 기능 호출 메소드의 성공 메소드 사용 팁
+   -> 화면 이동시 uxl.moveLocation() 함수의 매개변수로 화면 ID를 넘기면 해당 화면으로 이동한다.
+      예) uxl.moveLocation('TST0001');
+      
+      마찬가지로 기능 호출 옵션 작성시 성공핸들러 속성값을 화면 ID로 설정하면 해당 화면으로 이동한다.
+      예) uxl.Page.makeServiceEventOption('REMOVE', {
+          	success:'MCM0018'
+          })
+      
+4. 메세지 함수 호출 팁
+   -> uxl.showMessage() 함수의 매개변수로 '@' + 메세지 리소스 키값을 넘기면 해당 메세지를 표시한다.
+      예) uxl.showMessage('@message.common.tip');

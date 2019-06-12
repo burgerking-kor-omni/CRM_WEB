@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="UBS0001" screenType="list" screenLayoutType="Default" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>게시판관리 목록</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/ubs/</filePath>
+  <fileName>UBS0001</fileName>
+  <functions>
+    <function id="FNCUBS0295" isStartFunction="false" functionName="게시판관리 / 게시판목록 조회 호출" serviceId="SVCUBS0279" alias="INQUIRY"/>
+    <function id="FNCUBS0307" isStartFunction="false" functionName="게시판관리 / 게시판 연결화면 정보 조회 호출" serviceId="SVCUBS0291" alias="USERDEFINED1"/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+  </authorities>
+</screenBuilder>

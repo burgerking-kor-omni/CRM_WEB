@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<serviceBuilder id="SVCUBD0014" isProtectedResource="false" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <serviceName>게시판 정보 조회</serviceName>
+  <serviceType type="Read"/>
+  <serviceComponentType type="Custom">
+    <className>com.ubone.standard.ubboard.board.base.service.BoardInfomation</className>
+    <methodName>getBoard</methodName>
+    <linkedFile>false</linkedFile>
+    <inducedEvent>false</inducedEvent>
+    <linkedWorkCategory></linkedWorkCategory>
+    <linkedActivity></linkedActivity>
+  </serviceComponentType>
+  <serviceCodes>
+      <serviceCode id="CD_BRAND" includeSleep="false" alias="CD_BRAND"/>
+  </serviceCodes>
+  <serviceMasks/>
+</serviceBuilder>

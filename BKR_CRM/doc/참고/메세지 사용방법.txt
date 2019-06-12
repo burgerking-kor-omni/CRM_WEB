@@ -1,0 +1,104 @@
+1. 메세지 리소스
+   resource/message/message.xml 파일에 Application 에서 사용 할 메세지를 작성한다.
+   메세지의 키값은 반듯이 "message." 형태로 시작되어야 한다.
+   
+   ex) <!-- 일반적인 키 = 메세지 형태의 메세지 설정 -->
+       <entry key="message.common.login.authfail">입력하신 사용자 정보가 올바르지 않습니다.</entry>
+       
+   ex) <!-- 메세지에 치환 변수가 있을 경우의 메세지 설정({0},{1},.. 형태로 치환 변수 삽입) -->
+       <entry key="message.validation.required">{0} 은(는) 필수 항목입니다.</entry>
+
+
+2. 서비스에서 Client 로 메세지 전달하는 방법
+   ResultUtils 을 사용하여 메세지를 client 에게 전달한다.
+   서비스 메소드의 반환 타입이 String 일 경우 별도 처리 없이 문자열을 반환하면
+   해당값이 처리결과 키값으로 반환된다.
+   그러므로 문자열 반환값을 메세지로 사용하기 위해 약간의 처리가 동반되어야 한다.
+   일반적인 처리 내용은 아래 예제 1, 2, 3을 참고한다.
+   특별히 주의 할점은 메세지 리소스(message.xml)에 사전 정의된 메세지를 사용하고자 할 경우
+   해당 메세지 키값을 사용해야 하는데, 정의된 메세지 키값을 그대로 사용하는게 아니라
+   해당 키값 앞에 "@" 문자를 접두어로 붙여 사용해야 한다.
+   또한 치환 변수가 있어서 메세지값의 일부분을 변환하여 사용할 경우에는 메소드의 반환 타입을 String[] 로 한다.
+   
+   ex) public String checkId(Parameter parameter) {
+            .....
+            // 메세지릴 직접 입력하여 반환
+            return ResultUtils.makeResultForMessage("중복된 사용자 입니다.");
+       }
+       
+   ex) public String checkId(Parameter parameter) {
+            .....
+            // 해당 키값(message.user.checkid.false)으로 메세지 리소스(message.xml)의 메세지를 반환
+            return ResultUtils.makeResultForMessage("@message.user.checkid.false");
+       }
+       
+   ex) public String[] checkId(Parameter parameter) {
+            .....
+            // 해당 키값(message.validation.required)으로 메세지 리소스(message.xml)의 메세지를 가져와
+            // 치환 변수값을 변환하여 메세지 반환
+            return ResultUtils.makeResultForMessage("@message.validation.required", "변환할 값1", "변환할 값2", ..., "변환할 값N");
+       }
+   
+   위와 같이 문자열(혹은 문자열의 배열)을 반환하여 클라이언트에게 메세지를 전달하는 방법외에
+   Result 객체나 ServiceMessage 객체를 직접 조작하여 메세지와 함께 전달하고자 하는 다른 값들을
+   클라이언트에게 전달할 수 있다.
+   ex) public Result checkId(Parameter parameter) {
+             .....
+             // result 에 결과 메세지 설정
+             result.getServiceMessage().setMessage("해당값은 사용할 수 없습니다.");
+             return result;
+       }
+   ex) public ServiceMessage checkId(Parameter parameter) {
+             .....
+             // result 에 결과 메세지 설정
+             message.setMessage("해당값은 사용할 수 없습니다.");
+             return message;
+       }
+   
+   
+   *. Result, ServiceMessage 객체 생성 방법
+      서비스 메소드에서 Result, ServiceMessage 객체를 직접 조작하고자 할 경우 해당 객체들을 생성하거나 전달받아 사용 할 수 있다.
+      직접 생성하는 방법 보단 전달 받는 방법을 권장한다.
+      전달 받는 방법은 간단하다.
+      public Result checkId(Parameter parameter, Result result) {
+            .....
+      }
+      public ServiceMessage checkId(Parameter parameter, ServiceMessage message) {
+            .....
+      }
+      위와 같이 메소드 파라미터 시그너쳐에 필요로 하는 객체 타입(Result, ServiceMessage)을 선언해 주면
+      서비스 컨네이너에서 해당 메소드 호출시 선언된 타입의 객체를 생성하여 넘겨준다.
+      
+      
+    *. 서비스 메소드에서 메세지 리소스(message.xml)에 바로 접근하는 방법
+       서비스 메소드에서 메세지 리소스(message.xml)에 접근하여 메세지를 가져올 경우
+       public class  ExampleSO {
+            @Resource
+            private MessageSourceAccessor message;
+            ........
+       }
+       위와 같이 서비스 클래스에 MessageSourceAccessor 변수를 선언하면, DI를 통해 해당 서비스 객체에 MessageSourceAccessor 객체가 주입된다.
+
+
+3. Client(javascript)에서의 메세지 처리 방법
+   메세지 리소스(message.xml)에 선언된 메세지를 가져오고 자 할 경우 
+   uxl.getMessage(mesageeKey, replaceVariable1, replaceVariable2, ..., replaceVariableN) 함수를 사용하여 메세지 내용을 가져온다.
+
+   ex)  // 메세지 리소스(message.xml)로부터 메세지를 가져온다.
+        // 메세지 키값앞에 '@' 접두어 생략 가능
+        var message = uxl.getMessage('@message.user.checkid.false');
+
+   ex)  // 메세지 리소스(message.xml)로부터 메세지를 가져와 치환 변수값을 변환하여 메세지 반환.
+        // 메세지 키값앞에 '@' 접두어 생략 가능
+        var message = uxl.getMessage('@message.validation.required', '변환할 값1', '변환할 값2', ..., '변환할 값N');
+        
+   사용자 알림 창(uxl.showMessage)을 호출하여 메세지 리소스(message.xml)에 정의된 메세지를 보여줄 경우
+   uxl.showMessage(message, fn) 함수호출시 "@" 접두어를 메세지 리소스 키값에 앞에 덧붙여 uxl.showMessage 함수 파라미터의 인자값으로 사용한다.
+
+   ex)  // 메세지 리소스(message.xml)로부터 메세지를 가져와 사용자 알림 창 호출
+        // 메세지 키값앞에 '@' 접두어 필수
+        uxl.showMessage('@message.user.checkid.false');
+        
+   *. 주의!!! uxl.showMessage 함수는 치환 변수에 대한 처리를 지원하지 않고 있다.
+      그러므로 치환 변수가 포함된 메세지 리소스(message.xml)의 메세지를 사용할 경우에는
+      uxl.getMessage 함수를 사용해야 한다.

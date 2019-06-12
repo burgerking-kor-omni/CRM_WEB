@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE tiles-definitions PUBLIC
+"-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN"
+"http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+
+<tiles-definitions>
+	<!-- Default JSP -->
+	<definition name=".Default" template="/WEB-INF/tiles/defaultLayout.jsp">
+		<put-attribute name="body" value=""/>
+	</definition>
+	<!-- Left-Menu JSP -->
+	<definition name=".LeftMenu" template="/WEB-INF/tiles/leftMenuLayout.jsp">
+		<put-attribute name="body" value=""/>
+	</definition>
+	<!-- Full Width JSP -->
+	<definition name=".FullWidth" template="/WEB-INF/tiles/fullWidthLayout.jsp">
+		<put-attribute name="body" value=""/>
+	</definition>
+	<!-- Popup JSP -->
+	<definition name=".Popup" template="/WEB-INF/tiles/popupLayout.jsp">
+		<put-attribute name="body" value=""/>
+	</definition>
+	<!-- Inner JSP -->
+	<definition name=".InnerContent" template="/WEB-INF/tiles/innerContentLayout.jsp">
+		<put-attribute name="body" value=""/>
+	</definition>
+	<!-- Tab JSP -->
+	<definition name=".TabContent" template="/WEB-INF/tiles/tabContentLayout.jsp">
+		<put-attribute name="body" value=""/>
+	</definition>
+	<!-- DivTab JSP -->
+	<definition name=".DivTabContent" template="/WEB-INF/tiles/divTabContentLayout.jsp">
+		<put-attribute name="body" value=""/>
+	</definition>
+	<!-- Blank JSP -->
+	<definition name=".Blank" template="/WEB-INF/tiles/blankLayout.jsp">
+		<put-attribute name="body" value=""/>
+	</definition>
+	<!-- Portal Main JSP -->
+	<definition name=".MainPortal" template="/WEB-INF/tiles/mainPortalLayout.jsp">
+		<put-attribute name="body" value=""/>
+	</definition>
+	<!-- Login JSP -->
+	<definition name=".Login" template="/WEB-INF/tiles/loginLayout.jsp">
+		<put-attribute name="body" value=""/>
+	</definition>
+	<!-- Report JSP -->
+	<definition name=".Report" template="/WEB-INF/tiles/reportLayout.jsp">
+		<put-attribute name="body" value=""/>
+	</definition>
+	<!-- Board JSP -->
+	<definition name=".Board" template="/WEB-INF/tiles/boardLayout.jsp">
+		<put-attribute name="body" value=""/>
+	</definition>
+	<!-- 반응형 웹 레이아웃 -->
+	<definition name=".RWD" template="/WEB-INF/tiles/rwdLayout.jsp">
+		<put-attribute name="body" value=""/>
+	</definition>
+</tiles-definitions>

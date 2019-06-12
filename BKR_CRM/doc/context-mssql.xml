@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>    
+    <WatchedResource>WEB-INF/web.xml</WatchedResource>
+
+<!--  	<Resource name="jdbc/meta" auth="Container" type="javax.sql.DataSource" -->
+<!-- 		driverClassName="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:hsql://10.10.1.115:9605/ubmeta" -->
+<!-- 		username="sa" password="" maxActive="20" maxIdle="10" maxWait="-1" validationQuery="SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS"/> -->
+  	
+<!-- 	<Resource name="jdbc/application" auth="Container" type="javax.sql.DataSource" -->
+<!-- 		driverClassName="core.log.jdbc.driver.OracleDriver" url="jdbc:oracle:thin:@10.10.1.115:1521:orcl" -->
+<!-- 		username="BASE_WEB2" password="BASE_WEB2" maxActive="20" maxIdle="10" maxWait="-1" validationQuery="SELECT 1 FROM DUAL"/> -->
+
+ 	<Resource name="jdbc/meta" auth="Container" type="javax.sql.DataSource"
+		driverClassName="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:hsql://www.ubqone.com:9615/ubmeta"
+		username="sa" password="" maxActive="20" maxIdle="10" maxWait="-1" validationQuery="SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS"/>
+
+	<!-- MS-SQL -->  	
+	<Resource name="jdbc/application" auth="Container" type="javax.sql.DataSource"
+		driverClassName="core.log.jdbc.driver.Mssql2005Driver" url="jdbc:sqlserver://www.ubqone.com:14314;databaseName=BASE_WEB2"
+		username="BASE_WEB2" password="BASE_WEB2" maxActive="20" maxIdle="10" maxWait="-1" validationQuery="SELECT 1" />
+</Context>
+ 

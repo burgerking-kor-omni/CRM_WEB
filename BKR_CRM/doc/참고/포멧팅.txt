@@ -1,0 +1,102 @@
+포멧팅
+
+입력 컨트롤일 경우 ----------------------------------------------------
+
+라벨에 포맷팅 적용하던 방식을 (ctr-datafield 속성에 포맷문자열 설정) 사용하지 말고,
+메타 속성정보 중 [metaformat] 속성에 각각 용도에 맞는 포맷상수를 설정한다.
+현재(2010.04.05) 적용된 포맷 유형은 날짜 입력을 위한 [date]와 숫자 입력을 위한 [number]가 설정 가능
+
+ex) metastudio 입력컨트롤 metaformat 에 date 또는 number 입력
+
+    date일 경우는 2010.04.05 <-년월일까지 표시
+  number일 경우는 999,999,999 <- 세자리마다 콤마 표시    
+  
+
+DB에 저장시 해당 DB칼럼 유형에 따른 설정 필요함.
+
+1. number로 설정 된 입력값을 number type의 db 컬럼에 저장 할 경우 
+
+ sqlmap 예제
+<update id="update" 
+	parameterClass="map">
+	update AP_SERVICE
+	   set .........
+	     , PAGING_COUNT = #PAGING_COUNT:INTEGER#
+	     ........
+</update>
+
+
+2. date로 설정 된 입력값을 timestamp type의 db 컬럼에 저장 할 경우
+
+ sqlmap 예제
+<update id="update" 
+	parameterClass="map">
+	update AP_SERVICE
+	   set .........
+	     , UPD_DATETIME = #UPD_DATETIME:TIMESTAMP#
+	     ........
+</update>
+
+
+목록레이아웃에 라벨 컨트롤일 경우 ----------------------------------------
+
+라벨 datafiled 속성에 포멧팅을 하기위해서는 FMT:포멧형식:컬럼명으로 설정한다.
+
+ex) Date 타입
+	1. FMT:YMD:UPD_DATETIME
+    2. FMT:YMDHM:UPD_DATETIME
+
+	number 타입
+	1. FMT:0,000.00:REQUEST_CNT    1234567 는 1,234,567.00
+	2. FMT:0,00:REQUEST_CNT        1234567 는 1,23,45,67
+    3. FMT:integer:REQUEST_CNT     1234567 는 1,234,567
+    4. FMT:currency:REQUEST_CNT    1234567 는 ￦1,234,567
+    
+    # Date 포멧형식은 config.xml 참고
+    
+ ## 숫자만 입력받는 방법
+ Meta Studio에서 ime-mode=disabled를 준다.
+ onkeypress이벤트에 allowOnly('0..9'); 를 준다.
+    
+## 한글 입력받는 방법 (단, 한/영 전환키로 한글모드 변경 가능)
+Meta Studio에서 ime-mode=active를 준다.
+
+## 영문 입력받는 방법(단, 한/영 전환키로 한글모드 변경 가능)
+Meta Studio에서 ime-mode=inactive를 준다.
+
+## 주민번호 입력받는 방법 (999999-9999999)
+Meta Studio에서 metaformat=resident를 준다.
+
+## 주민번호 앞자리 입력받는 방법 (999999)
+Meta Studio에서 metaformat=resident_1를 준다.
+
+## 주민번호 뒷자리 입력받는 방법 (9999999)
+Meta Studio에서 metaformat=resident_2를 준다.
+
+## 전화번호 입력받는 방법 (ppppppppppppp)
+Meta Studio에서 metaformat=phone를 준다.
+
+## 전화번호 지역번호 입력받는 방법
+Meta Studio에서 metaformat=phone_slice_head를 준다.
+
+## 전화번호 국번 입력받는 방법
+Meta Studio에서 metaformat=phone_slice를 준다.
+
+## 숫자(,입력) 입력받는 방법 (999,999,999)
+Meta Studio에서 metaformat=number를 준다.
+
+## 사업자번호 입력받는 방법 (999-99-99999)
+Meta Studio에서 metaformat=business를 준다.
+
+## 사업자번호 앞3자리 입력받는 방법 (999)
+Meta Studio에서 metaformat=business_1를 준다.
+
+## 사업자번호 중간 2자리 입력받는 방법 (99)
+Meta Studio에서 metaformat=business_2를 준다.
+
+## 사업자번호 뒷 3자리 입력받는 방법 (99999)
+Meta Studio에서 metaformat=business_3를 준다.
+
+## 우편번호  입력받는 방법 (999-999)
+Meta Studio에서 metaformat=postNo를 준다.
+

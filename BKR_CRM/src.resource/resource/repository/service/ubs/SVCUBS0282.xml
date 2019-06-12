@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<serviceBuilder id="SVCSYS0282" isProtectedResource="false" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <serviceName>게시판관리 / 게시판등록 기본정보 조회 (Dummy)</serviceName>
+  <serviceType type="Read">
+    <paging isPaging="false" pagingCount="-1"/>
+    <isFindConditionSave>false</isFindConditionSave>
+  </serviceType>
+  <serviceComponentType type="Dummy">
+    <linkedFile>false</linkedFile>
+    <inducedEvent>false</inducedEvent>
+    <linkedWorkCategory></linkedWorkCategory>
+    <linkedActivity></linkedActivity>
+  </serviceComponentType>
+  <serviceCodes version="1.0">
+    <serviceCode id="BOARD_TYPE_CD" includeSleep="false" alias="BOARD_TYPE_CD"/>
+  </serviceCodes>
+  <serviceMasks version="1.0"/>
+</serviceBuilder>

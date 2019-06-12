@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<serviceBuilder id="SVCSYS0279" isProtectedResource="false" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <serviceName>게시판관리 / 게시판목록 조회</serviceName>
+  <serviceType type="Read">
+    <paging isPaging="true" pagingCount="10"/>
+    <isFindConditionSave>true</isFindConditionSave>
+  </serviceType>
+  <serviceComponentType type="Custom">
+    <className>com.ubone.standard.ubboard.system.service.BoardManageSO</className>
+    <methodName>getList</methodName>
+    <linkedFile>false</linkedFile>
+    <inducedEvent>false</inducedEvent>
+    <linkedWorkCategory></linkedWorkCategory>
+    <linkedActivity></linkedActivity>
+  </serviceComponentType>
+  <serviceCodes version="1.0"/>
+  <serviceMasks version="1.0"/>
+</serviceBuilder>

@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="ko">
+<head>
+	<meta charset="utf-8" />
+	<title>(주)유비원 스타일 가이드</title>
+	<link type="text/css" rel="stylesheet" href="./css/shCoreDefault.css"/>
+	<link type="text/css" rel="stylesheet" href="./css/style.css"/>
+	<link type="text/css" rel="stylesheet" href="./css/jquery.mCustomScrollbar.css"/>
+	<script type="text/javascript" src="./js/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="./js/html5.js"></script>
+	<script type="text/javascript" src="./js/shCore.js"></script>
+	<script type="text/javascript" src="./js/shBrushJScript.js"></script>
+	<script type="text/javascript" src="./js/shBrushCss.js"></script>
+	<script type="text/javascript" src="./js/shBrushXml.js"></script>
+	<script type="text/javascript" src="./js/jquery.mCustomScrollbar.concat.min.js"></script>
+	<script type="text/javascript">
+		jQuery(function(){
+		   jQuery('a[href^=#]').click(function() {
+			  var speed = 500;  // 스크롤 속도
+			  var href= jQuery(this).attr("href");
+			  var target = jQuery(href == "#" || href == "" ? 'html' : href);
+			  var position = target.offset().top;
+			  jQuery('body,html').animate({scrollTop:position}, speed, 'swing');
+			  return false;
+		   });
+		}); //부드럽게 페이지내 이동위해 사용
+		SyntaxHighlighter.all(); //syntaxhighlighter
+	</script>
+</head>
+
+<body>
+	<!-- S : wrap -->
+	<div id="wrap">
+		<!-- S : header-->
+		<div id="header">
+			<header class="gd-header">
+				<h1>
+					<a href="index.html"><img src="./images/h1_logo.png" alt="ubone" /></a>
+					<strong class="gd-ver">Style Guide
+						<strong class="ver">Ver1.0</strong>
+					</strong>
+				</h1>
+			</header>
+		</div>
+		<!-- E : header-->
+		<div id="container">
+			<!-- S : lnb-->
+			<div id="lnb">
+				<div class="lnb-inner">
+					<div class="tit-rcnt">
+						<h2>CSS Guide</h2>
+						<!-- <span class="rcnt"><a href="#"><img src="./images/btn_all_view.png" alt="전체보기" /></a></span> -->
+					</div>
+					<nav class="gd-nav">
+						<div class="menu">
+							<ul>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="index.html"><strong>공통</strong></a>
+								</li>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="list.html"><strong>목록화면</strong></a></li>
+								<li class="sub-open">
+									<button class="fold">하위메뉴 있음</button>
+									<a href="detail.html"><strong>상세화면</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="detail.html#gd03-1"><strong>상태바</strong></a></li>
+											<li><a href="detail.html#gd03-2"><strong>기본 테이블</strong></a></li>
+											<li><a href="detail.html#gd03-3"><strong>변형 테이블</strong></a></li>
+										</ul>
+									</div>
+								</li>
+								<li class="sub-open">
+									<button class="fold">하위메뉴 있음</button>
+									<a href="etc.html"><strong>기타</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="etc.html#gd04-1"><strong>통계</strong></a></li>
+											<li><a href="etc.html#gd04-2"><strong>탭&amp;파일첨부&amp;페이징</strong></a></li>
+											<li><a href="etc.html#gd04-3"><strong>설명문구</strong></a></li>
+											<li><a href="etc.html#gd04-4"><strong>로딩바</strong></a></li>
+											<li><a href="etc.html#gd04-5"><strong>그래프컬러 가이드</strong></a></li>
+										</ul>
+									</div>
+								</li>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="popup.html"><strong>팝업</strong></a>
+								</li>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="button.html"><strong>버튼</strong></a>
+								</li>
+								<li class="sub-open">
+									<button class="fold">하위메뉴 있음</button>
+									<a href="board.html"><strong>게시판</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="board.html#gd07-1"><strong>목록</strong></a></li>
+											<li><a href="board.html#gd07-2"><strong>상세</strong></a></li>
+											<li><a href="board.html#gd07-3"><strong>등록</strong></a></li>
+										</ul>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</nav>
+				</div>
+			</div>
+			<!-- E : lnb -->
+			<!-- S : content -->
+			<div id="content">
+				<!-- S : 팝업 -->
+				<section class="section" id="gd05">
+					<div class="h3-tit">
+						<h3>팝업</h3>
+					</div>
+					<article class="article-cnt">
+						<div class="h4-tit">
+							<h4>윈도우 팝업</h4>
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+							<img src="./images/ex/ex_popup.gif" alt="팝업 예시 화면">
+						</div>
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<!-- 헤더부터 푸터 버튼 영역까지 작성 -->
+								<!-- 헤더 -->
+								<div class="pop-header">
+									<h1 class="ub-control title"><span>직원검색</span></h1>
+									<a href="#" class="ub-control button imgBtn img-popClose"><span>close</span></a>
+								</div>
+								<!-- //헤더 -->
+
+								<!-- 팝업 컨텐트 -->
+								<div class="pop-contents">
+									<!-- 최상단 버튼 들어갈 경우 -->
+									<div class="ub-layout button inner" style="text-align:right;">
+										<span class="ub-control button top icon" id="conFirm">
+											<a href="#none" title="print"><span class="ico-print"></span>인쇄</a>
+										</span>
+									</div>
+									<!--//최상단 버튼 들어갈 경우 -->
+									<div class="ub-layout detail">
+										...
+									</div>
+								</div>
+								<!-- 팝업  컨텐트 -->
+
+								<!-- 팝업 테일 -->
+								<div class="ub-layout button bottom">
+									<span class="ub-control button inner icon" id="conFirm">
+										<a href="#none" title="Save">확인</a>
+									</span>
+								</div>
+								<!-- 팝업 테일 -->
+								<!-- //헤더부터 푸터 버튼 영역까지 작성 -->
+							</pre>
+						</div>
+						<div class="sub-desc02">
+							<!-- <p>팝업에 (일반 페이지에서 사용하는) 최상단 버튼이 들어갈 경우(이미지 빨간 테두리), <strong class="gd-txt-color01">버튼 레이아웃 inner를 택한 후 location을 top</strong>으로 지정해준다.</p> -->
+							<ul>
+								<li>팝업에 (일반 페이지에서 사용하는) 최상단 버튼이 들어갈 경우(이미지 빨간 테두리), <strong class="gd-txt-color01">버튼 레이아웃 inner를 택한 후 location을 top</strong>으로 지정해준다.</li>
+								<li>팝업의 경우 메타 등록시 <strong class="g-line">목록, 상세 레이아웃 안에 목록, 상세, 페이징 레이아웃을 사용하지 않는다.</strong></li>
+							</ul>
+						</div>
+
+						<div class="h4-tit">
+							<h4>레이어팝업</h4>
+						</div>
+						<div class="sub-desc01">
+							<p>주로 오류페이지에서 사용 (ex - 로그인시 비밀번호 오류시)</p>
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+							<img src="./images/ex/ex_layer.gif" alt="레이어팝업 예시 화면">
+						</div>
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<div class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-draggable ui-resizable ui-dialog-buttons" tabindex="-1" role="dialog" aria-labelledby="ui-id-1" style="outline: 0px; z-index: 1002; position: absolute; height: auto; width: 300px; top: 313.5px; left: 485.5px; display: block;"><div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix"><span id="ui-id-1" class="ui-dialog-title">오류 메세지</span><a href="#" class="ui-dialog-titlebar-close ui-corner-all" role="button"><span class="ui-icon ui-icon-closethick">close</span></a></div><div id="debugDialog" class="ui-dialog-content ui-widget-content" scrolltop="0" scrollleft="0" style="width: auto; min-height: 68px; height: auto;"><span style="color: red;" title="error">X</span>&nbsp;&nbsp;사용자 정보가 일치하지 않습니다.<br>확인후 다시 실행해 주십시요.<br></div><div class="ui-resizable-handle ui-resizable-n" style="z-index: 1000;"></div><div class="ui-resizable-handle ui-resizable-e" style="z-index: 1000;"></div><div class="ui-resizable-handle ui-resizable-s" style="z-index: 1000;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 1000;"></div><div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se ui-icon-grip-diagonal-se" style="z-index: 1000;"></div><div class="ui-resizable-handle ui-resizable-sw" style="z-index: 1000;"></div><div class="ui-resizable-handle ui-resizable-ne" style="z-index: 1000;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 1000;"></div><div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix"><div class="ui-dialog-buttonset"><button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">Ok</span></button></div></div>
+								</div>
+							</pre>
+						</div>
+
+					</article>
+				</section>
+				<!-- E : 팝업 -->
+			</div>
+			<!-- E : content -->
+		</div><!-- E : container -->
+	</div><!-- E : wrap -->
+</body>
+</html>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<screenBuilder id="BCO0002" screenType="detail" screenLayoutType="Default" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>포탈 메인</screenName>
+  <screenViewType>Velocity</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/bco/</filePath>
+  <fileName>BCO0002</fileName>
+  <functions/>
+  <defaultParameters/>
+  <authorities/>
+</screenBuilder>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="UBD0000" screenType="list" screenLayoutType="Board" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>UB-Board 공통</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/ubd/</filePath>
+  <fileName>UBD0000</fileName>
+  <functions>
+    <function id="FNCUBD0025" isStartFunction="false" functionName="UB-Board 사원정보 조회 호출" serviceId="SVCUBD0025" alias="MANLAYER"/>
+  </functions>
+  <defaultParameters/>
+</screenBuilder>

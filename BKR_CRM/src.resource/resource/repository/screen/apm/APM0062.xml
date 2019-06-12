@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<screenBuilder id="APM0062" screenType="detail" screenLayoutType="Default" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>시스템관리 / 코드 유형 상세(다국어용)</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId>APM0062R00</metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0062</fileName>
+  <functions>
+    <function id="FNCAPM0110" isStartFunction="false" functionName="코드 유형 목록 호출" serviceId="SVCAPM0110" alias=""/>
+    <function id="FNCAPM0114" isStartFunction="false" functionName="코드 조회 호출" serviceId="SVCAPM0114" alias="INQUIRY"/>
+    <function id="FNCAPM0115" isStartFunction="false" functionName="코드 유형 수정 호출" serviceId="SVCAPM0115" alias="MODIFY"/>
+    <function id="FNCAPM0116" isStartFunction="false" functionName="코드 유형 삭제 호출" serviceId="SVCAPM0116" alias="REMOVE"/>
+    <function id="FNCAPM0117" isStartFunction="false" functionName="코드 그룹 조회 호출" serviceId="SVCAPM0117" alias="USERDEFINED1"/>
+    <function id="FNCAPM0118" isStartFunction="false" functionName="코드 그룹 등록 호출" serviceId="SVCAPM0118" alias="USERDEFINED2"/>
+    <function id="FNCAPM0119" isStartFunction="false" functionName="코드 그룹 삭제 호출" serviceId="SVCAPM0119" alias="USERDEFINED3"/>
+    <function id="FNCAPM0120" isStartFunction="false" functionName="특정 그룹의 코드 조회 호출" serviceId="SVCAPM0120" alias="USERDEFINED4"/>
+    <function id="FNCAPM0121" isStartFunction="true" functionName="코드 유형 상세 호출" serviceId="SVCAPM0121" alias=""/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

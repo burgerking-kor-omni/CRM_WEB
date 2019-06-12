@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="CustManageRimsDAO">
+	
+	<!--
+		 QueryId     : CustManageRimsDAO.getOrderListRims
+		 Description : 고객 완료 주문목록 조회
+	 -->
+	<sql id="getOrderListRims_base">
+		SELECT DT_ORDER
+             , SALE_DT
+             , STOR_CD
+             , POS_NO
+             , ORDER_NO
+             , CNT_MENU
+             , TOTAL_PRC
+             , CASE WHEN INSTR(MENU_NM,',') > 0 THEN SUBSTR(MENU_NM,0,INSTR(MENU_NM,',')-1)||' 외 '||(CNT_MENU-1)||' 개'
+                     WHEN CNT_MENU > 1 THEN MENU_NM ||' 외 '||(CNT_MENU-1)||' 개'
+                    ELSE MENU_NM END AS MENU_NM
+             , PAYMENT_TYPE
+             , STOR_NM
+        FROM (
+        SELECT SUBSTR(SD.SALE_DT,0,4)||'-'||SUBSTR(SD.SALE_DT,5,2)||'-'||SUBSTR(SD.SALE_DT,7) AS DT_ORDER    /* 매출 일자 */
+                     , SD.SALE_DT
+                     , SD.STOR_CD    /* 매장 코드 */
+                     , SD.POS_NO    /* POS 번호 */
+                     , SD.TRADE_NO AS ORDER_NO   /* 거래 번호 */
+                     , SD.SALE_QTY AS CNT_MENU
+                     , SUM(MD.ACTUAL_SALE_AMT) AS TOTAL_PRC
+                     , SUBSTR(
+                        XMLAGG(
+                            XMLELEMENT(COL ,', ', MM.MENU_NM) ORDER BY MD.MENU_DIV ASC).EXTRACT('//text()').GETSTRINGVAL()
+                       , 2)  AS MENU_NM
+                     , SPW.PAY_WAY_CD||SPW.PAY_DTL_CD AS PAYMENT_TYPE
+                     , (SELECT STOR_NM FROM RIMS.MST_STOR WHERE STOR_CD = SD.STOR_CD ) AS STOR_NM
+                     , SD.REG_DATE
+                  FROM RIMS.SAL_DAILY_STOR_DTL SD
+                  LEFT OUTER JOIN RIMS.SAL_DAILY_STOR_MENU_DTL MD
+                    ON MD.TRADE_NO = SD.TRADE_NO
+                   AND MD.SALE_DT = SD.SALE_DT
+                   AND MD.STOR_CD = SD.STOR_CD
+                   AND MD.POS_NO = SD.POS_NO
+                   AND MD.CMP_CD = SD.CMP_CD
+                   AND MD.SALES_ORG_CD = SD.SALES_ORG_CD
+                  LEFT OUTER JOIN RIMS.MST_MENU MM
+                    ON MM.MENU_CD = MD.MENU_CD
+                   AND MM.CMP_CD = SD.CMP_CD
+                   AND MM.SALES_ORG_CD = SD.SALES_ORG_CD
+                  LEFT OUTER JOIN RIMS.SAL_DAILY_STOR_PAY_WAY_DTL SPW
+                    ON SPW.TRADE_NO = SD.TRADE_NO
+                   AND SPW.SALE_DT = SD.SALE_DT
+                   AND SPW.STOR_CD = SD.STOR_CD
+                   AND SPW.POS_NO = SD.POS_NO
+                   AND SPW.CMP_CD = SD.CMP_CD
+                   AND SPW.SALES_ORG_CD = SD.SALES_ORG_CD
+                 WHERE SD.TRADE_DIV = '0'
+				 <if test="ID_MEMBER != null and ID_MEMBER != ''">
+					  	AND SD.CUST_NO = #{ID_MEMBER}
+				 </if>
+				 <if test="MENU_CD != null and MENU_CD != ''">
+					  	AND (
+					  			MD.MENU_CD = #{MENU_CD}
+					  		 OR MD.SET_MENU_CD = #{MENU_CD}
+					  		)
+				 </if>
+				 <if test="STOR_CD != null and STOR_CD != ''">
+					  	AND SD.STOR_CD = #{STOR_CD}
+				 </if>
+				 <if test="CD_PAY_WAY != null and CD_PAY_WAY != ''">
+					  	AND SPW.PAY_WAY_CD||SPW.PAY_DTL_CD = #{CD_PAY_WAY}
+				 </if>
+				 <if test="CHL_CD != null and CHL_CD != ''">
+					  	AND SD.CHL_CD = #{CHL_CD}
+				 </if>
+				 GROUP BY SD.SALE_DT    /* 매출 일자 */
+				        , SD.STOR_CD    /* 매장 코드 */
+				        , SD.POS_NO    /* POS 번호 */
+				        , SD.TRADE_NO    /* 거래 번호 */
+				        , SPW.PAY_WAY_CD||SPW.PAY_DTL_CD
+				        , SD.SALE_QTY
+				        , SD.REG_DATE)
+			 ORDER BY REG_DATE DESC   /* 매출 일자 */
+	</sql>
+	<!-- 주문 목록 조회 -->
+	<select id="getOrderListRims" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getOrderListRims_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 주문 목록 조회 - count -->
+	<select id="getOrderListRims_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getOrderListRims_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 주문 목록 조회 - paging -->
+	<select id="getOrderListRims_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getOrderListRims_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		 QueryId     : CustManageRimsDAO.getOrderDetailRims
+		 Description : Rims 주문상세 조회
+	 -->
+	<select id="getOrderDetailRims" parameterType="map" resultType="lmap">
+		SELECT SUBSTR(SD.SALE_DT,0,4)||'-'||SUBSTR(SD.SALE_DT,5,2)||'-'||SUBSTR(SD.SALE_DT,7) AS DT_ORDER    /* 매출 일자 */
+			 , (SELECT STOR_NM FROM RIMS.MST_STOR WHERE STOR_CD = SD.STOR_CD ) AS STOR_NM
+			 , SPW.PAY_WAY_CD||SPW.PAY_DTL_CD AS CD_PAY_WAY
+			 , SD.TOT_SALE_AMT
+			 , SD.TOT_DC_AMT
+			 , SD.ACTUAL_SALE_AMT
+          FROM RIMS.SAL_DAILY_STOR_DTL SD
+          LEFT OUTER JOIN RIMS.SAL_DAILY_STOR_PAY_WAY_DTL SPW
+            ON SD.SALE_DT	= SPW.SALE_DT
+		   AND SD.STOR_CD	= SPW.STOR_CD
+		   AND SD.POS_NO	= SPW.POS_NO
+		   AND SD.TRADE_NO	= SPW.TRADE_NO
+         WHERE SD.SALE_DT	= #{SALE_DT}
+		   AND SD.STOR_CD	= #{STOR_CD}
+		   AND SD.POS_NO	= #{POS_NO}
+		   AND SD.TRADE_NO	= #{ORDER_NO}
+	</select>
+	
+	<!--
+		 QueryId     : CustManageRimsDAO.getProdListRims
+		 Description : 주문상세 상품목록 조회
+	 -->
+	<select id="getProdListRims" parameterType="map" resultType="lmap">
+		SELECT CASE WHEN SMD.MENU_DIV='3' OR (SMD.MENU_DIV='2' AND SMD.SET_CHNG_YN='1') THEN '└ '||MM.MENU_NM
+                    ELSE MM.MENU_NM END AS MENU_NM
+             , SMD.TOT_SALE_AMT / SMD.SALE_QTY AS TOT_SALE_AMT
+             , SMD.SALE_QTY
+          FROM RIMS.SAL_DAILY_STOR_MENU_DTL SMD
+          LEFT OUTER JOIN RIMS.MST_MENU MM
+            ON SMD.MENU_CD = MM.MENU_CD
+           AND MM.CMP_CD = SMD.CMP_CD
+           AND MM.SALES_ORG_CD = SMD.SALES_ORG_CD
+		 WHERE SALE_DT   = #{SALE_DT} 
+		   AND STOR_CD   = #{STOR_CD}
+		   AND POS_NO    = #{POS_NO}
+		   AND TRADE_NO  = #{ORDER_NO}
+		  ORDER BY SMD.SEQ ASC
+	</select>
+	
+	<!--
+		 QueryId     : CustManageRimsDAO.getCouponListUseRims
+		 Description : Rims 주문상세 사용쿠폰 핀 번호 조회
+	 -->
+	<select id="getCouponListUseRims" parameterType="map" resultType="lmap">
+		SELECT CPN_NO
+		  FROM RIMS.SAL_DAILY_STOR_PAY_WAY_DTL
+		 WHERE MSHP_ID = #{ID_MEMBER}
+		   AND SALE_DT   = #{SALE_DT} 
+		   AND STOR_CD   = #{STOR_CD}
+		   AND POS_NO    = #{POS_NO}
+		   AND TRADE_NO  = #{ORDER_NO}
+	</select>
+	
+	<!--
+		 QueryId     : CustManageRimsDAO.getOrderProdRims
+		 Description : 고객 주문상품 조회
+	 -->
+	<sql id="getOrderProdRims_base">
+		SELECT MENU_NM
+             , MENU_CD
+             , SUM(SALE_QTY) AS CNT_SALE
+             , SUM(SALE_AMT) AS SALE_AMT
+          FROM (SELECT MM.MENU_NM
+                     , SMD.MENU_CD AS MENU_CD
+                     , SUM (SMD.SALE_QTY) AS SALE_QTY
+                     , SUM(SMD.ACTUAL_SALE_AMT) AS SALE_AMT
+                  FROM RIMS.SAL_DAILY_STOR_DTL SD
+                  LEFT OUTER JOIN RIMS.SAL_DAILY_STOR_MENU_DTL SMD
+                    ON SD.TRADE_NO = SMD.TRADE_NO
+                   AND SD.SALE_DT = SMD.SALE_DT
+                   AND SD.STOR_CD = SMD.STOR_CD
+                   AND SD.POS_NO = SMD.POS_NO
+                   AND SMD.CMP_CD = SD.CMP_CD
+                   AND SMD.SALES_ORG_CD = SD.SALES_ORG_CD
+                  LEFT OUTER JOIN RIMS.MST_MENU MM
+                    ON MM.MENU_CD = SMD.MENU_CD
+                   AND MM.CMP_CD = SD.CMP_CD
+                   AND MM.SALES_ORG_CD = SD.SALES_ORG_CD
+                 WHERE SD.CUST_NO =  #{ID_MEMBER}
+                   AND SMD.MENU_DIV IN ('0','1')
+                 GROUP BY SMD.MENU_CD, MM.MENU_NM
+                UNION ALL
+                -- 컨디먼트 목록
+                SELECT MM.MENU_NM
+                     , SMD.SET_MENU_CD AS MENU_CD
+                     , 0 AS SALE_QTY
+                     , SUM(SMD.ACTUAL_SALE_AMT) AS SALE_AMT
+                  FROM RIMS.SAL_DAILY_STOR_DTL SD
+                  LEFT OUTER JOIN RIMS.SAL_DAILY_STOR_MENU_DTL SMD
+                    ON SD.TRADE_NO = SMD.TRADE_NO
+                   AND SD.SALE_DT = SMD.SALE_DT
+                   AND SD.STOR_CD = SMD.STOR_CD
+                   AND SD.POS_NO = SMD.POS_NO
+                   AND SMD.CMP_CD = SD.CMP_CD
+                   AND SMD.SALES_ORG_CD = SD.SALES_ORG_CD
+                  LEFT OUTER JOIN RIMS.MST_MENU MM
+                    ON MM.MENU_CD = SMD.SET_MENU_CD
+                   AND MM.CMP_CD = SD.CMP_CD
+                   AND MM.SALES_ORG_CD = SD.SALES_ORG_CD
+                 WHERE SD.CUST_NO =  #{ID_MEMBER}
+                   AND SMD.MENU_DIV NOT IN ('0','1')
+                   AND SMD.SET_MENU_CD IS NOT NULL
+                 GROUP BY SMD.SET_MENU_CD, MM.MENU_NM
+                ) 
+        GROUP BY MENU_NM, MENU_CD
+        ORDER BY MENU_NM
+	</sql>
+	<!-- 주문상품 목록 조회 -->
+	<select id="getOrderProdRims" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getOrderProdRims_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 주문상품 목록 조회 - count -->
+	<select id="getOrderProdRims_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getOrderProdRims_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 주문상품 목록 조회 - paging -->
+	<select id="getOrderProdRims_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getOrderProdRims_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	
+	<!--
+		 QueryId     : CustManageRimsDAO.getOrderStoreRims
+		 Description : 고객 주문매장이력 조회
+	 -->
+	<sql id="getOrderStoreRims_base">
+		SELECT SD.STOR_CD 
+             , MS.STOR_NM
+             , COUNT(SD.STOR_CD) AS SALE_CNT
+             , SUM(ACTUAL_SALE_AMT) AS SALE_AMT
+          FROM RIMS.SAL_DAILY_STOR_DTL SD
+          LEFT OUTER JOIN RIMS.MST_STOR MS
+            ON MS.STOR_CD = SD.STOR_CD 
+           AND MS.CMP_CD = SD.CMP_CD
+           AND MS.SALES_ORG_CD = SD.SALES_ORG_CD
+         WHERE SD.CUST_NO = #{ID_MEMBER}
+           AND TRADE_DIV = '0'
+         GROUP BY SD.STOR_CD 
+             , MS.STOR_NM
+
+	</sql>
+	
+	<!-- 고객 주문매장이력 목록 조회 -->
+	<select id="getOrderStoreRims" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getOrderStoreRims_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 고객 주문매장이력 목록 조회 - count -->
+	<select id="getOrderStoreRims_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getOrderStoreRims_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 고객 주문매장이력 목록 조회 - paging -->
+	<select id="getOrderStoreRims_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getOrderStoreRims_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		 QueryId     : CustManageRimsDAO.getPaymentListRims
+		 Description : 고객 구매방법 이력 조회
+	 -->
+	<sql id="getPaymentListRims_base">
+		SELECT SPW.PAY_WAY_CD||SPW.PAY_DTL_CD AS CD_PAY_WAY
+              , SPW.PAY_WAY_CD||SPW.PAY_DTL_CD AS NM_PAY_WAY
+              , COUNT(SD.CUST_NO) AS SALE_CNT
+              , SUM(SD.ACTUAL_SALE_AMT) AS SALE_AMT
+                  FROM RIMS.SAL_DAILY_STOR_DTL SD
+                  LEFT OUTER JOIN RIMS.SAL_DAILY_STOR_PAY_WAY_DTL SPW
+                    ON SPW.TRADE_NO = SD.TRADE_NO
+                   AND SPW.SALE_DT = SD.SALE_DT
+                   AND SPW.STOR_CD = SD.STOR_CD
+                   AND SPW.POS_NO = SD.POS_NO
+                   AND SPW.CMP_CD = SD.CMP_CD
+                   AND SPW.SALES_ORG_CD = SD.SALES_ORG_CD
+                 WHERE SD.CUST_NO =   #{ID_MEMBER}
+                   AND SD.TRADE_DIV = '0'
+               GROUP BY SPW.PAY_WAY_CD||SPW.PAY_DTL_CD
+	</sql>
+	
+	<!-- 고객 구매방법 이력 목록 조회 -->
+	<select id="getPaymentListRims" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getPaymentListRims_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 고객 구매방법 이력 목록 조회 - count -->
+	<select id="getPaymentListRims_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getPaymentListRims_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 고객 구매방법 이력 목록 조회 - paging -->
+	<select id="getPaymentListRims_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getPaymentListRims_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	
+	<!--
+		 QueryId     : CustManageRimsDAO.getPayChannelRims
+		 Description : 고객 구매채널 이력 조회
+	 -->
+	<sql id="getPayChannelRims_base">
+		SELECT SD.CHL_CD
+		     , SD.CHL_CD AS CHL_NM
+		     , COUNT(*) AS SALE_CNT
+		     , SUM(SD.ACTUAL_SALE_AMT) AS SALE_AMT
+		  FROM RIMS.SAL_DAILY_STOR_DTL SD
+		 WHERE SD.CUST_NO = #{ID_MEMBER}
+	  GROUP BY SD.CHL_CD
+	  ORDER BY SD.CHL_CD ASC
+	</sql>
+	
+	<!-- 고객 구매채널 이력 목록 조회 -->
+	<select id="getPayChannelRims" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getPayChannelRims_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 고객 구매채널 이력 목록 조회 - count -->
+	<select id="getPayChannelRims_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getPayChannelRims_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 고객 구매채널 이력 목록 조회 - paging -->
+	<select id="getPayChannelRims_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getPayChannelRims_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		 QueryId     : CustManageRimsDAO.getPosSchedule
+		 Description : Rims 차세대 오픈 스케줄 조회
+	 -->
+	<select id="getPosSchedule" parameterType="map" resultType="lmap">
+		SELECT STOR_CD
+			 , POS_COMPLETE
+			 , POS_COMPLETE_TM
+			 , CASE WHEN TO_DATE(POS_COMPLETE || POS_COMPLETE_TM, 'YYYYMMDD HH24:MI:SS') <![CDATA[<=]]> SYSDATE THEN 1
+					ELSE 0
+				END AS STOR_TYPE
+		 FROM RIMS.POS_INSTALL_SCHEDULE
+        WHERE STOR_CD = #{STOR_CD}
+
+	</select>
+
+</mapper>
+ 

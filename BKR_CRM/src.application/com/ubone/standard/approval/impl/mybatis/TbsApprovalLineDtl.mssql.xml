@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="EUC-KR"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+	<mapper namespace="TbsApprovalLineDtl">
+		
+		<!--
+			Query id    : TbsApprovalLine.insertApprovalLine
+			Description : 결재선 신규 등록
+		-->
+		<insert id="insertApprovalLineDtl" parameterType="map">
+
+			<selectKey keyProperty="ID_APPR_LINE_DTL" resultType="String" order="BEFORE">
+				SELECT #{ID_APPR_LINE_DTL_KEY}
+			</selectKey>
+
+				INSERT INTO TBS_APPROVAL_LINE_DTL(
+				 	   ID_APPR_LINE_DTL    	/* 결재선상세ID*/
+					 , ID_APPR_LINE    		/* 결재선ID*/
+			    	 , TP_APPR_LINE    		/* 결재선구분*/
+			    	 , SEQ_APPR    			/* 결재순번*/
+			    	 , ID_EMP    			/* 직원ID*/
+			    	 , CD_LEVEL    			/* 직급코드*/
+			    	 , CD_POSITION    		/* 직위코드*/
+			    	 , CD_DUTY	    		/* 직책코드*/
+			    	 , ID_DEPT    			/* 부서코드*/
+			    	 , TP_APPR_AUTH    		/* 전결권한*/
+			    	 , FG_APPR_LINE_UPT    	/* 결재선수정여부*/
+			    	 , FG_APPR_UPT    		/* 본문수정여부*/
+			    	 , FG_USE    			/* 사용여부*/
+			    	 , DS_REMARK    		/* 비고*/
+			    	 , FG_DEL    			/* 삭제여부*/
+			    	 , ID_EMP_REG    		/* 최초등록직원*/
+			    	 , ID_DEPT_REG    		/* 최초등록부서*/
+			    	 , DT_REG    			/* 최초등록일시*/
+			    	 , ID_EMP_UPT    		/* 최근수정직원*/
+			    	 , ID_DEPT_UPT    		/* 최근수정부서*/
+			    	 , DT_UPT    			/* 최근수정일시*/
+				     )
+			  VALUES (
+				     #{ID_APPR_LINE_DTL}    /* 결재선상세ID*/
+				   , #{ID_APPR_LINE}    	/* 결재선ID*/
+				   , #{TP_APPR_LINE}    	/* 결재선구분*/
+				   , #{SEQ_APPR}    		/* 결재순번*/
+				   , #{ID_EMP}    			/* 직원ID*/
+				   , #{CD_LEVEL}    		/* 직급코드*/
+				   , #{CD_POSITION}    		/* 직위코드*/
+				   , #{CD_DUTY}    			/* 직책코드*/
+				   , #{ID_DEPT}    			/* 부서코드*/
+				   , #{TP_APPR_AUTH}    	/* 전결권한*/
+				   , #{FG_APPR_LINE_UPT}    /* 결재선수정여부*/
+				   , #{FG_APPR_UPT}    		/* 본문수정여부*/
+				   , #{FG_USE}    			/* 사용여부*/
+				   , #{DS_REMARK}    		/* 비고*/
+				   , 'N'    				/* 삭제여부*/
+				   , #{user.id}    			/* 최초등록직원	*/
+				   , #{user.partCode}    	/* 최초등록부서	*/
+				   , CURRENT_TIMESTAMP    	/* 최초등록일시	*/
+				   , #{user.id}	    		/* 최근수정직원	*/
+				   , #{user.partCode}    	/* 최근수정부서	*/
+				   , CURRENT_TIMESTAMP 	 	/* 최근수정일시	*/
+				   )
+			
+		</insert>
+		
+		<!-- 결재선 상세 삭제		-->
+		<delete id="deleteApprovalLineDtl" parameterType="map">
+		
+			DELETE FROM TBS_APPROVAL_LINE_DTL
+ 		     WHERE ID_APPR_LINE = #{ID_APPR_LINE}    /* 공지사항ID */
+ 		     
+		</delete>
+	</mapper>

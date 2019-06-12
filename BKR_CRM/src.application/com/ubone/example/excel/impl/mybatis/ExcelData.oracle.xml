@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ExcelData">
+
+	<!--
+	Query id    : ExcelData.getList
+	Description : 엑셀데이터 조회
+	-->
+	<select id="getExcel" parameterType="map" resultType="lmap">
+		SELECT RUN_LOG_SN
+		     , SCREEN_ID
+		     , SCREEN_NAME
+		     , SERVICE_ID
+		     , SERVICE_NAME
+		  FROM AP_SERVICE_RUN_LOG A
+		 WHERE ROWNUM <![CDATA[ < ]]> 5
+	</select>	
+
+	<!--
+	Query id    : ExcelData.getLargeCapacityExcel
+	Description : 대용량 엑셀데이터 조회 (몽땅 가져온 다음 엑셀을 만들 경우  )
+	-->
+	<select id="getLargeCapacityExcel" parameterType="map" resultType="lmap">
+		SELECT RUN_LOG_SN
+		     , SCREEN_ID
+		     , SCREEN_NAME
+		     , SERVICE_ID
+		     , SERVICE_NAME
+		  FROM AP_SERVICE_RUN_LOG A
+	</select>
+	<!--
+	Query id    : ExcelData.getLargeCapacityExcelPetch
+	                               필수파라메터 petchIndex
+	                               필수파라메터 petchSize
+	Description : 대용량 엑셀데이터 조회 ( petchSize 만큼만 조회해서 엑셀을 만들기를 반복해서 하는경우  )
+	-->
+	<select id="getLargeCapacityExcelPetch" parameterType="map" resultType="lmap">
+		<include refid="common.petch-top" />
+		SELECT RUN_LOG_SN
+		     , SCREEN_ID
+		     , SCREEN_NAME
+		     , SERVICE_ID
+		     , SERVICE_NAME
+		  FROM AP_SERVICE_RUN_LOG A
+		<include refid="common.petch-bottom" />
+	</select>
+</mapper>

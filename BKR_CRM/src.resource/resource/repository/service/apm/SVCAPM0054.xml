@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<serviceBuilder id="SVCAPM0054" isProtectedResource="false" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <serviceName>마스크관리 권한 정보 업데이트</serviceName>
+  <serviceType type="Update"/>
+  <serviceComponentType type="Custom">
+    <className>com.ubone.standard.system.mask.service.MaskManageSO</className>
+    <methodName>updateAuthByMaskId</methodName>
+    <linkedFile>false</linkedFile>
+    <inducedEvent>false</inducedEvent>
+    <linkedWorkCategory></linkedWorkCategory>
+    <linkedActivity></linkedActivity>
+  </serviceComponentType>
+  <serviceCodes version="1.0"/>
+  <serviceMasks version="1.0"/>
+</serviceBuilder>

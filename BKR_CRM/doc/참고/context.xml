@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+
+	<WatchedResource>WEB-INF/web.xml</WatchedResource>
+	
+	<Resource name="jdbc/bimeta" auth="Container" type="javax.sql.DataSource"
+		driverClassName="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:hsql://58.143.131.69:9505/bimeta"
+		username="sa" password="" maxActive="20" maxIdle="10" maxWait="-1" />
+
+	<Resource name="jdbc/application" auth="Container" type="javax.sql.DataSource"
+		driverClassName="oracle.jdbc.OracleDriver" url="jdbc:oracle:thin:@58.143.131.69:1521:PMS"
+		username="pms" password="pms" maxActive="20" maxIdle="10" maxWait="-1" />
+
+</Context>

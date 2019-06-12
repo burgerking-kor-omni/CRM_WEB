@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+			http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.2.xsd">
+
+	<!--
+	================================================================================
+	DataSource 관련 Configuration
+	================================================================================
+	-->	
+	<bean id="metaDataSource"
+        class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+        p:driverClassName="org.hsqldb.jdbcDriver"
+        p:url="jdbc:hsqldb:hsql://10.10.1.50:9100/ubmeta"
+        p:username="sa"
+        p:password="" />
+        
+	<bean id="frameworkDataSource"
+        class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+        p:driverClassName="core.log.jdbc.driver.OracleDriver"
+        p:url="jdbc:oracle:thin:@10.10.1.78:1521:ORCL"
+        p:username="VOCAPP"
+        p:password="VOCAPP" />
+
+	<bean id="applicationDataSource"
+        class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+        p:driverClassName="core.log.jdbc.driver.OracleDriver"
+        p:url="jdbc:oracle:thin:@10.10.1.78:1521:ORCL"
+        p:username="VOCAPP"
+        p:password="VOCAPP" />        
+
+
+	<!-- Log4j Configurer -->
+	<bean id="log4jDirectConfigurer" class="com.ubone.voc.utility.junit.Log4jDirectConfigurer">
+		<property name="location" value="classpath:resource/config/log4j.properties"/>
+		<property name="refreshInterval" value="0"/>
+	</bean>
+</beans>

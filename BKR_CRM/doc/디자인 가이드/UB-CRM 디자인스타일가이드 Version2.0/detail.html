@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="ko">
+<head>
+	<meta charset="utf-8" />
+	<title>(주)유비원 스타일 가이드</title>
+	<link type="text/css" rel="stylesheet" href="./css/shCoreDefault.css"/>
+	<link type="text/css" rel="stylesheet" href="./css/style.css"/>
+	<link type="text/css" rel="stylesheet" href="./css/jquery.mCustomScrollbar.css"/>
+	<script type="text/javascript" src="./js/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="./js/html5.js"></script>
+	<script type="text/javascript" src="./js/shCore.js"></script>
+	<script type="text/javascript" src="./js/shBrushJScript.js"></script>
+	<script type="text/javascript" src="./js/shBrushCss.js"></script>
+	<script type="text/javascript" src="./js/shBrushXml.js"></script>
+	<script type="text/javascript" src="./js/jquery.mCustomScrollbar.concat.min.js"></script>
+	<script type="text/javascript">
+		jQuery(function(){
+		   jQuery('a[href^=#]').click(function() {
+			  var speed = 500;  // 스크롤 속도
+			  var href= jQuery(this).attr("href");
+			  var target = jQuery(href == "#" || href == "" ? 'html' : href);
+			  var position = target.offset().top;
+			  jQuery('body,html').animate({scrollTop:position}, speed, 'swing');
+			  return false;
+		   });
+		}); //부드럽게 페이지내 이동위해 사용
+		SyntaxHighlighter.all(); //syntaxhighlighter
+	</script>
+</head>
+
+<body>
+	<!-- S : wrap -->
+	<div id="wrap">
+		<!-- S : header-->
+		<div id="header">
+			<header class="gd-header">
+				<h1>
+					<a href="index.html"><img src="./images/h1_logo.png" alt="ubone" /></a>
+					<strong class="gd-ver">Style Guide
+						<strong class="ver">Ver2.0</strong>
+					</strong>
+				</h1>
+			</header>
+		</div>
+		<!-- E : header-->
+		<div id="container">
+			<!-- S : lnb-->
+			<div id="lnb">
+				<div class="lnb-inner">
+					<div class="tit-rcnt">
+						<h2>CSS Guide</h2>
+						<!-- <span class="rcnt"><a href="#"><img src="./images/btn_all_view.png" alt="전체보기" /></a></span> -->
+					</div>
+					<nav class="gd-nav">
+						<div class="menu">
+							<ul>
+								<li>
+									<button class="fold">하위메뉴 있음</button>
+									<a href="index.html"><strong>공통</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="index.html#gd01-1"><strong>메뉴</strong></a></li>
+										</ul>
+									</div>
+								</li>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="menu.html"><strong>메뉴</strong></a>
+								</li>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="list.html"><strong>목록화면</strong></a></li>
+								<li class="sub-open">
+									<button class="fold">하위메뉴 있음</button>
+									<a href="detail.html"><strong>상세화면</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="detail.html#gd03-1"><strong>상태바</strong></a></li>
+											<li><a href="detail.html#gd03-2"><strong>기본 테이블</strong></a></li>
+											<li><a href="detail.html#gd03-3"><strong>변형 테이블</strong></a></li>
+										</ul>
+									</div>
+								</li>
+								<li class="sub-open">
+									<button class="fold">하위메뉴 있음</button>
+									<a href="etc.html"><strong>기타</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="etc.html#gd04-1"><strong>통계</strong></a></li>
+											<li><a href="etc.html#gd04-2"><strong>탭&amp;파일첨부&amp;페이징</strong></a></li>
+											<li><a href="etc.html#gd04-3"><strong>설명문구</strong></a></li>
+											<li><a href="etc.html#gd04-4"><strong>로딩바</strong></a></li>
+											<li><a href="etc.html#gd04-5"><strong>그래프컬러 가이드</strong></a></li>
+										</ul>
+									</div>
+								</li>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="popup.html"><strong>팝업</strong></a>
+								</li>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="button.html"><strong>버튼</strong></a>
+								</li>
+								<li class="sub-open">
+									<button class="fold">하위메뉴 있음</button>
+									<a href="board.html"><strong>게시판</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="board.html#gd07-1"><strong>목록</strong></a></li>
+											<li><a href="board.html#gd07-2"><strong>상세</strong></a></li>
+											<li><a href="board.html#gd07-3"><strong>등록</strong></a></li>
+										</ul>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</nav>
+				</div>
+			</div>
+			<!-- E : lnb -->
+			<!-- S : content -->
+			<div id="content">
+				<!-- S : 상세화면 -->
+				<section class="section" id="gd03">
+					<article class="article-cnt" id="gd03-1">
+						<div class="h3-tit">
+							<h3>상세_상태바 - 추후 업데이트 예정</h3>
+						</div>
+						<div class="sub-desc01">
+							<p>
+								상세화면 <strong class="gd-txt-color01">최상단</strong>에 위치
+								<br />하위내용을 포괄적으로 대표한다. (상태바가 없는 경우도 있다.)
+								<br />기본 레이아웃에 state-bar클래스 추가 후, 일반 테이블 그리기 (td값은 데이터를 받아 뿌린다)
+							</p>
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면" /></h5>
+							<img src="./images/ex/ex_status.gif" alt="상세_상태바 예시 화면" />
+						</div>
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<div class="ub-layout state-bar">
+									<table class="ub-control table normal " summary="테이블 테스트 화면-Normal Summary-2"><caption>테이블 테스트 화면-Normal-2</caption>
+										<colgroup>
+											<col>
+											<col>
+											<col>
+											<col>
+										</colgroup>
+										<tbody>
+											<tr id="layout-1_1">
+											<th id="layout-1_1_1" scope="col"><label class="ub-control label">VOC번호</label></th>
+											<td id="layout-1_1_2"><label id="TEST1" name="TEST1" class="ub-control label">한글</label></td>
+											<th id="layout-1_1_3" scope="col"><label class="ub-control label">VOC번호</label></th>
+											<td id="layout-1_1_4"><label id="TEST2" name="TEST2" class="ub-control label">한글2</label></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</pre>
+						</div>
+					</article>
+					<article class="article-cnt" id="gd03-2">
+						<div class="h3-tit">
+							<h3>상세_기본테이블</h3>
+						</div>
+						<div class="h4-tit">
+							<h4>기본 테이블</h4>
+						</div>
+						<div class="sub-desc01">
+							<p>상세화면에 기본적으로 사용되는 테이블. 페이지에 따라 접힘,펼침 존재<br /><strong class="gd-txt-color01">테이블 셀의 경우 4칸일때 120px / 480px / 120px / n 으로 width값을 준다. (2칸일 경우 - 120px / n)</strong></p>
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면" /></h5>
+							<img src="./images/ex/ex_detail01.gif" alt="상세_기본테이블 예시 화면" />
+						</div>
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<!-- 타이틀 -->
+								<h2 class="ub-control title hfold" for="cusInfo" hfold="1"><span class="ico-fold on"></span>고객정보</h2>
+								<!-- //타이틀 -->
+								<div class="ub-layout details" id="cusInfo" name="cusInfo">
+									<table class="ub-control table normal " id="cusTable">
+										<colgroup>
+											<col width="120px">
+											<col width="480px">
+											<col width="120px">
+											<col>
+										</colgroup>
+										<tbody>
+											<tr>
+												<th scope="row"><label class="ub-control label">고객명</label></th>
+												<td><input type="text" class="ub-control input-text readonly" id="NM_CUST" name="NM_CUST" value="" style="ime-mode:active;text-align:left;width:100px;" readonly="readonly"><input class="ub-control input-checkbox readonly" type="checkbox" id="ANONYMITY_CUST" name="ANONYMITY_CUST" checked="" value="Y" readonly="" disabled="disabled"><label>고객정보없음</label><span class="ub-control button inner icon" id="vocCustHisPop" style="display: none;">    <a href="#none" title="VOC이력"><span></span>VOC이력</a></span><input type="hidden" id="ID_CUST" name="ID_CUST" value="0000000099"><input type="hidden" id="ID_CUST_SRC" name="ID_CUST_SRC" value=""><input type="hidden" id="ID_VOC" name="ID_VOC" value="VOC_150320_00103"><input type="hidden" id="ID_SUB_VOC" name="ID_SUB_VOC" value="001"></td>
+												<td></td>
+												<td></td>
+											</tr>
+											<tr style="display: none;">
+												<th scope="row"><label class="ub-control label">CUST ID</label></th>
+												<td><input type="text" class="ub-control input-text  readonly" id="ID_CUST_FAMILY" name="ID_CUST_FAMILY" value="" style="text-align:left;width:100px;" disabled="disabled"></td>
+												<th scope="row"><label class="ub-control label">회원 ID</label></th>
+												<td><input type="text" class="ub-control input-text readonly" id="ID_HOMEPAGE" name="ID_HOMEPAGE" value="" style="text-align:left;width:100px;" readonly="readonly"></td>
+											</tr>
+											</tbody>
+									</table>
+								</div>
+							</pre>
+						</div>
+
+						<div class="ex-view">
+							<h5><img src="./images/txt_bad_ex.gif" alt="잘못된 예시화면"></h5>
+							<img src="./images/ex/ex_bad_detail01.gif" alt="테이블 잘못된 예시 화면">
+						</div>
+						<div class="sub-desc02">
+							input hidden을 제일 앞에 두지 않는다. (css 속성에 의해 hidden이 처음에 오면 화면에 보이는 인풋을 2번째 인풋으로 인식하여 공백 생김)
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_bad_ex.gif" alt="잘못된 예시화면"></h5>
+							<img src="./images/ex/ex_bad_detail02.gif" alt="테이블 잘못된 예시 화면">
+						</div>
+						<div class="sub-desc02">
+							뒤의 셀에 내용이 없을 경우, 빈 셀을 합쳐 내용이 길어져도 2줄로 떨어지지 않게 한다.
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_bad_ex.gif" alt="잘못된 예시화면"></h5>
+							<img src="./images/ex/ex_bad_detail03.gif" alt="테이블 잘못된 예시 화면">
+						</div>
+						<div class="sub-desc02">
+							th부분은 cell type을 헤더로 택하여 th,td 구분이 명확해도록 그려준다.
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_bad_ex.gif" alt="잘못된 예시화면"></h5>
+							<img src="./images/ex/ex_bad_detail04.gif" alt="테이블 잘못된 예시 화면">
+						</div>
+						<div class="sub-desc02">
+							끝 라인을 맞춰준다.(예외적인 경우 제외)
+						</div>
+
+						<div class="h4-tit">
+							<h4>일반 목록 테이블</h4>
+						</div>
+						<div class="sub-desc01">
+							<p>
+								대체로 상세화면에서 사용. <br />
+								상세화면에서 (jqgrid가 아닌)목록 테이블이 필요할 경우 사용됨. <span class="gd-txt-color01">(일반적으로 jqgrid, 통계화면과 디자인이 다르다.)</span><br />
+								메타 작성시 thead구분이 안되어지므로 일반 목록 테이블로 그린 후 상단 th에 해당하는 부분은 <span class="gd-txt-color01">cell type="header"</span>로 택한다.<br />
+								thead 영역의 label은 <span class="gd-txt-color01">목록 헤더 레이블</span>을 사용하고, tbody 영역의 label은 <span class="gd-txt-color01">목록 내용 레이블</span>을사용한다.
+							</p>
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면" /></h5>
+							<img src="./images/ex/ex_detail02.gif" alt="상세_일반 목록 테이블 예시 화면" />
+						</div>
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<table class="ub-control table list">
+									<colgroup>
+										<col style="width:10%;" />
+										<col style="width:20%;" />
+										<col style="width:12%;" />
+										<col style="width:12%;" />
+										<col />
+										<col />
+									</colgroup>
+									<thead>
+										<tr>
+											<th rowspan="2" scope="col"><label class="ub-control list-header"><nobr>NO</nobr></label></th>
+											<th rowspan="2" scope="col"><label class="ub-control list-header"><nobr>부품코드</nobr></label></th>
+											<th colspan="2" scope="colgroup"><label class="ub-control list-header"><nobr>센터<br />재고</nobr></label></th>
+											<th rowspan="2" scope="col"><label class="ub-control list-header"><nobr>부품명</label></nobr></th>
+										</tr>
+										<tr>
+											<th class="bl" scope="col"><label class="ub-control list-header"><nobr>가용</nobr></label></th>
+											<th scope="col"><label class="ub-control list-header"><nobr>수리중</nobr></label></th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td><label class="ub-control list-content">4</label></td>
+											<td><label class="ub-control list-content">ACR854D</label></td>
+											<td><label class="ub-control list-content">0</label></td>
+											<td><label class="ub-control list-content">0</label></td>
+											<td class="left"><label class="ub-control list-content">신한생명 프로젝트</label></td>
+										</tr>
+										<tr>
+											<td><label class="ub-control list-content">4</label></td>
+											<td><input type="radio" class="ub-control radio" /><label class="ub-control list-content">한글</label></td>
+											<td><label class="ub-control list-content"></label></td>
+											<td><input type="text" class="ub-control input-text" /></td>
+											<td class="left"></td>
+										</tr>
+										<tr>
+											<td><span class="ico-emergency"></span></td>
+											<td><input type="radio" class="ub-control radio" /><label class="ub-control list-content">테스트</label></td>
+											<td><input type="checkbox" class="ub-control input-checkbox" /><label class="ub-control list-content">테스트</label></td>
+											<td></td>
+											<td class="left"></td>
+										</tr>
+									</tbody>
+								</table>
+							</pre>
+						</div>
+					</article>
+					<article class="article-cnt" id="gd03-3">
+						<div class="h3-tit">
+							<h3>상세_변형 테이블</h3>
+						</div>
+
+						<div class="h4-tit">
+							<h4>테이블 안 테이블</h4>
+						</div>
+
+						<div class="sub-desc01">
+							<p>td안에 테이블이 들어갈 경우 테이블을 감싸는 <strong class="gd-txt-color01">td안에 div(기본레이아웃) 넣고 in-td 클래스</strong>를 추가한다.<br /></p>
+						</div>
+
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+							<img src="./images/ex/ex_transform_tbl01.gif" alt="테이블 안 테이블 예시 화면">
+						</div>
+
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<table class="ub-control table normal ">
+									<colgroup>
+										<col width="120px">
+										<col>
+									</colgroup>
+									<tbody>
+										<tr>
+											<th scope="row"><label class="ub-control label">접수일시</label></th>
+											<td>
+												<div class="in-td">
+													<h3 class="ub-control title">td안에 테이블 들어갈때는 테이블을 감싸는 td안에 div(기본레이아웃)을 넣고 in-td클래스를 추가한다.</h3>
+													<table class="ub-control table list">
+														<colgroup>
+															<col style="width:10%;">
+															<col style="width:20%;">
+															<col style="width:12%;">
+															<col style="width:12%;">
+															<col style="width:%;">
+															<col>
+														</colgroup>
+														<thead>
+															<tr>
+																<th rowspan="2" scope="col"><label class="ub-control list-header"><nobr>NO</nobr></label></th>
+																<th rowspan="2" scope="col"><label class="ub-control list-header"><nobr>부품코드</nobr></label></th>
+																<th colspan="2" scope="col"><label class="ub-control list-header"><nobr>센터<br>재고</nobr></label></th>
+																<th rowspan="2" scope="col"><label class="ub-control list-header"><nobr>부품명</nobr></label></th>
+															</tr>
+															<tr>
+																<th class="bl" scope="col"><label class="ub-control list-header"><nobr>가용</nobr></label></th>
+																<th scope="col"><label class="ub-control list-header"><nobr>수리중</nobr></label></th>
+															</tr>
+														</thead>
+														<tbody>
+															<tr>
+																<td><label class="ub-control list-content">4</label></td>
+																<td><label class="ub-control list-content">ACR854D</label></td>
+																<td><label class="ub-control list-content">0</label></td>
+																<td><label class="ub-control list-content">0</label></td>
+																<td class="left"><label class="ub-control list-content">Spring, Plate (BL)COP</label></td>
+															</tr>
+														</tbody>
+													</table>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th scope="row"><label class="ub-control label">접수일시</label></th>
+											<td>
+												<div class="in-td">
+													<table class="ub-control table normal ">
+														<colgroup>
+															<col width="120px;">
+															<col>
+														</colgroup>
+														<tbody>
+															<tr>
+																<th scope="row"><label class="ub-control label">접수일시</label></th>
+																<td><label class="ub-control label">내용</label></td>
+															</tr>
+														</tbody>
+													</table>
+												</div>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</pre>
+						</div>
+						<div class="sub-desc02">
+							<p>td안에 들어가는 테이블의 경우 같은 테이블을 사용하더라도 상위 테이블보다 하위개념이므로 (디자인 측면)중요도 낮춤 </p>
+						</div>
+
+						<div class="h4-tit">
+							<h4>멀티 테이블(일반 테이블 기반) - 추후 업데이트 예정</h4>
+						</div>
+						<div class="sub-desc01">
+							<p>th가 상단과 왼쪽에 함께 들어가는 경우 사용. 메타로 그릴 시 기본테이블에 <strong class="gd-txt-color01">“multi” class 추가</strong></p>
+						</div>
+
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+							<img src="./images/ex/ex_transform_tbl02.jpg" alt="멀티 테이블 예시 화면">
+						</div>
+
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<table class="ub-control table normal multi" summary="테이블 멀티 화면">
+									<caption>테이블 테스트 화면-Normal-1</caption>
+									<colgroup>
+										<col width="10%">
+										<col width="320px">
+										<col width="10%">
+										<col width="10%">
+										<col width="10%">
+										<col width="10%">
+										<col width="10%">
+										<col width="10%">
+									</colgroup>
+									<tbody>
+										<tr>
+											<th colspan="4" scope="colgruop"><label class="ub-control label">심사 I</label></th>
+											<th scope="row"><label class="ub-control label">처리결과 I</label></th>
+											<td></td>
+											<th scope="row"><label class="ub-control label">심사 I</label></th>
+											<td></td>
+										</tr>
+										<tr>
+											<th class="label-none" scope="col"><label class="ub-control label">구분</label></th>
+											<th style="text-align:center" scope="col"><label class="ub-control label">처리일자</label></th>
+											<th style="text-align:Center" scope="col"><label class="ub-control label">처리기관</label></th>
+											<th style="text-align:Right" scope="col"><label class="ub-control label">사원명</label></th>
+											<td rowspan="4" colspan="4"><textarea class="ub-control textarea " style="width:95%;" rows="4"></textarea></td>
+										</tr>
+										<tr>
+											<th scope="row"><label class="ub-control label">수신</label></th>
+											<td></td>
+											<th scope="row"></th>
+											<td></td>
+										</tr>
+										<tr>
+											<th scope="row"><label class="ub-control label">심사</label></th>
+											<td></td>
+											<th scope="row"></th>
+											<td></td>
+										</tr>
+										<tr>
+											<th scope="row"><label class="ub-control label">결재</label></th>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+									</tbody>
+								</table>
+							</pre>
+						</div>
+
+						<div class="h4-tit">
+							<h4>번들 테이블(목록 테이블 기반) - 추후 업데이트 예정</h4>
+						</div>
+						<div class="sub-desc01">
+							<p>
+								대체로 상세화면에서 사용. 형태는 혼합형 테이블과 유사하나, <strong class="gd-txt-color01">동일한 형태의 데이터가 반복</strong>되어<br />
+								사용될 경우 번들 테이블을 사용한다. 주로 금융권 프로젝트에서 사용된다.<br />
+								메타로 그릴 시 목록테이블에  <strong class="gd-txt-color01">“bundle” class 추가 / tbody영역의 회색bg부분에는 td에 클래스 head01 추가</strong>
+							</p>
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면" /></h5>
+							<img src="./images/ex/ex_transform_tbl03.jpg" alt="묶음 테이블 예시 화면" />
+						</div>
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<table class="ub-control table list bundle">
+									<colgroup>
+										<col width="3%">
+										<col width="5%">
+										<col width="5%">
+										<col width="*">
+										<col width="6%">
+										<col width="6%">
+										<col width="5%">
+										<col width="5%">
+										<col width="5%">
+										<col width="6%">
+										<col width="8%">
+										<col width="8%">
+										<col width="8%">
+										<col width="4%">
+									</colgroup>
+									<thead>
+										<tr>
+											<th  scope="col">
+												<label class="ub-control list-header"><nobr>선택</nobr></label>
+											</th>
+											<th  scope="col">
+												<label class="ub-control list-header"><nobr>대표여부</nobr></label>
+											</th>
+											<th  scope="col">
+												<label class="ub-control list-header"><nobr>증권번호</nobr></label>
+											</th>
+											<th  scope="col">
+												<label class="ub-control list-header"><nobr>상품명</nobr></label>
+											</th>
+											<th  scope="col">
+												<label class="ub-control list-header"><nobr>계약일자</nobr></label>
+											</th>
+											<th  scope="col">
+												<label class="ub-control list-header"><nobr>성립일자</nobr></label>
+											</th>
+											<th  scope="col">
+												<label class="ub-control list-header"><nobr>계약자</nobr></label>
+											</th>
+											<th  scope="col">
+												<label class="ub-control list-header"><nobr>피보험자</nobr></label>
+											</th>
+											<th  scope="col">
+												<label class="ub-control list-header"><nobr>월보험료</nobr></label>
+											</th>
+											<th  scope="col">
+												<label class="ub-control list-header"><nobr>최종납입일</nobr></label>
+											</th>
+											<th  scope="col">
+												<label class="ub-control list-header"><nobr>최종납입/납입횟수</nobr></label>
+											</th>
+											<th  scope="col">
+												<label class="ub-control list-header"><nobr>모집지점/모집인</nobr></label>
+											</th>
+											<th  scope="col">
+												<label class="ub-control list-header"><nobr>수금지점/수금인</nobr></label>
+											</th>
+											<th  scope="col">
+												<label class="ub-control list-header"><nobr>이미지</nobr></label>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td rowspan="2">
+												<input type="checkbox" class="ub-control input-checkbox">
+											</td>
+											<td rowspan="2">
+												<input type="checkbox" class="ub-control input-checkbox">
+											</td>
+											<td><label class="ub-control label">11007807</label></td>
+											<td><label class="ub-control label">나이스건강(개인)</label></td>
+											<td><label class="ub-control label">2001-02-15</label></td>
+											<td></td>
+											<td><label class="ub-control label">허황</label></td>
+											<td><label class="ub-control label">허황</label></td>
+											<td class="text-right"><label class="ub-control label">51,800</label></td>
+											<td><label class="ub-control label">2011-01-31</label></td>
+											<td><label class="ub-control label">2011-01/120</label></td>
+											<td><label class="ub-control label">사직/권혁순</label></td>
+											<td><label class="ub-control label">명동/권혁순</label></td>
+											<td></td>
+										</tr>
+										<tr>
+											<td class="head01">
+												<label class="ub-control label">접수유형</label>
+											</td>
+											<td colspan="12" class="text-left">
+												<input type="text" class="ub-control input-text" style="width:506px;">
+												<select class="ub-control select" style="width:123px;">
+													<option></option>
+												</select>
+												<select class="ub-control select" style="width:123px;">
+													<option></option>
+												</select>
+												<select class="ub-control select" style="width:133px;">
+													<option></option>
+												</select>
+												<span class="ub-control button inner icon" name=""><a href="#" title="일괄선택">일괄선택</a></span>
+											</td>
+										</tr>
+										<tr>
+											<td rowspan="2">
+												<input type="checkbox" class="ub-control input-checkbox">
+											</td>
+											<td rowspan="2">
+												<input type="checkbox" class="ub-control input-checkbox">
+											</td>
+											<td><label class="ub-control label">11007807</label></td>
+											<td><label class="ub-control label">무)알리안츠파워</label></td>
+											<td><label class="ub-control label">2001-02-15</label></td>
+											<td></td>
+											<td><label class="ub-control label">허황</label></td>
+											<td><label class="ub-control label">허황</label></td>
+											<td class="text-right"><label class="ub-control label">51,800</label></td>
+											<td><label class="ub-control label">2011-01-31</label></td>
+											<td><label class="ub-control label">2011-01/120</label></td>
+											<td><label class="ub-control label">사직/권혁순</label></td>
+											<td><label class="ub-control label">명동/권혁순</label></td>
+											<td></td>
+										</tr>
+										<tr>
+											<td class="head01">
+												<label class="ub-control label">접수유형</label>
+											</td>
+											<td colspan="12" class="text-left">
+												<input type="text" class="ub-control input-text" style="width:506px;">
+												<select class="ub-control select" style="width:123px;">
+													<option></option>
+												</select>
+												<select class="ub-control select" style="width:123px;">
+													<option></option>
+												</select>
+												<select class="ub-control select" style="width:133px;">
+													<option></option>
+												</select>
+												<span class="ub-control button inner icon" name=""><a href="#" title="일괄선택">일괄선택</a></span>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</pre>
+						</div>
+
+						<div class="h4-tit">
+							<h4>일반 테이블 데이터형(일반 테이블 기반)</h4>
+						</div>
+						<div class="sub-desc01">
+							<p>상세화면에서 데이터 값만 뿌려질때 사용한다. 메타로 그릴 시 기본테이블에  <strong class="gd-txt-color01">“data” class 추가</strong>
+							</p>
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면" /></h5>
+							<img src="./images/ex/ex_transform_tbl04.jpg" alt="데이터 값만 뿌려지는 테이블 예시 화면" />
+						</div>
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<table class="ub-control table normal data">
+									<colgroup>
+									<col width="120px">
+									<col width="480px">
+									<col width="120px">
+									<col width="480px">
+									<col width="120px">
+									<col width="*">
+									</colgroup>
+									<tbody>
+										<tr>
+											<th scope="row">
+												<label class="ub-control label">VOC번호</label>
+											</th>
+											<td><label class="ub-control label">20161006-0017</label></td>
+											<th scope="row">
+												<label class="ub-control label">상태</label>
+											</th>
+											<td><label class="ub-control label">결재중</label></td>
+										</tr>
+										<tr>
+											<th  scope="row">
+												<label class="ub-control label">등록일</label>
+											</th>
+											<td><label class="ub-control label">2016-10-26</label></td>
+											<th scope="row">
+												<label class="ub-control label">등록부서</label>
+											</th>
+											<td><label class="ub-control label">소비자보호팀</label></td>
+										</tr>
+									</tbody>
+									</table>
+								</pre>
+							</div>
+
+						<div class="sub-desc02">
+							기본 테이블 특성은 일반 테이블을 따른다.<br />
+							th영역에 불릿이 없을경우, th에 label-none클래스 추가
+						</div>
+					</article>
+				</section>
+				<!-- E : 상세화면 -->
+			</div>
+			<!-- E : content -->
+		</div><!-- E : container -->
+	</div><!-- E : wrap -->
+</body>
+</html>

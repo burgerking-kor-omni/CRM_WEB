@@ -1,0 +1,5 @@
+1. CHECK BOX
+
+2. RADIO BOX
+
+3. SELECT (LIST BOX형태)

@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans 
+			http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+			http://www.springframework.org/schema/context 
+			http://www.springframework.org/schema/context/spring-context-3.2.xsd
+			http://www.springframework.org/schema/aop 
+			http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+			http://www.springframework.org/schema/mvc 
+			http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+			">
+
+	<!--
+	================================================================================
+	Spring MVC의 Controller, View Resolver, Viewer 관련 Configuration
+	================================================================================
+	-->
+	<context:annotation-config />
+
+	<!-- Properties 설정 : 외부 프로퍼티 파일 사용을 위한 설정 -->
+	<context:property-placeholder location="classpath:resource/config/config.xml" />
+
+	<!-- Controller Mapping Handler 설정 -->
+	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+		<property name="interceptors">
+			<list>
+			</list>
+		</property>
+	
+	</bean>
+	
+	<!-- Mobile GateWay Controller 설정 -->
+<!-- 	<bean id="httpGatewayController" class="com.ubone.standard.gateway.HttpGatewayController"> -->
+<!-- 		<property name="targetUrl" 		value="http://localhost:8080" /> -->
+<!-- 		<property name="encoding"		value="UTF-8"/> -->
+<!-- 		<property name="resetSession"	value="true" /> -->
+<!-- 	</bean> -->
+	
+	<!-- Login Controller 설정 -->
+	<bean class="com.ubone.standard.login.controller.LoginController" />
+
+	<!-- SsoLogin Controller 설정 -->
+	<bean class="com.ubone.standard.login.controller.SsoLoginController"/>
+	
+	<!-- SSO Controller 설정 -->
+	<bean class="com.ubone.standard.login.controller.SsoController"/>
+
+	<!-- hsql Meta Data Controller 설정 -->
+	<bean class="com.ubone.standard.system.metadata.controller.HsqlDataInquiryController"/>
+
+	<!-- Screen Controller 설정 -->
+	<bean class="com.ubone.framework.web.controller.ScreenController" />
+	
+	<!-- Function Controller 설정 -->
+	<bean class="com.ubone.framework.web.controller.FunctionController" />
+<!-- 	<bean class="com.ubone.interfaces.hessian.controller.HessianFunctionServiceController"> -->
+<!-- 		<property name="remoteUrl" value="http://localhost:8080/hessianFunctionService.do" /> -->
+<!-- 		<property name="matchedUrlPatterns"> -->
+<!-- 			<list> -->
+<!-- 				<value>/**/EXP8001/INQUIRY.ub</value> -->
+<!-- 			</list> -->
+<!-- 		</property> -->
+<!-- 		<property name="excludedUrlPatterns"> -->
+<!-- 			<list> -->
+<!-- 			</list> -->
+<!-- 		</property> -->
+<!-- 	</bean> -->
+	
+	<!-- Service Controller 설정 -->
+	<bean class="com.ubone.framework.web.controller.ServiceController" />
+	<!-- Code Service Controller 설정 -->
+	<bean class="com.ubone.framework.web.controller.CodeController" />
+	<!-- 공통기능 지원 Controller 설정 -->
+	<bean class="com.ubone.framework.web.controller.CommonFunctionController" />
+	<!-- File Controller 설정 -->
+	<bean class="com.ubone.framework.web.controller.FileController" p:encoding="${framework.encoding}" />
+	<!-- Excel Controller 설정 -->
+	<bean class="com.ubone.framework.web.controller.ExcelController" p:encoding="${framework.encoding}" />
+	<!-- UB-Board File Controller 설정 -->
+	<bean class="com.ubone.standard.ubboard.common.controller.BoardFileController" p:encoding="${framework.encoding}" />
+	<!-- Cache Flush Controller 설정 -->
+	<bean class="com.ubone.framework.cache.controller.OSCacheController" />
+
+	<!-- JCryption Controller 설정 -->
+	<bean class="com.ubone.framework.security.jcryption.controller.JCryptionController" />
+	
+	<!-- UB-Alimy Login Controller 설정 -->
+	<bean class="com.ubone.standard.alimy.controller.AlimyLoginController" />
+	
+	<!-- 다국어 관련 메세지 디버그 Controller 설정 -->
+	<bean class="com.ubone.framework.web.controller.MessageDebugController" />	
+	
+	<!-- Rexpert Report XML Controller 설정 -->
+<!-- 	<bean class="com.ubone.voc.controller.RexpertController" /> -->
+		
+	<!-- (TO-DO) Chart Controller 설정
+	<bean class="com.ubone.framework.web.controller.ChartController" />
+	-->
+	
+	<!-- viewResolver 설정 -->
+	<bean id="beanNameResolver" class="org.springframework.web.servlet.view.BeanNameViewResolver" p:order="1" />
+
+<!-- 	<bean id="screenJspViewResolver" -->
+<!-- 		class="com.ubone.framework.web.view.ScreenJspViewResolver" -->
+<!-- 		p:contentType="text/html; charset=${framework.encoding}" -->
+<!-- 		p:prefix="${framework.view.jsp.root}" p:suffix=".jsp"  -->
+<!-- 		p:order="2" /> -->
+
+	<!-- Tiles View Resolver -->
+	<bean id="tilesViewResolver" class="com.ubone.framework.web.view.TilesUrlBasedViewResolver"  p:order="1">
+        <property name="viewClass" value="com.ubone.framework.web.view.TilesView" />
+        <property name="prefix" value="${framework.view.jsp.root}/${framework.view.app.path}"/>
+        <property name="suffix" value=".jsp"/>
+    	<property name="tilesDefinitionDelimiter" value="." />
+    	<property name="tilesBodyAttributeName" value="body" />
+    	<property name="cache" value="false" />
+    </bean>
+
+	<!-- Tiles Configuration -->
+	<bean id="tilesConfigurer" class="org.springframework.web.servlet.view.tiles2.TilesConfigurer">
+		<property name="definitions">
+			<list>
+				<value>classpath:/resource/config/tiles-*.xml</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- MVC Annotation Driven -->
+	<mvc:annotation-driven>
+		<mvc:argument-resolvers>
+			<!-- Parameter 인스턴스를 Controller에서 선언시 처리해주는 ArgumentResolver -->
+			<bean class="com.ubone.framework.web.resolver.ParameterArgumentResolver"></bean>      
+		</mvc:argument-resolvers>
+	</mvc:annotation-driven>
+
+	<!-- MVC Interceptors -->
+	<mvc:interceptors>
+		<bean class="com.ubone.framework.web.interceptor.BasicHandlerInterceptor">
+			<property name="interceptors">
+				<list>
+					<ref bean="localeChangeInterceptor" />
+					<bean class="com.ubone.framework.web.ConfigSupportInterceptor" />
+					<bean class="com.ubone.framework.web.PropagationReadyInterceptor" />
+					<bean class="com.ubone.framework.web.SearchHistoryInterceptor" />
+				
+					<!--
+						전체 적용 웹 관련 적용 사항 
+						보안설정 :: Response 헤더값에 추가하여 보안을 강화하는 기능으로 사용됨. 
+					-->
+					<bean class="com.ubone.framework.web.interceptor.SecurityInterceptor"><!-- Security Interceptor -->
+						<property name="dateHeaders">
+							<props>
+								<!-- 브라우져 캐쉬 해제 설정 -->
+								<prop key="Expire">0</prop>
+							</props>
+						</property>
+						<property name="headers">
+							<props>
+								<!-- 서버정보 클리어 -->
+								<prop key="Server">server</prop>
+								<!-- 브라우져 캐쉬 해제 설정 -->
+								<prop key="Cache-Control">no-cache, no-store, must-revalidate</prop>
+								<!-- 브라우져 캐쉬 해제 설정 -->
+								<prop key="Pragma">no-cache</prop>
+								<!--
+									타 사이트에서 frame, iframe, object를 넣지 못하게 하는 헤더설정
+									- DENY : 해당 페이지는 frame을 표시할 수 없다.
+									- SAMEORIGIN : 해당 페이지와 동일한 orgin에 해당하는 frame만 표시할 수 있다.
+									- ALLOW-FROM : uri 해당 페이지는 지정된 orgin에 해당하는 frame만 표시할 수 있다.
+								-->
+								<prop key="X-Frame-Options">SAMEORIGIN</prop>
+								<!--
+								 	SSL 적용시 301 Redirect의 전환비용을 최소화 해주는 헤더로, 
+								 	활성화 되면 프로토콜을 http에서 https로 브라우져가 변경을 할 수 있게 헤더를 전송한다.
+								 	단, 기본포트에 한해서 가능하며, SSL포트(443)를 사용하지 않는 경우에는 http로 호출시 프로토콜만 변경되는 현상을 볼 수 있다.
+								 -->
+								<prop key="Strict-Transport-Security">max-age=31536000; includeSubDomains; preload</prop>
+
+								<!--
+									XSS 공격을 막기 위한 방법은 다양한데, X-XSS-Protection는 응답 헤더를 통해 사용자 브라우저의 XSS 보호 옵션을 설정할 수 있는 방법이다. 
+									현재는 마이크로소프트의 인터넷 익스플로러, 구글 크롬 및 사파리가 이 헤더를 지원하고 있다.
+																		 
+									 옵션                                                              기능
+									 X-XSS-Protection : 0                - 브라우저의 XSS-Filter 비활성화
+									 X-XSS-Protection : 1                - 브라우저의 XSS-Filter 활성화
+									 X-XSS-Protection : 1, mode=block    - 브라우저의 XSS-Filter 비활성화, 전체 페이지의 응답 내용을 # 문자로만 보여줌
+								 -->
+								<prop key="X-XSS-Protection">1; mode=block</prop>
+
+								<!--
+								 예전 브라우저는 사용자 경험을 높이기 위해 컨텐츠 타입을 sniffing (냄새를 맡아봄)해본 후 컨텐츠 타입을 유추해서 렌더링한 결과를 보여주었다. 
+								 이 기능을 악용해 악의적인 사용자가 공격을 할 수 있게 되므로 컨텐츠 스니핑을 하지 못하도록 설정한다.
+								 -->
+								<prop key="X-Content-Type-Options">nosniff</prop>
+								
+								<!--
+								  Content-Security-Policy 헤더가 활성화 되면 허용된 도메인에서만 스크립트를 실행할 수 있다.
+								   반드시 아래의 참고 사이트 정보를 숙지한 후 변경하세요. 전체 사이트에 영향을 주는 내용입니다.
+								    
+								   참고 사이트
+								   https://developers.google.com/web/fundamentals/security/csp/?hl=ko
+								 -->
+								<prop key="Content-Security-Policy">script-src 'self' 'unsafe-inline' 'unsafe-eval'</prop>
+							</props>
+						</property>
+					</bean>
+					
+					<!--
+						특정 URL에만 특별 헤더 추가 설정
+						보안설정 :: Response 헤더값에 추가하여 보안을 강화하는 기능으로 사용됨. 
+					-->
+					<bean class="com.ubone.framework.web.interceptor.SecurityInterceptor"><!-- Security Interceptor -->
+						<property name="matchedUrlPatterns">
+							<list>
+								<value>/function/EXP*/*</value><!-- 모바일 접근 Function기능 -->
+								<value>/function/MOB*/*</value><!-- 모바일 접근 Function기능 -->
+								<value>/message.*</value><!-- 메세지 서비스 -->
+							</list>
+						</property>
+						<property name="headers">
+							<props>
+								<!-- CROSS 도메인 허용 -->
+								<prop key="Access-Control-Allow-Origin">*</prop>
+							</props>
+						</property>
+					</bean>					
+					<bean class="com.ubone.standard.ubboard.common.intercepter.BoardInterceptor" /><!-- Board Interceptor -->
+					<bean class="com.ubone.framework.web.interceptor.ScreenInterceptor" /><!-- Screen Interceptor -->
+					<bean class="com.ubone.framework.web.interceptor.JqGridInterceptor" /><!-- Service Interceptor -->
+	           	</list>
+			</property>
+		</bean>
+	</mvc:interceptors>
+
+	<bean id="viewParent" abstract="true">
+		<property name="encoding" value="${framework.encoding}" />
+	</bean>
+
+	<!-- JSON view class 설정 -->
+	<bean id="json" class="com.ubone.framework.web.view.JsonView" p:contentType="text/plain" parent="viewParent">
+		<property name="viewConverters">
+			<list>
+				<bean class="com.ubone.ui.tree.TreeViewConverter" />
+				<bean class="com.ubone.framework.web.view.converter.ResultViewConverter">
+					<property name="converters">
+						<list>
+							<bean class="com.ubone.framework.web.view.xstreamconverter.MapConverter" />
+						</list>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<!-- XML view class 설정 -->
+	<bean id="xml" class="com.ubone.framework.web.view.XmlView" p:contentType="text/xml" parent="viewParent">
+	</bean>
+	
+	<!-- jsonView class 설정 -->
+	<bean id="jsonView" class="org.springframework.web.servlet.view.json.MappingJackson2JsonView">
+		<property name="contentType" value="application/json;charset=UTF-8"> </property>
+	</bean>
+
+	<!-- Rexpert XML view class 설정 -->
+<!-- 	<bean id="rex" class="com.ubone.voc.controller.RexpertXmlView" p:contentType="text/xml" parent="viewParent">
+	</bean> -->
+
+	<!-- 	ApplicationContext singleTone으로 가지고 오기 위한. -->
+	<bean id="contextHolder" class="com.ubone.framework.web.util.ContextHolder"/>
+
+	<!--  	http request 를 가져오기 위한 bean 설정. scope 를 request 로 하였으며, scoped-proxy 설정을 주어서 주입받는 bean이 신경쓰지 않고 사용할 수 있도록 함. -->
+	<bean id="httpRequestHolder" class="com.ubone.framework.web.util.HttpRequestHolder" scope="request">
+		<aop:scoped-proxy proxy-target-class="true" />
+	</bean>
+</beans>

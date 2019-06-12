@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+	<!--
+		================================================================================
+		Framework 관련 Configuration
+		================================================================================
+	-->
+
+	<!-- screen repository declaration -->
+	<!-- Xml 파일에서 Screen 정보를 로딩하는 설정 (운영서버 모드) -->
+<!-- 	<bean id="screenRepository" class="com.ubone.framework.engine.screen.CachingScreenRepository"> -->
+<!-- 		<property name="parentScreenRepository"> -->
+<!-- 			<bean class="com.ubone.framework.repository.screen.XmlScreenRepository" parent="frameworkRepository"> -->
+<!-- 			</bean> -->
+<!-- 		</property> -->
+<!-- 	</bean> -->
+
+	<!-- DB에서 Screen 정보를 읽어 Xml 파일을 무조건 생성하고 로딩하는 설정 -->
+	<bean id="screenRepository" class="com.ubone.framework.engine.screen.CachingScreenRepository">
+		<property name="parentScreenRepository">
+			<bean class="com.ubone.framework.repository.screen.XmlScreenRepository" parent="frameworkRepository">
+				<property name="parentScreenRepository">
+					<bean class="com.ubone.framework.repository.screen.XmlFileMakeScreenRepository" parent="frameworkRepository"/>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	<!-- Xml 파일을 검색후 존재하지 않으면 DB에서 Screen 정보를 로드하는 설정 -->
+<!-- 	<bean id="screenRepository" class="com.ubone.framework.engine.screen.CachingScreenRepository"> -->
+<!-- 		<property name="parentScreenRepository"> -->
+<!-- 			<bean class="com.ubone.framework.repository.screen.XmlScreenRepository" parent="frameworkRepository"> -->
+<!-- 				<property name="parentScreenRepository"> -->
+<!-- 					<bean class="com.ubone.framework.engine.screen.JdbcScreenRepository" parent="frameworkRepository"/> -->
+<!-- 				</property> -->
+<!-- 			</bean> -->
+<!-- 		</property> -->
+<!-- 	</bean> -->
+	<!-- DB을 검색후 존재하지 않으면 Screen Xml 파일 정보를 로드하는 설정 -->
+<!-- 	<bean id="screenRepository" class="com.ubone.framework.engine.screen.CachingScreenRepository"> -->
+<!-- 		<property name="parentScreenRepository"> -->
+<!-- 			<bean class="com.ubone.framework.engine.screen.JdbcScreenRepository" parent="frameworkRepository"> -->
+<!-- 				<property name="parentScreenRepository"> -->
+<!-- 					<bean class="com.ubone.framework.repository.screen.XmlScreenRepository" parent="frameworkRepository"/> -->
+<!-- 				</property> -->
+<!-- 			</bean> -->
+<!-- 		</property> -->
+<!-- 	</bean> -->
+
+	
+	<!-- service repository declaration -->
+	<!-- Xml 파일에서 Service 정보를 로딩하는 설정 (운영서버 모드) -->
+<!-- 	<bean id="serviceRepository" class="com.ubone.framework.engine.service.CachingServiceRepository"> -->
+<!-- 		<property name="parentServiceRepository"> -->
+<!-- 			<bean class="com.ubone.framework.repository.service.XmlServiceRepository" parent="frameworkRepository"> -->
+<!-- 			</bean> -->
+<!-- 		</property> -->
+<!-- 	</bean> -->
+	<!-- DB에서 Service 정보를 읽어 Xml 파일을 무조건 생성하고 로딩하는 설정 -->
+	<bean id="serviceRepository" class="com.ubone.framework.engine.service.CachingServiceRepository">
+		<property name="parentServiceRepository">
+			<bean class="com.ubone.framework.repository.service.XmlServiceRepository" parent="frameworkRepository">
+				<property name="parentServiceRepository">
+					<bean class="com.ubone.framework.repository.service.XmlFileMakeServiceRepository" parent="frameworkRepository"/>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	<!-- Xml 파일을 검색후 존재하지 않으면 DB에서 Service 정보를 로드하는 설정 -->
+<!-- 	<bean id="serviceRepository" class="com.ubone.framework.engine.service.CachingServiceRepository"> -->
+<!-- 		<property name="parentServiceRepository"> -->
+<!-- 			<bean class="com.ubone.framework.repository.service.XmlServiceRepository" parent="frameworkRepository"> -->
+<!-- 				<property name="parentServiceRepository"> -->
+<!-- 					<bean class="com.ubone.framework.engine.service.JdbcServiceRepository" parent="frameworkRepository"/> -->
+<!-- 				</property> -->
+<!-- 			</bean> -->
+<!-- 		</property> -->
+<!-- 	</bean> -->
+	<!-- DB을 검색후 존재하지 않으면 Service Xml 파일 정보를 로드하는 설정 -->
+<!-- 	<bean id="serviceRepository" class="com.ubone.framework.engine.service.CachingServiceRepository"> -->
+<!-- 		<property name="parentServiceRepository"> -->
+<!-- 			<bean class="com.ubone.framework.engine.service.JdbcServiceRepository" parent="frameworkRepository"> -->
+<!-- 				<property name="parentServiceRepository"> -->
+<!-- 					<bean class="com.ubone.framework.repository.service.XmlServiceRepository" parent="frameworkRepository"/> -->
+<!-- 				</property> -->
+<!-- 			</bean> -->
+<!-- 		</property> -->
+<!-- 	</bean> -->
+	
+</beans>

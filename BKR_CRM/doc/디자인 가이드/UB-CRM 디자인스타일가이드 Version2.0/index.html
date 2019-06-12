@@ -1,0 +1,758 @@
+<!doctype html>
+<html lang="ko">
+<head>
+	<meta charset="utf-8" />
+	<title>(주)유비원 스타일 가이드</title>
+	<link type="text/css" rel="stylesheet" href="./css/shCoreDefault.css"/>
+	<link type="text/css" rel="stylesheet" href="./css/style.css"/>
+	<link type="text/css" rel="stylesheet" href="./css/jquery.mCustomScrollbar.css"/>
+	<script type="text/javascript" src="./js/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="./js/html5.js"></script>
+	<script type="text/javascript" src="./js/shCore.js"></script>
+	<script type="text/javascript" src="./js/shBrushJScript.js"></script>
+	<script type="text/javascript" src="./js/shBrushCss.js"></script>
+	<script type="text/javascript" src="./js/shBrushXml.js"></script>
+	<script type="text/javascript" src="./js/jquery.mCustomScrollbar.concat.min.js"></script>
+	<script type="text/javascript">
+		jQuery(function(){
+		   jQuery('a[href^=#]').click(function() {
+			  var speed = 500;  // 스크롤 속도
+			  var href= jQuery(this).attr("href");
+			  var target = jQuery(href == "#" || href == "" ? 'html' : href);
+			  var position = target.offset().top;
+			  jQuery('body,html').animate({scrollTop:position}, speed, 'swing');
+			  return false;
+		   });
+		}); //부드럽게 페이지내 이동위해 사용
+		SyntaxHighlighter.all(); //syntaxhighlighter
+	</script>
+</head>
+
+<body>
+	<!-- S : wrap -->
+	<div id="wrap">
+		<!-- S : header-->
+		<div id="header">
+			<header class="gd-header">
+				<h1>
+					<a href="index.html"><img src="./images/h1_logo.png" alt="ubone" /></a>
+					<strong class="gd-ver">Style Guide
+						<strong class="ver">Ver2.0</strong>
+					</strong>
+				</h1>
+				<!-- <div class="move">
+					<a href="#"><img src="./images/ico_mobile.png" alt="모바일 가이드로 이동" /></a>
+				</div> -->
+			</header>
+		</div>
+		<!-- E : header-->
+		<div id="container">
+			<!-- S : lnb-->
+			<div id="lnb">
+				<div class="lnb-inner">
+					<div class="tit-rcnt">
+						<h2>CSS Guide</h2>
+						<!-- <span class="rcnt"><a href="#"><img src="./images/btn_all_view.png" alt="전체보기" /></a></span> -->
+					</div>
+					<nav class="gd-nav">
+						<div class="menu">
+							<ul>
+								<li>
+									<button class="fold">하위메뉴 있음</button>
+									<a href="index.html"><strong>공통</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="index.html#gd01-1"><strong>메뉴</strong></a></li>
+										</ul>
+									</div>
+								</li>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="list.html"><strong>목록화면</strong></a></li>
+								<li class="sub-open">
+									<button class="fold">하위메뉴 있음</button>
+									<a href="detail.html"><strong>상세화면</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="detail.html#gd03-1"><strong>상태바</strong></a></li>
+											<li><a href="detail.html#gd03-2"><strong>기본 테이블</strong></a></li>
+											<li><a href="detail.html#gd03-3"><strong>변형 테이블</strong></a></li>
+										</ul>
+									</div>
+								</li>
+								<li class="sub-open">
+									<button class="fold">하위메뉴 있음</button>
+									<a href="etc.html"><strong>기타</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="etc.html#gd04-1"><strong>통계</strong></a></li>
+											<li><a href="etc.html#gd04-2"><strong>탭&amp;파일첨부&amp;페이징</strong></a></li>
+											<li><a href="etc.html#gd04-3"><strong>설명문구</strong></a></li>
+											<li><a href="etc.html#gd04-4"><strong>로딩바</strong></a></li>
+											<li><a href="etc.html#gd04-5"><strong>그래프컬러 가이드</strong></a></li>
+										</ul>
+									</div>
+								</li>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="popup.html"><strong>팝업</strong></a>
+								</li>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="button.html"><strong>버튼</strong></a>
+								</li>
+								<li class="sub-open">
+									<button class="fold">하위메뉴 있음</button>
+									<a href="board.html"><strong>게시판</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="board.html#gd07-1"><strong>목록</strong></a></li>
+											<li><a href="board.html#gd07-2"><strong>상세</strong></a></li>
+											<li><a href="board.html#gd07-3"><strong>등록</strong></a></li>
+										</ul>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</nav>
+				</div>
+			</div>
+			<!-- E : lnb -->
+			<!-- S : content -->
+			<div id="content">
+				<!-- S : 공통 -->
+				<section class="section" id="gd01">
+					<div class="h3-tit">
+						<h3>공통</h3>
+					</div>
+					<article class="article-cnt">
+						<div class="sub-desc01">
+							<ul>
+								<li>- 스타일 가이드 목적 : 디자인팀 작업의 가이드를 제공하여 작업자마다 상이한 화면을 만들지 않고, 개발자들의 편의를 도모</li>
+								<li>- 예시화면과 html코드는 <strong class="gd-txt-color01">중요 코드나 클래스의 이해를 돕기 위함이므로 예시화면과 html 코드 상이할 수 있음</strong></li>
+								<li>- 프로젝트에 따라 변경(디자인, 컬러값, 해상도 등..)될 수 있으며, 추가발생시 디자인팀에 서포트 요청할 것</li>
+							</ul>
+						</div>
+
+						<div class="h4-tit">
+							<h4>기본환경</h4>
+						</div>
+						<ul class="list-txt01">
+							<li>- 문서타입 : html5 <br />(단, IE8에서 html5를 지원하지 않기때문에 <strong class="gd-txt-color01">html5.js</strong>를 반드시 써준다)</li>
+							<li>- 기준 해상도 : 1280*n (세로스크롤 생성시 컨텐츠 width : 1260px, <strong class="gd-txt-color01">실제로 컨텐트가 뿌려질 영역은 1220px정도</strong>.  간혹 1024인 프로젝트 존재)</li>
+							<li>- 브라우저 환경 : IE8.0 ~ , 크롬</li>
+						</ul>
+
+						<div class="h4-tit">
+							<h4>css 구분 기준</h4>
+						</div>
+						<ul class="list-txt01">
+							<li>기본 위치 (베이스) : <strong class="gd-txt-color01">page/css</strong>
+								<ul class="list-txt01">
+									<li>- base.css : 주요 태그의 리셋, 공통 클래스</li>
+									<li>- develop.css : 기존 베이스웹과 추후 버전 높이기 전 사이에 발생하는 공통 스타일 컨트롤</li>
+									<li>- layout.css : 화면의 레이아웃 잡는 용도</li>
+									<li>- style.css : 디자인 구현 및 각각의 컨트롤 (버튼, 테이블, 아이콘, jqgrid)</li>
+									<li>- main.css : 메인 포탈 화면. 프로젝트마다 유니크</li>
+									<li>- dashboard.css : 프로젝트에 따라 유,무가 결정되고,  프로젝트마다 유니크 함</li>
+								</ul>
+							</li>
+							<li>
+								프로젝트에 따라 변경될 경우 (사이트) :  <strong class="gd-txt-color01">page/css/site</strong>
+								<ul class="list">
+									<li>- layout.css : (위를 기반으로 하여) 화면의 레이아웃 잡는 용도</li>
+									<li>- style.css : (위를 기반으로 하여) 디자인 구현 및 각각의 컨트롤, 프로젝트마다 추가되는 페이지 작업</li>
+								</ul>
+							</li>
+						</ul>
+
+						<div class="h4-tit">
+							<h4>화면 구조</h4>
+						</div>
+						<div class="sub-desc01">
+							<p>ub-page > ub-frame > ub-layout > ub-control</p>
+						</div>
+						<ul class="list-txt01">
+							<li>- ub-page : 페이지를 구성하는 가장 기본 단위. document.body의 최상단 클래스명으로 정의한다. </li>
+							<li>- ub-frame : 페이지를 구성하는 커다란 레이아웃을 지칭하는 클래스. 유형에 따라 분류됨 (ex - top, contents)</li>
+							<li>- ub-layout : 컨텐츠 프레임에 표지되는 영역의 layout정의. 서브 클래스를 가질수 있다. (ex - search, list, button, paging..)</li>
+							<li>- ub-control : 페이지를 구성하는 요소. 서브 클래스를 가질수 있다. (ex - table, input, select, label..)</li>
+						</ul>
+
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<!-- ub-page -->
+								&lt;body class="ub-page portal-main"&gt;
+									<!-- ub-frame -->
+									<div class="ub-frame top">
+										지엔비 영역
+									</div>
+									<div class="ub-frame contents">
+										<!-- ub-layout -->
+										<div class="ub-layout paging">
+											...
+										</div>
+										<div class="ub-layout button top"><!-- 서브클래스 가짐 -->
+											...
+										</div>
+										<div class="ub-layout list">
+											<!-- ub-control -->
+											<table class="ub-control table normal">
+												...
+												<label class="ub-control label">...</label>
+
+												<input type="text" class="ub-control input-text">
+												...
+											<!-- ub-control -->
+											</table>
+										</div>
+										<!-- //ub-layout -->
+									<!-- //ub-frame -->
+								&lt;/body&gt;
+								<!-- //ub-page -->
+							</pre>
+						</div>
+
+						<div class="h4-tit">
+							<h4>프레임 페이지</h4>
+						</div>
+						<ul class="list-txt01">
+							<li>- POR0007.jsp : 심플메뉴를 사용할 수 있는 프레임 페이지</li>
+							<li>- POR0001.jsp : 와이드메뉴를 사용할 수 있는 프레임 페이지</li>
+							<li>- POR0017.jsp : 심플메뉴 + 레프트메뉴를 사용할 수 있는 프레임 페이지</li>
+							<li>- POR0011.jsp : 와이드메뉴 + 레프트메뉴를 사용할 수 있는 프레임 페이지</li>
+						</ul>
+						<div class="sub-desc02">
+							<p>각 메뉴에 관련된 설명은 gnb 항목을 참고</p>
+						</div>
+
+						<div class="h4-tit" id="gd01-1">
+							<h4>GNB(global navigation bar)</h4>
+						</div>
+						<div class="sub-desc01">
+							<p>웹사이트를 방문한 사용자의 이동 경로를 하이퍼링크 형태로 모아서 보여주는 내비게이션 시스템이다. simplemenu / widemenu / leftmenu 3가지 스타일이 있다.</p>
+						</div>
+
+						<div class="sub-desc01">
+							<p><strong class="gd-txt-color02">1 .simplemenu(심플메뉴)</strong> : 가장 많이 사용하는 메뉴. 하위 2depth 이하 메뉴는 가려진 형태이다. 프레임 페이지 POR0007.jsp를 사용.</p>
+						</div>
+
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면" /></h5>
+							<img src="./images/ex/simplemenu.jpg" alt="simple메뉴 예시 화면" />
+						</div>
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<div class="ub-frame top">
+									<div class="ub-layout header">
+										<!-- 로고 -->
+										<h1><a href="javascript:fnGoMain();"><img src="../page/images/common/img_h1_logo.png" alt="ubone 로고"></a></h1>
+										<!-- //로고 -->
+										<!--util -->
+										<div class="gnb-util">
+											<div class="gnb-util-inner">
+												<span class="login-user"><em>관리자</em>님 환영합니다</span>
+												<span class="pw-button"><a href="javascript:fnUserChange();">비밀번호변경</a></span>
+												<span class="logout-button"><a href="#">LOGOUT</a></span>
+											</div>
+										</div>
+										<!-- //util -->
+										<!-- 심플메뉴 -->
+										<div class="ub-layout menu simple" style="z-index:9999">
+											<nav>
+												<ul id="menu" class="ub-control menu dropdown">
+													<li class="menu-item">
+														<a menuid="MENU0289" menuurl="" menuname="[en] UB-Board" menutype="N" menuheight="" menuwidth="" menutarget="" menupath="UB-Board" class="dir" title="[en] UB-Board">UB-Board</a>
+														<div class="menu-sub-box" style="display: none;">
+															<span class="subbox-arrow"></span>
+															<ul class="menu-sub">
+																<li class="menu-sub-item">
+																	<a menuid="MENU0285" menuurl="/screen/UBD1001.ub?ID_BOARD=DEFAULT" menuname="일반 게시판" menutype="N" menuheight="" menuwidth="" menutarget="" menupath="UB-Board>일반 게시판" title="일반 게시판">일반 게시판</a>
+																</li>
+																<li class="menu-sub-item">
+<!-- 																	<a menuid="MENU0332" menuurl="/screen/UBD2001.ub?ID_BOARD=NOTICE" menuname="공지 게시판" menutype="N" menuheight="" menuwidth="" menutarget="" menupath="UB-Board>공지 게시판" title="공지 게시판">공지 게시판</a> -->
+																</li>
+															</ul>
+														</div>
+													</li>
+													<li class="menu-item last">
+														<a menuid="MENU0099" menuurl="" menuname="시스템 관리" menutype="N" menuheight="" menuwidth="" menutarget="" menupath="시스템 관리" class="dir" title="시스템 관리">시스템 관리</a>
+														<div class="menu-sub-box">
+															<span class="subbox-arrow"></span>
+															<ul class="menu-sub">
+																<li class="menu-sub-item">
+																	<a menuid="MENU0235" menuurl="" menuname="보안관리" menutype="N" menuheight="" menuwidth="" menutarget="" menupath="시스템 관리>보안관리" title="보안관리">보안관리</a>
+																	<span class="menu-sub-arrow"></span>
+																	<div class="menu-sub-box">
+																		<ul class="menu-sub">
+																			<li class="menu-sub-item">
+																				<a menuid="MENU0248" menuurl="SYS0159" menuname="부서관리" menutype="N" menuheight="" menuwidth="" menutarget="" menupath="시스템 관리>보안관리>부서관리" title="부서관리">부서관리</a></li>
+																		</ul>
+																	</div>
+																</li>
+																<li class="menu-sub-item">
+																	<a menuid="MENU0334" menuurl="TSQ0001" menuname="SQL관리" menutype="N" menuheight="" menuwidth="" menutarget="" menupath="시스템 관리>SQL관리" title="SQL관리">SQL관리</a>
+																</li>
+															</ul>
+														</div>
+													</li>
+												</ul>
+											</nav>
+										</div>
+										<!-- //심플메뉴 -->
+									</div>
+								</div>
+							</pre>
+						</div>
+						 <div class="sub-desc01">
+							<p><strong class="gd-txt-color02">2 .widemenu(와이드메뉴)</strong> : 하위 서브 메뉴를 한눈에 파악할 수 있는 메뉴 형태이다. 프레임 페이지 POR0001.jsp를 사용한다.</p>
+						</div>
+
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면" /></h5>
+							<img src="./images/ex/widemenu.jpg" alt="wide메뉴 예시 화면" />
+						</div>
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<div class="ub-frame top">
+									<div class="ub-layout header">
+										<!-- 로고 -->
+										<h1><a href="javascript:fnGoMain();"><img src="../page/images/common/img_h1_logo.png" alt="ubone 로고"></a></h1>
+										<!-- //로고 -->
+										<!-- util -->
+										<div class="gnb-util">
+											<div class="gnb-util-inner">
+												<span class="login-user"><em>관리자</em>님 환영합니다</span>
+												<span class="pw-button"><a href="javascript:fnUserChange();">패스워드변경</a></span>
+												<span class="lang-cd"><a href="javascript:uxl.changeLocale('en')">English</a></span>
+												<span class="logout-button"><a href="#">로그아웃</a></span>
+											</div>
+										</div>
+										<!-- //util -->
+										<!-- 와이드메뉴 -->
+										<div id="menu" class="ub-layout menu wide-menu" style="z-index:9999">
+											<nav>
+												<ul class="ub-control menu depth01">
+													<li class="">
+														<a menuid="MENU0289" menuurl="" menuname="UB-Board" menutype="N" menuheight="" menuwidth="" menutarget="" menupath="UB-Board" class="t" title="UB-Board"><strong>UB-Board</strong></a>
+													</li>
+													<li class="last-menu"> <!-- 마지막 메뉴 last -->
+														<a menuid="MENU0099" menuurl="" menuname="시스템 관리" menutype="N" menuheight="" menuwidth="" menutarget="" menupath="시스템 관리" class="t" title="시스템 관리"><strong>시스템 관리</strong></a>
+													</li>
+												</ul>
+											</nav>
+										</div>
+										<!-- //와이드메뉴 -->
+									</div>
+								</div>
+							</pre>
+						</div>
+
+						<div class="sub-desc02">
+							<p>simplemenu, widemenu는 ub-frame top안에 들어간다.</p>
+						</div>
+
+						<div class="sub-desc01">
+							<p>
+								<strong class="gd-txt-color02">3 .leftmenu</strong> : leftmenu는 대메뉴 클릭시 좌측에 하위 메뉴가 나온다. <br />현재 메뉴 오픈시 컨텐츠를 덮는 형태이며, 추후 다른 타입 레프트 메뉴 업데이트 예정
+							</p>
+						</div>
+
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면" /></h5>
+							<img src="./images/ex/leftmenu.jpg" alt="left메뉴 예시 화면" />
+						</div>
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<!-- 레프트메뉴 -->
+								<div class="ub-frame left">
+									<div class="ub-layout lnb-wrap">
+										<div class="ub-layout menu lnb mCustomScrollbar _mCS_7 mCS-autoHide mCS_no_scrollbar" style="position: relative; overflow: visible;">
+											<div id="mCSB_7" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical mCSB_outside" tabindex="0" style="max-height: none;">
+												<div id="mCSB_7_container" class="mCSB_container mCS_y_hidden mCS_no_scrollbar_y" style="position:relative; top:0; left:0;" dir="ltr">
+													<div class="tit-wrap">
+														<h2 class="ub-control title">결재관리</h2>
+													</div>
+													<nav class="left-nav">
+														<ul>
+															<li>
+																<a menuid="MENU0323" menuurl="APP0005" menuname="결재함" menutype="N" menuheight="" menuwidth=""><strong>결재함</strong></a>
+															</li>
+															<li>
+																<a menuid="MENU0324" menuurl="APP0001" menuname="상신함" menutype="N" menuheight="" menuwidth=""><strong>상신함</strong></a>
+															</li>
+															<li>
+																<a menuid="MENU0325" menuurl="APP0008" menuname="결재선관리" menutype="N" menuheight="" menuwidth=""><strong>결재선관리</strong></a>
+															</li>
+															<li>
+																<a menuid="MENU0326" menuurl="APP0003" menuname="결재상신등록" menutype="P" menuheight="550" menuwidth="800"><strong>결재상신등록</strong></a>
+															</li>
+														</ul>
+													</nav>
+												</div>
+											</div>
+											<div id="mCSB_7_scrollbar_vertical" class="mCSB_scrollTools mCSB_7_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: none;">
+												<div class="mCSB_draggerContainer">
+													<div id="mCSB_7_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; top: 0px; height: 0px;" oncontextmenu="return false;">
+														<div class="mCSB_dragger_bar" style="line-height: 50px;"></div>
+													</div>
+													<div class="mCSB_draggerRail"></div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							<!-- //레프트메뉴 -->
+							</pre>
+						</div>
+
+							<div class="sub-desc01">
+								<p><strong class="gd-txt-color02">3_1 .simplemenu + leftmenu (심플메뉴 + 레프트메뉴)</strong> : 프레임 페이지 POR0017.jsp 사용. 메뉴 오픈시 컨텐츠 위로 레프트 메뉴가 올라온다.
+								</p>
+							</div>
+
+							<div class="ex-view">
+								<h5><img src="./images/txt_ex.gif" alt="예시화면" /></h5>
+								<img src="./images/ex/simple_leftmenu.jpg" alt="simple+left메뉴 예시 화면" />
+							</div>
+							<div class="source">
+								<h5>HTML Code</h5>
+								<pre class="brush: xml;">
+									<div class="ub-frame top">
+										<div class="ub-layout header">
+											<!-- 로고 -->
+											<h1><a href="javascript:fnGoMain();"><img src="../page/images/common/img_h1_logo.png" alt="ubone 로고"></a></h1>
+											<!-- //로고 -->
+											<!--util -->
+											<div class="gnb-util">
+												<div class="gnb-util-inner">
+													<span class="login-user"><em>관리자</em>님 환영합니다</span>
+													<span class="pw-button"><a href="javascript:fnUserChange();">비밀번호변경</a></span>
+													<span class="logout-button"><a href="#">LOGOUT</a></span>
+												</div>
+											</div>
+											<!-- //util -->
+											<!-- 심플메뉴 -->
+											<div class="ub-layout menu simple" style="z-index:9999">
+												<nav>
+													<ul id="menu" class="ub-control menu dropdown">
+														<li class="menu-item">
+															<a menuid="MENU0289" menuurl="" menuname="[en] UB-Board" menutype="N" menuheight="" menuwidth="" menutarget="" menupath="UB-Board" class="dir" title="[en] UB-Board">UB-Board</a>
+															<div class="menu-sub-box" style="display: none;">
+																<span class="subbox-arrow"></span>
+																<ul class="menu-sub">
+																	<li class="menu-sub-item">
+																		<a menuid="MENU0285" menuurl="/screen/UBD1001.ub?ID_BOARD=DEFAULT" menuname="일반 게시판" menutype="N" menuheight="" menuwidth="" menutarget="" menupath="UB-Board>일반 게시판" title="일반 게시판">일반 게시판</a>
+																	</li>
+																	<li class="menu-sub-item">
+<!-- 																		<a menuid="MENU0332" menuurl="/screen/UBD2001.ub?ID_BOARD=NOTICE" menuname="공지 게시판" menutype="N" menuheight="" menuwidth="" menutarget="" menupath="UB-Board>공지 게시판" title="공지 게시판">공지 게시판</a> -->
+																	</li>
+																</ul>
+															</div>
+														</li>
+														<li class="menu-item last">
+															<a menuid="MENU0099" menuurl="" menuname="시스템 관리" menutype="N" menuheight="" menuwidth="" menutarget="" menupath="시스템 관리" class="dir" title="시스템 관리">시스템 관리</a>
+															<div class="menu-sub-box">
+																<span class="subbox-arrow"></span>
+																<ul class="menu-sub">
+																	<li class="menu-sub-item">
+																		<a menuid="MENU0235" menuurl="" menuname="보안관리" menutype="N" menuheight="" menuwidth="" menutarget="" menupath="시스템 관리>보안관리" title="보안관리">보안관리</a>
+																		<span class="menu-sub-arrow"></span>
+																		<div class="menu-sub-box">
+																			<ul class="menu-sub">
+																				<li class="menu-sub-item">
+																					<a menuid="MENU0248" menuurl="SYS0159" menuname="부서관리" menutype="N" menuheight="" menuwidth="" menutarget="" menupath="시스템 관리>보안관리>부서관리" title="부서관리">부서관리</a></li>
+																			</ul>
+																		</div>
+																	</li>
+																	<li class="menu-sub-item">
+																		<a menuid="MENU0334" menuurl="TSQ0001" menuname="SQL관리" menutype="N" menuheight="" menuwidth="" menutarget="" menupath="시스템 관리>SQL관리" title="SQL관리">SQL관리</a>
+																	</li>
+																</ul>
+															</div>
+														</li>
+													</ul>
+												</nav>
+											</div>
+											<!-- //심플메뉴 -->
+										</div>
+									</div>
+									<!-- 레프트메뉴 -->
+									<div class="ub-frame left">
+										<div class="ub-layout lnb-wrap">
+											<div class="ub-layout menu lnb mCustomScrollbar _mCS_7 mCS-autoHide mCS_no_scrollbar" style="position: relative; overflow: visible;">
+												<div id="mCSB_7" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical mCSB_outside" tabindex="0" style="max-height: none;">
+													<div id="mCSB_7_container" class="mCSB_container mCS_y_hidden mCS_no_scrollbar_y" style="position:relative; top:0; left:0;" dir="ltr">
+														<div class="tit-wrap">
+															<h2 class="ub-control title">결재관리</h2>
+														</div>
+														<nav class="left-nav">
+															<ul>
+																<li>
+																	<a menuid="MENU0323" menuurl="APP0005" menuname="결재함" menutype="N" menuheight="" menuwidth=""><strong>결재함</strong></a>
+																</li>
+																<li>
+																	<a menuid="MENU0324" menuurl="APP0001" menuname="상신함" menutype="N" menuheight="" menuwidth=""><strong>상신함</strong></a>
+																</li>
+																<li>
+																	<a menuid="MENU0325" menuurl="APP0008" menuname="결재선관리" menutype="N" menuheight="" menuwidth=""><strong>결재선관리</strong></a>
+																</li>
+																<li>
+																	<a menuid="MENU0326" menuurl="APP0003" menuname="결재상신등록" menutype="P" menuheight="550" menuwidth="800"><strong>결재상신등록</strong></a>
+																</li>
+															</ul>
+														</nav>
+													</div>
+												</div>
+												<div id="mCSB_7_scrollbar_vertical" class="mCSB_scrollTools mCSB_7_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: none;">
+													<div class="mCSB_draggerContainer">
+														<div id="mCSB_7_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; top: 0px; height: 0px;" oncontextmenu="return false;">
+															<div class="mCSB_dragger_bar" style="line-height: 50px;"></div>
+														</div>
+														<div class="mCSB_draggerRail"></div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								<!-- //레프트메뉴 -->
+								</pre>
+							</div>
+							<div class="sub-desc01">
+								<p><strong class="gd-txt-color02">3_2. widemenu + leftmenu (와이드메뉴 + 레프트메뉴)</strong> : 프레임 페이지 POR0011.jsp를 사용. 메뉴 오픈시 컨텐츠 위로 레프트 메뉴가 올라온다.
+								</p>
+							</div>
+
+							<div class="ex-view">
+								<h5><img src="./images/txt_ex.gif" alt="예시화면" /></h5>
+								<img src="./images/ex/wide_leftmenu.jpg" alt="wide+left메뉴 예시 화면" />
+							</div>
+							<div class="source">
+								<h5>HTML Code</h5>
+								<pre class="brush: xml;">
+									<div class="ub-frame top">
+										<div class="ub-layout header">
+											<!-- 로고 -->
+											<h1><a href="javascript:fnGoMain();"><img src="../page/images/common/img_h1_logo.png" alt="ubone 로고"></a></h1>
+											<!-- //로고 -->
+											<!-- util -->
+											<div class="gnb-util">
+												<div class="gnb-util-inner">
+													<span class="login-user"><em>관리자</em>님 환영합니다</span>
+													<span class="pw-button"><a href="javascript:fnUserChange();">패스워드변경</a></span>
+													<span class="lang-cd"><a href="javascript:uxl.changeLocale('en')">English</a></span>
+													<span class="logout-button"><a href="#">로그아웃</a></span>
+												</div>
+											</div>
+											<!-- //util -->
+										</div>
+									</div>
+									<!-- 와이드메뉴 -->
+									<div id="menu" class="ub-layout menu wide-menu" style="z-index:9999">
+										<nav>
+											<ul class="ub-control menu depth01">
+												<li class="">
+													<a menuid="MENU0289" menuurl="" menuname="UB-Board" menutype="N" menuheight="" menuwidth="" menutarget="" menupath="UB-Board" class="t" title="UB-Board"><strong>UB-Board</strong></a>
+												</li>
+												<li class="last-menu"> <!-- 마지막 메뉴 last -->
+													<a menuid="MENU0099" menuurl="" menuname="시스템 관리" menutype="N" menuheight="" menuwidth="" menutarget="" menupath="시스템 관리" class="t" title="시스템 관리"><strong>시스템 관리</strong></a>
+												</li>
+											</ul>
+										</nav>
+									</div>
+									<!-- //와이드메뉴 -->
+									<!-- 레프트메뉴 -->
+										<div class="ub-frame left">
+											<div class="ub-layout lnb-wrap">
+												<div class="ub-layout menu lnb mCustomScrollbar _mCS_7 mCS-autoHide mCS_no_scrollbar" style="position: relative; overflow: visible;">
+													<div id="mCSB_7" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical mCSB_outside" tabindex="0" style="max-height: none;">
+														<div id="mCSB_7_container" class="mCSB_container mCS_y_hidden mCS_no_scrollbar_y" style="position:relative; top:0; left:0;" dir="ltr">
+															<div class="tit-wrap">
+																<h2 class="ub-control title">결재관리</h2>
+															</div>
+															<nav class="left-nav">
+																<ul>
+																	<li>
+																		<a menuid="MENU0323" menuurl="APP0005" menuname="결재함" menutype="N" menuheight="" menuwidth=""><strong>결재함</strong></a>
+																	</li>
+																	<li>
+																		<a menuid="MENU0324" menuurl="APP0001" menuname="상신함" menutype="N" menuheight="" menuwidth=""><strong>상신함</strong></a>
+																	</li>
+																	<li>
+																		<a menuid="MENU0325" menuurl="APP0008" menuname="결재선관리" menutype="N" menuheight="" menuwidth=""><strong>결재선관리</strong></a>
+																	</li>
+																	<li>
+																		<a menuid="MENU0326" menuurl="APP0003" menuname="결재상신등록" menutype="P" menuheight="550" menuwidth="800"><strong>결재상신등록</strong></a>
+																	</li>
+																</ul>
+															</nav>
+														</div>
+													</div>
+													<div id="mCSB_7_scrollbar_vertical" class="mCSB_scrollTools mCSB_7_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: none;">
+														<div class="mCSB_draggerContainer">
+															<div id="mCSB_7_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; top: 0px; height: 0px;" oncontextmenu="return false;">
+																<div class="mCSB_dragger_bar" style="line-height: 50px;"></div>
+															</div>
+															<div class="mCSB_draggerRail"></div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									<!-- //레프트메뉴 -->
+								</pre>
+							</div>
+
+						<div class="sub-desc02">
+							<p>leftmenu는 ub-frame left안에 들어간다.</p>
+						</div>
+
+						<div class="h4-tit">
+							<h4>화면 레이아웃</h4>
+						</div>
+						<div class="sub-desc01">
+							<p>컨텐츠의 목적에 따라 알맞은 레이아웃 지정을 통해 화면이 올바르게 나올 수 있도록 함</p>
+						</div>
+
+						<div class="sub-desc01">
+							<p><strong>- Default</strong> :  기본 레이아웃이며, 가운데 정렬되는 형태.</p>
+						</div>
+
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면" /></h5>
+							<img src="./images/ex/ex_layout_default.jpg" alt="default 레이아웃 예시 화면" />
+						</div>
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								 &lt; body class="ub-page default list"&gt; <!-- ub-page / 지정한 화면 레이아웃 / 화면 유형 순으로 출력된다. -->
+										<section class="ub-frame body">
+											<div class="inner-contents-wrap">
+												contents area
+											</div>
+										</section>
+								 &lt;/body&gt;
+							</pre>
+						</div>
+
+						<div class="sub-desc01">
+							<p><strong>- Fullwidth</strong> : 양 사이드에 최소한의 여백을 가지며, 화면 사이즈에 맞게 컨텐츠가 100% 늘어나는 형태.</p>
+						</div>
+
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면" /></h5>
+							<img src="./images/ex/ex_layout_fullwidth.jpg" alt="fullwidth 레이아웃 예시 화면" />
+						</div>
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								&lt;body class="ub-page fullwidth list"&gt;  <!-- ub-page / 지정한 화면 레이아웃 / 화면 유형 순으로 출력된다. -->
+									<section class="ub-frame body">
+										<div class="inner-contents-wrap">
+											contents area
+										</div>
+									</section>
+								&lt;/body&gt;
+							</pre>
+						</div>
+
+						<div class="sub-desc01">
+							<p>- 기타 레이아웃 : Popup,  Innercontent, Tabcontent, Mainportal</p>
+						</div>
+
+						<div class="h4-tit">
+							<h4>화면 유형</h4>
+						</div>
+						<ul class="list-txt01">
+							<li>목록(list) - 주로 검색화면으로 구성</li>
+							<li>상세(detail) - 주로 검색되어진 상세값을 볼 수있음</li>
+							<li>register 기타 등등..</li>
+						</ul>
+						<div class="sub-desc02">
+							같은 메타 템플릿을 사용하더라도, list이냐 detail이냐에 따라 다른 화면 나올수 있다. (ex - 검색 레이아웃 템플릿)
+						</div>
+
+						<div class="h4-tit">
+							<h4>공통 클래스</h4>
+						</div>
+						<ul class="list-txt01">
+							<li>- 폰트 왼쪽 정렬 : text-left</li>
+							<li>- 폰트 가운데 정렬 : text-center</li>
+							<li>- 폰트 오른쪽 정렬 : text-right</li>
+							<li>- 폼 태그 사용시, (수정불가)값만 뿌릴때 사용 : input-data</li>
+							<li>-  인풋 자동 완성 : input-auto</li>
+							<li>-  텍스트에 밑줄 긋기 : line</li>
+						</ul>
+
+						<div class="h4-tit">
+							<h4>폰트 컬러 클래스</h4>
+						</div>
+						<ul class="list-txt01">
+							<li>- 기본폰트 : <span class="font-type">맑은고딕 12px #444444</span></li>
+							<li>- 포인트컬러 1 : <strong class="font-type">맑은고딕 12px <strong class="txt-color01">#db482b</strong></strong> / <strong class="txt-color01">클래스명 : txt-color01</strong></li>
+							<li>- 포인트컬러 2 : <strong class="font-type">맑은고딕 12px <strong class="txt-color02">#4b6aa9</strong></strong> / <strong class="txt-color02">클래스명 : txt-color02</strong></li>
+							<li>- 링크컬러 1 : <strong class="font-type">맑은고딕 12px <strong class="txt-color01">#db482b</strong></strong> / <strong class="txt-color01">클래스명 : link-color01</strong></li>
+							<li>- 링크컬러 2 : <strong class="font-type">맑은고딕 12px <strong class="txt-color02">#4b6aa9</strong></strong> / <strong class="txt-color02">클래스명 : link-color02</strong></li>
+						</ul>
+						<div class="sub-desc02">
+							포인트 컬러 사용시 메타에서 color에 <strong class="gd-txt-color01">font color=”red”로 사용하지 말고</strong> 위 포인트 컬러의 클래스를 사용한다. <br />
+							일반적으로 label영역에 &lt;span class="txt-color01"&gt;글씨&lt;/span&gt; , 굵은 글씨일 경우 &lt;b&gt;태그 대신 &lt;strong class="txt-color01"&gt;글씨&lt;/strong&gt;를 사용하여 적용시켜준다.<br />
+							2가지 이상 컬러 필요시 디자이너에게 요청할 것
+						</div>
+
+						<div class="h4-tit">
+							<h4>공통 적용</h4>
+						</div>
+						<ul class="list-txt01">
+							<li>- <strong class="gd-txt-color01">날짜 (년-월-일) </strong>부분 : 인풋 박스 사이즈 <strong class="gd-txt-color01">73px</strong>로 통일</li>
+							<li>- 기본 인풋박스 사이즈는 100px로 하되, 필요에 따라 유동적으로 한다.</li>
+							<li>- 현재 <strong class="gd-txt-color01">화면에 보이지 않는 부분은 확실하게 none처리 하여 브라우저에서 높이를 가지지 않게 처리</strong>한다.</li>
+							<li>- 테이블 셀의 경우 4칸일때 <strong class="gd-txt-color01">120px / 480px / 120px / n</strong> 으로 width값을 준다. (2칸일 경우 - 120px / n)<li>
+						</ul>
+
+						<div class="h4-tit">
+							<h4>타이틀 정의</h4>
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면" /></h5>
+							<img src="./images/ex/ex_title.gif" alt="타이틀 예시 화면" />
+						</div>
+
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<!-- 1번 - 화면 전체 타이틀 -->
+								<h1 class="ub-control title">화면 전체 타이틀</h1>
+								<!-- //1번 - 화면 전체 타이틀 -->
+
+								<!-- 2번 - 1뎁스 타이틀 -->
+								<h2 class="ub-control title">1뎁스 타이틀</h2>
+								<!-- //2번 - 1뎁스 타이틀 -->
+
+								<!-- 3번 - 2뎁스 타이틀 -->
+								<h3 class="ub-control title">2뎁스 타이틀</h3>
+								<!-- //3번 - 2뎁스 타이틀 -->
+							</pre>
+						</div>
+
+						<div class="sub-desc02">
+							<p>
+								<strong>1번 : </strong>화면 전체 타이틀<br />
+								<strong>2번 : </strong>1뎁스 타이틀. 상세화면의 접힘/펼침 기본 타이틀<br />
+								<strong>3번 : </strong>2뎁스 타이틀, 1뎁스 하위에 오는 타이틀에 사용<br />
+								<strong class="gd-txt-color01">※ 타이틀은 반드시 1,2,3번의 순서로 사용한다. 3번 블릿이 2번보다 먼저 사용될 수 없다.</strong>
+							</p>
+						</div>
+					</article>
+				</section>
+				<!-- E : 공통 -->
+			</div>
+			<!-- E : content -->
+		</div><!-- E : container -->
+	</div><!-- E : wrap -->
+</body>
+</html>

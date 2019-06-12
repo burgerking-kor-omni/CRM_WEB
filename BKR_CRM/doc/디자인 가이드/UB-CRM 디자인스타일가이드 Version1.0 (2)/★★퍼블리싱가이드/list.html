@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="ko">
+<head>
+	<meta charset="utf-8" />
+	<title>(주)유비원 스타일 가이드</title>
+	<link type="text/css" rel="stylesheet" href="./css/shCoreDefault.css"/>
+	<link type="text/css" rel="stylesheet" href="./css/style.css"/>
+	<link type="text/css" rel="stylesheet" href="./css/jquery.mCustomScrollbar.css"/>
+	<script type="text/javascript" src="./js/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="./js/html5.js"></script>
+	<script type="text/javascript" src="./js/shCore.js"></script>
+	<script type="text/javascript" src="./js/shBrushJScript.js"></script>
+	<script type="text/javascript" src="./js/shBrushCss.js"></script>
+	<script type="text/javascript" src="./js/shBrushXml.js"></script>
+	<script type="text/javascript" src="./js/jquery.mCustomScrollbar.concat.min.js"></script>
+	<script type="text/javascript">
+		jQuery(function(){
+		   jQuery('a[href^=#]').click(function() {
+			  var speed = 500;  // 스크롤 속도
+			  var href= jQuery(this).attr("href");
+			  var target = jQuery(href == "#" || href == "" ? 'html' : href);
+			  var position = target.offset().top;
+			  jQuery('body,html').animate({scrollTop:position}, speed, 'swing');
+			  return false;
+		   });
+		}); //부드럽게 페이지내 이동위해 사용
+		SyntaxHighlighter.all(); //syntaxhighlighter
+	</script>
+</head>
+
+<body>
+	<!-- S : wrap -->
+	<div id="wrap">
+		<!-- S : header-->
+		<div id="header">
+			<header class="gd-header">
+				<h1>
+					<a href="index.html"><img src="./images/h1_logo.png" alt="ubone" /></a>
+					<strong class="gd-ver">Style Guide
+						<strong class="ver">Ver1.0</strong>
+					</strong>
+				</h1>
+			</header>
+		</div>
+		<!-- E : header-->
+		<div id="container">
+			<!-- S : lnb-->
+			<div id="lnb">
+				<div class="lnb-inner">
+					<div class="tit-rcnt">
+						<h2>CSS Guide</h2>
+						<!-- <span class="rcnt"><a href="#"><img src="./images/btn_all_view.png" alt="전체보기" /></a></span> -->
+					</div>
+					<nav class="gd-nav">
+						<div class="menu">
+							<ul>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="index.html"><strong>공통</strong></a>
+								</li>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="list.html"><strong>목록화면</strong></a></li>
+								<li class="sub-open">
+									<button class="fold">하위메뉴 있음</button>
+									<a href="detail.html"><strong>상세화면</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="detail.html#gd03-1"><strong>상태바</strong></a></li>
+											<li><a href="detail.html#gd03-2"><strong>기본 테이블</strong></a></li>
+											<li><a href="detail.html#gd03-3"><strong>변형 테이블</strong></a></li>
+										</ul>
+									</div>
+								</li>
+								<li class="sub-open">
+									<button class="fold">하위메뉴 있음</button>
+									<a href="etc.html"><strong>기타</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="etc.html#gd04-1"><strong>통계</strong></a></li>
+											<li><a href="etc.html#gd04-2"><strong>탭&amp;파일첨부&amp;페이징</strong></a></li>
+											<li><a href="etc.html#gd04-3"><strong>설명문구</strong></a></li>
+											<li><a href="etc.html#gd04-4"><strong>로딩바</strong></a></li>
+											<li><a href="etc.html#gd04-5"><strong>그래프컬러 가이드</strong></a></li>
+										</ul>
+									</div>
+								</li>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="popup.html"><strong>팝업</strong></a>
+								</li>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="button.html"><strong>버튼</strong></a>
+								</li>
+								<li class="sub-open">
+									<button class="fold">하위메뉴 있음</button>
+									<a href="board.html"><strong>게시판</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="board.html#gd07-1"><strong>목록</strong></a></li>
+											<li><a href="board.html#gd07-2"><strong>상세</strong></a></li>
+											<li><a href="board.html#gd07-3"><strong>등록</strong></a></li>
+										</ul>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</nav>
+				</div>
+			</div>
+			<!-- E : lnb -->
+			<!-- S : content -->
+			<div id="content">
+				<!-- S : 목록화면 -->
+				<section class="section" id="gd02">
+					<div class="h3-tit">
+						<h3>목록화면</h3>
+					</div>
+					<article class="article-cnt">
+						<div class="h4-tit">
+							<h4>기본검색</h4>
+						</div>
+
+						<div class="sub-desc01">
+							<p>목록화면의 Jquery 테이블 상단에 위치. <strong class="gd-txt-color01">화면유형은 list</strong></p>
+						</div>
+
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면" /></h5>
+							<img src="./images/ex/ex_sch01.gif" alt="확장없는 검색 예시화면" />
+						</div>
+
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<div class="ub-layout search">
+									<span class="search-ltbg"></span>
+									<span class="search-rtbg"></span>
+									<span class="search-lbbg"></span>
+									<span class="search-rbbg"></span>
+									<form name="searchForm" id="searchForm">
+										<!-- 검색영역 기본 -->
+										<table class="ub-control table normal ">
+											<colgroup>
+												<col width="12%">
+												<col>
+												<col width="12%">
+												<col>
+											</colgroup>
+											<tbody>
+												<tr id="layout-1_1">
+												<th id="layout-1_1_1"><label class="ub-control label">등록일자</label></th>
+												<td id="layout-1_1_2"><input type="text" style="text-align:left;width:100px;" value="2015-02-23" metaformat="date" name="DT_VOC_REG_START" id="DT_VOC_REG_START" class="ub-control input-text calendar  hasDatepicker"><img class="ui-datepicker-trigger" src="../page/images/common/calendar.gif" alt="Calandar" title="Calandar"><label class="ub-control label">~</label><input type="text" style="text-align:left;width:100px;" value="2015-03-02" metaformat="date" name="DT_VOC_REG_END" id="DT_VOC_REG_END" class="ub-control input-text calendar  hasDatepicker"><img class="ui-datepicker-trigger" src="../page/images/common/calendar.gif" alt="Calandar" title="Calandar"></td>
+												<th id="layout-1_1_3"><label class="ub-control label">진행상태</label></th>
+												<td id="layout-1_1_4"><select datacid="CD_VOC_STATUS" size="1" style="width:112px;" class="ub-control select " name="CD_VOC_STATUS" id="CD_VOC_STATUS"><option value="">전체</option>
+
+												</select></td>
+												</tr>
+												<tr id="layout-1_2">
+												<th id="layout-1_2_5"><label class="ub-control label">유형</label></th>
+												<td id="layout-1_2_6"><select size="1" style="width:112px;" class="ub-control select " name="CD_VOC_PATTERN" id="CD_VOC_PATTERN" selectedindex="0"><option value="">전체</option><option value="01">만족</option><option value="02">불만족</option><option value="03">문의</option><option value="04">제안</option></select></td>
+												<th id="layout-1_2_7"><label class="ub-control label">수집채널</label></th>
+												<td id="layout-1_2_8"><select datacid="TP_CHNN_SYSTEM" size="1" style="width:112px;" class="ub-control select " name="TP_CHNN_SYSTEM" id="TP_CHNN_SYSTEM"><option value="">전체</option>
+
+												</select><select size="1" style="width:112px;" class="ub-control select " name="TP_CHNN_PATH" id="TP_CHNN_PATH"></select></td>
+												</tr>
+												<tr id="layout-1_3">
+												<th id="layout-1_3_9"><label class="ub-control label">세부유형</label></th>
+												<td colspan="3" id="layout-1_3_10"><input type="text" style="ime-mode:active;text-align:left;width:100px;" value="" name="NM_VOC_CAUSE" id="NM_VOC_CAUSE" class="ub-control input-text "><select size="1" style="width:112px;" class="ub-control select " name="CD_VOC_CAUSE_1" id="CD_VOC_CAUSE_1"></select><select size="1" style="width:150px;" class="ub-control select " name="CD_VOC_CAUSE_2" id="CD_VOC_CAUSE_2"></select><select size="1" style="width:150px;" class="ub-control select " name="CD_VOC_CAUSE_3" id="CD_VOC_CAUSE_3"></select></td>
+												</tr>
+											</tbody>
+										</table>
+									<!-- //검색영역 기본 -->
+									</form>
+								</div>
+							</pre>
+						</div>
+
+						<div class="h4-tit">
+							<h4>상세(확장) 검색</h4>
+						</div>
+
+						<div class="sub-desc01">
+							<p>검색조건이 많을 경우 <strong class="gd-txt-color01">[Advanced]</strong> 버튼을 클릭하여 검색영역이 늘어남</p>
+						</div>
+
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면" /></h5>
+							<img src="./images/ex/ex_sch02.gif" alt="확장 검색 예시화면" />
+						</div>
+
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<div class="ub-layout search">
+									<span class="search-ltbg"></span>
+									<span class="search-rtbg"></span>
+									<span class="search-lbbg"></span>
+									<span class="search-rbbg"></span>
+									<form name="searchForm" id="searchForm">
+										<!-- 검색영역 기본 -->
+										<table class="ub-control table normal ">
+											<colgroup>
+												<col width="12%">
+												<col>
+												<col width="12%">
+												<col>
+											</colgroup>
+											<tbody>
+												<tr id="layout-1_1">
+												<th id="layout-1_1_1"><label class="ub-control label">등록일자</label></th>
+												<td id="layout-1_1_2"><input type="text" style="text-align:left;width:100px;" value="2015-02-23" metaformat="date" name="DT_VOC_REG_START" id="DT_VOC_REG_START" class="ub-control input-text calendar  hasDatepicker"><img class="ui-datepicker-trigger" src="../page/images/common/calendar.gif" alt="Calandar" title="Calandar"><label class="ub-control label">~</label><input type="text" style="text-align:left;width:100px;" value="2015-03-02" metaformat="date" name="DT_VOC_REG_END" id="DT_VOC_REG_END" class="ub-control input-text calendar  hasDatepicker"><img class="ui-datepicker-trigger" src="../page/images/common/calendar.gif" alt="Calandar" title="Calandar"></td>
+												<th id="layout-1_1_3"><label class="ub-control label">진행상태</label></th>
+												<td id="layout-1_1_4"><select datacid="CD_VOC_STATUS" size="1" style="width:112px;" class="ub-control select " name="CD_VOC_STATUS" id="CD_VOC_STATUS"><option value="">전체</option>
+												</select></td>
+												</tr>
+												<tr id="layout-1_2">
+												<th id="layout-1_2_5"><label class="ub-control label">유형</label></th>
+												<td id="layout-1_2_6"><select size="1" style="width:112px;" class="ub-control select " name="CD_VOC_PATTERN" id="CD_VOC_PATTERN" selectedindex="0"><option value="">전체</option><option value="01">만족</option><option value="02">불만족</option><option value="03">문의</option><option value="04">제안</option></select></td>
+												<th id="layout-1_2_7"><label class="ub-control label">수집채널</label></th>
+												<td id="layout-1_2_8"><select datacid="TP_CHNN_SYSTEM" size="1" style="width:112px;" class="ub-control select " name="TP_CHNN_SYSTEM" id="TP_CHNN_SYSTEM"><option value="">전체</option>
+												</select><select size="1" style="width:112px;" class="ub-control select " name="TP_CHNN_PATH" id="TP_CHNN_PATH"></select></td>
+												</tr>
+												<tr id="layout-1_3">
+												<th id="layout-1_3_9"><label class="ub-control label">세부유형</label></th>
+												<td colspan="3" id="layout-1_3_10"><input type="text" style="ime-mode:active;text-align:left;width:100px;" value="" name="NM_VOC_CAUSE" id="NM_VOC_CAUSE" class="ub-control input-text "><select size="1" style="width:112px;" class="ub-control select " name="CD_VOC_CAUSE_1" id="CD_VOC_CAUSE_1"></select><select size="1" style="width:150px;" class="ub-control select " name="CD_VOC_CAUSE_2" id="CD_VOC_CAUSE_2"></select><select size="1" style="width:150px;" class="ub-control select " name="CD_VOC_CAUSE_3" id="CD_VOC_CAUSE_3"></select></td>
+												</tr>
+											</tbody>
+										</table>
+									<!-- //검색영역 기본 -->
+									<!-- 검색영역 확장 -->
+									<div class="search-advanced close"><span class="btn"><a href="#" class="open"><span>advanced</span></a></span><!-- 확장 닫을땐 close 추가 -->
+										<div class="advance">
+											<table class="ub-control table normal ">
+												<colgroup>
+													<col width="12%">
+													<col>
+													<col width="12%">
+													<col>
+												</colgroup>
+												<tbody>
+													<tr id="layout-1_4">
+													<th id="layout-1_4_11"><label class="ub-control label">고객명</label></th>
+													<td id="layout-1_4_12"><input type="text" style="ime-mode:active;text-align:left;width:100px;" value="" name="NM_CUST" id="NM_CUST" class="ub-control input-text "></td>
+													<th id="layout-1_4_13"><label class="ub-control label">고객 연락처</label></th>
+													<td id="layout-1_4_14"><input type="text" style="text-align:left;width:100px;" onkeydown="onlyNumber()" value="" name="CUST_ID_PHONE" id="CUST_ID_PHONE" class="ub-control input-text "></td>
+													</tr>
+													<tr id="layout-1_5">
+													<th id="layout-1_5_15"><label class="ub-control label">VOC ID</label></th>
+													<td id="layout-1_5_16"><input type="hidden" value="" name="ID_CUST" id="ID_CUST"><input type="text" style="ime-mode:inactive;text-align:left;width:100px;" value="" name="ID_VOC" id="ID_VOC" class="ub-control input-text "></td>
+													<th id="layout-1_5_17"></th>
+													<td id="layout-1_5_18"></td>
+													</tr>
+													<tr id="layout-1_6">
+													<th id="layout-1_6_19"><label class="ub-control label">제목</label></th>
+													<td id="layout-1_6_20"><input type="text" style="ime-mode:active;text-align:left;width:300px;" value="" name="DS_TITLE" id="DS_TITLE" class="ub-control input-text "></td>
+													<th id="layout-1_6_21"><label class="ub-control label">기타</label></th>
+													<td id="layout-1_6_22"><input type="checkbox" value="Y" name="FG_EXCLUSIVE" id="FG_EXCLUSIVE" class="ub-control input-checkbox"><label>제외여부</label></td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+									</div>
+									<span class="ub-control button search" id="search">
+										<a href="#none" title="Search">검색</a>
+									</span>
+									<!-- 검색영역 확장 -->
+									</form>
+								</div>
+							</pre>
+						</div>
+
+						<div class="h4-tit">
+							<h4>jqgrid 테이블</h4>
+						</div>
+						<div class="sub-desc01">
+							<p>주로 목록화면에 사용되는 목록 테이블. 검색조건 밑에 위치</p>
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면" /></h5>
+							<img src="./images/ex/ex_grid.gif" alt="jqgrid 예시화면" />
+						</div>
+
+					</article>
+				</section>
+				<!-- E : 목록화면 -->
+			</div>
+			<!-- E : content -->
+		</div><!-- E : container -->
+	</div><!-- E : wrap -->
+</body>
+</html>

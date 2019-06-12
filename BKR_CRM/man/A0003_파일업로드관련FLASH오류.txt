@@ -1,0 +1,4 @@
+IFRAME 안에 플래쉬가 있는 경우 페이지가 사라지기 전에 플래쉬를 삭제하여야 한다.
+
+$('iframe',$tab).get(index).contentWindow.uxl.ext.UploadDestroyAll();
+ 

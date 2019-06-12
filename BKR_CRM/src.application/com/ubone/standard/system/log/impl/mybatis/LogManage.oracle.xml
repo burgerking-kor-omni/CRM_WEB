@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="LogManage">
+	
+	<!--
+		QueryId     : LogManage.getUserAccessLogList
+		Description : 사용자접속로그관리 목록 조회 호출 쿼리
+	 -->
+	<sql id="getUserAccessLogList_base">
+		SELECT
+		          A.LOG_ID AS LOG_ID
+		        , B.LOGIN_ID AS LOGIN_ID
+		        , C.USER_NM AS USER_NM
+		        , D.DEPT_NM AS DEPT_NM
+		        , TO_CHAR(A.LOGIN_DT, 'YYYY-MM-DD HH24:MI') AS LOGIN_DT
+		        <!-- , A.LOGIN_IP AS LOGIN_IP -->
+		        , CASE 
+		        	WHEN INSTR(A.LOGIN_IP,'.',1,1) = 0 THEN A.LOGIN_IP
+		        	ELSE '***.***' || SUBSTR(A.LOGIN_IP,INSTR(A.LOGIN_IP,'.',1,2),LENGTH(A.LOGIN_IP))
+		          END
+		          AS LOGIN_IP
+		    FROM SYS_LOGIN_LOG A
+		    JOIN SYS_LOGIN B ON A.LOGIN_ID = B.LOGIN_ID
+		    JOIN SYS_USER C  ON B.USER_ID = C.USER_ID
+		    JOIN SYS_DEPARTMENT D ON D.DEPT_ID = C.DEPT_ID 
+		    WHERE 1=1
+			<if test="USER_NM != null and USER_NM != ''" >
+		   		AND C.USER_NM LIKE '%' || #{USER_NM} || '%' 
+			</if>
+			ORDER BY LOGIN_DT DESC
+	</sql>
+	
+	<!-- 사용자접속로그관리 목록 조회 -->
+	<select id="getUserAccessLogList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getUserAccessLogList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- 사용자접속로그관리 목록 조회 - count -->
+	<select id="getUserAccessLogList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getUserAccessLogList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- 사용자접속로그관리 목록 조회 - paging -->
+	<select id="getUserAccessLogList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getUserAccessLogList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		QueryId     : LogManage.getProgramUseLogList
+		Description : 프로그램사용로그관리 목록 조회 호출 쿼리
+	 -->
+	<sql id="getProgramUseLogList_base">
+		SELECT
+		          A.RUN_LOG_SN AS RUN_LOG_SN
+		        , A.USER_ID AS USER_ID
+		        , B.USER_NM AS USER_NM
+		        , TO_CHAR(A.RUN_DATETIME,'YYYY-MM-DD HH24:MI') AS RUN_DATETIME
+		        , A.CLIENT_IP_ADDR AS CLIENT_IP_ADDR
+		        , NVL(A.FUNCTION_ALIAS_NAME,'호출') AS FUNCTION_ALIAS_NAME
+		        , A.MENU_FULL_NAME AS MENU_FULL_NAME
+		    FROM AP_SERVICE_RUN_LOG A
+		    LEFT OUTER JOIN SYS_USER B
+                ON A.USER_ID = B.USER_ID
+		    WHERE 1=1
+		    <if test="RUN_DATETIME_START != null and RUN_DATETIME_START != ''" >
+		   		AND A.RUN_DATETIME <![CDATA[ >= ]]> TO_DATE (#{RUN_DATETIME_START} || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS')
+			</if>
+			<if test="RUN_DATETIME_END != null and RUN_DATETIME_END != ''" >
+		   		AND A.RUN_DATETIME <![CDATA[ <= ]]> TO_DATE (#{RUN_DATETIME_END} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS') 
+			</if>
+			<if test="USER_ID != null and USER_ID != ''" >
+		   		AND A.USER_ID LIKE '%' || #{USER_ID} || '%' 
+			</if>
+			<if test="USER_NM != null and USER_NM != ''" >
+		   		AND (SELECT USER_NM FROM SYS_USER WHERE USER_ID = A.USER_ID) LIKE '%' || #{USER_NM} || '%' 
+			</if>
+			<if test="FUNCTION_ALIAS_ID != null and FUNCTION_ALIAS_ID != ''" >
+		   		AND A.FUNCTION_ALIAS_ID = #{FUNCTION_ALIAS_ID} 
+			</if>
+		    ORDER BY RUN_DATETIME DESC
+	</sql>
+	
+	<!-- 프로그램사용로그관리 목록 조회 -->
+	<select id="getProgramUseLogList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getProgramUseLogList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- 프로그램사용로그관리 목록 조회 - count -->
+	<select id="getProgramUseLogList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getProgramUseLogList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- 프로그램사용로그관리 목록 조회 - paging -->
+	<select id="getProgramUseLogList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getProgramUseLogList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		QueryId     : LogManage.getRoleChangeLogList
+		Description : 권한변경로그관리 목록 조회 호출 쿼리
+	 -->
+	<sql id="getRoleChangeLogList_base">
+		SELECT 
+	            RUN_LOG_SN
+	          , SERVICE_NAME
+	          , DECODE(INSTR(PARAM_VALUE,'CD_ROLE='),0,           
+                REPLACE(SUBSTR(PARAM_VALUE, INSTR(PARAM_VALUE,'ROLE_ID=')+8,(INSTR(SUBSTR(PARAM_VALUE, INSTR(PARAM_VALUE,'ROLE_ID=')+8),','))-1),'}',''),      
+                SUBSTR(PARAM_VALUE, INSTR(PARAM_VALUE,'CD_ROLE=')+8,(INSTR(SUBSTR(PARAM_VALUE, INSTR(PARAM_VALUE,'CD_ROLE=')+8),','))-1)) AS ROLE_ID
+              , DECODE(INSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1),'LOGIN_ID='),0,           
+                (SELECT USER_NM FROM SYS_USER WHERE USER_ID = REPLACE(SUBSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1), INSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1),'ROLE_COMPOSITION_CODE=')+22,(INSTR(SUBSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1), INSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1),'ROLE_COMPOSITION_CODE=')+22),','))-1),'}','')),      
+                  DECODE(INSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1),'EMP_NO='),0,
+                    (SELECT USER_NM FROM SYS_USER WHERE EMP_NO = (SUBSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1), INSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1),'LOGIN_ID=')+9,(INSTR(SUBSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1), INSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1),'LOGIN_ID=')+9),','))-1))),
+                    (SELECT USER_NM FROM SYS_USER WHERE EMP_NO = (SUBSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1), INSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1),'EMP_NO=')+7,(INSTR(SUBSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1), INSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1),'EMP_NO=')+7),','))-1)))
+                      )) AS TARGET_USER_NM
+              , DECODE(INSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1),'LOGIN_ID='),0,           
+                (SELECT EMP_NO FROM SYS_USER WHERE USER_ID = REPLACE(SUBSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1), INSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1),'ROLE_COMPOSITION_CODE=')+22,(INSTR(SUBSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1), INSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1),'ROLE_COMPOSITION_CODE=')+22),','))-1),'}','')),      
+                  DECODE(INSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1),'EMP_NO='),0,
+                    (SELECT EMP_NO FROM SYS_USER WHERE EMP_NO = (SUBSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1), INSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1),'LOGIN_ID=')+9,(INSTR(SUBSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1), INSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1),'LOGIN_ID=')+9),','))-1))),
+                    (SELECT EMP_NO FROM SYS_USER WHERE EMP_NO = (SUBSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1), INSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1),'EMP_NO=')+7,(INSTR(SUBSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1), INSTR(DBMS_LOB.SUBSTR( PARAM_VALUE, 4000, 1),'EMP_NO=')+7),','))-1)))
+                      )) AS TARGET_USER_ID
+	          , (SELECT USER_NM FROM SYS_USER SU WHERE SU.USER_ID = L.USER_ID) AS REG_USER_NM
+	          , TO_CHAR(REG_DATETIME,'YYYY-MM-DD HH24:MI') AS REG_DATETIME
+	        FROM AP_SERVICE_RUN_LOG L
+	        WHERE FUNCTION_ID IN ('FNCSYS0267','FNCSYS0269','FNCSYS0056','FNCSYS0055')	
+	        <if test="RUN_DATETIME_START != null and RUN_DATETIME_START != ''" >
+		   		AND L.RUN_DATETIME <![CDATA[ >= ]]> TO_DATE (#{RUN_DATETIME_START} || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS')
+			</if>
+			<if test="RUN_DATETIME_END != null and RUN_DATETIME_END != ''" >
+		   		AND L.RUN_DATETIME <![CDATA[ <= ]]> TO_DATE (#{RUN_DATETIME_END} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS') 
+			</if>		    
+			<if test="USER_ID != null and USER_ID != ''" >
+		   		AND L.USER_ID LIKE '%' || #{USER_ID} || '%'
+			</if>
+		    ORDER BY RUN_DATETIME DESC
+	</sql>
+	
+	<!-- 권한변경로그관리 목록 조회 -->
+	<select id="getRoleChangeLogList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getRoleChangeLogList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- 권한변경로그관리 목록 조회 - count -->
+	<select id="getRoleChangeLogList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getRoleChangeLogList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- 권한변경로그관리 목록 조회 - paging -->
+	<select id="getRoleChangeLogList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getRoleChangeLogList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		QueryId     : LogManage.getUserNameByAuto
+		Description : 로그관리 사용자 검색 AutoComplate 호출 쿼리
+	 -->
+	<select id="getUserNameByAuto" parameterType="map" resultType="lmap">
+		SELECT 
+                  (SELECT DEPT_NM FROM SYS_DEPARTMENT WHERE DEPT_ID = A.DEPT_ID) AS DEPT_NM
+                , A.USER_NM AS USER_NM
+                , A.USER_ID AS USER_ID
+            FROM SYS_USER A
+            WHERE 1=1
+            <if test="USER_NM != null and USER_NM != ''" >
+		   		AND A.USER_NM LIKE '%' || #{USER_NM} || '%'
+			</if>
+			<if test="USER_ID != null and USER_ID != ''" >
+				AND UPPER(A.USER_ID) LIKE '%' || UPPER(#{USER_ID}) || '%'
+			</if>
+			ORDER BY USER_NM ASC
+	</select>
+	
+	<!--
+		QueryId     : LogManage.getBatchLogList
+		Description : 배치 로그 목록 조회 호출 쿼리
+	 -->
+	<sql id="getBatchLogList_base">
+		SELECT L.BATCH_LOG_ID								/*			배치로그 id			*/
+	      , L.BATCH_ID									/*			배치id				*/
+	      , L.START_DATETIME							/*			시작시간			*/
+	      , L.FINISH_DATETIME							/*			종료시간			*/
+	      , L.STATUS									/*			상태				*/
+	      , BATCH_RSLT_STATUS.CODE_NAME AS NM_STATUS	/*			상태명				*/
+	      , L.RESULT_COUNT								/*			건수				*/
+	      , L.ERROR_MESSAGE								/*			오류내용			*/
+	      , L.REG_DT									/*			최초등록일시		*/
+	FROM SYS_BATCH_LOG L
+	LEFT OUTER JOIN SYS_CODE BATCH_RSLT_STATUS
+	ON BATCH_RSLT_STATUS.CODE_CATEGORY_ID = 'BATCH_RSLT_STATUS'
+    	AND L.STATUS = BATCH_RSLT_STATUS.CODE
+    WHERE 1=1
+    <if test="BATCH_ID != null and BATCH_ID != ''" >
+    	AND L.BATCH_ID LIKE '%'	||	#{BATCH_ID} || '%'
+	</if>
+	<if test="DT_START != null and DT_START != ''" >
+   		AND L.REG_DT <![CDATA[ >= ]]> TO_DATE (#{DT_START} || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS')
+	</if>
+	<if test="DT_END != null and DT_END != ''" >
+   		AND L.REG_DT <![CDATA[ <= ]]> TO_DATE (#{DT_END} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS') 
+	</if>    	
+	ORDER BY L.REG_DT DESC 
+	</sql>
+	
+	<!-- 배치로그관리 목록 조회 -->
+	<select id="getBatchLogList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getBatchLogList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- 배치로그관리 목록 조회 - count -->
+	<select id="getBatchLogList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getBatchLogList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- 배치로그관리 목록 조회 - paging -->
+	<select id="getBatchLogList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getBatchLogList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	
+	<!--
+		QueryId     : LogManage.getListDispatch
+		Description : 사용자접속로그관리 목록 조회 호출 쿼리
+	 -->
+	<sql id="getListDispatch_base">
+		SELECT R.ID_DISPATCH_RUN AS ID_DISPATCH_RUN                        /* 통보 ID */
+		     , R.TP_DISPATCH_METHOD AS TP_DISPATCH_METHOD                  /* 통보방법 */
+		     , RT.TP_DISPATCH_TARGET AS TP_DISPATCH_TARGET                 /* 수신자 유형 */
+		     , CASE WHEN RT.TP_DISPATCH_TARGET = '01' THEN DIS_CUS.USER_NM
+		            WHEN RT.TP_DISPATCH_TARGET = '02' THEN DIS_EMP.USER_NM
+		            ELSE DIS_DEPT.DEPT_NM
+		       END AS NM_DISPATCH                                          /* 통보대상자 */
+		     , R.DS_TITLE_DISPATCH AS DS_TITLE_DISPATCH                    /* 제목 */
+		     , TO_CHAR(R.DT_DISPATCH_OCCUR,'YYYY-MM-DD HH24:MI:SS') AS DT_DISPATCH  /* 통보일시 */
+		     , SC3.CODE_NAME AS TP_STATUS_DISPATCH                         /* 전송상태 */
+		  FROM TBS_DISPATCH_RUN R
+		       INNER JOIN TBS_DISPATCH_RUN_TARGET RT   /* 통보 Target */
+		        ON R.ID_DISPATCH_RUN = RT.ID_DISPATCH_RUN
+		       LEFT OUTER JOIN SYS_CODE SC3            /* 전송상태 */
+		        ON R.TP_STATUS_DISPATCH = SC3.CODE
+		        AND SC3.CODE_CATEGORY_ID = 'TP_STATUS_DISPATCH'
+		       LEFT OUTER JOIN SYS_USER DIS_CUS        /* 통보대상자(고객) */
+		        ON RT.ID_CUST_DISPATCH = DIS_CUS.USER_ID
+		       LEFT OUTER JOIN SYS_USER DIS_EMP        /* 통보대상자(직원) */
+		        ON RT.ID_EMP_DISPATCH_TARGET = DIS_EMP.USER_ID
+		       LEFT OUTER JOIN SYS_DEPARTMENT DIS_DEPT /* 통보대상자(부서) */
+		        ON RT.ID_DEPT_DISPATCH_TARGET = DIS_DEPT.DEPT_ID
+		 WHERE 1=1
+			   <if test="DT_START != null and DT_START !=''">
+			   	  AND R.DT_DISPATCH_OCCUR <![CDATA[>=]]> TO_DATE (#{DT_START} || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS')		/* 기간검색(from)		*/
+			   </if>
+		   	   <if test="DT_END != null and DT_END !=''">
+			      AND R.DT_DISPATCH_OCCUR <![CDATA[<=]]> TO_DATE (#{DT_END} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS')		/* 기간검색(to)		*/
+			   </if>
+			   <if test="TP_DISPATCH_METHOD != null and TP_DISPATCH_METHOD != ''">
+			      AND R.TP_DISPATCH_METHOD = #{TP_DISPATCH_METHOD}                /* 통보방법 */
+			   </if>
+			   <if test="TP_DISPATCH_TARGET != null and TP_DISPATCH_TARGET != ''">
+			      AND RT.TP_DISPATCH_TARGET = #{TP_DISPATCH_TARGET}               /* 수신자 유형 */
+			   </if>
+			   <if test="TP_STATUS_DISPATCH != null and TP_STATUS_DISPATCH != ''">
+			      AND R.TP_STATUS_DISPATCH = #{TP_STATUS_DISPATCH}                /* 전송상태 */
+			   </if>
+		 ORDER BY R.DT_REG DESC
+	</sql>
+	
+	<!-- 사용자접속로그관리 목록 조회 -->
+	<select id="getListDispatch" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getListDispatch_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- 사용자접속로그관리 목록 조회 - count -->
+	<select id="getListDispatch_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getListDispatch_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- 사용자접속로그관리 목록 조회 - paging -->
+	<select id="getListDispatch_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getListDispatch_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+
+
+
+	<!--
+		QueryId     : LogManage.getPrivacyList
+		Description : 고객정보 조회로그 목록 조회 호출 쿼리
+	 -->
+	<sql id="getPrivacyList_base">
+		SELECT TPL.NO_LOG
+			 , TPL.USER_ID
+			 , SU.USER_NM
+			 , TPL.ID_ADDR
+			 , TPL.SCREEN_ID
+			 , APS.SCREEN_NAME
+			 , TO_CHAR(TPL.DT_VIEW,'YYYY-MM-DD') AS DT_VIEW
+		  FROM CRMADMIN.TBS_PRIVACY_LOG TPL
+		  LEFT OUTER JOIN CRMADMIN.SYS_USER SU
+		    ON TPL.USER_ID = SU.USER_ID
+		  LEFT OUTER JOIN CRMADMIN.AP_SCREEN APS
+		    ON APS.SCREEN_ID = TPL.SCREEN_ID
+		  <where>
+		  	<if test="DT_VIEW_START != null and DT_VIEW_START !=''">
+		  		AND DT_VIEW >= TO_DATE(#{DT_VIEW_START}||' 000000', 'YYYY-MM-DD HH24:MI:SS')
+		  	</if>
+		  	<if test="DT_VIEW_END != null and DT_VIEW_END !=''">
+		  		AND TO_DATE(#{DT_VIEW_END}||' 235959', 'YYYY-MM-DD HH24:MI:SS') >= DT_VIEW
+		  	</if>
+		  	<if test="SCREEN_NAME != null and SCREEN_NAME !=''">
+		  		AND APS.SCREEN_NAME LIKE '%'||#{SCREEN_NAME}||'%'
+		  	</if>
+		  	<if test="USER_NM != null and USER_NM != ''" >
+		   		AND SU.USER_NM LIKE '%' || #{USER_NM} || '%'
+			</if>
+			<if test="USER_ID != null and USER_ID != ''" >
+				AND UPPER(SU.USER_ID) LIKE '%' || UPPER(#{USER_ID}) || '%'
+			</if>
+		  </where>
+		  ORDER BY DT_VIEW DESC
+	</sql>
+	
+	<!-- 고객정보 조회로그 목록 조회 -->
+	<select id="getPrivacyList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getPrivacyList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- 고객정보 조회로그 목록 조회 - count -->
+	<select id="getPrivacyList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getPrivacyList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- 고객정보 조회로그 목록 조회 - paging -->
+	<select id="getPrivacyList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getPrivacyList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	
+	<!--
+		QueryId     : LogManage.insertPrivacyLog
+		Description : 고객정보 조회로그 등록
+	 -->
+	<insert id="insertPrivacyLog" parameterType="map">
+		<selectKey keyProperty="NO_LOG" resultType="String" order="BEFORE">
+			SELECT CRMADMIN.SEQ_TBS_PRIVACY_LOG.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO CRMADMIN.TBS_PRIVACY_LOG
+		(
+			  NO_LOG
+			, USER_ID
+			, ID_ADDR
+			, SCREEN_ID
+			, DT_VIEW
+		)
+		VALUES
+		(
+			  #{NO_LOG}
+			, #{user.id}
+			, #{user.lastLoginIp}
+			, #{SCREEN_ID}
+			, SYSDATE
+		)
+	</insert>
+	
+</mapper>

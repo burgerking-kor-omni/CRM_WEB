@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<!-- 메세지 발송기 설정 -->
+	<bean id="defaultMessageSender" class="com.ubone.standard.system.message.DefaultMessageSender">
+		<property name="splitter">
+			<bean class="com.ubone.standard.system.message.util.DefaultSplitter"/>
+		</property>
+		<property name="messageCorrectors">
+			<list>
+				<bean class="com.ubone.standard.system.message.util.SenderCorrector"/>
+				<bean class="com.ubone.standard.system.message.util.ApplicationMessengerConverter"/>				
+				<bean class="com.ubone.standard.system.message.util.SystemInfomationKewordConverter"/>
+				<bean class="com.ubone.standard.system.message.util.RecipientKewordConverter"/>
+				<bean class="com.ubone.standard.system.message.util.ParameterKewordConverter"/>				
+				<bean class="com.ubone.standard.system.message.util.RecipientCorrector"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="parameterKewordConverter" class="com.ubone.standard.system.message.util.ParameterKewordConverter"/>
+</beans>

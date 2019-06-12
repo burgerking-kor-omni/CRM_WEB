@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="UBS0004" screenType="detail" screenLayoutType="Default" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>게시판관리 / 게시판상세 Main Tab Control</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/ubs/</filePath>
+  <fileName>UBS0004</fileName>
+  <functions>
+    <function id="FNCUBS0299" isStartFunction="true" functionName="게시판관리 / 게시판 상세 정보 조회 호출" serviceId="SVCUBS0283" alias=""/>
+    <function id="FNCUBS0300" isStartFunction="false" functionName="게시판관리 / 게시판 상세 정보 수정 호출" serviceId="SVCUBS0284" alias="MODIFY"/>
+    <function id="FNCUBS0306" isStartFunction="false" functionName="게시판관리 / 게시판 삭제 호출" serviceId="SVCUBS0290" alias="REMOVE"/>
+    <function id="FNCUBS0307" isStartFunction="false" functionName="게시판관리 / 게시판 연결화면 정보 조회 호출" serviceId="SVCUBS0291" alias="USERDEFINED1"/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+  </authorities>
+</screenBuilder>

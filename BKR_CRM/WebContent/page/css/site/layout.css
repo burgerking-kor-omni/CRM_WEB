@@ -1,0 +1,49 @@
+@charset "utf-8";
+
+/* 레이아웃 용도 (베이스 소스를 기반으로 플젝 디자인별 적용)   */
+
+/* header */
+.ub-frame.top {height:85px; border-bottom:0; background-color:#264b9a;}
+.ub-frame.top h1 {padding:11px 0 0 30px;}
+.ub-frame.top .gnb-util {top:6px; color:#fff;}
+.ub-frame.top .gnb-util a {color:#fff;}
+.ub-frame.top .gnb-util .pw-button, 
+.ub-frame.top .gnb-util .logout-button, 
+.ub-frame.top .gnb-util .lang-cd {margin:0 2px 0 5px; background:url('../../images/site/common/bar_utill.gif') no-repeat 0 2px; }
+.ub-frame.top .gnb-util .login-user em {margin-right:5px; font-weight:normal;}
+
+.ub-layout.menu.wide-menu {top:44px !important;}
+.ub-layout.menu nav .ub-control.menu li {height:41px !important; padding:0 0 0 24px !important; background:none !important;}
+.ub-layout.menu nav .ub-control.menu li a {height:41px !important; padding:0 22px 0 0 !important; color:#fff !important; border:0 !important;}
+.ub-layout.menu nav .ub-control.menu li:hover {background:url('../../images/site/common/bg_nav_1depth.gif') no-repeat 0 0 !important;}
+.ub-layout.menu nav .ub-control.menu li:hover a {padding:0 22px 0 0 !important; border:0 !important; background:url('../../images/site/common/bg_nav_1depth.gif') no-repeat 100% 0 !important;}
+
+.ub-layout.menu nav .ub-control.menu .sub-depth-box {top:41px !important; box-shadow:none !important;}
+.ub-layout.menu nav .ub-control.menu .depth02 li {height:auto !important; padding-left:0 !important;}
+.ub-layout.menu nav .ub-control.menu .depth02 li a {height:auto !important; padding:2px 0 5px 18px !important; color:#444 !important;  line-height: 18px !important; background:url('../../images/site/common/bul_dep03_basic.gif') no-repeat 9px 10px !important;}
+.ub-layout.menu nav .ub-control.menu .depth02 li.depth-end a {background:url('../../images/site/common/bul_dep02_basic.gif') no-repeat 9px 10px !important;}
+.ub-layout.menu nav .ub-control.menu .depth02 li:hover {background:none !important;}
+.ub-layout.menu nav .ub-control.menu .depth02 li:hover a {color:#fff !important; background:#18ace0 url('../../../page/images/common/bul_dep03_over.gif') no-repeat 9px 10px !important;}
+.ub-layout.menu nav .ub-control.menu .depth02 li.depth-end a:hover {background:#18ace0 url('../../images/common/bul_dep02_over.gif') no-repeat 9px 10px !important;}
+.ub-layout.menu nav .ub-control.menu .depth03 li {padding-left:0 !important;}
+.ub-layout.menu nav .ub-control.menu .depth03 li a {padding:2px 0 5px 25px !important; line-height: 16px !important;background:url('../../../page/images/common/bul_lastdep_basic.gif') no-repeat 15px 10px !important;}
+.ub-layout.menu nav .ub-control.menu .depth02 li:hover .depth03 li a {color:#444 !important; background:url('../../../page/images/common/bul_lastdep_basic.gif') no-repeat 15px 10px !important;}
+.ub-layout.menu nav .ub-control.menu .depth03 li:hover {background:none !important;}
+.ub-layout.menu nav .ub-control.menu .depth02 li .depth03 li:hover a {text-decoration:underline; background:url('../../../page/images/common/bul_lastdep_basic.gif') no-repeat 15px 10px !important;}
+.ub-layout.menu nav .ub-control.menu .depth03 li:hover a strong {font-weight:bold !important; }
+
+
+/* title */
+.ub-frame.body h1.ub-control.title {padding:7px 0 5px 9px; font-size:17px; background:url('../../images/site/common/bar_h1.gif') no-repeat 0 7px;}
+.ub-frame.body h2.ub-control.title {padding-left:11px; border-top:1px solid #666; background:#f3f3f3;}
+.ub-frame.body h2.ub-control.title.hfold {z-index:3 !important;}
+
+/* popup */
+.ub-page.popup .ub-frame.body a.imgBtn.img-popClose {top:12px;}
+.ub-page.popup .ub-frame.body h1.ub-control.title {background:#264b9a;}
+.ub-page.popup .ub-frame.body h1.ub-control.title span {padding:11px 0 0 20px;}
+.ub-page.popup .ub-frame.body .pop-tail .ub-layout.button.bottom .ub-control.button.bottom {height:auto; margin-right:0; padding-left:0; background:none;}
+.ub-page.popup .ub-frame.body .pop-tail .ub-layout.button.bottom .ub-control.button.bottom a {padding:2px 25px 0; border:1px solid #747a81; background:#80878f;}
+.ub-page.popup .ub-frame.body .pop-tail .ub-layout.button.bottom .ub-control.button.bottom:hover {background:none;}
+.ub-page.popup .ub-frame.body .pop-tail .ub-layout.button.bottom .ub-control.button.bottom:hover a {background:#80878f !important;}
+.ub-page.popup .ub-layout.search .ub-control.table.normal th label {background:url('../../images/common/ico_gray2.gif') no-repeat 0 8px;}

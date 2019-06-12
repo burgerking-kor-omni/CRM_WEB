@@ -1,0 +1,1361 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="CustManageDAO">
+	<!--
+		QueryId     : customerDAO.getCustList
+		Description : 고객 목록을 조회하는 쿼리
+	 -->
+	<sql id="getCustList_base">
+		SELECT
+		<if test='NM_MEMBER_SEARCH == "" and DS_EMAIL == "" and NO_PHONE_SEARCH == "" '> 
+			/*+ INDEX (TM TBS_MEMBER_IDX04) */
+		</if> 
+			   TM.ID_MEMBER
+			 , TM.NM_MEMBER 
+			 , TM.DS_EMAIL
+			 , TM.NO_PHONE
+			 , TM.CD_GRADE
+			 , TM.CD_STATUS
+			 , TM.CD_JOIN_PATH
+			 , TM.CD_JOIN_SITE
+			 , TM.DT_JOIN
+		  FROM CRMADMIN.TBS_MEMBER TM
+		 WHERE 1=1
+		 <if test="NM_MEMBER_SEARCH != null and NM_MEMBER_SEARCH != ''">
+			AND TM.NM_MEMBER = #{NM_MEMBER}
+		 </if>
+		<if test="DS_EMAIL != null and DS_EMAIL != ''">
+			AND TM.DS_EMAIL LIKE #{DS_EMAIL}||'%'
+		</if>
+		<if test="NO_PHONE_SEARCH != null and NO_PHONE_SEARCH != ''">
+			AND TM.NO_PHONE = #{NO_PHONE}
+		</if>
+		<if test="CD_GRADE != null and CD_GRADE != ''">
+			AND TM.CD_GRADE = #{CD_GRADE}
+		</if>
+		<if test="CD_JOIN_SITE != null and CD_JOIN_SITE != ''">
+			AND TM.CD_JOIN_SITE = #{CD_JOIN_SITE}
+		</if>
+		<if test="CD_JOIN_PATH != null and CD_JOIN_PATH != ''">
+			AND TM.CD_JOIN_PATH = #{CD_JOIN_PATH}
+		</if>
+		
+		<if test='NM_MEMBER_SEARCH == "" and DS_EMAIL == "" and NO_PHONE_SEARCH == "" and ID_MEMBER == ""'>
+			<if test="DT_START != null and DT_START != ''">
+				AND TM.DT_JOIN >= TO_DATE(#{DT_START}||' 000000', 'YYYY-MM-DD HH24MISS')
+			</if>
+			<if test="DT_END != null and DT_END != ''">
+				AND TO_DATE(#{DT_END}||' 235959', 'YYYY-MM-DD HH24MISS') >= TM.DT_JOIN
+			</if>
+		</if>
+		<if test="CD_STATUS != null and CD_STATUS != ''">
+			AND TM.CD_STATUS = #{CD_STATUS}
+		</if>
+		<if test="ID_MEMBER != null and ID_MEMBER != ''">
+			AND TM.ID_MEMBER = #{ID_MEMBER}
+		</if>
+		
+		ORDER BY TM.DT_JOIN DESC
+	</sql>
+	
+	<!-- 고객 목록 조회 -->
+	<select id="getCustList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getCustList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 고객 목록 조회 - count -->
+	<select id="getCustList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getCustList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 고객 목록 조회 - paging -->
+	<select id="getCustList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getCustList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		QueryId     : CustManageDAO.getCustDetail
+		Description : 고객 상세를 조회하는 쿼리
+	 -->
+	<select id="getCustDetail" parameterType="map" resultType="lmap" >
+		SELECT  TM.ID_MEMBER,
+				TM.NM_MEMBER,
+				TM.CD_STATUS,
+				CASE WHEN LENGTH(TM.DT_BIRTH) = 8 THEN TO_CHAR(TO_DATE(TM.DT_BIRTH,'YYYYMMDD'),'YYYY-MM-DD')
+                             WHEN TM.DT_BIRTH IS NULL THEN ''
+                               ELSE CASE WHEN TO_DATE(TM.DT_BIRTH,'YYMMDD') > SYSDATE THEN TO_CHAR(TO_DATE('19'||TM.DT_BIRTH,'YYYYMMDD'),'YYYY-MM-DD')
+                                    ELSE TO_CHAR(TO_DATE(TM.DT_BIRTH,'YYMMDD') ,'YYYY-MM-DD') END
+                          END AS DT_BIRTHDAY,
+				TM.CD_GENDER,
+				CASE WHEN TM.CD_AGE IS NULL THEN ''
+					 ELSE TM.CD_AGE||' 대' END AS CD_AGE,
+				TM.CD_AGE AS CD_AGE_DEL,
+				TM.CD_GRADE,
+				NVL(TM.CNT_STAMP,0)||' 개' AS CNT_STAMP,
+				TM.DS_EMAIL,
+				TM.YN_EMAIL_RECV,
+				TO_CHAR(TM.DT_EMAIL_RECV, 'YYYY-MM-DD') AS DT_EMAIL_RECV,
+				TM.NO_PHONE,
+				TM.YN_SMS_RECV,
+				TO_CHAR(TM.DT_SMS_RECV, 'YYYY-MM-DD') AS DT_SMS_RECV,
+				TM.YN_BKR_AGREE,
+				TD.NO_ADDRESS,
+				TD.ZIP_CODE,
+				NVL(TD.DS_ADDR,TD.DS_ADDR_STREET) AS DS_ADDR,
+				NVL(TD.DS_ADDR_DTL, TD.DS_ADDR_STREET_DTL) AS DS_ADDR_DTL,
+				TO_CHAR(TM.DT_CHNG_PASSWD,'YYYY-MM-DD') AS DT_CHNG_PASSWD,
+				TM.CD_JOIN_PATH,
+				TM.CD_JOIN_SITE,
+				TO_CHAR(TM.DT_JOIN,'YYYY-MM-DD') AS DT_JOIN,
+				CASE WHEN TM.CD_STATUS = 'H' THEN 'Y' ELSE 'N' END AS CD_DORMANCY,
+				TO_CHAR(TM.DT_DORMANCY ,'YYYY-MM-DD') AS DT_DORMANCY,
+				tm.YN_BKR_AGREE,
+				TO_CHAR(TM.DT_BKR_AGREE ,'YYYY-MM-DD') AS DT_BKR_AGREE,
+				TM.YN_PRIVACY_AGREE,
+				TO_CHAR(TM.DT_PRIVACY_AGREE,'YYYY-MM-DD') AS DT_PRIVACY_AGREE,
+				TM.YN_CONFIRM,
+				TO_CHAR(TM.DT_CONFIRM,'YYYY-MM-DD') AS DT_CONFIRM,
+				TO_CHAR(TM.DT_LAST_LOGIN,'YYYY-MM-DD') AS DT_LAST_LOGIN,
+                TM.TOKEN_PK
+				FROM CRMADMIN.TBS_MEMBER TM
+				LEFT OUTER JOIN CRMADMIN.TBS_MEMBER_ADDRESS TD
+				  ON TD.ID_MEMBER = TM.ID_MEMBER
+				 AND TD.YN_ADDR_BASE = 'Y'
+		 WHERE TM.ID_MEMBER = #{ID_MEMBER}
+		  
+	</select>
+	
+	<!--
+		 QueryId     : CustManageDAO.getSnsList
+		 Description : 고객  SNS 연동리스트 조회
+	 -->
+	<select id="getSnsList" parameterType="map" resultType="lmap">
+		SELECT ID_MEMBER
+             , (SELECT CODE_NAME 
+             	  FROM CRMADMIN.SYS_CODE 
+             	 WHERE CODE_CATEGORY_ID = 'CD_JOIN_SITE' 
+             	   AND CODE = TMS.TP_SNS) AS TP_SNS
+             , SN_SNS
+             , NM_NICK
+             , DS_IMAGE
+             , TO_CHAR(DT_REG, 'YYYY-MM-DD') AS DT_REG
+             , ID_REG_USER
+             , TO_CHAR(DT_UPT, 'YYYY-MM-DD') AS DT_UPT
+             , ID_UPT_USER
+          FROM CRMADMIN.TBS_MEMBER_SNS TMS
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+	</select>
+	
+	<!--
+		 QueryId     : CustManageDAO.insertDelMember
+		 Description : 고객 회원탈퇴 이력 등록
+	 -->
+	<insert id="insertDelMember" parameterType="map">
+		INSERT INTO CRMADMIN.TBS_MEMBER_DEL
+		(
+			   ID_MEMBER                       /* 회원PK */
+			 , DT_DEL                          /* 탈퇴일자 */
+			 , TP_DEL                          /* 탈퇴구분 */
+			 , DS_DEL                          /* 탈퇴사유 */
+			 , DT_REG                          /* 최초등록일시 */
+			 , ID_REG_USER                     /* 최초등록자 */
+			 , DT_UPT                          /* 최근수정일시 */
+			 , ID_UPT_USER                     /* 최근수정자 */
+			 , CD_AGE
+			 , CD_GENDER
+			 , CD_GRADE
+		) VALUES (
+		       #{ID_MEMBER}
+		     , SYSDATE
+		     , #{TP_DEL}
+		     , #{DS_DEL}
+		     , SYSDATE
+		     , #{user.id}
+		     , SYSDATE
+		     , #{user.id}
+		     , #{CD_AGE}
+		     , #{CD_GENDER}
+		     , #{CD_GRADE}
+		)
+	</insert>
+	
+	<!--
+		QueryId     : CustManageDAO.deleteMember
+		Description : 회원 탈퇴
+	 -->
+	<delete id="deleteMember" parameterType="map">
+		DELETE FROM CRMADMIN.TBS_MEMBER
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+
+	</delete>
+	
+	<!--
+		QueryId     : CustManageDAO.deletelMemberAddr
+		Description : 회원 주소 탈퇴
+	 -->
+	<delete id="deletelMemberAddr" parameterType="map">
+		DELETE FROM CRMADMIN.TBS_MEMBER_ADDRESS
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+
+	</delete>
+	
+	<!--
+		QueryId     : CustManageDAO.deletelSnsMember
+		Description : 회원 SNS 탈퇴
+	 -->
+	<delete id="deletelSnsMember" parameterType="map">
+		DELETE FROM CRMADMIN.TBS_MEMBER_SNS
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+
+	</delete>
+	
+	<!--
+		 QueryId     : CustManageDAO.getOrderList
+		 Description : 고객 진행중 주문목록 조회
+	 -->
+	<sql id="getOrderList_base">
+		SELECT OM.ORDER_NO        /*주문번호*/
+             , OM.ORDER_NM AS MENU_NM    /*메뉴명*/
+             , OM.TOTAL_PRC    /*금액*/
+             , TC.NM_COUPON        /* 쿠폰명 */
+             , OM.PAYMENT_TYPE    /*결제구분*/
+             , OM.ORDER_STATUS    /*상태*/
+             , TO_CHAR(OM.REG_DATE,'YYYY-MM-DD') AS REG_DATE        /*주문일시*/
+             , MST.STOR_NM        /*매장명*/
+             , OM.POS_ORDER_NO    /*포스주문번호*/
+          FROM OMNI.OMNI_ORDER_MAIN OM
+          LEFT OUTER JOIN (
+          					SELECT ORDER_NO
+				          		 , LISTAGG(OMN.MENU_NM,', ') WITHIN GROUP(ORDER BY OMN.ORDER_NO) AS MENU_NM
+				          	  FROM OMNI.OMNI_ORDER_MENU OMN
+				          GROUP BY ORDER_NO
+				          ) OME
+            ON OM.ORDER_NO = OME.ORDER_NO
+          LEFT OUTER JOIN OMNI.OMNI_STOR_APP MST
+            ON MST.STOR_CD = OM.STOR_CD
+           AND MST.CMP_CD = 'BKR'
+           AND MST.SALES_ORG_CD = '1000'
+           AND MST.STOR_STATUS = '1'
+           AND SUBSTR(MST.STOR_CD, 4, 1) != 9
+           AND TO_CHAR(SYSDATE, 'YYYYMMDD') >= MST.SALES_START_DATE
+          LEFT OUTER JOIN CRMADMIN.TBS_COUPON TC
+            ON TC.CD_COUPON = OM.COUPON_PIN_CD
+		 where
+		 <choose>
+		 	<when test='ORDER_STATUS == "00"'>
+		 		OM.ORDER_STATUS IN ('00','01')
+		 	</when>
+		 	<otherwise>
+		 		OM.ORDER_STATUS NOT IN ('00','01')
+		 	</otherwise>
+		 </choose> 
+		 
+			 <if test="ID_MEMBER != null and ID_MEMBER != ''">
+			  	AND OM.ID_MEMBER = #{ID_MEMBER}
+			 </if>
+			 <if test="STOR_CD != null and STOR_CD != ''">
+			  	AND OM.STOR_CD = #{STOR_CD}
+			 </if>
+			 <if test="PAYMENT_TYPE != null and PAYMENT_TYPE != ''">
+			 	AND OM.PAYMENT_TYPE = #{PAYMENT_TYPE}
+			 </if>
+			 <if test="ORDER_CHN != null and ORDER_CHN != ''">
+			 	AND OM.ORDER_CHN = #{ORDER_CHN}
+			 </if>
+		 ORDER BY OM.REG_DATE DESC
+	</sql>
+	<!-- 주문 목록 조회 -->
+	<select id="getOrderList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getOrderList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 주문 목록 조회 - count -->
+	<select id="getOrderList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getOrderList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 주문 목록 조회 - paging -->
+	<select id="getOrderList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getOrderList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		 QueryId     : CustManageDAO.getOrderDetail
+		 Description : 주문상세 조회
+	 -->
+	<select id="getOrderDetail" parameterType="map" resultType="lmap">
+		SELECT DISTINCT OM.ORDER_NO             /* 주문번호 */
+             , OM.POS_ORDER_NO         /* 포스주문번호 */
+             , OM.ORDER_STATUS         /* 주문상태 */
+             , OM.PAYMENT_TYPE        /* 결제구분 */
+             , MS.STOR_NM            /* 매장명 */
+             , TO_CHAR(OM.REG_DATE,'YYYY-MM-DD') AS REG_DATE /* 등록일 */
+             , OM.TOTAL_PRC        /* 상품금액 (총 금액) */
+             , TC.NM_COUPON            /* 쿠폰사용 (쿠폰명) */
+             , OM.CASH_BAG_DC_PRC    /* 캐시백할인금액*/
+             , OM.COUPON_DC_PRC + OM.CASH_BAG_DC_PRC AS ALL_DC_PRC /* 총할인금액 */
+             , OM.PAYMENT_PRC        /* 결제금액 */
+             , OM.ORDER_MEMO        /* 메모 */
+          FROM OMNI.OMNI_ORDER_MAIN OM
+          LEFT OUTER JOIN OMNI.OMNI_STOR_APP MS
+            ON MS.STOR_CD = OM.STOR_CD
+           AND MS.CMP_CD = 'BKR'
+           AND MS.SALES_ORG_CD = '1000'
+           AND MS.STOR_STATUS = '1'
+           AND SUBSTR(MS.STOR_CD, 4, 1) != 9
+           AND TO_CHAR(SYSDATE, 'YYYYMMDD') >= MS.SALES_START_DATE 
+          LEFT OUTER JOIN OMNI.OMNI_ORDER_MENU OMENU
+            ON OM.ORDER_NO = OMENU.ORDER_NO
+          LEFT OUTER JOIN CRMADMIN.TBS_COUPON TC
+            ON OM.COUPON_PIN_CD = TC.CD_COUPON
+		 WHERE OM.ORDER_NO = #{ORDER_NO}
+	</select>
+	
+	<!--
+		 QueryId     : CustManageDAO.getProdList
+		 Description : 주문상세 상품목록 조회
+	 -->
+	<select id="getProdList" parameterType="map" resultType="lmap">
+		SELECT OM.MENU_NM
+             , NVL(OM.MENU_PRC,0) + NVL(OMO.OPTPRC,0) AS MENU_PRC
+             , OM.MENU_QTY
+             , OMO.OPTION_NAME
+          FROM OMNI.OMNI_ORDER_MENU OM
+          LEFT OUTER JOIN 
+                        (SELECT ORDER_NO
+                              , SEQ
+                              , SUM(OPTION_MENU_PRC) AS OPTPRC
+                              , SUBSTR(XMLAGG(XMLELEMENT(A,',' || OPTION_MENU_NM) ORDER BY OPTION_MENU_NM).EXTRACT('//text()'), 2) AS OPTION_NAME
+                           FROM OMNI.OMNI_ORDER_MENU_OPTION OMO
+                          GROUP BY ORDER_NO,SEQ
+                        ) OMO
+             ON OM.ORDER_NO = OMO.ORDER_NO
+            AND OM.SEQ = OMO.SEQ
+			WHERE OM.ORDER_NO = #{ORDER_NO}
+	</select>
+	
+	<!--
+		 QueryId     : CustManageDAO.getOptionList
+		 Description : 주문상세 구성품 조회
+	 -->
+	<select id="getOptionList" parameterType="map" resultType="lmap" >
+		SELECT OMO.OPTION_MENU_NM
+			 , OMO.OPTON_MENU_PRC
+			 , OMO.OPTON_MENU_QTY
+		  FROM OMNI.OMNI_ORDER_MENU_OPTION OMO
+		 WHERE ORDER_NO = #{ORDER_NO}
+	</select>
+	
+	<!--
+		 QueryId     : CustManageDAO.getCouponListUse
+		 Description : 주문상세 사용쿠폰 조회
+	 -->
+	<select id="getCouponListUse" parameterType="map" resultType="lmap">
+		SELECT TC.NM_COUPON
+			 , TC.CD_COUPON_OBJ
+			 , TC.TP_MEMBER
+			 , TC.CD_COUPON_TARGET
+			 , TC.CD_SALE_POLICY
+			 , NVL(TC.VAL_SALE_POLICY,0) AS VAL_SALE_POLICY
+		  FROM OMNI.OMNI_ORDER_MAIN OOM
+		  INNER JOIN CRMADMIN.TBS_COUPON_PIN TCP
+		    ON (OOM.COUPON_PIN_CD = TCP.NO_PIN
+		     	OR OOM.COUPON_PIN_CD = TCP.PIN_NUM
+		    )
+		  INNER JOIN CRMADMIN.TBS_COUPON TC
+		    ON TCP.CD_COUPON = TC.CD_COUPON
+		 WHERE OOM.ORDER_NO = #{ORDER_NO}
+	</select>
+	
+	<!--
+		 QueryId     : CustManageDAO.getCouponInfo
+		 Description : 주문상세 사용쿠폰 조회
+	 -->
+	<select id="getCouponInfo" parameterType="map" resultType="lmap">
+		SELECT TC.NM_COUPON
+             , TC.CD_COUPON_OBJ
+             , TC.TP_MEMBER
+             , TC.CD_COUPON_TARGET
+             , TC.CD_SALE_POLICY
+             , NVL(TC.VAL_SALE_POLICY,0) AS VAL_SALE_POLICY
+          FROM CRMADMIN.TBS_COUPON TC
+          LEFT OUTER JOIN CRMADMIN.TBS_COUPON_PIN TCP
+            ON TC.CD_COUPON = TCP.CD_COUPON
+         WHERE TCP.NO_PIN = #{CPN_NO}
+	</select>
+	
+	<!--
+		 QueryId     : CustManageDAO.getOrderProd
+		 Description : 고객 주문상품 조회
+	 -->
+	<sql id="getOrderProd_base">
+		SELECT OOME.MENU_CD
+		     , OOME.MENU_NM
+		     , SUM(OOME.MENU_PRC) AS SALE_AMT
+		     , COUNT(OOME.MENU_PRC) AS CNT_SALE
+		  FROM OMNI.OMNI_ORDER_MAIN OOM
+		 INNER JOIN OMNI.OMNI_ORDER_MENU OOME
+		    ON OOM.ORDER_NO = OOME.ORDER_NO
+		   AND OOM.STOR_CD = OOME.STOR_CD
+		 WHERE OOM.ID_MEMBER = #{ID_MEMBER}
+		   AND OOM.ORDER_STATUS = '04'
+		 GROUP BY OOME.MENU_CD, OOME.MENU_NM, OOME.MENU_PRC
+		 ORDER BY OOME.MENU_NM ASC
+
+	</sql>
+	<!-- 주문상품 목록 조회 -->
+	<select id="getOrderProd" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getOrderProd_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 주문상품 목록 조회 - count -->
+	<select id="getOrderProd_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getOrderProd_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 주문상품 목록 조회 - paging -->
+	<select id="getOrderProd_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getOrderProd_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	
+	<!--
+		 QueryId     : CustManageDAO.getOrderStore
+		 Description : 고객 주문매장이력 조회
+	 -->
+	<sql id="getOrderStore_base">
+		SELECT OOM.STOR_CD
+		     , OSA.STOR_NM
+		     , SUM(OOM.PAYMENT_PRC) AS SALE_AMT
+		     , COUNT(OOM.PAYMENT_PRC) AS SALE_CNT
+		  FROM OMNI.OMNI_ORDER_MAIN OOM
+		 INNER JOIN OMNI.OMNI_STOR_APP OSA
+		    ON OOM.STOR_CD = OSA.STOR_CD
+		   AND OSA.CMP_CD = 'BKR'
+		   AND OSA.SALES_ORG_CD = '1000'
+		 WHERE OOM.ID_MEMBER = #{ID_MEMBER}
+		   AND OOM.ORDER_STATUS = '04'
+		 GROUP BY OOM.STOR_CD, OSA.STOR_NM, OOM.PAYMENT_PRC
+		 ORDER BY OSA.STOR_NM ASC
+
+	</sql>
+	
+	<!-- 고객 주문매장이력 목록 조회 -->
+	<select id="getOrderStore" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getOrderStore_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 고객 주문매장이력 목록 조회 - count -->
+	<select id="getOrderStore_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getOrderStore_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 고객 주문매장이력 목록 조회 - paging -->
+	<select id="getOrderStore_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getOrderStore_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		 QueryId     : CustManageDAO.getPaymentList
+		 Description : 고객 구매방법 이력 조회
+	 -->
+	<sql id="getPaymentList_base">
+		SELECT COUNT(PAYMENT_TYPE) AS SALE_CNT
+             , SUM(PAYMENT_PRC) AS SALE_AMT
+			 , PAYMENT_TYPE
+			 , PAYMENT_TYPE AS NM_PAYMENT_TYPE
+		  FROM OMNI.OMNI_ORDER_MAIN
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+		   AND ORDER_STATUS = '04'
+		 GROUP BY PAYMENT_TYPE
+		 ORDER BY SALE_CNT DESC
+	</sql>
+	
+	<!-- 고객 구매방법 이력 목록 조회 -->
+	<select id="getPaymentList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getPaymentList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 고객 구매방법 이력 목록 조회 - count -->
+	<select id="getPaymentList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getPaymentList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 고객 구매방법 이력 목록 조회 - paging -->
+	<select id="getPaymentList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getPaymentList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	
+	<!--
+		 QueryId     : CustManageDAO.getPayChannel
+		 Description : 고객 구매채널 이력 조회
+	 -->
+	<sql id="getPayChannel_base">
+		SELECT COUNT(PAYMENT_TYPE) AS SALE_CNT        /* 구입횟수 */
+             , SUM(PAYMENT_PRC) AS SALE_AMT    /* 금액 */
+			 , ORDER_CHN						/* 구매채널 */
+			 , ORDER_CHN AS NM_ORDER_CHN
+		  FROM OMNI.OMNI_ORDER_MAIN
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+		   AND ORDER_STATUS = '04'
+		 GROUP BY ORDER_CHN
+		 ORDER BY SALE_CNT DESC
+	</sql>
+	
+	<!-- 고객 구매채널 이력 목록 조회 -->
+	<select id="getPayChannel" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getPayChannel_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 고객 구매채널 이력 목록 조회 - count -->
+	<select id="getPayChannel_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getPayChannel_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 고객 구매채널 이력 목록 조회 - paging -->
+	<select id="getPayChannel_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getPayChannel_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		 QueryId     : CustManageDAO.getOrderListPopup
+		 Description : 고객 구매채널 이력 조회
+	 -->
+	<sql id="getOrderListPopup_base">
+		SELECT OM.ORDER_NO        /*주문번호*/
+             , OM.ORDER_NM AS MENU_NM    /*메뉴명*/
+             , OM.TOTAL_PRC    /*금액*/
+             , TC.NM_COUPON        /* 쿠폰명 */
+             , OM.PAYMENT_TYPE    /*결제구분*/
+             , OM.ORDER_STATUS    /*상태*/
+             , TO_CHAR(OM.REG_DATE,'YYYY-MM-DD') AS DT_ORDER        /*주문일시*/
+             , MST.STOR_NM        /*매장명*/
+             , OM.POS_ORDER_NO    /*포스주문번호*/
+          FROM OMNI.OMNI_ORDER_MAIN OM
+          LEFT OUTER JOIN (SELECT ORDER_NO
+                                       , LISTAGG(OMN.MENU_NM,', ') WITHIN GROUP(ORDER BY OMN.ORDER_NO) AS MENU_NM
+                                       , LISTAGG(OMN.MENU_CD,', ') WITHIN GROUP(ORDER BY OMN.ORDER_NO) AS MENU_CD
+                                    FROM OMNI.OMNI_ORDER_MENU OMN
+                              GROUP BY ORDER_NO) OME
+            ON OM.ORDER_NO = OME.ORDER_NO
+          LEFT OUTER JOIN OMNI.OMNI_STOR_APP MST
+            ON MST.STOR_CD = OM.STOR_CD
+           AND MST.CMP_CD = 'BKR'
+           AND MST.SALES_ORG_CD = '1000'
+           AND MST.STOR_STATUS = '1'
+           AND SUBSTR(MST.STOR_CD, 4, 1) != 9
+           AND TO_CHAR(SYSDATE, 'YYYYMMDD') >= MST.SALES_START_DATE 
+          LEFT OUTER JOIN CRMADMIN.TBS_COUPON TC
+            ON TC.CD_COUPON = OM.COUPON_PIN_CD
+         WHERE 
+         	OM.ORDER_STATUS NOT IN ('00','01')
+       	 <if test="ID_MEMBER != '' and ID_MEMBER != null">
+       	 	AND ID_MEMBER = #{ID_MEMBER}
+       	 </if>
+       	 <if test="MENU_CD != '' and MENU_CD != null">
+       	 	AND MENU_CD LIKE '%'||#{MENU_CD}||'%'
+  		 </if>
+  		 <if test="STOR_CD != '' and STOR_CD != null">
+  		 	AND MST.STOR_CD = #{STOR_CD}
+  		 </if>
+  		 <if test="PAYMENT_TYPE != '' and PAYMENT_TYPE != null">
+  		 	AND OM.PAYMENT_TYPE = #{PAYMENT_TYPE}
+  		 </if>
+  		 <if test="ORDER_CHN != '' and ORDER_CHN != null">
+  		 	AND OM.ORDER_CHN = #{ORDER_CHN}
+  		 </if>
+	</sql>
+
+	<!-- 주문 목록 팝업 목록 조회 -->
+	<select id="getOrderListPopup" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getOrderListPopup_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 주문 목록 팝업 목록 조회 - count -->
+	<select id="getOrderListPopup_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getOrderListPopup_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 주문 목록 팝업 목록 조회 - paging -->
+	<select id="getOrderListPopup_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getOrderListPopup_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		 QueryId     : CustManageDAO.getUseCouponList
+		 Description : 고객 쿠폰 사용이력 조회
+	 -->
+	<sql id="getUseCouponList_base">
+		SELECT TCP.NO_PIN
+			 , TCP.CD_COUPON
+			 , TC.NM_COUPON
+			 , TC.CD_COUPON_OBJ
+			 , TC.CD_COUPON_TARGET
+			 , TC.REAL_CUP_PRICE 		AS REAL_CUP_PRICE
+			 , TC.SALE_CUP_PRICE 		AS SALE_CUP_PRICE
+			 , TC.SALE_CUP_RATE || ' %' AS SALE_CUP_RATE
+			 , TO_CHAR(TCP.DT_EXPIRY_START,'YYYY-MM-DD') ||' ~ '||TO_CHAR(TCP.DT_EXPIRY_END,'YYYY-MM-DD') AS DT_EXPIRY
+		  FROM CRMADMIN.TBS_COUPON_PIN TCP
+		  LEFT OUTER JOIN CRMADMIN.TBS_COUPON TC
+		    ON TC.CD_COUPON = TCP.CD_COUPON
+		  LEFT OUTER JOIN CRMADMIN.SYS_CODE SC
+		    ON SC.CODE = TC.CD_SALE_POLICY
+		   AND SC.CODE_CATEGORY_ID = 'CD_SALE_POLICY'
+		 WHERE TCP.ID_MEMBER = #{ID_MEMBER}
+		   AND TCP.STATUS = 'A'
+	  ORDER BY DT_EXPIRY DESC
+	</sql>
+	
+	<!-- 고객 쿠폰 사용이력 목록 조회 -->
+	<select id="getUseCouponList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getUseCouponList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 고객 쿠폰 사용이력 목록 조회 - count -->
+	<select id="getUseCouponList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getUseCouponList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 고객 쿠폰 사용이력 목록 조회 - paging -->
+	<select id="getUseCouponList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getUseCouponList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		 QueryId     : CustManageDAO.getCustLog_stamp
+		 Description : 고객  스템프 리스트 조회
+	 -->
+	<sql id="getCustLog_stamp_base" >
+		SELECT SR.NO_MEMBER_STAMP_RECORD
+             , SR.CD_INCREMENT
+             , SR.TP_INCREMENT
+             , SC.CODE_NAME AS NM_INCREMENT
+             , TO_CHAR(SR.DT_UPT ,'YYYY-MM-DD') AS DT_UPD
+             , OM.ORDER_NM AS MENU_NM
+             , SR.CNT_STAMP_INCRE
+             , SR.CNT_STAMP_STACK
+             , TRUNC(SR.CNT_STAMP_STACK / 5) * 5 AS CNT_AVAIL
+             , TO_CHAR(SR.DT_REG ,'YYYY-MM-DD') AS DT_REG
+             , SR.ID_REG_USER
+             , SU.USER_NM AS NM_REG_USER 
+             , TO_CHAR(SR.DT_UPT ,'YYYY-MM-DD') AS DT_UPT
+             , SR.ID_UPT_USER
+          FROM CRMADMIN.TBS_MEMBER_STAMP_RECORD SR
+          LEFT OUTER JOIN	(
+					          	SELECT ORDER_NO
+					          		 , LISTAGG(OMN.MENU_NM,', ') WITHIN GROUP(ORDER BY OMN.ORDER_NO) AS MENU_NM
+					          	  FROM OMNI.OMNI_ORDER_MENU OMN
+					          GROUP BY ORDER_NO
+          					) OMN
+            ON SR.ORDER_NO = OMN.ORDER_NO
+          LEFT OUTER JOIN OMNI.OMNI_ORDER_MAIN OM
+            ON SR.ORDER_NO = OM.ORDER_NO
+          LEFT OUTER JOIN CRMADMIN.SYS_CODE SC
+            ON SC.CODE = SR.TP_INCREMENT
+           AND SC.CODE_CATEGORY_ID = 'TP_INCREMENT'
+          LEFT OUTER JOIN CRMADMIN.SYS_USER SU
+            ON SU.USER_ID = SR.ID_REG_USER
+         WHERE SR.ID_MEMBER = #{ID_MEMBER}
+         ORDER BY SR.DT_REG DESC
+	</sql>
+	<!-- 스템프 목록 조회 -->
+	<select id="getCustLog_stamp" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getCustLog_stamp_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 스템프 목록 조회 - count -->
+	<select id="getCustLog_stamp_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getCustLog_stamp_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 스템프 목록 조회 - paging -->
+	<select id="getCustLog_stamp_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getCustLog_stamp_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		 QueryId     : CustManageDAO.getHaveCouponList
+		 Description : 고객 보유쿠폰 조회
+	 -->
+	<sql id="getHaveCouponList_base">
+		SELECT DISTINCT TC.NM_COUPON
+		     , TC.CD_COUPON_OBJ
+		     , TC.CD_COUPON_TARGET
+		     , CD_SALE_POLICY
+		     , NVL(TC.VAL_SALE_POLICY,' 0') AS VAL_SALE_POLICY
+		     , TO_CHAR(TCP.DT_EXPIRY_START,'YYYY-MM-DD') ||' ~ '||TO_CHAR(TCP.DT_EXPIRY_END,'YYYY-MM-DD') AS DT_EXPIRY
+		     , PINCNT.CNT
+		 FROM CRMADMIN.TBS_COUPON_PIN TCP
+		 LEFT OUTER JOIN CRMADMIN.TBS_COUPON TC
+		   ON TCP.CD_COUPON = TC.CD_COUPON
+		 LEFT OUTER JOIN (
+		             SELECT TCP.CD_COUPON
+		                  , COUNT(TCP.CD_COUPON) AS CNT
+		               FROM CRMADMIN.TBS_COUPON_PIN TCP
+		               LEFT OUTER JOIN CRMADMIN.TBS_COUPON TC
+		                 ON TCP.CD_COUPON = TC.CD_COUPON
+		              WHERE ID_MEMBER = #{ID_MEMBER}
+		                AND STATUS = 'N'
+		           GROUP BY TCP.CD_COUPON
+		        ) PINCNT
+		   ON PINCNT.CD_COUPON = TCP.CD_COUPON
+		 LEFT OUTER JOIN CRMADMIN.SYS_CODE SC
+		            ON SC.CODE = TC.CD_SALE_POLICY
+		           AND SC.CODE_CATEGORY_ID = 'CD_SALE_POLICY'
+		WHERE TCP.STATUS = 'N'
+		  AND SYSDATE BETWEEN TCP.DT_EXPIRY_START AND TCP.DT_EXPIRY_END
+		  AND TCP.ID_MEMBER = #{ID_MEMBER}
+		UNION ALL
+		SELECT TC.NM_COUPON
+		     , TC.CD_COUPON_OBJ
+		     , TC.CD_COUPON_TARGET
+		     , CD_SALE_POLICY
+		     , NVL(TC.VAL_SALE_POLICY,0) AS VAL_SALE_POLICY
+		     , TO_CHAR(TC.DT_EXPIRY_START,'YYYY-MM-DD') ||' ~ '||TO_CHAR(TC.DT_EXPIRY_END,'YYYY-MM-DD') AS DT_EXPIRY
+		     , 1 AS CNT
+		  FROM CRMADMIN.TBS_COUPON TC 
+		  LEFT OUTER JOIN CRMADMIN.SYS_CODE SC
+		    ON SC.CODE = TC.CD_SALE_POLICY
+		   AND SC.CODE_CATEGORY_ID = 'CD_SALE_POLICY'
+		 WHERE TC.FG_PUB = 'Y'
+		   AND SYSDATE BETWEEN TC.DT_EXPIRY_START AND TC.DT_EXPIRY_END
+		   AND TC.TP_MEMBER IN ('1','2')
+		   AND CD_COUPON_OBJ != '4'
+		   AND TC.CD_COUPON NOT IN (SELECT CD_COUPON FROM CRMADMIN.TBS_COUPON_PIN WHERE ID_MEMBER=#{ID_MEMBER} )
+	  ORDER BY DT_EXPIRY DESC
+	</sql>
+	
+	<!-- 고객 보유쿠폰 목록 조회 -->
+	<select id="getHaveCouponList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getHaveCouponList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 고객 보유쿠폰 목록 조회 - count -->
+	<select id="getHaveCouponList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getHaveCouponList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 고객 보유쿠폰 목록 조회 - paging -->
+	<select id="getHaveCouponList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getHaveCouponList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		 QueryId     : CustManageDAO.getCustLog_change
+		 Description : 고객  변경사항 리스트 조회
+	 -->
+	<sql id="getCustLog_change_base">
+		SELECT TMR.NO_ITEM_RECD
+			 , TMR.ID_MEMBER
+			 , TMR.CD_CHNG_ITEM
+			 , TMR.VAL_ITEM_BR
+			 , TMR.VAL_ITEM_AF
+			 , TO_CHAR(TMR.DT_REG, 'YYYY-MM-DD') AS DT_REG
+			 , NVL( TM.NM_MEMBER, '(관리자)'||SU.USER_NM ) AS NM_REG_USER
+			 , TMR.DT_UPT
+			 , TMR.ID_UPT_USER
+		  FROM CRMADMIN.TBS_MEMBER_RECORD TMR
+		  LEFT OUTER JOIN CRMADMIN.SYS_USER SU
+		    ON SU.USER_ID = TMR.ID_REG_USER
+		  LEFT OUTER JOIN CRMADMIN.TBS_MEMBER TM
+		    ON TM.ID_MEMBER = TMR.ID_MEMBER
+		 WHERE TMR.ID_MEMBER = #{ID_MEMBER}
+		 ORDER BY TMR.DT_REG
+	</sql>
+	<!-- 변경이력 목록 조회 -->
+	<select id="getCustLog_change" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getCustLog_change_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 변경이력 목록 조회 - count -->
+	<select id="getCustLog_change_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getCustLog_change_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 변경이력 목록 조회 - paging -->
+	<select id="getCustLog_change_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getCustLog_change_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		 QueryId     : CustManageDAO.getSendGift
+		 Description : 고객  보낸 선물함 리스트 조회
+	 -->
+	<sql id="getSendGift_base">
+		SELECT NO_GIFT_RECD
+			 , ID_MEMBER
+			 , TP_GIFT
+			 , SN_GIFT
+			 , YN_MEMBER
+			 , ID_MEMBER_TARGET
+			 , NM_TARGET
+			 , NO_PHONE_TARGET
+			 , DS_EMAIL_TARGET
+			 , DS_MESSAGE
+			 , YN_USE
+			 , VAL_MONEY_CHNN
+			 , DT_REG
+			 , ID_REG_USER
+			 , DT_UPT
+			 , ID_UPT_USER
+		  FROM CRMADMIN.TBS_GIFT_RECORD
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+	</sql>
+	<!-- 보낸선물 목록 조회 -->
+	<select id="getSendGift" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getSendGift_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 보낸선물 목록 조회 - count -->
+	<select id="getSendGift_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getSendGift_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 보낸선물 목록 조회 - paging -->
+	<select id="getSendGift_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getSendGift_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	
+	<!--
+		 QueryId     : CustManageDAO.getRecvGift
+		 Description : 고객  받은 선물함리스트 조회
+	 -->
+	<sql id="getRecvGift_base">
+		SELECT TGR.NO_GIFT_RECD
+			 , TGR.ID_MEMBER
+			 , TGR.TP_GIFT
+			 , TGR.SN_GIFT
+			 , TGR.YN_MEMBER
+			 , TGR.ID_MEMBER_TARGET
+			 , TGR.NM_TARGET
+			 , TGR.NO_PHONE_TARGET
+			 , TGR.DS_EMAIL_TARGET
+			 , TGR.DS_MESSAGE
+			 , TGR.YN_USE
+			 , TGR.VAL_MONEY_CHNN
+			 , TO_CHAR(TGR.DT_REG ,'YYYY-MM-DD') AS DT_REG
+			 , TGR.ID_REG_USER
+			 , TO_CHAR(TGR.DT_UPT ,'YYYY-MM-DD') AS DT_UPT
+			 , TGR.ID_UPT_USER
+			 
+			 , TM.NM_MEMBER
+			 , TM.NO_PHONE
+			 
+		  FROM CRMADMIN.TBS_GIFT_RECORD TGR
+		  LEFT OUTER JOIN CRMADMIN.TBS_MEMBER TM
+		    ON TGR.ID_MEMBER = TM.ID_MEMBER
+		 WHERE ID_MEMBER_TARGET = #{ID_MEMBER}
+		   AND YN_MEMBER = 'Y'
+	</sql>
+	<!-- 받은선물  목록 조회 -->
+	<select id="getRecvGift" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getRecvGift_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 받은선물  목록 조회 - count -->
+	<select id="getRecvGift_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getRecvGift_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 받은선물 목록 조회 - paging -->
+	<select id="getRecvGift_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getRecvGift_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	
+	<!--
+		 QueryId     : CustManageDAO.getMoneyList
+		 Description : 고객 버거킹머니 이력 조회
+	 -->
+	<sql id="getMoneyList_base">
+		SELECT TBMR.NO_MONEY_RECD                            /* 버거킹머니이력일련번호 */
+			 , TBMR.ID_MEMBER                                /* 회원PK        */
+			 , TBMR.CD_INCREMENT                             /* 적립/차감코드     */
+			 , NVL(TBMR.VAL_AMOUNT_INCRE,0) AS VAL_AMOUNT_INCRE /* 적립/차감금액     */
+			 , NVL(TBMR.VAL_AMOUNT_LAST ,0) AS VAL_AMOUNT_LAST 	/* 최종금액        */
+			 , TO_CHAR(TBMR.DT_REG, 'YYYY-MM-DD') AS DT_REG  /* 최초등록일시      */
+			 , TBMR.ID_REG_USER                              /* 최초등록자       */
+		  FROM CRMADMIN.TBS_BKR_MONEY_RECORD TBMR
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+		 ORDER BY TBMR.DT_REG DESC
+	</sql>
+	<!-- 받은선물  목록 조회 -->
+	<select id="getMoneyList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getMoneyList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 받은선물  목록 조회 - count -->
+	<select id="getMoneyList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getMoneyList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 받은선물 목록 조회 - paging -->
+	<select id="getMoneyList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getMoneyList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	<!--
+		 QueryId     : CustManageDAO.getGradeList
+		 Description : 고객  등급목록 조회
+	 -->
+	<select id="getGradeList" resultType="lmap">
+		SELECT CD_GRADE
+			 , NM_GRADE
+			 , CNT_MIN_STAMP || ' ~ ' || CNT_MAX_STAMP AS CNT_STAMP
+			 , FG_USE
+			 , CNT_MIN_STAMP
+			 , CNT_MAX_STAMP
+		  FROM CRMADMIN.TBS_GRADE
+		 where FG_DEL = 'N'
+		  ORDER BY CD_GRADE
+	</select>
+	
+	<!--
+		 QueryId     : CustManageDAO.getGradeDetail
+		 Description : 고객  등급 상세 조회
+	 -->
+	<select id="getGradeDetail" parameterType="map" resultType="lmap">
+		SELECT CD_GRADE
+			 , NM_GRADE
+			 , CNT_MIN_STAMP
+			 , CNT_MAX_STAMP
+			 , TMG.FG_USE
+			 , RT_DSCNT_CART
+			 , TDS.CD_DOWN_STAD
+		  FROM CRMADMIN.TBS_GRADE TMG
+		  LEFT OUTER JOIN CRMADMIN.TBS_DOWN_STAND TDS
+		    ON TDS.FG_USE = 'Y'
+		 WHERE CD_GRADE = #{CD_GRADE}
+	</select>
+	
+	<!--
+		 QueryId     : CustManageDAO.insertGrade
+		 Description : 고객  등급 신규등록
+	 -->
+	<insert id="insertGrade" parameterType="map">
+		<selectKey keyProperty="CD_GRADE" resultType="String" order="BEFORE">
+			SELECT
+				 LPAD(NVL(MAX(CD_GRADE),0)+1, 2, '0')
+<!-- 				LPAD(SEQ_TBS_GRADE.NEXTVAL, 2, '0')  -->
+			FROM CRMADMIN.TBS_GRADE
+		</selectKey>
+		INSERT INTO CRMADMIN.TBS_GRADE
+		(
+			  CD_GRADE		/* 회원등급코드	*/		
+			, NM_GRADE		/* 회원등급명	*/		
+			, CNT_MIN_STAMP			/* 최소스탬프갯수	*/
+			, CNT_MAX_STAMP			/* 최대스탬프갯수	*/
+			, FG_USE				/* 사용여부		*/	
+			, FG_DEL
+			, RT_DSCNT_CART			/* 장바구니할인율	*/
+			, DT_REG				/* 최초등록일시	*/		
+			, ID_REG_USER			/* 최초등록자	*/		
+			, DT_UPT				/* 최근수정일시  	*/
+			, ID_UPT_USER			/* 최근수정자	*/	
+		)
+		values
+		(
+			  #{CD_GRADE}    /* 회원등급코드	*/
+			, #{NM_GRADE}    /* 회원등급명	*/
+			, #{CNT_MIN_STAMP}      /* 최소스탬프갯수	*/
+			, #{CNT_MAX_STAMP}      /* 최대스탬프갯수	*/
+			, #{FG_USE}             /* 사용여부		*/
+			, 'N'
+			, #{RT_DSCNT_CART}		/* 장바구니할인율	*/
+			, SYSDATE               /* 최초등록일시	*/
+			, #{user.id}            /* 최초등록자	*/
+			, SYSDATE               /* 최근수정일시      */
+			, #{user.id}            /* 최근수정자	*/
+		)
+	</insert>
+	
+	<!--
+		 QueryId     : CustManageDAO.updateGradeDetail
+		 Description : 고객  등급 수정
+	 -->
+	<update id="updateGradeDetail" parameterType="map">
+		UPDATE CRMADMIN.TBS_GRADE
+		   SET NM_GRADE	= #{NM_GRADE}	/* 회원등급명	*/
+			 , CNT_MIN_STAMP	= #{CNT_MIN_STAMP}		/* 최소스탬프갯수	*/
+			 , CNT_MAX_STAMP	= #{CNT_MAX_STAMP}		/* 최대스탬프갯수	*/
+			 , FG_USE			= #{FG_USE}				/* 사용여부		*/
+			 , RT_DSCNT_CART	= #{RT_DSCNT_CART}		/* 장바구니할인율	*/
+			 , DT_UPT			= SYSDATE				/* 최근수정일시  	*/
+			 , ID_UPT_USER		= #{user.id}			/* 최근수정자	*/
+		 WHERE
+		 	   CD_GRADE	= #{CD_GRADE} 	/* 회원등급코드	*/
+	</update>
+	
+	<!--
+		 QueryId     : CustManageDAO.deleteGrade
+		 Description : 고객  등급 삭제처리
+	 -->
+	<update id="deleteGrade" parameterType="map">
+		UPDATE CRMADMIN.TBS_GRADE
+		   SET FG_DEL			= 'Y'				/* 삭제여부		*/
+			 , DT_UPT			= SYSDATE			/* 최근수정일시  	*/
+			 , ID_UPT_USER		= #{user.id}		/* 최근수정자	*/
+		 WHERE
+		 	   CD_GRADE	= #{CD_GRADE} 	/* 회원등급코드	*/
+	</update>
+	
+	
+	<!--
+		 QueryId     : CustManageDAO.getDownStd
+		 Description : 고객  등급 하향적용기간 조회
+	 -->
+	<select id="getDownStd" resultType="lmap">
+		SELECT CD_DOWN_STAD
+		  FROM CRMADMIN.TBS_DOWN_STAND
+		 WHERE FG_USE = 'Y'
+	</select>
+	
+	<!--
+		 QueryId     : CustManageDAO.insertDownStd
+		 Description : 고객  등급 하향적용기간 등록
+	 -->
+	<insert id="insertDownStd" parameterType="map">
+		<selectKey keyProperty="NO_DOWN_STAND" resultType="String" order="BEFORE">
+			SELECT SEQ_TBS_DOWN_STAND.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO CRMADMIN.TBS_DOWN_STAND
+		(
+			 NO_DOWN_STAND	/* 하향기준일련번호	*/
+			,CD_DOWN_STAD	/* 하향기준코드   */
+			,FG_USE			/* 사용여부     */
+			,DT_REG			/* 최초등록일시   */
+			,ID_REG_USER		/* 최초등록자    */
+			,DT_UPT			/* 최근수정일시   */
+			,ID_UPT_USER		/* 최근수정자    */
+		)
+		VALUES
+		(
+			 ${NO_DOWN_STAND}	/* 하향기준일련번호	*/
+			,${CD_DOWN_STAD}	/* 하향기준코드   */
+			,'Y'				/* 사용여부     */
+			,SYSDATE			/* 최초등록일시   */
+			,#{user.id}			/* 최초등록자    */
+			,SYSDATE			/* 최근수정일시   */
+			,#{user.id}			/* 최근수정자    */
+		)
+	</insert>
+	
+	<!--
+		 QueryId     : CustManageDAO.deleteDownStd
+		 Description : 고객  등급 하향적용기간 삭제
+	 -->
+	<update id="deleteDownStd">
+		UPDATE CRMADMIN.TBS_DOWN_STAND
+		   SET FG_USE = 'N'
+		   	 , DT_UPT = SYSDATE			/* 최근수정일시   */
+			 , ID_UPT_USER = #{user.id}	/* 최근수정자    */
+		 WHERE FG_USE = 'Y'
+	</update>
+	
+	
+	
+	<!--
+		 QueryId     : CustManageDAO.getCouponList
+		 Description : 모든 쿠폰목록 조회
+	 -->
+	<sql id="getCouponList_base">
+		SELECT CD_COUPON
+			 , NM_COUPON
+			 , DS_COUPON
+			 , TP_EXPIRY_DATE
+			 , DT_EXPIRY_START || ' ~ ' || DT_EXPIRY_END AS DT_EXPIRY
+			 , DT_EXPIRY_START
+			 , DT_EXPIRY_END
+			 , FG_PUB
+			 , CD_GOODS
+			 , NM_GOODS
+			 , IMG_GOODS
+			 , CD_STORE__EXCEPT
+			 , DT_REG
+			 , ID_REG_USER
+			 , DT_UPT
+			 , ID_UPT_USER
+		  FROM TBS_COUPON
+		  <where>
+		  	<if test="CD_COUPON != null and CD_COUPON != ''">
+		  		CD_COUPON LIKE #{CD_COUPON}||'%'
+		  	</if>
+		  	<if test="NM_COUPON != null and NM_COUPON != ''">
+		  		AND NM_COUPON LIKE #{NM_COUPON}||'%'
+		  	</if>
+		  </where>
+	</sql>
+	<!-- 모든 쿠폰목록 조회 -->
+	<select id="getCouponList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getCouponList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 모든 쿠폰목록 조회 - count -->
+	<select id="getCouponList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getCouponList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 모든 쿠폰목록 조회 - paging -->
+	<select id="getCouponList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getCouponList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		 QueryId     : CustManageDAO.getCardList
+		 Description : 선불카드 목록 조회
+	 -->
+	<select id="getCardList" parameterType="map" resultType="lmap">
+		SELECT TMC.NO_CARD
+<!-- 			 , TMC.VAL_AMOUNT -->
+<!-- 			 , TMC.DT_UPT -->
+<!-- 			 , TMC.DT_REG -->
+<!-- 			 , /* 해지여부 */ -->
+		  FROM CRMADMIN.TBS_MEMBER_CARD TMC
+<!-- 		  LEFT OUTER JOIN TBS_MEMBER_CARD_RECORD TMCR -->
+<!-- 		    ON TMC.NO_CARD = TMCR.NO_CARD -->
+		  WHERE TMC.ID_MEMBER = #{ID_MEMBER}
+	</select>
+	
+	<!--
+		 QueryId     : CustManageDAO.getStampCntLast
+		 Description : 최종 스탬프  누적값 조회
+	 -->
+	<select id="getStampCntLast" parameterType="map" resultType="lmap">
+		SELECT NVL(CNT_STAMP_STACK,0) AS CNT_STAMP_STACK
+		  FROM CRMADMIN.TBS_MEMBER_STAMP_RECORD
+		 WHERE YN_STMAP_LAST = 'Y'
+		   AND ID_MEMBER = #{ID_MEMBER}
+	</select>
+	
+	<!--
+		 QueryId     : CustManageDAO.updateStampLast
+		 Description : 관리자 추가 스탬프 이력 수정
+	 -->
+	<update id="updateStampLast" parameterType="map">
+		UPDATE CRMADMIN.TBS_MEMBER_STAMP_RECORD
+		   SET YN_STMAP_LAST = 'N'
+		   	 , DT_UPT = SYSDATE
+			 , ID_UPT_USER = #{user.id}
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+	</update>
+	
+	<!--
+		 QueryId     : CustManageDAO.addStampRecord
+		 Description : 관리자 추가 스탬프 이력 등록
+	 -->
+	<insert id="addStampRecord" parameterType="map">
+		<selectKey keyProperty="SEQ_TBS_MEMBER_STAMP_RECORD" resultType="String" order="BEFORE">
+			SELECT CRMADMIN.SEQ_TBS_MEMBER_STAMP_RECORD.NEXTVAL FROM DUAL 
+		</selectKey>
+		INSERT INTO CRMADMIN.TBS_MEMBER_STAMP_RECORD
+		(
+			   NO_MEMBER_STAMP_RECORD     /* 회원스템프이력 일련번호 */
+			 , ID_MEMBER                  /* 회원PK */
+			 , ORDER_NO                   /* 주문번호 */
+			 , CD_INCREMENT               /* 증가/차감코드 */
+			 , TP_INCREMENT               /* 증가/차감구분 */
+			 , FG_EVENT                   /* 이벤트여부 */
+			 , CNT_STAMP_INCRE            /* 증가/차감스탬프갯수 */
+			 , CNT_STAMP_STACK            /* 누적스탬프갯수 */
+			 , YN_STMAP_LAST              /* 최종스탬프여부 */
+			 , DT_REG                     /* 최초등록일시 */
+			 , ID_REG_USER                /* 최초등록자 */
+			 , DT_UPT                     /* 최근수정일시 */
+			 , ID_UPT_USER                /* 최근수정자 */
+		) VALUES (
+		       #{SEQ_TBS_MEMBER_STAMP_RECORD}
+			 , #{ID_MEMBER}
+			 , '0'
+			 , '01'
+			 , '05'
+			 , 'N'
+			 , #{CNT_STAMP}
+			 , #{CNT_STAMP_STACK} 
+			 , 'Y'
+			 , SYSDATE
+			 , #{user.id}
+		     , SYSDATE
+		     , #{user.id}
+		)
+	</insert>
+	
+	<!--
+		 QueryId     : CustManageDAO.updateStampMember
+		 Description : 관리자 추가 스탬프 적립개수 수정
+	 -->
+	<update id="updateStampMember" parameterType="map">
+		UPDATE CRMADMIN.TBS_MEMBER
+		SET   CNT_STAMP = #{CNT_STAMP_STACK}
+			, DT_UPT = SYSDATE
+			, ID_UPT_USER = #{user.id}
+		WHERE ID_MEMBER = #{ID_MEMBER}
+	</update>
+	
+	
+	<!--
+		QueryId     : CustManageDAO.getCountStamp
+		Description : 회원 스템프 개수 조회
+	 -->
+	<select id="getCountStamp" parameterType="map" resultType="lmap">
+		SELECT TRUNC(CNT_STAMP/5) AS CNT_FIVE
+		     , TRUNC(CNT_STAMP/10) AS CNT_TEN
+		  FROM TBS_MEMBER
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+	</select>
+	
+	<!--
+		QueryId     : CustManageDAO.getCountReward
+		Description : 발행된 리워드 쿠폰 갯수 조회
+	 -->
+	<select id="getCountReward" parameterType="map" resultType="lmap">
+		SELECT A.CODE AS TP_REWARD
+		     , NVL(B.CNT, 0) AS CNT
+		  FROM CRMADMIN.SYS_CODE A
+		  LEFT OUTER JOIN (SELECT TP_REWARD, COUNT(*) AS CNT
+		                     FROM CRMADMIN.TBS_MEMBER_STAMP_REWARD
+		                    WHERE ID_MEMBER = #{ID_MEMBER}
+		                    GROUP BY TP_REWARD
+		                   ) B
+		    ON A.CODE = B.TP_REWARD
+		 WHERE CODE_CATEGORY_ID = 'TP_REWARD' 
+	</select>
+	
+	<!--
+		QueryId     : CustManageDAO.addStampReward
+		Description : 회원 스템프 리워드 저장
+	 -->
+	<insert id="addStampReward" parameterType="map">
+		<selectKey keyProperty="SEQ_TBS_MEMBER_STAMP_REWARD" resultType="String" order="BEFORE">
+			SELECT CRMADMIN.SEQ_TBS_MEMBER_STAMP_REWARD.NEXTVAL FROM DUAL 
+		</selectKey>
+		INSERT INTO CRMADMIN.TBS_MEMBER_STAMP_REWARD
+		(
+			   ID_MEMBER                  /* 회원PK */
+			 , NO_MEMBER_STAMP_REWARD     /* 회원스템프리워드일련번호 */
+			 , TP_REWARD                  /* 리워드구분(5개,10개) */
+			 , CD_COUPON                  /* 쿠폰코드 */
+			 , DT_ACT_STAMP_EXCHANGE      /* 스템프교환가능일자 */
+			 , DT_STAMP_ISSUE             /* 스템프발급일자 */
+			 , FG_ISSUE                   /* 발급여부 */
+			 , DT_REG                     /* 최초등록일시 */
+			 , ID_REG_USER                /* 최초등록자 */
+			 , DT_UPT                     /* 최근수정일시 */
+			 , ID_UPT_USER                /* 최근수정자 */
+		) VALUES (
+		       #{ID_MEMBER}
+			 , #{SEQ_TBS_MEMBER_STAMP_REWARD}
+			 , #{TP_REWARD}
+			 , NULL
+			 , SYSDATE + 1
+			 , NULL
+			 , 'N'
+			 , SYSDATE
+			 , #{user.id}
+		     , SYSDATE
+		     , #{user.id}
+		)
+		    
+	</insert>
+	
+</mapper>
+ 

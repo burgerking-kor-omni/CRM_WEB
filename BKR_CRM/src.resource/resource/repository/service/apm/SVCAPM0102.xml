@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<serviceBuilder id="SVCAPM0102" isProtectedResource="false" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <serviceName>프로그램 권한 관리 - Screen 목록 조회 (다국어용)</serviceName>
+  <serviceType type="Read">
+    <paging isPaging="false" pagingCount="-1"/>
+    <isFindConditionSave>false</isFindConditionSave>
+  </serviceType>
+  <serviceComponentType type="Custom">
+    <className>com.ubone.standard.system.auth.service.AuthManageSO</className>
+    <methodName>listScreenByMenuId</methodName>
+    <linkedFile>false</linkedFile>
+    <inducedEvent>false</inducedEvent>
+    <linkedWorkCategory></linkedWorkCategory>
+    <linkedActivity></linkedActivity>
+  </serviceComponentType>
+  <serviceCodes version="1.0">
+    <serviceCode id="APMD_SCREEN_TYPE" includeSleep="false" alias="APMD_SCREEN_TYPE"/>
+  </serviceCodes>
+  <serviceMasks version="1.0"/>
+</serviceBuilder>

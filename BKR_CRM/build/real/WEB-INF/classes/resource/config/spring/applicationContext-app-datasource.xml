@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+			http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.2.xsd">
+
+	<!--
+	================================================================================
+	DataSource 관련 Configuration
+	================================================================================
+	-->	
+<!-- 	<bean id="metaDataSource" class="org.springframework.jndi.JndiObjectFactoryBean"> -->
+<!-- 		<property name="jndiName" value="${com.ubone.meta.jdbc.ds}"/> -->
+<!-- 	</bean> -->
+    	
+	<bean id="frameworkDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="${app.db.jndi}"/>
+	</bean>
+	
+	<bean id="applicationDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="${app.db.jndi}"/>
+	</bean>
+
+	<bean id="applicationDataSourceLog4j" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+        <constructor-arg ref="applicationDataSource" />
+        <property name="logFormatter">
+            <bean class="net.sf.log4jdbc.tools.Log4JdbcCustomFormatter">
+                <property name="loggingType" value="MULTI_LINE" />
+                <property name="sqlPrefix" value="SQL         :  "/>
+            </bean>
+        </property>
+    </bean>
+
+	<!-- 2019.03.05 rims 연동관련 추가 -->
+    <bean id="rimsDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="${rims.db.jndi}"/>
+	</bean>
+
+	<!-- <bean id="extend1DataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="${ext1.db.jndi}"/>
+	</bean> -->
+
+<!-- 	<bean id="extend2DataSource" class="org.springframework.jndi.JndiObjectFactoryBean"> -->
+<!-- 		<property name="jndiName" value="${ext2.db.jndi}"/> -->
+<!-- 	</bean> -->
+
+<!-- 	<bean id="extend3DataSource" class="org.springframework.jndi.JndiObjectFactoryBean"> -->
+<!-- 		<property name="jndiName" value="${ext3.db.jndi}"/> -->
+<!-- 	</bean> -->
+</beans>

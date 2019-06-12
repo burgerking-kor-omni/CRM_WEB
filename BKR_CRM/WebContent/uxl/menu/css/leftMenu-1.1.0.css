@@ -1,0 +1,80 @@
+@charset "utf-8";
+
+html {height:100%;}
+
+ /* 왼쪽메뉴 고정+  스크롤 position:fixed; top:0; bottom:0; height:100%; */
+
+.ub-frame.middle {position:relative; box-sizing:border-box;}
+.ub-frame.middle:after {clear:both; display:block; content:' ';}
+.ub-frame.middle .ub-layout.lnb-wrap {display:block; width:34px;}
+
+.ub-frame.middle .ub-frame.left {float:left; min-width:34px;}
+.ub-frame.middle.show-left .ub-frame.left {max-width:187px;}
+
+.ub-frame.middle .ub-layout.lnb-wrap {background:url('../../../page/images/common/bg_lnb_wrap.gif') repeat-y 100% 0;}
+.ub-frame.middle.show-left .ub-layout.lnb-wrap {width:187px;}
+
+/* 왼쪽메뉴 활성화시 컨텐트 영역 밀림 */
+.ub-frame.middle.move .ub-frame.contents {margin-left:0;}
+.ub-frame.middle.show-left.move .ub-frame.contents {margin-left:187px;}
+
+.ub-frame.middle .ub-frame.left .tit-wrap,
+.ub-frame.middle .ub-layout.menu-wrap,
+.ub-frame.middle .ub-layout.menu.lnb,
+.ub-frame.middle .side-tab {display:none;}
+
+/* 버튼컨트롤 */
+.ub-frame.middle .toggle-btn {position:fixed; top:89px; left:0px; z-index:100;}
+.ub-frame.middle.show-left .toggle-btn {left:153px;}
+.ub-frame.middle .toggle-btn a {color:#fff; display:inline-block; width:34px; height:46px; background:url('../../../page/images/common/bg_open_close.png') no-repeat 0 0;}
+.ub-frame.middle .toggle-btn a strong {font-size:0; line-height:0;}
+.ub-frame.middle.show-left .toggle-btn a {background:url('../../../page/images/common/bg_open_close.png') no-repeat 0 -54px;}
+
+.ub-frame.middle .ub-frame.left .tit-wrap {margin-right:1px; background:url('../../../page/images/common/bg_lnb_tit.gif') repeat-x 0 100%;}
+.ub-frame.middle.show-left .ub-frame.left .tit-wrap {display:block;}
+.ub-frame.left .tit-wrap h2.ub-control.title {padding:18px 0 0 37px;  height:30px; font-size:15px; color:#2e6ab3; background:url('../../../page/images/common/ico_left_h2.gif') no-repeat 18px 22px;}
+
+.ub-layout.lnb-wrap {position:fixed; left:0; top:89px; bottom:0; z-index:1;}
+.ub-layout.menu-wrap {position:absolute; top:46px; bottom:0; width:187px; }
+.ub-frame.middle.show-left .ub-layout.menu-wrap {display:block;}
+.ub-frame.middle.show-left .ub-layout.menu.lnb {display:block; height:100%;}
+
+.left-nav,
+.left-nav ul,
+.left-nav li,
+.left-nav a {position: relative;}
+
+.left-nav > ul > li {background:url('../../../page/images/common/bg_sidemenu_item.gif') repeat-x 0 0;}
+.left-nav > ul > li:first-child {background-image:none;}
+.left-nav > ul > li:hover {}
+.left-nav > ul > li > a {font-size:14px; color:#646464; display: block;}
+.left-nav > ul > li > a > strong {display: block; padding:7px 10px 7px 32px; background: url('../../../page/images/common/menu_plus.png') no-repeat 15px 14px;}
+.left-nav > ul > li > a:hover {color:#2366b6;}
+.left-nav > ul > li:hover a {color:#444;}
+.left-nav > ul > li.active {border-bottom: none;}
+.left-nav > ul > li.active > a strong {color:#444; background: url('../../../page/images/common/menu_minus.png') no-repeat 16px 14px;} /* 활성화 된 상위뎁스 컬러 */
+.left-nav > ul > li.has-sub.active > a strong {background: url('../../../page/images/common/menu_minus.png') no-repeat 16px 14px;}  /* 하위메뉴있을때 - 표시 */
+
+/* .left-nav > ul > li.has-sub > a strong {background: url('../../../page/images/common/menu_plus.png') no-repeat 15px 14px;} 하위메뉴있을때 + 표시 */
+/* .left-nav > ul > li.has-sub.active > a strong {background: url('../../../page/images/common/menu_minus.png') no-repeat 16px 14px;}  하위메뉴있을때 - 표시 */
+
+.left-nav ul ul {display:none; margin-right:1px; padding:5px 0; background:#fff url('../../../page/images/common/bg_sidemenu_item.gif') repeat-x 0 0;}
+.left-nav ul ul li:last-child {border-bottom: none;}
+.left-nav ul ul li a {padding:5px 10px 5px 38px; display:block; color:#444 !important; font-size:13px; background: url('../../../page/images/common/ico_depth02.png') no-repeat 23px 12px;}
+.left-nav ul ul a:before {}
+.left-nav ul ul li.current {background:#eb9296 url('../../../page/images/common/bg_side_submenu_on.png') repeat-x 0 0;}
+.left-nav ul ul li:hover a,
+.left-nav ul ul li.current a {color:#fff !important; background:#eb9296 url('../../../page/images/common/ico_depth02_over.png') no-repeat 23px 12px;} /* 하위뎁스오버, 현재 선택된 메뉴 링크 컬러 */
+
+/* 탭 */
+.ub-frame.middle.show-left .side-tab {display:block;}
+.ub-frame.middle .side-tab ul:after {clear:both; display:block; content:' ';}
+.ub-frame.middle .side-tab li {float:left;}
+.ub-frame.middle .side-tab li a {width:auto; height:46px; display:block; vertical-align:middle; background-image:url('../../../page/images/common/bg_side_tab.gif'); background-repeat:no-repeat;}
+.ub-frame.middle .side-tab .tab01 a {width:77px; background-position:0 0;}
+.ub-frame.middle .side-tab .tab02 a {width:76px; background-position:-77px -54px;}
+.ub-frame.middle .side-tab li a strong {font-size:0; line-height:0;}
+.ub-frame.middle .side-tab .tab01.on a {background-position:0 -54px;}
+.ub-frame.middle .side-tab .tab02.on a {background-position:-77px 0;}
+.ub-frame.middle .tab-cnt.show {display:block;}
+.ub-frame.middle .tab-cnt.hide {display:none;}

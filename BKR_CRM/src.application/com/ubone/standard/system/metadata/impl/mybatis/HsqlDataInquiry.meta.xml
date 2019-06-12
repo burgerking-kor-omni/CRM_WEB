@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="HsqlDataInquiry">
+	<select id="getCategoryCodeList" parameterType="map" resultType="lmap">
+		SELECT A.TYPE TYPE
+		     , A.NAME NAME
+		  FROM META_PROGRAM_TYPE A
+		     , META_PROJECT_TYPE B
+		 WHERE A.TYPE     = B.PROGRAM_TYPE
+	</select>
+	
+	<select id="getScreenList" parameterType="map" resultType="lmap">
+		select A.PID          PID
+		     , A.TEMPLATEID   TEMPLATEID
+		     , A.DESCRIPTION  DESCRIPTION
+		     , B.PCLASS       PCLASS
+		     , A.PID                            CODE
+		     , A.PID || '   ' || A.DESCRIPTION  CODE_NAME
+		  from META_PAGE      A
+		     , META_PROGRAM   B
+		 where A.PID = B.PID
+		   and B.PROJECT_ID = #{PROJECT_CODE}
+		<if test="PID != null and PID != ''" >
+		   and A.PID like ('%' || UPPER(#{PID}) || '%')
+		</if>
+		<if test="PCLASS != null and PCLASS != ''" >
+		   and B.PCLASS = #{PCLASS}
+		</if>
+		<if test="DESCRIPTION != null and DESCRIPTION != ''" >
+		   and A.DESCRIPTION like ('%' || #{DESCRIPTION} || '%')
+		</if>
+		<if test="CATEGORY_CODE != null and CATEGORY_CODE != ''" >
+		   and B.PCLASS = #{CATEGORY_CODE}
+		</if>
+		<if test="SCREEN_ID != null and SCREEN_ID != ''" >
+		   and A.PID like ('%' || UPPER(#{SCREEN_ID}) || '%')
+		</if>
+		order by PCLASS, PID
+	</select>
+	
+	<select id="getPidDetail" parameterType="map" resultType="lmap">
+		select A.PID          PID
+		     , A.TEMPLATEID   TEMPLATEID
+		     , A.DESCRIPTION  DESCRIPTION
+		     , B.PCLASS       PCLASS
+		     , A.PID                            CODE
+		     , '['||A.PID || '] ' || A.DESCRIPTION  CODE_NAME
+		  from META_PAGE      A
+		     , META_PROGRAM   B
+		 where A.PID = B.PID
+		 <if test="SELECT_VALUE != null and SELECT_VALUE != ''">
+		   and A.PID = #{SELECT_VALUE}  
+		 </if> 
+		 <if test="SEARCH_PID != null and SEARCH_PID != ''">
+		   and (A.PID LIKE ('%' || UPPER(#{SEARCH_PID}) || '%') 
+		         or A.DESCRIPTION LIKE ('%' || UPPER(#{SEARCH_PID}) || '%')
+		         or '['||A.PID||'] '||A.DESCRIPTION LIKE ('%' || UPPER(#{SEARCH_PID}) || '%'))
+		 </if>
+		 order by A.PID ASC
+	</select>
+	
+	<select id="getScreenName" parameterType="map" resultType="lmap">
+		  SELECT '['||A.PID || '] ' || A.DESCRIPTION  AS PID_NAME
+			FROM META_PAGE A, META_PROGRAM B
+		   WHERE A.PID = B.PID
+			 AND B.PROJECT_ID = #{PROJECT_CODE}
+			 AND A.PID = #{PID}
+	</select>
+	
+</mapper>

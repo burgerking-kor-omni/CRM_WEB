@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+	<!-- 추적 로그 설정 :: 고객정보 조회 로깅 -->
+	<bean id="customTraceLogger" class="com.ubone.framework.aspects.TraceLogger">
+		<property name="matchedUrlPatterns">
+			<list>
+				<value>/**/*.ub</value>
+			</list>
+		</property>
+		<property name="excludedUrlPatterns">
+			<list>
+				<value>/**/*.ub</value>
+			</list>
+		</property>
+		<!-- log4j 관련 셋팅 -->
+		<property name="appenderName"		value="customer-search" />
+		<property name="logFile"			value="/logs/tomcat_crm/customer-search.log" />
+		<property name="datePattern"		value=".yyyyMMdd" />
+		<property name="layoutPattern" 		value="[%d] %m%n" />
+		<property name="logPackages">
+			<list>
+				<value>com.ubone.framework.logs</value>
+			</list>
+		</property>
+		<!--
+			DataList에서 해당 데이터를 로그파일에 남길 컬럼과의 맵핑을 설정한다.
+			즉, 아래에 설정된 key값으로 DataList 컬럼과 일치하는 데이터를 파일이 로깅할때 value의 이름으로 저장한다. 
+		 -->
+		 <property name="columnMapping">
+		 	<map>
+		 		<entry key="CON_NO"     value="CON_NO"/>		<!-- 증권번호 -->
+		 		<entry key="APLC_NM"	value="CUST_NM"/>		<!-- 신청인명 -->
+		 		<entry key="COOR_NM"    value="CUST_NM"/>		<!-- 계약자명 -->
+		 		<entry key="TELE_NO"    value="TEL_NO"/>		<!-- 전화번호 -->
+		 	</map>
+		 </property>
+	</bean>
+</beans>

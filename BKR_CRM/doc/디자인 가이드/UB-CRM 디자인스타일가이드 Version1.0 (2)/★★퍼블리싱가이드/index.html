@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="ko">
+<head>
+	<meta charset="utf-8" />
+	<title>(주)유비원 스타일 가이드</title>
+	<link type="text/css" rel="stylesheet" href="./css/shCoreDefault.css"/>
+	<link type="text/css" rel="stylesheet" href="./css/style.css"/>
+	<link type="text/css" rel="stylesheet" href="./css/jquery.mCustomScrollbar.css"/>
+	<script type="text/javascript" src="./js/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="./js/html5.js"></script>
+	<script type="text/javascript" src="./js/shCore.js"></script>
+	<script type="text/javascript" src="./js/shBrushJScript.js"></script>
+	<script type="text/javascript" src="./js/shBrushCss.js"></script>
+	<script type="text/javascript" src="./js/shBrushXml.js"></script>
+	<script type="text/javascript" src="./js/jquery.mCustomScrollbar.concat.min.js"></script>
+	<script type="text/javascript">
+		jQuery(function(){
+		   jQuery('a[href^=#]').click(function() {
+			  var speed = 500;  // 스크롤 속도
+			  var href= jQuery(this).attr("href");
+			  var target = jQuery(href == "#" || href == "" ? 'html' : href);
+			  var position = target.offset().top;
+			  jQuery('body,html').animate({scrollTop:position}, speed, 'swing');
+			  return false;
+		   });
+		}); //부드럽게 페이지내 이동위해 사용
+		SyntaxHighlighter.all(); //syntaxhighlighter
+	</script>
+</head>
+
+<body>
+	<!-- S : wrap -->
+	<div id="wrap">
+		<!-- S : header-->
+		<div id="header">
+			<header class="gd-header">
+				<h1>
+					<a href="index.html"><img src="./images/h1_logo.png" alt="ubone" /></a>
+					<strong class="gd-ver">Style Guide
+						<strong class="ver">Ver1.0</strong>
+					</strong>
+				</h1>
+			</header>
+		</div>
+		<!-- E : header-->
+		<div id="container">
+			<!-- S : lnb-->
+			<div id="lnb">
+				<div class="lnb-inner">
+					<div class="tit-rcnt">
+						<h2>CSS Guide</h2>
+						<!-- <span class="rcnt"><a href="#"><img src="./images/btn_all_view.png" alt="전체보기" /></a></span> -->
+					</div>
+					<nav class="gd-nav">
+						<div class="menu">
+							<ul>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="index.html"><strong>공통</strong></a>
+								</li>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="list.html"><strong>목록화면</strong></a></li>
+								<li class="sub-open">
+									<button class="fold">하위메뉴 있음</button>
+									<a href="detail.html"><strong>상세화면</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="detail.html#gd03-1"><strong>상태바</strong></a></li>
+											<li><a href="detail.html#gd03-2"><strong>기본 테이블</strong></a></li>
+											<li><a href="detail.html#gd03-3"><strong>변형 테이블</strong></a></li>
+										</ul>
+									</div>
+								</li>
+								<li class="sub-open">
+									<button class="fold">하위메뉴 있음</button>
+									<a href="etc.html"><strong>기타</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="etc.html#gd04-1"><strong>통계</strong></a></li>
+											<li><a href="etc.html#gd04-2"><strong>탭&amp;파일첨부&amp;페이징</strong></a></li>
+											<li><a href="etc.html#gd04-3"><strong>설명문구</strong></a></li>
+											<li><a href="etc.html#gd04-4"><strong>로딩바</strong></a></li>
+											<li><a href="etc.html#gd04-5"><strong>그래프컬러 가이드</strong></a></li>
+										</ul>
+									</div>
+								</li>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="popup.html"><strong>팝업</strong></a>
+								</li>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="button.html"><strong>버튼</strong></a>
+								</li>
+								<li class="sub-open">
+									<button class="fold">하위메뉴 있음</button>
+									<a href="board.html"><strong>게시판</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="board.html#gd07-1"><strong>목록</strong></a></li>
+											<li><a href="board.html#gd07-2"><strong>상세</strong></a></li>
+											<li><a href="board.html#gd07-3"><strong>등록</strong></a></li>
+										</ul>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</nav>
+				</div>
+			</div>
+			<!-- E : lnb -->
+			<!-- S : content -->
+			<div id="content">
+				<!-- S : 공통 -->
+				<section class="section" id="gd01">
+					<div class="h3-tit">
+						<h3>공통</h3>
+					</div>
+					<article class="article-cnt">
+						<div class="sub-desc01">
+							<ul>
+								<li>- 스타일 가이드 목적 : 디자인팀 작업의 가이드를 제공하여 작업자마다 상이한 화면을 만들지 않고, 개발자들의 편의를 도모</li>
+								<li>- 예시화면과 html코드는 <strong class="gd-txt-color01">중요 코드나 클래스의 이해를 돕기 위함이므로 예시화면과 html 코드 상이할 수 있음</strong></li>
+								<li>- 프로젝트에 따라 변경(디자인, 컬러값, 해상도 등..)될 수 있으며, 추가발생시 디자인팀에 서포트 요청할 것</li>
+							</ul>
+						</div>
+
+						<div class="h4-tit">
+							<h4>기본환경</h4>
+						</div>
+						<ul class="list-txt01">
+							<li>- 문서타입 : html5 <br />(단, IE8에서 html5를 지원하지 않기때문에 <strong class="gd-txt-color01">html5.js</strong>를 반드시 써준다)</li>
+							<li>- 기준 해상도 : 1280*n (세로스크롤 생성시 컨텐츠 width : 1260px, 간혹 1024인 프로젝트 존재)</li>
+							<li>- 브라우저 환경 : IE8.0 ~ , 크롬</li>
+						</ul>
+
+						<div class="h4-tit">
+							<h4>화면 구조</h4>
+						</div>
+						<div class="sub-desc01">
+							<p>ub-page > ub-frame > ub-layout > ub-control</p>
+						</div>
+						<ul class="list-txt01">
+							<li>- ub-page : 페이지를 구성하는 가장 기본 단위. document.body의 최상단 클래스명으로 정의한다. </li>
+							<li>- ub-frame : 페이지를 구성하는 커다란 레이아웃을 지칭하는 클래스. 유형에 따라 분류됨 (ex - top, contents)</li>
+							<li>- ub-layout : 컨텐츠 프레임에 표지되는 영역의 layout정의. 서브 클래스를 가질수 있다. (ex - search, list, button, paging..)</li>
+							<li>- ub-control : 페이지를 구성하는 요소. 서브 클래스를 가질수 있다. (ex - table, input, select, label..)</li>
+						</ul>
+
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<!-- ub-page -->
+								&lt;body class="ub-page portal-main"&gt;
+									<!-- ub-frame -->
+									<div class="ub-frame top">
+										...
+									</div>
+									<div class="ub-frame contents">
+										<!-- ub-layout -->
+										<div class="ub-layout paging">
+											...
+										</div>
+										<div class="ub-layout button top"><!-- 서브클래스 가짐 -->
+											...
+										</div>
+										<div class="ub-layout list">
+											<!-- ub-control -->
+											<table class="ub-control table normal">
+												...
+												<label class="ub-control label">...</label>3
+
+												<input type="text" class="ub-control input-text">
+												...
+											<!-- ub-control -->
+											</table>
+										</div>
+										<!-- //ub-layout -->
+									<!-- //ub-frame -->
+								&lt;/body&gt;
+								<!-- //ub-page -->
+							</pre>
+						</div>
+
+						<div class="h4-tit">
+							<h4>화면 유형</h4>
+						</div>
+						<ul class="list-txt01">
+							<li>목록(list) - 주로 검색화면으로 구성</li>
+							<li>상세(detail) - 주로 검색되어진 상세값을 볼 수있음</li>
+						</ul>
+						<div class="sub-desc02">
+							같은 메타 템플릿을 사용하더라도, list이냐 detail이냐에 따라 다른 화면 나올수 있다.
+						</div>
+
+						<div class="h4-tit">
+							<h4>css 구분 기준</h4>
+						</div>
+						<ul class="list-txt01">
+							<li>기본 위치 : <strong class="gd-txt-color01">page/css</strong>
+								<ul class="list-txt01">
+									<li>- base.css : 주요 태그의 리셋, 공통 클래스</li>
+									<li>- layout.css : 화면의 레이아웃 잡는 용도</li>
+									<li>- style.css : 디자인 구현 및 각각의 컨트롤 (버튼, 테이블, 아이콘, jqgrid)</li>
+									<li>- main.css : 메인 포탈 화면. 프로젝트마다 유니크</li>
+									<li>- dashboard.css : 프로젝트에 따라 유,무가 결정되고,  프로젝트마다 유니크 함</li>
+								</ul>
+							</li>
+							<li>
+								프로젝트에 따라 변경될 경우 :  <strong class="gd-txt-color01">page/css/site</strong>
+								<ul class="list">
+									<li>- layout.css : (위를 기반으로 하여) 화면의 레이아웃 잡는 용도</li>
+									<li>- style.css : (위를 기반으로 하여) 디자인 구현 및 각각의 컨트롤, 프로젝트마다 추가되는 페이지 작업</li>
+								</ul>
+							</li>
+						</ul>
+
+						<div class="h4-tit">
+							<h4>폰트 컬러 클래스</h4>
+						</div>
+						<ul class="list-txt01">
+							<li>- 기본폰트 : <span class="font-type">맑은고딕 12px #444444</span></li>
+							<li>- 포인트컬러 1 : <strong class="font-type">맑은고딕 12px <strong class="txt-color01">#db482b</strong></strong> / <strong class="txt-color01">클래스명 : txt-color01</strong></li>
+							<li>- 포인트컬러 2 : <strong class="font-type">맑은고딕 12px <strong class="txt-color02">#4b6aa9</strong></strong> / <strong class="txt-color02">클래스명 : txt-color02</strong></li>
+							<li>- 링크컬러 1 : <strong class="font-type">맑은고딕 12px <strong class="txt-color01">#db482b</strong></strong> / <strong class="txt-color01">클래스명 : link-color01</strong></li>
+							<li>- 링크컬러 2 : <strong class="font-type">맑은고딕 12px <strong class="txt-color02">#4b6aa9</strong></strong> / <strong class="txt-color02">클래스명 : link-color02</strong></li>
+						</ul>
+						<div class="sub-desc02">
+							포인트 컬러 사용시 메타에서 color에 <strong class="gd-txt-color01">font color=”red”로 사용하지 말고</strong> 위 포인트 컬러의 클래스를 사용한다. <br />
+							일반적으로 label영역에 &lt;span class="txt-color01"&gt;글씨&lt;/span&gt; , 굵은 글씨일 경우 &lt;b&gt;태그 대신 &lt;strong class="txt-color01"&gt;글씨&lt;/strong&gt;를 사용하여 적용시켜준다.<br />
+							2가지 이상 컬러 필요시 디자이너에게 요청할 것
+						</div>
+
+						<div class="h4-tit">
+							<h4>공통 클래스</h4>
+						</div>
+						<ul class="list-txt01">
+							<li>- 폰트 왼쪽 정렬 : text-left</li>
+							<li>- 폰트 가운데 정렬 : text-center</li>
+							<li>- 폰트 오른쪽 정렬 : text-right</li>
+							<li>- 폼 태그 사용시, (수정불가)값만 뿌릴때 사용 : input-data</li>
+						</ul>
+
+						<div class="h4-tit">
+							<h4>공통 적용</h4>
+						</div>
+						<ul class="list-txt01">
+							<li>날짜 (년-월-일) 부분 : 인풋 박스 사이즈 <strong class="gd-txt-color01">73px</strong>로 통일</li>
+						</ul>
+
+						<div class="h4-tit">
+							<h4>타이틀 정의</h4>
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면" /></h5>
+							<img src="./images/ex/ex_title.gif" alt="타이틀 예시 화면" />
+						</div>
+
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<!-- 1번 - 화면 전체 타이틀 -->
+								<h1 class="ub-control title">화면 전체 타이틀</h1>
+								<!-- //1번 - 화면 전체 타이틀 -->
+
+								<!-- 2번 - 1뎁스 타이틀 -->
+								<h2 class="ub-control title">1뎁스 타이틀</h2>
+								<!-- //2번 - 1뎁스 타이틀 -->
+
+								<!-- 3번 - 2뎁스 타이틀 -->
+								<h3 class="ub-control title">2뎁스 타이틀</h3>
+								<!-- //3번 - 2뎁스 타이틀 -->
+							</pre>
+						</div>
+
+						<div class="sub-desc02">
+							<p>
+								<strong>1번 : </strong>화면 전체 타이틀<br />
+								<strong>2번 : </strong>1뎁스 타이틀. 상세화면의 접힘/펼침 기본 타이틀<br />
+								<strong>3번 : </strong>2뎁스 타이틀, 1뎁스 하위에 오는 타이틀에 사용<br />
+								<strong class="gd-txt-color01">※ 타이틀은 반드시 1,2,3번의 순서로 사용한다. 3번 블릿이 2번보다 먼저 사용될 수 없다.</strong>
+							</p>
+						</div>
+					</article>
+				</section>
+				<!-- E : 공통 -->
+			</div>
+			<!-- E : content -->
+		</div><!-- E : container -->
+	</div><!-- E : wrap -->
+</body>
+</html>

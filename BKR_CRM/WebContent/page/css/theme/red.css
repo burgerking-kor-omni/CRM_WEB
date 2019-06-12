@@ -1,0 +1,33 @@
+@charset "utf-8";
+
+/* - ver1.0 (초기버전)
+    - 헤더를 포함한 전반적인 컬러가 붉은 계열 	
+ */
+
+/* layout */
+ .ub-frame.top {border-bottom:1px solid #b20e3a; background-color:#d31145;}
+.ub-frame.top .gnb-util,
+.ub-frame.top .gnb-util span a {color:#fff;}
+.ub-frame.top .gnb-util .pw-button, 
+.ub-frame.top .gnb-util .logout-button,
+.ub-frame.top .gnb-util .lang-cd {background-image:url('../../images/theme/red/bg_util.png');}
+
+/* wide-menu 수정 */
+.ub-layout.menu.wide-menu {}
+.ub-layout.menu nav .ub-control.menu li {background-image:url('../../images/theme/red/bar_nav.png') !important;}
+.ub-layout.menu nav .ub-control.menu.depth01 li:first-child {background-image:none !important;}
+.ub-layout.menu nav .ub-control.menu.depth01 li a {color:#fff !important;}
+.ub-layout.menu nav .ub-control.menu.depth01 li:hover a,
+.ub-layout.menu nav .ub-control.menu.depth01 li a:hover {color:#d31145 !important;}
+.ub-layout.menu nav .ub-control.menu li:hover a {border-color:#b20e3a !important;}
+/* 2depth */
+.ub-layout.menu nav .ub-control.menu.depth01 .depth02 li,
+.ub-layout.menu nav .ub-control.menu.depth01 .depth03 li {background-image:none !important;}
+.ub-layout.menu nav .ub-control.menu .depth02 li a {margin:0; padding:4px 0 3px 23px !important; height:auto !important; line-height:auto !important; color:#d31145 !important; font-size:12px !important; background:url('../../images/theme/red/bul_dep02_basic.gif') no-repeat 9px 10px !important;}
+.ub-layout.menu nav .ub-control.menu.depth01 .depth02 li a:hover {color:#fff !important;}
+.ub-layout.menu nav .ub-control.menu .depth02 li a:hover {color:#fff !important; opacity:0.8; background:#dc416a url('../../images/theme/red/bul_dep02_over.gif') no-repeat 9px 10px !important;}
+/* 3depth */
+.ub-layout.menu nav .ub-control.menu.depth01 .depth03 li a {color:#444 !important;}
+.ub-layout.menu nav .ub-control.menu.depth01 .depth03 li a:hover {color:#fff !important;}
+.ub-layout.menu nav .ub-control.menu .depth03 li a {padding:3px 0 4px 30px !important; color:#444 !important; background:#fff url('../../images/site/common/bul_lastdep_basic.gif') no-repeat 20px 11px !important;}
+.ub-layout.menu nav .ub-control.menu .depth03 li a:hover {border:0; color:#fff !important; background:#a8a8a8 url('../../images/site/common/bul_lastdep_over.gif') no-repeat 20px 11px !important;}

@@ -1,0 +1,951 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ServiceManageInquiry">
+	
+	<!--
+		QueryId     : ServiceManageInquiry.getListService
+		Description : Service 목록을 조회하는 쿼리  
+	 -->
+	<sql id="getListService_base">
+		select S.SERVICE_ID               SERVICE_ID
+		     , S.SERVICE_NAME		      SERVICE_NAME
+		     , S.SERVICE_TYPE			  SERVICE_TYPE
+		     , S.DESCRIPTION              DESCRIPTION
+		     , S.CALL_TYPE			      CALL_TYPE
+		     , S.PAGING_YN                PAGING_YN
+		     , S.PAGING_COUNT             PAGING_COUNT
+		     , S.FIND_COND_SAVE_YN        FIND_COND_SAVE_YN
+		     , S.PROJECT_CODE             PROJECT_CODE
+		     , S.CATEGORY_CODE            CATEGORY_CODE
+		     , S.CLASS_NAME               CLASS_NAME
+		     , S.METHOD_NAME              METHOD_NAME
+		     , DECODE(S.LOGIN_CHECK_YN, 'Y', 'Yes', 'No')           LOGIN_CHECK_YN
+		     , S.REG_USER_ID              REG_USER_ID
+		     , S.REG_DATETIME             REG_DATETIME
+		     , S.UPD_USER_ID              UPD_USER_ID
+		     , S.UPD_DATETIME             UPD_DATETIME
+		     , (select count(*) 
+		          from AP_SERVICE_ERROR_LOG E
+		             , AP_SERVICE_RUN_LOG   R
+		         where E.ERROR_LOG_SN = R.ERROR_LOG_SN
+		           and R.SERVICE_ID   = S.SERVICE_ID)                        ERROR_COUNT
+		  from AP_SERVICE  S
+		 where 1=1
+		 	AND S.PROJECT_CODE = #{PROJECT_CODE}
+		<if test="SERVICE_ID != null and SERVICE_ID != ''" >
+		   and S.SERVICE_ID like ('%' || UPPER(#{SERVICE_ID}) || '%')
+		</if>
+		<if test="SERVICE_NAME != null and SERVICE_NAME != ''" >
+		   and S.SERVICE_NAME like ('%' || #{SERVICE_NAME} || '%')
+		</if>
+		<if test="CATEGORY_CODE != null and CATEGORY_CODE != ''" >
+		   and S.CATEGORY_CODE = #{CATEGORY_CODE}
+		</if>
+		<if test="SERVICE_TYPE != null and SERVICE_TYPE != ''" >
+		   and S.SERVICE_TYPE = #{SERVICE_TYPE}
+		</if>
+		<if test="CALL_TYPE != null and CALL_TYPE != ''" >
+		   and S.CALL_TYPE = #{CALL_TYPE}
+		</if>
+		<if test="LOGIN_CHECK_YN != null and LOGIN_CHECK_YN != ''" >
+		   and S.LOGIN_CHECK_YN = #{LOGIN_CHECK_YN}
+		</if>
+		order by REG_DATETIME DESC
+	</sql>
+
+	<!-- Service 목록 조회 -->
+	<select id="getListService" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getListService_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- Service 목록 조회 - count -->
+	<select id="getListService_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getListService_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- Service 목록 조회 - paging -->
+	<select id="getListService_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getListService_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+	Query id    : ServiceManageInquiry.getListForAutocomplete
+	Description : 서비스 자동완성 목록 조회 
+	 -->
+	<select id="getListServiceByAuto"	parameterType="map" resultType="lmap">
+		select S.SERVICE_ID      AS SERVICE_ID
+		     , S.SERVICE_TYPE    AS SERVICE_TYPE
+		     , S.CALL_TYPE       AS CALL_TYPE
+		     , S.SERVICE_NAME    AS SERVICE_NAME
+          from AP_SERVICE S
+		 where 1=1 
+		 	AND S.PROJECT_CODE = #{PROJECT_CODE}
+		<if test="SERVICE_ID != null and SERVICE_ID != ''" >
+		   and S.SERVICE_ID like ('%' || UPPER(#{SERVICE_ID}) || '%')
+		 order by SERVICE_ID ASC
+		</if>
+		<if test="SERVICE_NAME != null and SERVICE_NAME != ''" >
+		   and S.SERVICE_NAME like ('%' || #{SERVICE_NAME} || '%')
+		 order by SERVICE_NAME ASC
+		</if>
+		<if test="SEARCH_SERVICE != null and SEARCH_SERVICE != ''" >
+		   and (S.SERVICE_ID like ('%' || UPPER(#{SEARCH_SERVICE}) || '%') or S.SERVICE_NAME like ('%' || #{SEARCH_SERVICE} || '%'))
+		 order by SERVICE_ID ASC
+		</if>
+	</select>
+	
+	
+	<!--
+		Query id    : ServiceManageInquiry.registService
+		Description : 등록
+	-->
+	<insert id="registService" parameterType="map">
+		<selectKey keyProperty="SERVICE_ID" resultType="String" order="BEFORE">
+            SELECT 'SVC'||#{CATEGORY_CODE}||LPAD(MAX(maxKey), 4, '0')
+              FROM (
+                SELECT replace(SERVICE_ID, 'SVC' || #{CATEGORY_CODE}, '') +1 AS maxKey
+                  FROM AP_SERVICE
+                 WHERE SERVICE_ID like 'SVC' || #{CATEGORY_CODE} || '%'
+                 UNION
+                SELECT 0 AS maxKey FROM DUAL 
+                   ) A
+		</selectKey>
+		
+		insert into	AP_SERVICE (
+		       SERVICE_ID
+		     , SERVICE_NAME		
+		     , SERVICE_TYPE
+		     , DESCRIPTION
+		     , CALL_TYPE
+		     , PAGING_YN
+		     , PAGING_COUNT
+		     , FIND_COND_SAVE_YN
+		     , PROJECT_CODE
+		     , CATEGORY_CODE
+		     , CLASS_NAME
+		     , METHOD_NAME
+		     , LOGIN_CHECK_YN
+		     , REG_USER_ID
+		     , REG_DATETIME
+		     , UPD_USER_ID
+		     , UPD_DATETIME
+		     , IS_PROTECTED_RESOURCE
+		     , HAS_LINKED_FILE
+			 , IS_INDUCED_EVENT
+			 , LINKED_WORK_CATEGORY
+			 , LINKED_ACTIVITY_TYPE
+		<if test="IS_WORKFLOW_ENABLE == true">
+			 , IS_WORKFLOW_CREATION	
+			 , WORKFLOW_EXEC_LOCATION
+			 , WORKFLOW_BIZ_TYPE
+			 , WORKFLOW_ACTIVITY
+			 , IS_WORKFLOW_TRIGGER		
+			 , WORKFLOW_EVENT_NAME		
+			 , WORKFLOW_DETAIL_BIZ_TYPE	
+		</if>
+		<!-- <isEqual compareProperty="IS_WORKFLOW_ENABLE" compareValue="true"> -->		 
+		<!-- </isEqual> -->
+		     , ENCRYPT_COLUMNS
+		)
+		values (
+			   #{SERVICE_ID}
+		     , #{SERVICE_NAME}
+		     , #{SERVICE_TYPE}
+		     , #{DESCRIPTION}
+		     , #{CALL_TYPE}
+		     , #{PAGING_YN}
+		     , #{PAGING_COUNT:INTEGER}
+		     , #{FIND_COND_SAVE_YN}
+		     , #{PROJECT_CODE}
+		     , #{CATEGORY_CODE}
+		     , #{CLASS_NAME}
+		     , #{METHOD_NAME}
+		     , #{loginChkYn}
+		     , #{user.id}
+		     , CURRENT_TIMESTAMP
+		     , #{user.id}
+		     , CURRENT_TIMESTAMP
+		     , #{IS_PROTECTED_RESOURCE}
+		     , #{HAS_LINKED_FILE}
+			 , #{IS_INDUCED_EVENT}
+			 , #{LINKED_WORK_CATEGORY}
+			 , #{LINKED_ACTIVITY_TYPE}
+		<if test="IS_WORKFLOW_ENABLE == true">	
+			 , #{IS_WORKFLOW_CREATION}
+			 , #{WORKFLOW_EXEC_LOCATION}
+			 , #{WORKFLOW_BIZ_TYPE}
+			 , #{WORKFLOW_ACTIVITY}
+			 , #{IS_WORKFLOW_TRIGGER}
+			 , #{WORKFLOW_EVENT_NAME}	
+			 , #{WORKFLOW_DETAIL_BIZ_TYPE}
+		</if>
+		<!-- <isEqual compareProperty="IS_WORKFLOW_ENABLE" compareValue="true"> -->
+		<!-- </isEqual> -->
+		     , #{ENCRYPT_COLUMNS}
+		)
+	</insert>	
+	
+	<!--
+		Query id    : ServiceManageInquiry.getDetail
+		Description : 상세 조회
+	-->
+	<select id="getDetail" parameterType="map" resultType="lmap">
+		select S.SERVICE_ID                 SERVICE_ID
+		     , S.SERVICE_NAME		        SERVICE_NAME
+		     , S.SERVICE_TYPE               SERVICE_TYPE
+		     , S.DESCRIPTION                DESCRIPTION
+		     , S.CALL_TYPE                  CALL_TYPE
+		     , S.PAGING_YN                  PAGING_YN
+		     , S.PAGING_COUNT               PAGING_COUNT
+		     , S.FIND_COND_SAVE_YN          FIND_COND_SAVE_YN
+		     , S.PROJECT_CODE               PROJECT_CODE
+		     , S.CATEGORY_CODE              CATEGORY_CODE
+		     , S.CLASS_NAME                 CLASS_NAME
+		     , S.METHOD_NAME                METHOD_NAME
+		     , S.LOGIN_CHECK_YN             LOGIN_CHECK_YN
+		     , S.REG_USER_ID                REG_USER_ID
+		     , S.REG_DATETIME               REG_DATETIME
+		     , S.UPD_USER_ID                UPD_USER_ID
+		     , S.UPD_DATETIME               UPD_DATETIME
+		     , S.IS_PROTECTED_RESOURCE      IS_PROTECTED_RESOURCE
+		     , NVL(S.HAS_LINKED_FILE, 'N')  HAS_LINKED_FILE
+			 , NVL(S.IS_INDUCED_EVENT, 'N') IS_INDUCED_EVENT
+			 , S.LINKED_WORK_CATEGORY       LINKED_WORK_CATEGORY
+			 , S.LINKED_ACTIVITY_TYPE       LINKED_ACTIVITY_TYPE
+			 , S.IS_WORKFLOW_CREATION       IS_WORKFLOW_CREATION          		
+			 , S.WORKFLOW_EXEC_LOCATION     WORKFLOW_EXEC_LOCATION
+			 , S.WORKFLOW_BIZ_TYPE          WORKFLOW_BIZ_TYPE
+			 , S.WORKFLOW_ACTIVITY          WORKFLOW_ACTIVITY
+			 , S.IS_WORKFLOW_TRIGGER        IS_WORKFLOW_TRIGGER
+			 , S.WORKFLOW_EVENT_NAME        WORKFLOW_EVENT_NAME
+			 , S.WORKFLOW_DETAIL_BIZ_TYPE   WORKFLOW_DETAIL_BIZ_TYPE
+		     , S.ENCRYPT_COLUMNS			ENCRYPT_COLUMNS
+		  from AP_SERVICE  S
+		 where S.SERVICE_ID = #{SERVICE_ID}
+	</select>
+	
+	<!--
+		Query id    : ServiceManageInquiry.getListServiceCode
+		Description : 서비스 코드 목록 조회
+	-->
+	<sql id="getListServiceCode_base">
+		SELECT A.SERVICE_ID         SERVICE_ID
+		     , A.SERVICE_CODE_ID    SERVICE_CODE_ID
+		     , A.CODE_CATEGORY_ID   CODE_CATEGORY_ID
+		     , B.CODE_CATEGORY_NM   CODE_CATEGORY_NM
+		     , A.SLEEP_INCLUDE_YN   SLEEP_INCLUDE_YN
+		     , A.ALIAS              ALIAS
+		     , A.FILTER_VALUE       FILTER_VALUE
+		     , B.CODE_TP            CODE_TYPE
+		     , B.CODE_QUERY_CONTENT CODE_QUERY_CONTENT
+		  FROM AP_SERVICE_CODE      A
+		     , SYS_CODE_CATEGORY    B
+	     WHERE A.CODE_CATEGORY_ID = B.CODE_CATEGORY_ID (+)
+		<if test="SERVICE_ID != null and SERVICE_ID != ''" >
+		   AND A.SERVICE_ID = #{SERVICE_ID} 
+		</if>
+		order by CODE_CATEGORY_ID
+	</sql>
+	
+	<!-- Service Code 목록 조회 -->
+	<select id="getListServiceCode" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getListServiceCode_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- Service Code 목록 조회 - count -->
+	<select id="getListServiceCode_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getListServiceCode_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- Service Code 목록 조회 - paging -->
+	<select id="getListServiceCode_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getListServiceCode_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!-- Service Code 상세 코드 조회 -->
+	<select id="getCodeDetailList" parameterType="map" resultType="lmap">
+	    SELECT CODE
+		     , CODE_NAME
+		     , PARENT_CODE
+		     , STATUS
+		  FROM SYS_CODE
+		 WHERE CODE_CATEGORY_ID = #{CODE_CATEGORY_ID}
+         ORDER BY SORT_ORDER ASC
+	</select>
+	
+	<!--
+		QueryId     : ServiceManageInquiry.getListCodeCategoryByAuto (AutoComplete)
+		Description : Code Category 목록을 조회하는 쿼리  
+	 -->
+	<select id="getListCodeCategoryByAuto" parameterType="map" resultType="lmap">
+		SELECT 
+		       CODE_CATEGORY_ID AS CODE_CATEGORY_ID 
+		     , CODE_CATEGORY_NM    AS CODE_CATEGORY_NM
+		  FROM SYS_CODE_CATEGORY
+         WHERE STATUS = 'A'
+		<if test="CODE_CATEGORY_ID != null and CODE_CATEGORY_ID != ''">
+		   AND UPPER(CODE_CATEGORY_ID) LIKE '%' || UPPER(#{CODE_CATEGORY_ID}) || '%'
+		   OR CODE_CATEGORY_NM LIKE '%' || #{CODE_CATEGORY_ID} ||'%'
+		</if> 
+		 ORDER BY CODE_CATEGORY_ID
+	</select>
+	
+	<!--
+		Query id    : ServiceManageInquiry.getScreenList
+		Description : 화면 파라미터 목록 조회
+	-->
+	<select id="getScreenList" parameterType="map" resultType="lmap">
+		SELECT S.CATEGORY_CODE AS CATEGORY_CODE,
+		       S.SCREEN_ID AS SCREEN_ID,
+		       S.SCREEN_NAME AS SCREEN_NAME,
+		       S.SCREEN_TYPE AS SCREEN_TYPE,
+		       S.VIEW_TYPE AS VIEW_TYPE,
+		       S.REG_DATETIME AS REG_DATETIME
+		  FROM AP_SCREEN S, AP_SCREEN_FUNCTION SF, AP_FUNCTION F
+		 WHERE S.SCREEN_ID = SF.SCREEN_ID
+		   AND SF.FUNCTION_ID = F.FUNCTION_ID
+		   AND F.SERVICE_ID = #{SERVICE_ID}
+	</select>
+	
+	<!--
+		Query id    : ServiceManageInquiry.modifyService
+		Description : 수정
+	-->
+	<update id="modifyService" parameterType="map">
+		update AP_SERVICE
+		   set SERVICE_NAME             = #{SERVICE_NAME}
+		     , SERVICE_TYPE             = #{SERVICE_TYPE}
+		     , DESCRIPTION              = #{DESCRIPTION}
+		     , CALL_TYPE                = #{CALL_TYPE}
+		     , PAGING_YN                = #{PAGING_YN}
+		     , PAGING_COUNT             = #{PAGING_COUNT}
+		     , FIND_COND_SAVE_YN        = #{FIND_COND_SAVE_YN}
+		     , CLASS_NAME               = #{CLASS_NAME}
+		     , METHOD_NAME              = #{METHOD_NAME}
+		     , LOGIN_CHECK_YN           = #{loginChkYn}
+		     , UPD_USER_ID              = #{user.id}
+		     , UPD_DATETIME             = CURRENT_TIMESTAMP
+		     , IS_PROTECTED_RESOURCE    = #{IS_PROTECTED_RESOURCE}
+		     , HAS_LINKED_FILE          = #{HAS_LINKED_FILE}
+			 , IS_INDUCED_EVENT         = #{IS_INDUCED_EVENT}
+			 , LINKED_WORK_CATEGORY     = #{LINKED_WORK_CATEGORY}
+			 , LINKED_ACTIVITY_TYPE     = #{LINKED_ACTIVITY_TYPE}
+		<if test="IS_WORKFLOW_ENABLE == true">
+			 , IS_WORKFLOW_CREATION     = #{IS_WORKFLOW_CREATION}
+			 , WORKFLOW_EXEC_LOCATION   = #{WORKFLOW_EXEC_LOCATION}
+			 , WORKFLOW_BIZ_TYPE        = #{WORKFLOW_BIZ_TYPE}
+			 , WORKFLOW_ACTIVITY        = #{WORKFLOW_ACTIVITY}
+			 , IS_WORKFLOW_TRIGGER      = #{IS_WORKFLOW_TRIGGER}
+			 , WORKFLOW_EVENT_NAME      = #{WORKFLOW_EVENT_NAME}
+			 , WORKFLOW_DETAIL_BIZ_TYPE = #{WORKFLOW_DETAIL_BIZ_TYPE}
+		</if>
+		<!-- <isEqual compareProperty="IS_WORKFLOW_ENABLE" compareValue="true"></isEqual> -->
+		     , ENCRYPT_COLUMNS          = #{ENCRYPT_COLUMNS}
+		 where SERVICE_ID = #{SERVICE_ID}
+	</update>
+	
+	<!--
+		Query id    : ServiceManageInquiry.removeService
+		Description : 삭제
+	-->
+	<delete id="removeService" parameterType="map">
+		delete from AP_SERVICE
+		 where SERVICE_ID = #{SERVICE_ID}
+	</delete>
+	
+	<!--
+		Query id    : ServiceManageInquiry.removeAllFunction
+		Description : 삭제
+	-->
+	<delete id="removeAllFunction" parameterType="map">
+		delete from AP_FUNCTION
+		 where SERVICE_ID = #{SERVICE_ID}
+	</delete>
+	
+	<!--
+		Query id    : ServiceManageInquiry.removeAllServiceMask
+		Description : 삭제
+	-->
+	<delete id="removeAllServiceMask" parameterType="map">
+		delete from AP_SERVICE_MASK
+		 where SERVICE_ID = #{SERVICE_ID}
+	</delete>
+	
+	<!--
+		QueryId     : ServiceManageInquiry.getListServiceError
+		Description : Service 실행 에러 로그 목록을 조회하는 쿼리  
+	 -->
+	<sql id="getListServiceError_base">
+		select R.RUN_LOG_SN              RUN_LOG_SN
+		     , R.SERVICE_ID              SERVICE_ID
+		     , R.LOGIN_ID		         LOGIN_ID
+		     , U.USER_NM		         USER_NM
+		     , R.CLIENT_IP_ADDR          CLIENT_IP_ADDR
+		     , R.RUN_DATETIME            RUN_DATETIME
+		     , R.RUN_ELAPSE_TIME         RUN_ELAPSE_TIME
+		     , decode(R.RUN_RESULT_CODE, 'S', 'Success', 'R', 'Reject', 'Fail')
+		                                 RUN_RESULT_CODE
+		     , E.ERROR_LOG_SN            ERROR_LOG_SN
+		     , E.ERROR_CLASS_NAME        ERROR_CLASS_NAME
+		     , E.ERROR_MESSAGE           ERROR_MESSAGE
+		     , E.PARAMETER_INFO_SNAPSHOT PARAMETER_INFO_SNAPSHOT
+		  from AP_SERVICE_RUN_LOG        R
+		     , SYS_USER                  U
+		     , AP_SERVICE_ERROR_LOG      E
+		 where R.SERVICE_ID            = #{SERVICE_ID} 
+		   and R.LOGIN_ID              = U.USER_ID (+)
+		   and R.ERROR_LOG_SN          = E.ERROR_LOG_SN (+)
+		   and R.RUN_RESULT_CODE       = 'F'
+		order by R.REG_DATETIME DESC
+	</sql>
+	
+	<!-- Service Error 목록 조회 -->
+	<select id="getListServiceError" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getListServiceError_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- Service Error 목록 조회 - count -->
+	<select id="getListServiceError_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getListServiceError_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- Service Error 목록 조회 - paging -->
+	<select id="getListServiceError_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getListServiceError_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		QueryId     : ServiceManageInquiry.getServiceCode
+		Description : Service Code 상세정보를 조회하는 쿼리  
+	 -->
+	<select id="getServiceCode" parameterType="map" resultType="lmap">
+		SELECT A.SERVICE_ID         SERVICE_ID
+		     , A.SERVICE_CODE_ID    SERVICE_CODE_ID
+		     , A.CODE_CATEGORY_ID   CODE_CATEGORY_ID
+		     , B.CODE_CATEGORY_NM   CODE_CATEGORY_NAME
+		     , A.SLEEP_INCLUDE_YN   SLEEP_INCLUDE_YN
+		     , A.ALIAS              ALIAS
+		     , A.FILTER_VALUE       FILTER_VALUE
+		     , B.CODE_TP            CODE_TYPE
+		     , B.CODE_QUERY_CONTENT CODE_QUERY_CONTENT
+		  FROM AP_SERVICE_CODE      A
+		     , SYS_CODE_CATEGORY    B
+	     WHERE A.CODE_CATEGORY_ID = B.CODE_CATEGORY_ID (+)
+		   AND A.SERVICE_CODE_ID = #{SERVICE_CODE_ID}
+		   AND A.SERVICE_ID      = #{SERVICE_ID}
+	</select>
+
+	<!--
+		QueryId     : ServiceManageInquiry.modifyServiceCode
+		Description : Service Code 정보를 수정하는 쿼리  
+	 -->
+	<update id="modifyServiceCode" parameterType="map">
+		update AP_SERVICE_CODE
+		   set CODE_CATEGORY_ID = #{CODE_CATEGORY_ID}
+		     , SLEEP_INCLUDE_YN = #{SLEEP_INCLUDE_YN}
+		     , ALIAS            = #{ALIAS}
+		     , FILTER_VALUE     = #{FILTER_VALUE}
+		     , UPD_USER_ID      = #{user.id}
+		     , UPD_DATETIME     = CURRENT_TIMESTAMP
+		 where SERVICE_CODE_ID  = #{SERVICE_CODE_ID}
+	</update>
+
+	<!--
+		QueryId     : ServiceManageInquiry.registServiceCode
+		Description : Service Code 등록하는 쿼리  
+	 -->
+	<insert id="registServiceCode" parameterType="map">
+	    <selectKey keyProperty="SERVICE_CODE_ID" resultType="String" order="BEFORE">
+            SELECT NVL(MAX(SERVICE_CODE_ID)+1, 1) FROM AP_SERVICE_CODE 
+		</selectKey>
+		INSERT INTO AP_SERVICE_CODE (
+		       SERVICE_ID
+		     , SERVICE_CODE_ID
+		     , CODE_CATEGORY_ID
+		     , SLEEP_INCLUDE_YN
+		     , ALIAS
+		     , FILTER_VALUE
+		     , REG_USER_ID
+		     , REG_DATETIME
+		     , UPD_USER_ID
+		     , UPD_DATETIME
+		)
+		VALUES (
+		       #{SERVICE_ID}
+		     , #{SERVICE_CODE_ID}
+		     , #{CODE_CATEGORY_ID}
+		     , NVL(#{SLEEP_INCLUDE_YN}, 'N')
+		     , #{ALIAS}
+		     , #{FILTER_VALUE}
+		     , #{user.id}
+		     , CURRENT_TIMESTAMP
+		     , #{user.id}
+		     , CURRENT_TIMESTAMP
+		)
+	</insert>
+	
+	<!--
+		QueryId     : ServiceManageInquiry.removeServiceCode
+		Description : Service Code 삭제하는 쿼리  
+	 -->
+	<delete id="removeServiceCode" parameterType="map">
+		delete AP_SERVICE_CODE
+		 where SERVICE_CODE_ID = #{SERVICE_CODE_ID}
+	</delete>
+	
+	<!--
+		QueryId     : ServiceManageInquiry.removeAllServiceCode
+		Description : 해당 Service 전체 Service Code 삭제하는 쿼리  
+	 -->
+	<delete id="removeAllServiceCode" parameterType="map">
+		delete AP_SERVICE_CODE
+		 where SERVICE_ID = #{SERVICE_ID}
+	</delete>
+	
+	<!--
+		QueryId     : ServiceManageInquiry.getMaskingList
+		Description : 해당 Service 마스킹 목록을 조회하는 쿼리  
+	 -->
+	<sql id="getMaskingList_base">
+		SELECT 
+		          SERVICE_ID
+		        , SERVICE_MASK_ID
+		        , (SELECT CODE_NAME
+                 		FROM SYS_CODE
+                  		WHERE CODE_CATEGORY_ID='CD_POINTCUT' AND CODE=POINTCUT_CD ) AS POINTCUT_CD
+		        , DATALIST_ID
+		        , COLUMN_NAME
+		        , MASK_ID
+		        , (SELECT NM_MASK FROM SYS_MASK WHERE ID_MASK = MASK_ID) AS MASK_NAME
+		    FROM AP_SERVICE_MASK
+		    WHERE SERVICE_ID = #{SERVICE_ID}
+		    ORDER BY REG_DATETIME DESC
+	</sql>
+	
+	<!-- Service 마스킹 목록 조회 -->
+	<select id="getMaskingList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getMaskingList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- Service 마스킹 목록 조회 - count -->
+	<select id="getMaskingList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getMaskingList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- Service 마스킹 목록 조회 - paging -->
+	<select id="getMaskingList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getMaskingList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		QueryId     : ServiceManageInquiry.getMaskingColumn
+		Description : Service Masking Column 상세정보 조회하는 쿼리
+	 -->
+	<select id="getMaskingColumn" parameterType="map" resultType="lmap">
+		SELECT 
+				  SERVICE_ID
+				, SERVICE_MASK_ID
+				, POINTCUT_CD
+				, DATALIST_ID
+				, COLUMN_NAME
+				, MASK_ID
+				, (SELECT NM_MASK FROM SYS_MASK WHERE ID_MASK = MASK_ID) AS MASK_NAME
+			FROM AP_SERVICE_MASK
+			WHERE SERVICE_MASK_ID = #{SERVICE_MASK_ID}
+				AND SERVICE_ID = #{SERVICE_ID}
+	</select>
+	
+	<!--
+		QueryId     : ServiceManageInquiry.checkMaskingColumn
+		Description : Service Masking Column 중복여부를 조회하는 쿼리
+	 -->
+	<select id="checkMaskingColumn" parameterType="map" resultType="lmap">
+		SELECT COUNT(*) AS MASK_COUNT
+			FROM AP_SERVICE_MASK
+			WHERE SERVICE_ID = #{SERVICE_ID}
+				AND DATALIST_ID = #{DATALIST_ID}
+				AND COLUMN_NAME = #{COLUMN_NAME}
+	</select>
+	
+	<!--
+		QueryId     : ServiceManageInquiry.insertMaskingColumn
+		Description : 해당 Service 마스킹 컬럼을 등록하는 쿼리
+	 -->
+	<insert id="insertMaskingColumn" parameterType="map">
+		<selectKey keyProperty="SERVICE_MASK_ID" resultType="String" order="BEFORE">
+            SELECT 'MSK'||LPAD(MAX(maxKey), 4, '0')
+              FROM (
+                SELECT replace(SERVICE_MASK_ID, 'MSK' , '') +1 AS maxKey
+                  FROM AP_SERVICE_MASK
+                 WHERE SERVICE_MASK_ID like 'MSK' || '%'
+                 UNION
+                SELECT 0 AS maxKey FROM DUAL 
+                   ) A
+		</selectKey>
+		INSERT INTO AP_SERVICE_MASK(
+				  SERVICE_ID
+				, SERVICE_MASK_ID
+				, POINTCUT_CD
+				, DATALIST_ID
+				, COLUMN_NAME
+				, MASK_ID
+				, REG_USER_ID
+				, REG_DATETIME
+				, UPD_USER_ID
+				, UPD_DATETIME
+			)VALUES(
+				  #{SERVICE_ID}
+				, #{SERVICE_MASK_ID}
+				, #{POINTCUT_CD}
+				, #{DATALIST_ID}
+				, #{COLUMN_NAME}
+				, #{MASK_ID}
+				, #{user.id}
+				, CURRENT_TIMESTAMP
+				, #{user.id}
+				, CURRENT_TIMESTAMP
+			)
+	</insert>
+	
+	<!--
+		QueryId     : ServiceManageInquiry.updateMaskingColumn
+		Description : 해당 Service 마스킹 컬럼을 수정하는 쿼리
+	 -->
+	<update id="updateMaskingColumn" parameterType="map">
+		UPDATE AP_SERVICE_MASK SET
+				  POINTCUT_CD = #{POINTCUT_CD}
+				, DATALIST_ID = #{DATALIST_ID}
+				, COLUMN_NAME = #{COLUMN_NAME}
+				, MASK_ID     = #{MASK_ID}
+				, UPD_USER_ID = #{user.id}
+				, UPD_DATETIME = CURRENT_TIMESTAMP
+			WHERE SERVICE_ID = #{SERVICE_ID}
+				AND SERVICE_MASK_ID = #{SERVICE_MASK_ID}
+	</update>
+	
+	<!--
+		QueryId     : ServiceManageInquiry.deleteMaskingColumn
+		Description : 해당 Service 마스킹 컬럼을 삭제하는 쿼리
+	 -->
+	<delete id="deleteMaskingColumn" parameterType="map">
+		DELETE FROM AP_SERVICE_MASK
+			WHERE SERVICE_MASK_ID = #{SERVICE_MASK_ID}
+	</delete>
+	
+	<select id="getDataConvertListBefore" parameterType="map" resultType="lmap">
+	    SELECT SC.SERVICE_ID
+		     , SC.SERVICE_CRYPTO_ID
+		     , SC.POINTCUT_CD
+		     , SC.PARAMETER_NAME
+		     , (SELECT CODE_NAME FROM SYS_CODE WHERE CODE_CATEGORY_ID = 'CD_CRYPTO_TYPE' AND CODE = SC.CRYPTO_TYPE) AS CRYPTO_TYPE
+		     , (SELECT CODE_NAME FROM SYS_CODE WHERE CODE_CATEGORY_ID = 'CD_CRYPTO_MODE' AND CODE = SC.CRYPTO_MODE) AS CRYPTO_MODE 
+		  FROM AP_SERVICE_CRYPTO SC
+		 WHERE SERVICE_ID = #{SERVICE_ID}
+		   AND POINTCUT_CD = #{POINTCUT_CD}
+		 ORDER BY REG_DATETIME DESC
+	</select>
+	
+	<select id="getDataConvertListAfter" parameterType="map" resultType="lmap">
+	    SELECT ASM.SERVICE_ID
+		     , ASM.SERVICE_MASK_ID
+		     , ASM.POINTCUT_CD
+		     , ASM.DATALIST_ID
+		     , ASM.COLUMN_NAME
+		     , ASM.MASK_ID
+		     , SM.NM_MASK
+		  FROM AP_SERVICE_MASK ASM
+		  LEFT OUTER JOIN SYS_MASK SM
+		    ON ASM.MASK_ID = SM.ID_MASK
+		 WHERE SERVICE_ID = #{SERVICE_ID}
+		   AND POINTCUT_CD = #{POINTCUT_CD}
+		 
+		 ORDER BY REG_DATETIME DESC
+	</select>
+	
+	<insert id="insertDataConvertBefore" parameterType="map">
+		<selectKey keyProperty="SERVICE_CRYPTO_ID" resultType="String" order="BEFORE">
+            SELECT 'CRT'||LPAD(MAX(maxKey), 4, '0')
+              FROM (
+                SELECT replace(SERVICE_CRYPTO_ID, 'CRT' , '') +1 AS maxKey
+                  FROM AP_SERVICE_CRYPTO
+                 WHERE SERVICE_CRYPTO_ID like 'CRT' || '%'
+                 UNION
+                SELECT 0 AS maxKey FROM DUAL 
+                   ) A
+		</selectKey>
+		INSERT INTO AP_SERVICE_CRYPTO(
+				  SERVICE_ID
+				, SERVICE_CRYPTO_ID
+				, POINTCUT_CD
+				, PARAMETER_NAME
+				, CRYPTO_TYPE
+				, CRYPTO_MODE
+				, REG_USER_ID
+				, REG_DATETIME
+				, UPD_USER_ID
+				, UPD_DATETIME
+			)VALUES(
+				  #{SERVICE_ID}
+				, #{SERVICE_CRYPTO_ID}
+				, #{POINTCUT_CD}
+				, #{PARAMETER_NAME}
+				, #{CRYPTO_TYPE}
+				, #{CRYPTO_MODE}
+				, #{user.id}
+				, CURRENT_TIMESTAMP
+				, #{user.id}
+				, CURRENT_TIMESTAMP
+			)
+	</insert>
+	
+	<insert id="insertDataConvertAfter" parameterType="map">
+		<selectKey keyProperty="SERVICE_MASK_ID" resultType="String" order="BEFORE">
+            SELECT 'MSK'||LPAD(MAX(maxKey), 4, '0')
+              FROM (
+                SELECT replace(SERVICE_MASK_ID, 'MSK' , '') +1 AS maxKey
+                  FROM AP_SERVICE_MASK
+                 WHERE SERVICE_MASK_ID like 'MSK' || '%'
+                 UNION
+                SELECT 0 AS maxKey FROM DUAL 
+                   ) A
+		</selectKey>
+		INSERT INTO AP_SERVICE_MASK(
+				  SERVICE_ID
+				, SERVICE_MASK_ID
+				, POINTCUT_CD
+				, DATALIST_ID
+				, COLUMN_NAME
+				, MASK_ID
+				, REG_USER_ID
+				, REG_DATETIME
+				, UPD_USER_ID
+				, UPD_DATETIME
+			)VALUES(
+				  #{SERVICE_ID}
+				, #{SERVICE_MASK_ID}
+				, #{POINTCUT_CD}
+				, #{DATALIST_ID}
+				, #{COLUMN_NAME}
+				, #{MASK_ID}
+				, #{user.id}
+				, CURRENT_TIMESTAMP
+				, #{user.id}
+				, CURRENT_TIMESTAMP
+			)
+	</insert>
+	
+	<delete id="deleteDataConvertBefore" parameterType="map">
+	    DELETE 
+	      FROM AP_SERVICE_CRYPTO
+		 WHERE SERVICE_ID = #{SERVICE_ID} 
+		   AND SERVICE_CRYPTO_ID = #{SERVICE_CRYPTO_ID}
+	</delete>
+	
+	<delete id="deleteDataConvertAfter" parameterType="map">
+	    DELETE 
+	      FROM AP_SERVICE_MASK
+		 WHERE SERVICE_ID = #{SERVICE_ID} 
+		   AND SERVICE_MASK_ID = #{SERVICE_MASK_ID}
+	</delete>
+	
+	
+	
+	<!--
+		QueryId     : ServiceManageInquiry.getPointCutCodeList
+		Description : 적용위치 코드 리스트를 호출하는 쿼리
+	 -->
+	<select id="getPointCutCodeList"	parameterType="map" resultType="lmap">
+		SELECT CODE, CODE_NAME FROM SYS_CODE WHERE CODE_CATEGORY_ID = 'CD_POINTCUT' AND STATUS = 'A'
+	</select>
+	
+	<!--
+		QueryId     : ServiceManageInquiry.getMaskByAuto
+		Description : 마스크 정보 목록을 조회하는 쿼리 (AutoComplete)
+	 -->
+	<select id="getMaskByAuto"	parameterType="map" resultType="lmap">
+		select 
+				  ID_MASK
+				, NM_MASK
+			FROM SYS_MASK
+		 where 1=1 
+		<if test="NM_MASK != null and NM_MASK != ''" >
+		   and NM_MASK like ('%' || #{NM_MASK} || '%') or ID_MASK like('%' || UPPER(#{NM_MASK}) || '%')
+		</if>
+
+	</select>
+	
+	<!--
+		QueryId     : ServiceManageInquiry.getMaskList
+		Description : 마스크 정보 목록을 조회하는 쿼리
+	 -->
+	<select id="getMaskList" parameterType="map" resultType="lmap">
+		SELECT 
+                  ID_MASK
+                , NM_MASK
+                , '['|| ID_MASK || '] ' ||NM_MASK AS LABEL
+            FROM SYS_MASK
+	</select>
+	
+	<!--
+		QueryId     : ServiceManageInquiry.getServiceQueryList
+		Description : 해당 Service 쿼리 목록을 조회하는 쿼리  
+	 -->
+	<sql id="getServiceQueryList_base">
+		select Q.SERVICE_ID  SERVICE_ID
+		     , Q.QUERY_ID    QUERY_ID
+		     , (SELECT CODE_NAME
+                 		FROM SYS_CODE
+                  		WHERE CODE_CATEGORY_ID='APMD_QUERY_TYPE' AND CODE=Q.QUERY_TYPE ) AS  QUERY_TYPE
+			 , Q.RUN_ORDER   RUN_ORDER
+			 , Q.DATALIST_ID DATALIST_ID
+		  from AP_SERVICE_QUERY Q
+		 where 1 = 1
+		<if test="primary_key != null and primary_key != ''" >
+		   and SERVICE_ID = #{primary_key}
+		</if>
+		<if test="SERVICE_ID != null and SERVICE_ID != ''" >
+		   and SERVICE_ID = #{SERVICE_ID}
+		</if>
+		<if test="QUERY_ID != null and QUERY_ID != ''" >
+		   and QUERY_ID = #{QUERY_ID}
+		</if>
+		order by RUN_ORDER
+	</sql>
+	
+	<!-- Service 쿼리 목록 조회 -->
+	<select id="getServiceQueryList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getServiceQueryList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- Service 쿼리 목록 조회 - count -->
+	<select id="getServiceQueryList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getServiceQueryList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- Service 쿼리 목록 조회 - paging -->
+	<select id="getServiceQueryList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getServiceQueryList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		QueryId     : ServiceManageInquiry.getServiceQueryDetail
+		Description : 해당 Service 쿼리 상세정보를 조회하는 쿼리  
+	 -->
+	<select id="getServiceQueryDetail" parameterType="map" resultType="lmap">
+		select SERVICE_ID  as SERVICE_ID
+		     , QUERY_ID    as QUERY_ID
+		     , QUERY_TYPE  as QUERY_TYPE
+			 , RUN_ORDER   as RUN_ORDER
+			 , DATALIST_ID as DATALIST_ID
+		  from AP_SERVICE_QUERY
+		 where SERVICE_ID = #{SERVICE_ID}
+		 	AND QUERY_ID = #{QUERY_ID}
+	</select>
+	
+	<!--
+		Query id    : ServiceManageInquiry.isDuplicatedServiceQuery
+		Description : Service 쿼리 중복 조회
+	-->
+	<select id="isDuplicatedServiceQuery" parameterType="map" resultType="lmap">
+		select count(*) count
+		  from AP_SERVICE_QUERY
+	     where SERVICE_ID = #{SERVICE_ID}
+	       and QUERY_ID   = #{QUERY_ID}
+	</select>
+	
+	<!--
+		Query id    : ServiceManageInquiry.insertServiceQuery
+		Description : 서비스 쿼리 등록
+	-->
+	<insert id="insertServiceQuery" parameterType="map">
+		insert into AP_SERVICE_QUERY (
+			  SERVICE_ID
+			, QUERY_ID
+			, QUERY_TYPE
+			, RUN_ORDER
+			, DATALIST_ID
+			, REG_USER_ID
+			, REG_DATETIME
+			, UPD_USER_ID
+			, UPD_DATETIME
+		)
+		values (
+			  #{SERVICE_ID}
+			, #{QUERY_ID}
+			, #{QUERY_TYPE}
+			, #{RUN_ORDER}
+			, #{DATALIST_ID}
+			, #{user.id}
+			, CURRENT_TIMESTAMP
+			, #{user.id}
+			, CURRENT_TIMESTAMP
+		)
+	</insert>
+	
+	<!--
+		Query id    : ServiceManageInquiry.updateServiceQuery
+		Description : 서비스 쿼리 수정
+	-->
+	<update id="updateServiceQuery" parameterType="map">
+		update AP_SERVICE_QUERY
+		   set QUERY_TYPE   = #{QUERY_TYPE}
+		     , RUN_ORDER    = #{RUN_ORDER}
+		     , DATALIST_ID  = #{DATALIST_ID}
+		     , UPD_USER_ID  = #{user.id}
+		     , UPD_DATETIME = CURRENT_TIMESTAMP
+		 where SERVICE_ID   = #{SERVICE_ID}
+		   and QUERY_ID     = #{QUERY_ID}
+	</update>
+		
+	<!--
+		Query id    : ServiceManageInquiry.deleteServiceQuery
+		Description : 서비스 쿼리 삭제
+	-->
+	<delete id="deleteServiceQuery" parameterType="map">
+		delete AP_SERVICE_QUERY
+		 where SERVICE_ID = #{SERVICE_ID}
+		   and QUERY_ID   = #{QUERY_ID}
+	</delete>
+	
+	<!--
+		Query id    : ServiceManageInquiry.deleteAllServiceQuery
+		Description : 서비스에 사용된 모든 서비스 쿼리 삭제
+	-->
+	<delete id="deleteAllServiceQuery" parameterType="map">
+		delete AP_SERVICE_QUERY
+		 where SERVICE_ID = #{SERVICE_ID}
+	</delete>
+	
+	
+</mapper>

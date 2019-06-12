@@ -1,0 +1,317 @@
+##########################################################
+	
+		Release Note ub-framework		Ver 0.2.1
+
+								Author : 강 영 운.
+								
+##########################################################
+2012-07-30 ver 0.2.2 :
+	1. 서비스 데이터 암복호화 기능 추가
+		1.1. DB 스키마 변경 (AP_SERVICE 테이블 변경)
+			ALTER TABLE AP_SERVICE ADD (ENCRYPT_PROC_TYPE  VARCHAR2(10));
+			ALTER TABLE AP_SERVICE ADD (ENCRYPT_COLUMNS  VARCHAR2(2000));
+
+			COMMENT ON COLUMN AP_SERVICE.ENCRYPT_PROC_TYPE IS '암호화처리유형';
+			COMMENT ON COLUMN AP_SERVICE.ENCRYPT_COLUMNS IS '암호화대상컬럼';
+
+			Insert into AP_CODE_CATEGORY
+			   (CODE_CATEGORY_ID, CODE_TYPE, CODE_CATEGORY_NAME, STATUS, REG_USER_ID, REG_DATETIME, UPD_USER_ID, UPD_DATETIME, CACHE_YN, ENUM_CLASS_NAME)
+			 Values
+			   ('ENCRYPT_PROC_TYPE', 'EN', '암호화 처리유형', 'A', 'anonymous', TO_TIMESTAMP('2012-07-30 오후 1:48:16.062000','YYYY-MM-DD AM fmHH12fm:MI:SS.FF'), 'anonymous', TO_TIMESTAMP('2012-07-30 오후 1:48:16.062000','YYYY-MM-DD AM fmHH12fm:MI:SS.FF'), 'Y', 'com.ubone.framework.engine.domain.EncryptProcType');
+		
+		1.2. APMD WEB 화면 변경
+			- 서비스 등록/상세 화면 컬럼 추가 (암호화처리유형/암호화대상컬럼)
+			- 관련 화면 : 
+				서비스 등록/상세 화면
+		
+		1.3. 설정파일 신규 추가
+		    - /src.resource/resource/config/spring/applicationContext-core-crypto.xml 
+		    
+		1.4. framework 쿼리 파일 수정
+			- /src.resource/resource/config/framework/framework-query-oracle.xml
+
+			<entry key="query.service.definition">
+				SELECT SERVICE_ID                       serviceId
+				     , SERVICE_NAME                     serviceName
+				     , SERVICE_TYPE                     serviceType
+				     , CALL_TYPE                        callType
+				     , CLASS_NAME                       className
+				     , METHOD_NAME                      methodName
+				     , nvl(PAGING_YN, 'N')              isPaging
+				     , PAGING_COUNT                     pagingCount
+				     , nvl(FIND_COND_SAVE_YN, 'N')      isFindConditionSave
+				     , UPD_DATETIME                     lastUpdateTimestamp
+				     , nvl(IS_PROTECTED_RESOURCE, 'N')  isProtectedResource
+				     , nvl(HAS_LINKED_FILE, 'N')        hasLinkedFile
+				     , nvl(IS_INDUCED_EVENT, 'N')       isInducedEvent
+				     , LINKED_WORK_CATEGORY             linkedWorkCategory
+				     , LINKED_ACTIVITY_TYPE             linkedWorkActivityType
+				     , nvl(IS_WORKFLOW_CREATION, 'N')	isWorkflowCreation
+				     , nvl(WORKFLOW_EXEC_LOCATION, 'T') workflowExecLocation
+				     , WORKFLOW_BIZ_TYPE				workflowBizType
+				     , WORKFLOW_ACTIVITY				workflowActivity
+				     , nvl(IS_WORKFLOW_TRIGGER, 'N')	isWorkflowTrigger
+				     , WORKFLOW_EVENT_NAME				workflowEventName
+				     , WORKFLOW_DETAIL_BIZ_TYPE			workflowDetailBizType
+				     , nvl(ENCRYPT_PROC_TYPE, '')		encryptProcType				<!-- 신규추가 -->
+				     , nvl(ENCRYPT_COLUMNS, '')			encryptColumns				<!-- 신규추가 -->
+				  FROM AP_SERVICE
+				 WHERE SERVICE_ID = :serviceId
+			</entry>
+
+		1.5. framework 신규 소스
+			- /src.framework/com/ubone/framework/engine/domain/EncryptProcType.java
+			- /src.framework/com/ubone/framework/data/crypto/BasicDataCrypto.java
+			- /src.framework/com/ubone/framework/data/crypto/DataCrypto.java
+			- /src.framework/com/ubone/framework/data/crypto/DataCryptoFactory.java
+			- /src.framework/com/ubone/framework/data/crypto/UbMetaDataCrypto.java
+			
+		1.6. framework 수정 소스
+			- /src.framework/com/ubone/framework/dao/CombinedProcessRowHandler.java
+			- /src.framework/com/ubone/framework/dao/SqlMapClientDaoSupportBase.java
+			- /src.framework/com/ubone/framework/data/BasicParameter.java
+			- /src.framework/com/ubone/framework/data/Parameter.java
+			- /src.framework/com/ubone/framework/engine/domain/Service.java
+			- /src.framework/com/ubone/framework/engine/domain/ServiceBuilder.java
+			- /src.framework/com/ubone/framework/engine/service/JdbcServiceRepository.java
+			
+
+2012-07-23 ver 0.2.1 :
+	1. 로그인 로그 항목 추가
+		- loginBrowser 신규 추가
+		
+		- /src.resource/resource/config/framework/framework-query-UB-SFA-oracle.xml
+		- query.application.login.login 쿼리에 항목 추가
+		
+		<entry key="query.application.login.login">
+			insert into SYS_LOGIN_LOG (
+				  LOG_ID
+				, LOGIN_DT
+				, LOGIN_IP
+				, LOGIN_ID
+				, LOGIN_SESSION_ID
+				, LOGIN_BROWSER					<!-- 신규 컬럼 추가 varchar(100) -->
+			)
+			values (
+				  SEQ_SYS_LOGIN_LOG.nextval
+				, :loginTimeStamp
+				, :loginClientIp
+				, :loginId
+				, :sessionId
+				, :loginBrowser					<!-- 신규 파라미터 -->
+			)
+		</entry>
+
+2012-07-23 ver 0.2.1 :
+	1. Bad Request 체크 추가
+		- com.ubone.framework.security.BadRequestProcessingFilter   
+		- com.ubone.framework.security.BadRequestException
+		
+		참고사항) 
+			Bad Request 체크는 Request-Header의 Referer정보를 체크하여 해당 정보가 없으면, 
+		    Browser에서 강제로 URL을 변경하여 요청하거나 다른 형태의 접근을 함을 의미하기에 해당 요청을 Bad Request로 간주하여 필터에서 제외한다.
+		       
+		         단, 팝업을 띄울대는 새로은 부라우져가 띄워지는 것과 같기 때문에 referer정보가 들어오지 않는다.
+		         팝업을 띄울때는 frame페이지를 구성하거나 referer 정보를 강제로 생성시키기 위해서는 팝업이 뜰때 한번더 우회를 해주어야 한다.
+		
+			예) /screen/TST0001.ub?a=1&b=2
+			   --> "/mainPopup.jsp?url=" + encodeURIComponent('/screen/TST0001.ub?a=1&b=2')
+		
+		관련파일 )
+			- /WebContent/WEB-INF/lib/ub-framework-0.2.1.jar
+
+			- /WebContent/mainPopup.jsp
+			- /WebContent/uxl/uxl-core-1.2.0.js
+			- /WebContent/login/badRequest.jsp
+
+			- /src.resource/resource/config/spring/applicationContext-core-security.xml
+			- /src.resource/resource/config/config.xml
+		
+	2. applicationContext-core-security.xml 설정 추가
+	
+		- 파일위치 : /src.resource/resource/config/spring/applicationContext-core-security.xml
+
+		<!--
+		================================================================================
+		보안 필터 Proxy 설정
+		================================================================================
+		-->
+		<!-- 웹 보안 필터 Proxy -->
+		<!--
+			 filters - 보안에 사용될 필터들을 실행될 순서대로 설정(가장 먼저 선언된 필터가 최상위 계층에 존재)
+			 matchedUrlPatterns - 필터가 적용될 경로명
+			 excludedUrlPatterns - 예외적으로 보안필터가 적용안될 경로명
+		 -->
+		<bean id="webSecurityFilterProxy" class="com.ubone.framework.security.WebSecurityFilterProxy">
+			<property name="filters">
+				<list>
+					<ref bean="sessionUserIntegratorFilter" />
+					<ref bean="logoutFilter" />
+					<ref bean="securityExceptionHandlerFilter" />
+					<ref bean="badRequestProcessingFilter" />				<!-- 필터 추가 : securityExceptionHandlerFilter 이후 위치할 것 -->
+					<ref bean="authenticationProcessingFilter" />
+					<ref bean="anonymousProcessingFilter" />
+					<ref bean="anonymousAclFilter" />
+				</list>
+			</property>
+			<property name="matchedUrlPatterns">
+				<list>
+					<value>/**/*.ub</value>
+					<value>/**/screen/*.*</value>
+					<value>/**/service/*.*</value>
+					<value>/**/code/*.*</value>
+				</list>
+			</property>
+			<property name="excludedUrlPatterns">
+				<list>
+					<value>/**/screen/BCO0001.ub</value>
+					<value>/**/screen/MGC*.ub</value>
+				</list>
+			</property>
+		</bean>
+
+		<!-- 3. 보안 필터 설정 : 보안 예외 처리 필터 -->
+		<!--
+			 authenticationFailUrl - 인증실패 예외 발생시 redirect 될 URL 설정(별도 설정값이 없는 경우 /index.jsp)
+			 loginRequireUrl -  접근거부 예외 발생시 비인증 사용자를 redirect 할 URL 설정(별도 설정값이 없는 경우 /index.jsp)
+			 accessDeniedUrl - 접근거부 예외 발생시 인증 사용자를 redirect 할 URL 설정(별도 설정값이 없는 경우 /index.jsp)
+			 badRequestUrl - 비정상적 접속을 요청할 경우 redirect 될 URL 설정(별도 설정값이 없는 경우 /index.jsp)
+		 -->
+		<bean id="securityExceptionHandlerFilter"
+			class="com.ubone.framework.security.SecurityExceptionHandlerFilter">
+			<property name="authenticationFailUrl" value="/screen/BCO0001.ub?login_flag=fail" />
+			<property name="loginRequireUrl" value="/screen/BCO0001.ub?login_flag=require" />
+			<property name="accessDeniedUrl" value="/login/acessDenied.jsp" />
+			<property name="badRequestUrl" value="/login/badRequest.jsp" /> 		<!-- 신규 추가 : Bad Request 관련 -->
+		</bean>
+
+		<!-- 4. 보안 필터 설정 : 유효 URL체크 필터 -->
+		<!--
+			 badRequestProcessingFilter - 잘못된 요청을 체크하는 필터
+		 -->
+		<bean id="badRequestProcessingFilter"
+			class="com.ubone.framework.security.BadRequestProcessingFilter">
+			<property name="matchedUrlPatterns">
+				<list>
+					<value>/**/*</value>
+				</list>
+			</property>
+			<property name="excludedUrlPatterns">
+				<list>
+				</list>
+			</property>
+		</bean>
+
+		** matchedUrlPatterns 은 앞단 필터에서 들어온 패턴중 포함할 패턴을 설정한다.
+		** excludedUrlPatterns 해당 필터의 적용을 특정 URL패턴에서는 제외한다.
+
+
+	3. ConfigHolder.SECURITY_BAD_REQUEST_ENABLED 항목 추가 (default : true);
+
+	4. config.xml에 보안관련 설정 정보 추가
+
+			<!-- 
+			================================================
+			보안/권한 관련 설정
+			================================================
+			-->
+			
+			<!-- BadRequest 체크 : URL수정허용여부를 설정한다. -->
+			<entry key="framework.security.badrequest.enabled">true</entry>
+			
+			<!-- 메뉴 보안 설정 : 메뉴 접근 제어 사용 여부를 설정한다 -->
+			<entry key="framework.security.menu.enabled">false</entry>
+			<!-- 화면 보안 설정 : 화면 접근 제어 사용 여부를 설정한다 -->
+			<entry key="framework.security.screen.enabled">false</entry>
+			<!-- 서비스 보안 설정 : 서비스 호출 제어 사용 여부를 설정한다 -->
+			<entry key="framework.security.service.enabled">false</entry>
+			<!-- 데이타 보안 설정 : 데이타 조회 범위 제한 사용 여부를 설정한다 -->
+			<entry key="framework.security.data.enabled">false</entry>
+
+
+
+2012-07-20 ver 0.2.1 :
+	1. 2012-07-10 추가 기능 제외
+		--> 제외 사유 : Unix 시스템에서 단위폴더별 umask 설정 가능 - 구현기능 존재 무의미.
+		--> FileUtil 클래스는 유지.
+		
+	2. 로그인 관련 기능 수정
+		- 사유 : 로그인 로그 생성시 LOGIN_ID 누락 수정.
+		com.ubone.framework.security.auth.AuthenticationProcessingFilter		--> 일반 로그인 필터
+		com.ubone.framework.security.auth.SSOAuthenticationProcessingFilter		--> SSO 로그인 필터
+
+	3. Request Client IP 추출시 Header Key추가
+		- L7  :: CLIENT-IP
+		- 관련 소스 : com.ubone.framework.web.util.HttpUtils		
+
+2012-07-19 ver 0.2.1 :
+	1. Confilg Holder - Attribute 추가
+		- BROWSER_TITLE
+
+2012-07-10 ver 0.2.1 :
+	1. Unix 시스템에서 첨부파일 생성시 File 권한 변경 추가 (기본은 750 부여)
+	   - 기본 설정은 Config.xml에서 Propertity 추가
+	   - FileUtil.chmod 함수 추가
+
+		<!--
+		================================================
+		file 관련 설정
+		================================================
+		-->
+		<!-- CHMOD 사용여부 :: default=false -->
+		<entry key="framework.file.use.chmod">true</entry>
+		<!-- CHMOD 기본권한 -->
+		<entry key="framework.file.chmod">750</entry>
+
+
+2012-06-21 ver 0.2.0 : 
+	1. Screen Layout Type 코드 MainPortal 코드 (M) 추가
+		- 관련 파일 : /WebContent/velocity/layout/MainPortalLayout.vm
+		
+	2. FileInfo의 삭제여부 추가 (delYn)
+	
+	3. 첨부파일 수정기능 개선
+		- 문제점 : 탭으로 구성된 화면일 경우 동일한 업무코드 사용시 탭간의 
+		           Update 처리시 화면에 포함되지 않은 첨부파일은 삭제되는 현상 발생
+		- 수정 사항 : 한화면에 첨부파일 Type이 모두 있지 않아도 수정처리가 가능하도록 변경
+		- 관련 파일 :
+			/WebContent/velocity/macro/support-1.1.0.vm		--> 기능 수정
+			/WebContent/uxl/ext/swfupload/handlers.js		--> 기능 수정 
+
+	4. 공통 macro 파일명 변경
+	    - 문제점    : 매크로 파일의 버젼관리가 되지 않아. 프로젝트에서 변경시 시스템에서 반영시 어려움 발생. 
+		- 변경 사항 : 버젼관리되게 파일명에 버젼을 덧붙임
+		              --> 기존 버젼이 없는 파일명은 1.0.0과 같은 파일임.   단, 프로젝트에서 부분 변경된 경우는 예외임.
+		- 관련 파일 :
+			/WebContent/velocity/macro/default-1.0.0.vm
+			/WebContent/velocity/macro/form-1.0.0.vm
+			/WebContent/velocity/macro/meta-1.0.0.vm
+			/WebContent/velocity/macro/support-1.1.0.vm
+			
+			/src.resource/resource/config/spring/applicationContext-web.xml  --> 파일에서 상위 설정 파일의 명칭 변경
+
+				<bean id="velocityConfigurer"
+					class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
+					<property name="resourceLoaderPath" value="${framework.view.velocity.root}" />
+					<property name="velocityProperties">
+						<props>
+							<prop key="input.encoding">${framework.encoding}</prop>
+							<prop key="output.encoding">${framework.encoding}</prop>
+							<prop key="velocimacro.library">/macro/default-1.0.0.vm,/macro/form-1.0.0.vm,/macro/meta-1.0.0.vm,/macro/support-1.1.0.vm,/macro/${framework.application.name}.vm</prop>
+							<prop key="velocimacro.library.autoreload">true</prop>
+						</props>
+					</property>
+				</bean>
+	
+	5. 첨부파일 미리보기 기능 추가
+		- 변경 사항 : 첨부파일 타입 추가 (previewfiles)
+			* 구현가능 첨부파일 기능
+				1) multifiles				--> 동일키에 다른 유형으로 여러개의 첨부파일을 추가가능
+				2) preivewfiles				--> multifiles와 기능을 포함하며, 우측에 이미지 파일인경우 마우스 오버시 해당이미지를 미리보기 하는 기능 추가
+		- 관련 파일 : 
+			/WebContent/velocity/macro/support-1.1.0.vm
+			/WebContent/uxl/ext/swfupload/handlers.js
+							
+2012-06-01 ver 0.2.0 : 
+	1. 다국어 기능 추가
+

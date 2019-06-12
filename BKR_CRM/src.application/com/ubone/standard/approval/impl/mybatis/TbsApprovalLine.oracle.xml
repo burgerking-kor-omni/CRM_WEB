@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="EUC-KR"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+	<mapper namespace="TbsApprovalLine">
+		
+		<!--
+			Query id    : TbsApprovalLine.insertApprovalLine
+			Description : 결재선 신규 등록
+		-->
+		<insert id="insertApprovalLine" parameterType="map">
+
+			<selectKey keyProperty="ID_APPR_LINE" resultType="String" order="BEFORE">
+				SELECT SEQ_TBS_APPROVAL_LINE.NEXTVAL FROM DUAL 
+			</selectKey>
+
+				INSERT INTO TBS_APPROVAL_LINE(
+					   ID_APPR_LINE    			/* 결재선ID	*/
+					 , TP_APPR    				/* 결재종류	*/
+					 , TP_BIZ    				/* 업무구분	*/
+					 , ID_BIZ_KEY    			/* 업무별ID	*/
+					 , NM_APPR_LINE    			/* 결재선명	*/
+					 , FG_USE    				/* 사용여부	*/
+					 , DS_REMARK  				/* 비고		*/
+					 , FG_DEL    				/* 삭제여부	*/
+					 , ID_EMP_REG    			/* 최초등록직원	*/
+					 , ID_DEPT_REG    			/* 최초등록부서	*/
+					 , DT_REG    				/* 최초등록일시	*/
+					 , ID_EMP_UPT    			/* 최근수정직원	*/
+					 , ID_DEPT_UPT    			/* 최근수정부서	*/
+					 , DT_UPT    				/* 최근수정일시	*/
+					   )
+				VALUES (
+					    #{ID_APPR_LINE}    		/* 결재선ID	*/
+					  , #{TP_APPR}    			/* 결재종류	*/
+					  , #{TP_BIZ}    			/* 업무구분	*/
+					  , #{ID_BIZ_KEY}    		/* 업무별ID	*/
+					  , #{NM_APPR_LINE}    		/* 결재선명	*/
+					  , #{FG_USE}    			/* 사용여부	*/
+					  , #{DS_REMARK}    		/* 비고		*/
+					  , 'N'		    			/* 삭제여부	*/
+					  , #{user.id}    			/* 최초등록직원	*/
+					  , #{user.partCode}    	/* 최초등록부서	*/
+					  , CURRENT_TIMESTAMP    	/* 최초등록일시	*/
+					  , #{user.id}	    		/* 최근수정직원	*/
+					  , #{user.partCode}    	/* 최근수정부서	*/
+					  , CURRENT_TIMESTAMP 	 	/* 최근수정일시	*/
+					    )
+				            
+			
+		</insert>
+		
+		<!--
+			Query id    : TbsApprovalLine.deleteApprovalLine
+			Description : 결재선 삭제
+		-->
+		<delete id="deleteApprovalLine" parameterType="map">
+			
+			UPDATE TBS_APPROVAL_LINE
+			   SET FG_DEL = 'Y'
+ 		     WHERE ID_APPR_LINE = #{ID_APPR_LINE}    /* 결재선ID */
+			 
+		</delete>
+		
+		<!--
+			Query id    : TbsApprovalLine.updateApprovalLine
+			Description : 결재선 수정
+		-->
+		<update id="updateApprovalLine" parameterType="map">
+		
+			UPDATE TBS_APPROVAL_LINE
+			   SET TP_APPR		=	'01'	    		/*결재종류*/
+				 , TP_BIZ		=	#{TP_BIZ}    		/*업무구분*/
+				 , ID_BIZ_KEY	=	#{ID_BIZ_KEY}    	/*업무별ID*/
+				 , NM_APPR_LINE	=	#{NM_APPR_LINE}    	/*결재선명*/
+				 , FG_USE		=	#{FG_USE}    		/*사용여부*/
+				 , DS_REMARK	=	#{DS_REMARK}    	/*비고*/
+				 , FG_DEL		=	'N'
+				 , ID_EMP_UPT	=	#{user.id}    		/*최근수정직원*/
+				 , ID_DEPT_UPT	=	#{user.partCode}    /*최근수정부서*/
+				 , DT_UPT		=	CURRENT_TIMESTAMP   /*최근수정일시*/
+			 WHERE ID_APPR_LINE	=	#{ID_APPR_LINE}   	 /*결재선ID*/
+			 
+		</update>
+		
+	</mapper>

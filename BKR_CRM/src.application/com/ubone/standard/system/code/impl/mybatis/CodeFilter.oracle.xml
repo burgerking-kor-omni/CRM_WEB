@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="CodeFilter">
+
+	<!-- 코드 필터 목록 조회
+	     코드유형이 ST 인경우에 사용된다. 
+	-->
+	<select id="getCodeFilterList" parameterType="map" resultType="lmap">
+	
+	SELECT        C.CODE AS CODE       /* 코드               */
+	            , C.CODE_NAME          /* 코드명             */
+	            , C.CODE_DS            /* 상세코드명         */
+	            , C.SORT_ORDER         /* 정렬순서           */
+	            , C.PARENT_CODE        /* 상위코드           */
+	            , C.STATUS             /* 상태               */
+	            , C.REG_DT             /* 최초등록일시       */
+	            , C.USER_ID_REG        /* 최초등록자         */
+	            , C.UPD_DT             /* 최초수정일시       */
+	            , C.USER_ID_UPD        /* 최초수정자         */
+	            , M.CODE AS M_CODE     /* 코드               */
+	            , M.TP_FILTER          /* 필터유형           */
+	            , M.FILTER_CODE        /* 필터코드           */ 
+	            , M.CODE_TP            /* 코드유형           */
+	            , M.TABLE_ID           /* 테이블ID           */
+	            , M.CODE_COLUMN_ID     /* 컬럼ID             */
+	            , M.CODE_CATEGORY_ID   /* 코드유형ID         */
+	            , M.CODE AS M_CODE     /* 코드               */
+	            , M.REG_DT             /* 등록일자           */
+	            , M.USER_ID_REG        /* 등록유저ID         */
+	            , M.UPD_DT             /* 수정일자           */
+	            , M.USER_ID_UPD        /* 수정유저ID         */
+	  FROM SYS_CODE_MAPP M , SYS_CODE C
+	 WHERE 1=1
+	            AND C.CODE_CATEGORY_ID = M.CODE_CATEGORY_ID(+)
+	            AND C.CODE = M.CODE(+)
+	    <if test="TP_FILTER != null and TP_FILTER != ''">
+			AND #{TP_FILTER} = M.TP_FILTER(+) 
+		</if>	    
+		<if test="FILTER_CODE != null and FILTER_CODE != ''">
+			AND #{FILTER_CODE} = M.FILTER_CODE(+) 
+		</if>
+		<if test="CODE_CATEGORY_ID != null and CODE_CATEGORY_ID != ''">
+			AND C.CODE_CATEGORY_ID = #{CODE_CATEGORY_ID}
+		</if>
+	</select>
+	
+	<!-- 코드 필터 목록 조회
+	     코드유형이 DN 인경우에 사용된다. 
+	-->
+	<select id="getCodeFilterList_dn" parameterType="map" resultType="lmap">
+	
+	SELECT        CODE AS M_CODE     /* 코드               */
+	            , TP_FILTER          /* 필터유형           */
+	            , FILTER_CODE        /* 필터코드           */ 
+	            , CODE_TP            /* 코드유형           */
+	            , TABLE_ID           /* 테이블ID           */
+	            , CODE_COLUMN_ID     /* 컬럼ID             */
+	            , CODE_CATEGORY_ID   /* 코드유형ID         */
+	            , CODE AS M_CODE     /* 코드               */
+	            , REG_DT             /* 등록일자           */
+	            , USER_ID_REG        /* 등록유저ID         */
+	            , UPD_DT             /* 수정일자           */
+	            , USER_ID_UPD        /* 수정유저ID         */
+	  FROM SYS_CODE_MAPP
+	 WHERE 1=1
+	    <if test="TP_FILTER != null and TP_FILTER != ''">
+			AND TP_FILTER = #{TP_FILTER}  
+		</if>	    
+		<if test="FILTER_CODE != null and FILTER_CODE != ''">
+			AND FILTER_CODE = #{FILTER_CODE}  
+		</if>
+		<if test="CODE_CATEGORY_ID != null and CODE_CATEGORY_ID != ''">
+			AND CODE_CATEGORY_ID = #{CODE_CATEGORY_ID}
+		</if>
+	</select>
+	
+	
+	<select id="selectCodeCategory" parameterType="map" resultType="lmap">
+		SELECT   CODE_CATEGORY_ID,             /*코드유형ID      */
+		         CODE_TP,                      /*코드구분        */
+		         CODE_CATEGORY_NM,             /*코드유형명      */
+		         CONSTANT_REG_YN,              /*상수등록여부    */
+		         CACHE_YN,                     /*캐쉬여부        */
+		         CODE_QUERY_CONTENT,           /*코드정의쿼리    */
+		         ENUM_CLASS_NAME,              /*ENUM클래스명    */
+		         STATUS,                       /*상태            */
+		         REG_DT,                       /*최초등록일시    */
+		         USER_ID_REG,                  /*최초등록자      */
+		         UPD_DT,                       /*최초수정일시    */
+		         USER_ID_UPD,                  /*최초수정자      */
+		         TABLE_ID,                     /*원천코드테이블ID*/
+		         CODE_COLUMN_ID,               /*원천코드컬럼ID  */
+		         NAME_COLUMN_ID,               /*원천명칭컬럼ID  */
+		         MAPPING_YN                    /*맵핑여부        */
+		  FROM   SPCVOC.SYS_CODE_CATEGORY     
+		WHERE 1=1
+			AND CODE_CATEGORY_ID = #{CODE_CATEGORY_ID}
+	</select>
+	
+	<insert id="insertCodeFiler" parameterType="map">
+	INSERT INTO SYS_CODE_MAPP(
+               TP_FILTER            /* 필터구분        */
+             , FILTER_CODE          /* 필터코드        */
+             , CODE_TP              /* 코드구분(ST/DN) */
+             , TABLE_ID             /* 테이블ID        */
+             , CODE_COLUMN_ID       /* 컬럼ID          */
+             , CODE_CATEGORY_ID     /* 코드분류ID      */
+             , CODE                 /* 코드            */
+             , REG_DT               /* 최초등록일시    */
+             , USER_ID_REG          /* 최초등록자      */
+             , UPD_DT               /* 최근수정일시    */
+             , USER_ID_UPD          /* 최근수정자      */
+             )
+        VALUES (
+              #{TP_FILTER}           /* 필터구분        */ 
+            , #{FILTER_CODE}         /* 필터코드        */ 
+            , #{CODE_TP}             /* 코드구분(ST/DN) */ 
+            , #{TABLE_ID}            /* 테이블ID        */ 
+            , #{CODE_COLUMN_ID}      /* 컬럼ID          */ 
+            , #{CODE_CATEGORY_ID}    /* 코드분류ID      */ 
+            , #{CODE}                /* 코드            */ 
+            , CURRENT_TIMESTAMP      /* 최초등록일시    */ 
+            , #{user.id}             /* 최초등록자      */ 
+            , CURRENT_TIMESTAMP      /* 최근수정일시    */ 
+            , #{user.id}             /* 최근수정자      */ 
+            )
+	</insert>
+	
+	<delete id="delete" parameterType="map">
+		DELETE FROM SYS_CODE_MAPP
+		WHERE 1=1
+			AND TP_FILTER = #{TP_FILTER} 
+			AND FILTER_CODE = #{FILTER_CODE} 
+			AND CODE_CATEGORY_ID = #{CODE_CATEGORY_ID}
+	</delete>
+	
+</mapper>

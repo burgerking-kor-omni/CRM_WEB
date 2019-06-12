@@ -1,0 +1,70 @@
+@charset "utf-8";
+
+/* - ver1.0 (초기버전)
+    - 헤더를 포함한 전반적인 컬러가 푸른 계열 	
+ */
+ 
+ /* layout */ 
+.ub-frame.top {border-bottom:1px solid #184586; background-color:#2661b7;}
+.ub-frame.body h1.ub-control.title {background-image:url('../../images/theme/blue/ico_h1.gif');}
+.ub-frame.body h2.ub-control.title {border-top:1px solid #85b3e1; background-color:#f3f7f5; background-image:url('../../images/theme/blue/ico_h2.gif');}
+h2.ub-control.title.hfold .ico-fold.on {background-image:url('../../images/theme/blue/ico_fold.gif');}
+.ub-frame.body h3.ub-control.title {background-image:url('../../images/theme/blue/ico_h3.gif');}
+.ub-frame.top .gnb-util,
+.ub-frame.top .gnb-util span a {color:#fff;}
+.ub-frame.top .gnb-util .pw-button, 
+.ub-frame.top .gnb-util .logout-button,
+.ub-frame.top .gnb-util .lang-cd {background-image:url('../../images/theme/blue/bg_util.png');}
+
+/* wide-menu 수정 */
+.ub-layout.menu.wide-menu {}
+.ub-layout.menu nav .ub-control.menu li {background-image:url('../../images/theme/blue/bar_nav.png') !important;}
+.ub-layout.menu nav .ub-control.menu.depth01 li:first-child {background-image:none !important;}
+.ub-layout.menu nav .ub-control.menu.depth01 li a {color:#ddd !important;}
+.ub-layout.menu nav .ub-control.menu.depth01 li:hover a,
+.ub-layout.menu nav .ub-control.menu.depth01 li a:hover {color:#3557af !important;}
+/* 2depth */
+.ub-layout.menu nav .ub-control.menu.depth01 .depth02 li,
+.ub-layout.menu nav .ub-control.menu.depth01 .depth03 li {background-image:none !important;}
+.ub-layout.menu nav .ub-control.menu.depth01 .depth02 li a:hover {color:#fff !important;}
+/* 3depth */
+.ub-layout.menu nav .ub-control.menu.depth01 .depth03 li a {color:#444 !important;}
+.ub-layout.menu nav .ub-control.menu.depth01 .depth03 li a:hover {color:#fff !important;}
+
+/* style */
+ .ub-control.table.normal,
+ .in-td .ui-jqgrid {border-top:1px solid #69a1d9 !important;}
+ .ub-control.table.list {border-top:1px solid #69a1d9;}
+.ub-control.table.list thead th {background-color:#f3f7f5;}
+.ub-control.table.stats {border-top:2px solid #69a1d9;}
+.ub-layout.search .ub-control.table.normal,
+.ub-layout.state-bar .ub-control.table.normal {border-top:0 !important;}
+.ub-layout.state-bar .ub-control.table.normal td label {color:#4b6aa9;}
+
+span.ico-register,
+span.ico-list,
+span.ico-find,
+span.ico-print  {background-image:url('../../images/theme/blue/ico_btn.png');}
+
+/* 버튼 */
+h2.ub-control.title .ub-layout.button.inner .ub-control.button.inner a, 
+h3.ub-control.title .ub-layout.button.inner .ub-control.button.inner a, 
+h2.ub-control.title .ub-control.button.inner a, 
+h3.ub-control.title .ub-control.button.inner a {color:#4b6aa9;}
+
+.ub-layout.button.bottom .ub-control.button.bottom.left,
+.ub-layout.button.bottom .ub-control.button.bottom.left:hover,
+.ub-layout.button.bottom .ub-control.button.bottom.left a,
+.ub-layout.button.bottom .ub-control.button.bottom.left a:hover {background-image:url('../../images/theme/blue/btn_pageb_left.gif');}
+
+/* 탭 */
+.ub-control.tab .ui-tabs-nav .ui-state-active,
+.ub-control.tab .ui-tabs-nav .ui-state-active .ui-tabs-anchor {background-image:url('../../images/theme/blue/bg_tabs_nav_on.gif');}
+.ub-control.tab .ui-tabs-nav .ui-state-active .ui-tabs-anchor label {color:#4b6aa9;}
+
+.ui-jqgrid {border-top-color:#7aaddf !important;}
+.ui-jqgrid td.jqgrid-rownum {background:transparent;}
+.ui-jqgrid td.ui-state-default {color:#444;}
+
+/* ui-dialog */
+.ui-dialog .ui-dialog-titlebar {background-image:url('../../images/theme/blue/bg_error_title.gif');}

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ReferManageInquiry">
+
+	<!-- 자료실 목록 조회 -->
+	<sql id="getRefList_base">
+	
+		SELECT TB.ID_BULLETIN                                  							/* 자료실번호 */
+                 , TB.DS_TITLE                                    							/* 제목       */
+                 , (SELECT COUNT(1) 
+                 	   FROM SYS_ATTACH A
+					         , SYS_ATTACH_LINK L
+			         WHERE A.ATTACH_ID = L.ATTACH_ID
+					     AND L.BIZ_TP= 'BBS'
+					     AND L.BIZ_KEY = TB.ID_BULLETIN)  AS CNT_ATTACH 	/* 첨부여부   */
+                 , TB.CNT_INQUIRY                                   						/* 조회수     */
+                 , TO_CHAR(TB.DT_REG, 'YYYY-MM-DD HH24:MI:SS') AS DT_REG   	   		/* 등록일자   */
+                 , TB.ID_REG_DEPT 								   							/* 등록부서   */
+                 , SD.DEPT_NM AS NM_REG_DEPT
+                 , TB.ID_REG_EMP                                  						 	/* 등록자     */
+                 , SU.USER_NM AS NM_REG_EMP
+          FROM TBS_BULLETIN TB
+           LEFT OUTER JOIN SYS_USER SU
+             ON TB.ID_REG_EMP = SU.USER_ID
+           LEFT OUTER JOIN SYS_DEPARTMENT SD
+             ON TB.ID_REG_DEPT = SD.DEPT_ID
+        WHERE 1=1
+            AND TB.TP_BULLETIN = '02'
+	   	   <if test="DT_REG_START != null and DT_REG_START != ''">
+		    <![CDATA[
+		    AND TB.DT_REG >= TO_DATE (#{DT_REG_START} || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS')   						 /* 기간검색(FROM) */
+		     ]]>
+	       </if>
+	   	   <if test="DT_REG_END != null and DT_REG_END != ''">
+		   	<![CDATA[
+		   	AND TB.DT_REG <= TO_DATE (#{DT_REG_END} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS')     					 	 /* 기간검색(TO)  */
+		   	 ]]>
+		   </if>
+		   <if test="ID_REG_EMP != null and ID_REG_EMP != ''">
+		  	AND TB.ID_REG_EMP LIKE '%' || #{ID_REG_EMP} || '%'
+		   </if>
+		   <if test="DS_TITLE_CONTENT != null and DS_TITLE_CONTENT != ''">
+		  	AND (TB.DS_TITLE LIKE '%' || #{DS_TITLE_CONTENT} ||'%' OR TB.DS_CONTENT LIKE '%' || #{DS_TITLE_CONTENT} ||'%') /* 제목+내용	 */
+		   </if>
+		  	AND TB.FG_DEL = 'N'
+		 ORDER BY TB.ID_BULLETIN DESC 		
+	</sql>
+	
+	<!-- 자료실 목록 조회 -->
+	<select id="getRefList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getRefList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- 자료실 목록 조회 - count -->
+	<select id="getRefList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getRefList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- 자료실 목록 조회 - paging -->
+	<select id="getRefList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getRefList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	
+	<!-- 자료실 목록 상세조회 -->
+	<select id="getRefDetail" parameterType="map" resultType="lmap">
+	
+		SELECT TB.ID_BULLETIN                       		
+			     , TB.TP_CATEGORY 						 	
+			     , TB.DS_TITLE        		   			 	
+			     , TB.DS_CONTENT      		             	
+			     , TB.DS_CONT_DTL
+			     , TB.DT_REG     		   			 	
+			     , TB.ID_REG_DEPT                       	
+            	 , SD.DEPT_NM AS NM_REG_DEPT
+                 , TB.ID_REG_EMP
+                 , SU.USER_NM AS NM_REG_EMP
+                 , TB.DT_UPT
+                 , TB.ID_UPT_DEPT
+                 , SDU.DEPT_NM AS NM_UPT_DEPT
+                 , TB.ID_UPT_EMP
+                 , SUU.USER_NM AS NM_UPT_EMP
+		  FROM TBS_BULLETIN TB
+		   LEFT OUTER JOIN SYS_DEPARTMENT SD
+		      ON TB.ID_REG_DEPT = SD.DEPT_ID
+		   LEFT OUTER JOIN SYS_USER SU
+		      ON TB.ID_REG_EMP = SU.USER_ID
+		   LEFT OUTER JOIN SYS_DEPARTMENT SDU
+		      ON TB.ID_UPT_DEPT = SDU.DEPT_ID
+		   LEFT OUTER JOIN SYS_USER SUU
+		      ON TB.ID_UPT_EMP = SUU.USER_ID
+		WHERE 1 = 1
+		  	AND TB.TP_BULLETIN = '02' 			 		/* (01:FAQ 02:자료실) */
+		  	AND TB.ID_BULLETIN = #{ID_BULLETIN} 	/* 게시판ID 	*/
+	</select>
+	
+	
+	<!--
+		Query id    : CustomerManageInquiry.getLoginProgramAccess
+		Description : login 프로그램 권한 조회
+	-->
+	<select id="getLoginProgramAccessList" parameterType="map" resultType="lmap">
+		SELECT ROLE_ID
+		  FROM AP_ROLE_GROUP
+		 WHERE USER_ID = #{user.id}
+		 GROUP BY ROLE_ID
+	</select>
+	
+	
+</mapper>

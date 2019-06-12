@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="SearchDeptManage">
+
+	<sql id="getDeptList_base">
+		SELECT DEPT_ID,    /* 부서코드 	   */
+		       DEPT_NM,    /* 부서명	   */
+		       DEPT_NM_ENG,/* 부서영문명   */
+		       DEPT_ID_UP, /* 상위부서코드 */
+		       DEPT_TP,
+		       LEVEL_DS,
+		       PHONE_NO,
+		       FAX_NO,
+		       ORDER_DS,
+		       COMPANY_CD,
+		       STATUS AS STATUS_CD,
+		       IF_DT,
+		       REG_DT,
+		       DEPT_ID_REG,
+		       USER_ID_REG,
+		       UPD_DT,
+		       DEPT_ID_UPD,
+		       USER_ID_UPD,
+		       DEPT_BIZ_TP,
+		       USER_ID_MNG,
+		       DEPT_NM_FULL /* 부서전체명   */
+		  FROM SYS_DEPARTMENT
+		 WHERE 1=1
+		   AND STATUS = 'A'
+		<if test="DEPT_NM != null and DEPT_NM != ''"> 
+			AND UPPER(DEPT_NM) LIKE '%' || UPPER(#{DEPT_NM}) || '%'
+		</if>
+	</sql>
+	
+	<!-- 부서 목록(공통) 조회 -->
+	<select id="getDeptList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getDeptList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- 부서 목록(공통) 조회 - count -->
+	<select id="getDeptList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getDeptList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- 부서 목록(공통) 조회 - paging -->
+	<select id="getDeptList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getDeptList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	
+	<!-- 부서 목록(공통) 조회 -->
+	<select id="findByRoleIdAndPartCode" parameterType="map" resultType="lmap">
+        select U.USER_ID     id
+             , U.USER_NM     name
+             , ''            password
+             , U.COMPANY_CD  companyCode
+             , ''            companyName
+             , U.DEPT_ID     partCode
+             , D.DEPT_NM     partName
+             , U.TITLE_CD    classCode
+             , U.POSITION_CD  positionCode
+             , U.EMAIL_DS    email
+             , U.PHONE_NO    phoneNumber
+             , U.MOBILE_NO   mobilePhoneNumber
+             , '' headquartersCode
+             , '' languageCode
+          from SYS_USER            U
+             , SYS_DEPARTMENT      D
+         where U.DEPT_ID  = D.DEPT_ID
+           and U.DEPT_ID  = #{partCode}
+           AND U.DUTY_CD IN ( '0660',
+                              '0001',
+                              '0778',
+                              '0666') 
+	</select>	
+	
+	<!-- 부서관리 상세조회 -->
+	<select id="getDetail" parameterType="map" resultType="lmap">
+		SELECT DEPT_ID  	/*부서코드 			*/
+		     , DEPT_NM  	/*부서명 			*/
+		     , DEPT_NM_ENG  /*부서영문명 		*/
+		     , DEPT_ID_UP 	/*상위부서코드 		*/
+		     , DEPT_TP 		/*부서유형 			*/
+		     , LEVEL_DS 	/*레벨 				*/
+		     , PHONE_NO 	/*암호화전화번호 	*/
+		     , FAX_NO 		/*암호화팩스번호 	*/
+		     , ORDER_DS 	/*부서순서 			*/
+		     , COMPANY_CD 	/*회사코드 			*/
+		     , NVL(STATUS , 'S') AS STATUS       /*상태   			*/
+		     , IF_DT 		/*I/F일시 			*/
+		     , REG_DT 		/*등록일시 			*/
+		     , DEPT_ID_REG 	/*등록사용자부서ID 	*/
+		     , USER_ID_REG  /*등록사용자ID 		*/
+		     , UPD_DT  		/*수정일시 			*/
+		     , DEPT_ID_UPD  /*수정사용자부서ID 	*/
+		     , USER_ID_UPD  /*수정사용자ID 		*/
+		     , DEPT_BIZ_TP 	/*영업형태 			*/
+		     , USER_ID_MNG 	/*조직장ID 			*/
+		FROM SYS_DEPARTMENT SDT
+		WHERE 1=1
+		AND DEPT_ID = #{DEPT_ID}
+	</select>
+	
+	
+		<!-- 부서 트리 조회 -->
+	<select id="getDeptTree" parameterType="map" resultType="lmap">
+			SELECT   A.DEPT_ID        AS ID          /* 메뉴ID        */
+             		 , A.DEPT_NM      AS TITLE        /* 메뉴명        */
+		             , A.DEPT_ID        AS DATA_KEY
+		             , A.DEPT_NM    AS TOOL_TIP      /* 설명            */
+		             , NVL(A.DEPT_ID_UP, 'ROOT') AS PARENT_ID   /* 상위메뉴        */
+		             , A.ORDER_DS     AS SORT_ORDER       /* 순서            */
+		             , A.LEVEL_DS          AS DEPTH            /* 레벨            */
+		             , DECODE(B.DEPT_ID_UP , NULL , 'N','Y') AS FOLDER_YN 
+		        FROM SYS_DEPARTMENT A
+		               , (SELECT DEPT_ID_UP FROM SYS_DEPARTMENT 
+		                 GROUP BY DEPT_ID_UP) B
+		         WHERE 1=1
+		           AND A.DEPT_ID = B.DEPT_ID_UP(+)
+				   AND A.LEVEL_DS = '1' 
+				ORDER BY SORT_ORDER ASC
+	</select>
+	
+	<!-- 부서관리 트리 조회 (lazy)-->
+	<select id="getDeptTreeLazy" parameterType="map" resultType="lmap">
+		SELECT A.DEPT_ID        AS ID          /* 메뉴ID        */
+             , A.DEPT_NM      AS TITLE        /* 메뉴명        */
+             , A.DEPT_ID        AS DATA_KEY
+             , A.DEPT_NM    AS TOOL_TIP      /* 설명            */
+             , NVL(A.DEPT_ID_UP, 'ROOT') AS PARENT_ID   /* 상위메뉴        */
+             , A.ORDER_DS     AS SORT_ORDER       /* 순서            */
+             , A.LEVEL_DS          AS DEPTH            /* 레벨            */
+          ,(SELECT CASE WHEN COUNT(DEPT_ID) > 0 THEN 'Y' ELSE 'N'  END  
+                 FROM SYS_DEPARTMENT 
+                WHERE  DEPT_ID_UP = A.DEPT_ID )  AS FOLDER_YN
+        FROM SYS_DEPARTMENT A
+         WHERE 1=1
+		   AND A.DEPT_ID_UP = #{LAZY_KEY}
+		ORDER BY SORT_ORDER ASC
+	
+	</select>
+	
+    <!--
+		Query id    : SearchDeptManage.insertDept
+		Description : 사용자정보 등록
+	-->
+	<insert id="insertDept" parameterType="map">
+	      INSERT INTO SYS_DEPARTMENT (
+	                   DEPT_ID,
+	                   DEPT_NM,
+	                   DEPT_NM_ENG,
+	                   DEPT_ID_UP,
+	                   DEPT_TP,
+	                   LEVEL_DS,
+	                   PHONE_NO,
+	                   FAX_NO,
+	                   ORDER_DS,
+	                   COMPANY_CD,
+	                   STATUS,
+	                   IF_DT,
+	                   REG_DT,
+	                   DEPT_ID_REG,
+	                   USER_ID_REG,
+	                   UPD_DT,
+	                   DEPT_ID_UPD,
+	                   USER_ID_UPD,
+	                   DEPT_BIZ_TP,
+	                   USER_ID_MNG,
+	                   DEPT_NM_FULL)
+		     VALUES (#{DEPT_ID},
+		             #{DEPT_NM},
+		             #{DEPT_NM_ENG},
+		             #{DEPT_ID_UP},
+		             #{DEPT_TP},
+		             #{LEVEL_DS},
+		             #{PHONE_NO},
+		             #{FAX_NO},
+		             #{ORDER_DS},
+		             #{COMPANY_CD},
+		             #{STATUS},
+		             #{IF_DT},
+		             SYSDATE,
+		             #{user.partCode},
+		             #{user.id},
+		             SYSDATE,
+		             #{user.partCode},
+		             #{user.id},
+		             #{DEPT_BIZ_TP},
+		             #{USER_ID_MNG},
+		             #{DEPT_NM_FULL})
+	</insert>
+
+	<update id="updateDept" parameterType="map" >
+		UPDATE SYS_DEPARTMENT
+		SET	 DEPT_ID = #{DEPT_ID},
+             DEPT_NM = #{DEPT_NM},
+             DEPT_NM_ENG = #{DEPT_NM_ENG},
+             DEPT_ID_UP = #{DEPT_ID_UP},
+             DEPT_TP = #{DEPT_TP},
+             LEVEL_DS = #{LEVEL_DS},
+             PHONE_NO = #{PHONE_NO},
+             FAX_NO = #{FAX_NO},
+             ORDER_DS = #{ORDER_DS},
+             COMPANY_CD = #{COMPANY_CD},
+             STATUS = #{STATUS},
+             IF_DT = #{IF_DT},
+             UPD_DT = SYSDATE,
+             DEPT_ID_UPD = #{user.partCode},
+             USER_ID_UPD = #{user.id},
+             DEPT_BIZ_TP = #{DEPT_BIZ_TP},
+             USER_ID_MNG = #{user.id},
+             DEPT_NM_FULL = #{DEPT_NM_FULL}
+		WHERE  DEPT_ID = #{DEPT_ID}
+	</update>
+   	
+   	<!--
+		Query id    : "SearchDeptManage.delete"
+		Description : 삭제
+	-->
+   <delete id="delete" parameterType="map">
+		DELETE FROM SYS_DEPARTMENT
+			WHERE
+    			DEPT_ID = #{DEPT_ID}
+	</delete>
+	
+	<!-- 부서별 사용자 목록 조회 -->
+	<select id="getDeptEmpList" parameterType="map" resultType="lmap">
+		SELECT 
+				 SU.USER_ID
+				,SU.EMP_NO
+				,SU.USER_NM
+				,SU.DEPT_ID
+				,(SELECT DEPT_NM FROM SYS_DEPARTMENT WHERE DEPT_ID = SU.DEPT_ID) DEPT_NM
+				,SU.MOBILE_NO
+				,SU.EMAIL_DS
+				,(SELECT DEPT_ID_UP FROM SYS_DEPARTMENT WHERE DEPT_ID = SU.DEPT_ID) CD_BRANCH
+				,SU.INCUMBENT_CD
+				,SU.FG_RECV
+		FROM SYS_USER SU
+		LEFT OUTER JOIN SYS_DEPARTMENT SD
+			ON SU.DEPT_ID=SD.DEPT_ID
+			WHERE 1=1
+			AND SD.DEPT_ID = #{DEPT_ID}
+	</select>
+	
+	<select id="checkDeptId" parameterType = "map" resultType = "lmap">
+		SELECT COUNT(DEPT_ID) AS CHECK_COUNT 
+		   FROM SYS_DEPARTMENT 
+		 WHERE DEPT_ID = #{DEPT_ID}
+	</select>
+	
+	
+</mapper>

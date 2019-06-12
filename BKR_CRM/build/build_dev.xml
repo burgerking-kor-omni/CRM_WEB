@@ -1,0 +1,280 @@
+<?xml version="1.0"?>
+<project name="Build module" default="build" basedir=".">
+	<property environment="env"/>
+	<property file="./build_dev.properties" />
+	<property name="label" value="${env.JOB_NAME}-BUILD${env.BUILD_NUMBER}"/>
+
+	<!-- WAS Library 설정 -->
+	<path id="was.libs">
+		<fileset dir="${was.lib}" includes="**/*.jar" />
+	</path>
+
+	<!-- Web App 프로젝트를 빌드 하기 위한 Classpath 설정 -->
+	<path id="web.classpath">
+		<fileset dir="${web.lib.dir}" includes="**/*.jar" />
+	</path>
+
+	<!-- Ant 실행을 위한 Path 설정 -->
+	<path id="antpath">
+		<fileset dir="${ant.dir}/lib" includes="**/*.jar" />
+	</path>
+
+	<!-- WEB-INF/classes 폴더 clear-->
+	<target name="clean">
+		<echo>cleanning ...</echo>
+		<delete dir="${web.bin.dir}" failonerror="false" />
+		<delete dir="${target.dir}" failonerror="false" />
+	</target>
+
+	<!-- 프로젝트에 dist 폴더를 생성 - packaging된 결과를 dist폴더에 저장하기 위함 -->
+	<target name="init">
+		<echo>Init Start</echo>
+		<mkdir dir="${target.dir}/classes"/>
+	</target>
+
+	<!-- 환경 설정 파일들을 복사 -->
+	<target name="resources">
+		<echo>Resources Start</echo>
+
+		<echo>copy application</echo>
+		<copy todir="${bin.dir}">
+			<fileset dir="${src.dir}">
+				<exclude name="**/.svn/*.*" />
+				<exclude name="**/*.java" />
+				<include name="**/*.xml" />
+			</fileset>
+		</copy>
+
+		<echo>copy resource</echo>
+		<copy todir="${bin.dir}">
+			<fileset dir="${resources.dir}">
+				<exclude name="**/.svn/*.*" />
+			</fileset>
+		</copy>
+
+	</target>
+
+	<!-- 컴파일 -->
+	<target name="compile">
+		<echo> Compile Start</echo>
+		<!-- taget 디렉토리에 컴파일 결과 -->
+		<javac debug="true" encoding="UTF-8" srcdir="${src.dir}" destdir="${bin.dir}" includeAntRuntime="false" nowarn="true">
+			<classpath>
+				<path location="${bin.dir}" />
+				<path refid="web.classpath" />
+				<path refid="was.libs" />
+			</classpath>
+			<!-- <compilerarg value="-Xlint:unchecked"/> -->
+		</javac>
+
+		<!-- 서버 환경 파일로 교체 
+		<move file="${bin.dir}/context-weblogic-transaction.xml" tofile="${bin.dir}/spring/context-transaction.xml" failonerror="false" verbose="true" />
+		<move file="${bin.dir}/config-product.properties" tofile="${bin.dir}/config.properties" overwrite="true" />
+		-->
+
+		<!-- target폴터에 있는 모든 파일을  WEB-INF/classes폴터로 복사 -->
+		<copy todir="${web.bin.dir}">
+			<fileset dir="${bin.dir}">
+				<include name="**/*.*" />
+				<include name="**/*" />
+			</fileset>
+		</copy>
+
+		<!-- 서버 설정 파일로 복사 -->
+		<echo>from dev</echo>
+		<copy todir="${web.src.dir}" verbose="true" overwrite="true">
+			<fileset dir="dev">
+				<include name="**/*.*" />
+				<include name="**/*" />
+			</fileset>
+		</copy>
+
+	</target>
+	
+	
+	
+	<!-- hsqldb-backup (source) -->
+	<target name="hsqldb-backup">
+		<sshexec host="${src.hsqldb.host}" username="${src.hsqldb.username}" password="${src.hsqldb.password}"
+	    	command="sh ${src.hsqldb.home}/backup.sh" trust="true"/>
+	</target>
+
+	
+	<!-- hsqldb deploy -->
+	<target name="remote-hsqldb-deploy">
+		<!-- hsqldb script get-->
+	  	<ftp action="get"
+	       	server="${src.hsqldb.host}"
+	       	userid="${src.hsqldb.username}"
+	       	password="${src.hsqldb.password}"
+	  		chmod="755"
+	  		remotedir="${src.hsqldb.home}/scriptbackup">
+	    	<fileset dir="${metadb.dir}/${src.hsqldb.host}">
+	      		<include name="ubmeta.script"/>
+	    	</fileset>
+	  	</ftp>	
+		<!-- hsqldb script put-->
+		<ftp action="send"
+	       	server="${remote1.hsqldb.host}"
+	       	userid="${remote1.hsqldb.username}"
+	       	password="${remote1.hsqldb.password}"
+	  		chmod="755"
+	  		remotedir="${remote1.hsqldb.home}">
+	    	<fileset dir="${metadb.dir}/${src.hsqldb.host}">
+	      		<include name="ubmeta.script"/>
+	    	</fileset>
+	  	</ftp>
+		
+	</target>
+	
+	<!-- hsqldb start --> 
+	<target name="remote-hsqldb-start">
+		<sshexec host="${remote1.hsqldb.host}" username="${remote1.hsqldb.username}" password="${remote1.hsqldb.password}"
+	    	command="sh ${remote1.hsqldb.home}/dataserver.sh start" trust="true" timeout="10000" failonerror="false"/>
+	</target> 	
+	
+	<!-- hsqldb stop --> 
+	<target name="remote-hsqldb-stop">
+		<sshexec host="${remote1.hsqldb.host}" username="${remote1.hsqldb.username}" password="${remote1.hsqldb.password}"
+	    	command="sh ${remote1.hsqldb.home}/dataserver.sh stop" trust="true" timeout="10000" failonerror="false"/>
+	</target> 		
+	
+	<!-- target 폴더의 중간 결과물 target/classes를 삭제 -->
+	<target name="deleteTagetTempClasses">
+		<delete dir="${target.dir}/classes"/>
+	</target>
+
+	<!-- server Start remote -->
+	<target name="remote-server-start1">
+		<telnet server="${server1.host}" userid="${server1.username}" password="${server1.password}" timeout="600">
+			<read>jeus@dptvocprj:</read>
+			<write>${server1.bin.path}/${server1.start.cmd}</write>
+			<read>jeus.server.JeusBootstrapper</read>
+			<write></write>
+			<read>jeus@dptvocprj:</read>
+		</telnet>
+	</target>
+	<target name="remote-server-start2">
+		<telnet server="${server2.host}" userid="${server2.username}" password="${server2.password}" timeout="600">
+			<read>jeus@dptvocprj:</read>
+			<write>${server2.bin.path}/${server2.start.cmd}</write>
+			<read>jeus.server.JeusBootstrapper</read>
+			<write></write>
+			<read>jeus@dptvocprj:</read>
+		</telnet>
+	</target>	
+
+	<!-- server Stop remote -->
+	<target name="remote-server-stop1">
+		<telnet server="${server1.host}" userid="${server1.username}" password="${server1.password}" timeout="600">
+			<read>jeus@dptvocprj:</read>
+			<write>${server1.bin.path}/${server1.stop.cmd}</write>
+			<read>jeus@dptvocprj:</read>
+		</telnet>
+	</target>
+	<target name="remote-server-stop2">
+		<telnet server="${server2.host}" userid="${server2.username}" password="${server2.password}" timeout="600">
+			<read>jeus@dptvocprj:</read>
+			<write>${server2.bin.path}/${server2.stop.cmd}</write>
+			<read>jeus@dptvocprj:</read>
+		</telnet>
+	</target>
+				 	
+	
+	<!-- 실제 web root 폴더에 소스를 배포한다.  -->
+	<target name="ftp-deploy1">
+		<echo>from path : ${web.src.dir}</echo>
+		<ftp server="${server1.host}"
+		       port="21"
+		       remotedir="${server1.deploy.path}"
+		       userid="${server1.username}"
+		       password="${server1.password}"
+		       passive="yes"
+		       depends="yes"
+		       binary="yes"
+			   newer="yes"
+			   verbose="true"
+			>
+			<fileset dir="${web.src.dir}">
+				<include name="**/*.*"/>
+				<include name="**/*" />
+				<exclude name="**/page/images/*"/>
+			</fileset>
+		</ftp>
+	</target>
+	<target name="ftp-deploy2">
+		<ftp server="${server2.host}"
+		       port="21"
+		       remotedir="${server2.deploy.path}"
+		       userid="${server2.username}"
+		       password="${server2.password}"
+		       passive="yes"
+		       depends="yes"
+		       binary="yes"
+			   newer="yes"
+			   verbose="true"
+			>
+			<fileset dir="${web.src.dir}">
+				<include name="**/*.*"/>
+				<include name="**/*" />
+			</fileset>
+		</ftp>
+	</target>	
+	
+	<!-- Copy SSO Property -->
+	<target name="copy-config-by-server1">
+		<echo message="[${server1.host}] copy sso1.properties to sso.properties"></echo>
+		<sshexec host="${server1.host}" username="${server1.username}" password="${server1.password}"
+	    	command="cp ${server1.deploy.path}/WEB-INF/classes/sso1.properties ${server1.deploy.path}/WEB-INF/classes/sso.properties" trust="true"/>
+	</target>	
+	<target name="copy-config-by-server2">
+		<echo message="[${server2.host}] copy sso2.properties to sso.properties"></echo>
+		<sshexec host="${server2.host}" username="${server2.username}" password="${server2.password}"
+	    	command="cp ${server2.deploy.path}/WEB-INF/classes/sso2.properties ${server2.deploy.path}/WEB-INF/classes/sso.properties" trust="true"/>
+	</target>		
+
+
+	<!-- batch Start remote -->
+	<target name="remote-batch-start">
+		<sshexec host="${src.batch.host}" username="${src.batch.username}" password="${src.batch.password}"
+	    	command="sh ${src.batch.home}/bin/start_daemon.sh" trust="true"/>
+	</target>
+	
+	<!-- batch Stop remote -->
+	<target name="remote-batch-stop">
+		<sshexec host="${src.batch.host}" username="${src.batch.username}" password="${src.batch.password}"
+	    	command="sh ${src.batch.home}/bin/stop_daemon.sh" trust="true"/>
+	</target>
+	
+	<!-- JOB 순서 
+		1. clean 				: WEB-INF/classes 폴더 clear
+		2. init					: 프로젝트에 dist 폴더를 생성 - packaging된 결과를 dist폴더에 저장하기 위함
+		3. resource 			: 환경 설정 파일들을 복사
+		4. compile	 			: 컴파일
+		5. remote-batch-stop 	: 배치 stop (배치 job중 was통신을 하는부분이 있으므로 정지를 해야함.)
+		6. remote-hsqldb-deploy : metadb 배포 & start,stop
+	    7. remote-server-stop 	: WAS STOP (웹로직)
+	    8. ftp-deploy 			: Web Source 배포
+	    9. copy-config-by-server: sso설정파일 배포
+	    10. hsqldb-backup		: hsqldb 백업처리
+	    11.remote-server-stop 	: WAS START (웹로직)
+	    12.remote-batch-start   : 배치 start
+	-->
+
+	
+
+<!--	
+	<target name = "build" depends = "resources, compile
+									, hsqldb-backup, remote-hsqldb-stop, remote-hsqldb-deploy, remote-hsqldb-start
+									, remote-server-stop1, ftp-deploy1, copy-config-by-server1, remote-server-start1
+									, remote-server-stop2, ftp-deploy2, copy-config-by-server2, remote-server-start2"/>
+-->	
+	<target name = "build" depends = "clean, init, resources, compile
+		                            , remote-server-stop1, ftp-deploy1, remote-server-start1
+									 "/>
+
+<!--
+	<target name = "build" depends = "clean, init, resources, compile,  remote-batch-stop, remote-server-stop, ftp-deploy, copy-config-by-server, hsqldb-backup , remote-hsqldb-deploy, remote-server-start, remote-batch-start"/>
+-->
+	
+</project>

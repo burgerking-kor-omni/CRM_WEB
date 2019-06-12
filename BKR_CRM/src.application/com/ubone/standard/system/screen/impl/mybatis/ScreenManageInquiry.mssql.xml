@@ -1,0 +1,550 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ScreenManageInquiry">
+
+	<!--
+		QueryId     : ScreenManageInquiry.getScreenList
+		Description : Screen 목록을 조회하는 쿼리
+	 -->
+	<sql id="getScreenList_base">
+<!-- 페이징 공통 관련 쿼리 -->		  
+	   SELECT 
+	    <if test="ORDER_COLUMN == null or ORDER_COLUMN == ''">
+			  ROW_NUMBER() OVER( order by SCREEN_ID ) AS ROWNUM /* ROWNUM */
+		</if>
+		<if test="ORDER_COLUMN != null and ORDER_COLUMN != ''">
+			  ROW_NUMBER() OVER( order by ${ORDER_COLUMN} ${ORDER_ASC} ) AS ROWNUM /* ROWNUM */
+		</if>
+		    , SUB.*
+		 FROM (
+<!-- 업무 관련 쿼리 :: Begin -->
+			select S.SCREEN_ID      AS SCREEN_ID
+			     , S.PROJECT_CODE   AS PROJECT_CODE
+			     , S.CATEGORY_CODE  AS CATEGORY_CODE
+			     , (SELECT CODE_NAME
+	                 		FROM SYS_CODE WITH (NOLOCK)
+	                  		WHERE CODE_CATEGORY_ID='APMD_SCREEN_TYPE' AND CODE=S.SCREEN_TYPE ) AS SCREEN_TYPE
+			     , (SELECT CODE_NAME
+	                 		FROM SYS_CODE WITH (NOLOCK)
+	                  		WHERE CODE_CATEGORY_ID='APMD_VIEW_TYPE' AND CODE=S.VIEW_TYPE ) AS VIEW_TYPE
+			     , (SELECT CODE_NAME
+	                 		FROM SYS_CODE WITH (NOLOCK)
+	                  		WHERE CODE_CATEGORY_ID='APMD_LAYOUT_TYPE' AND CODE=S.LAYOUT_TYPE ) AS LAYOUT_TYPE
+			     , S.SCREEN_NAME    AS SCREEN_NAME
+			     , S.DESCRIPTION    AS "DESCRIPTION"
+			     , S.FILE_PATH      AS FILE_PATH
+			     , S.FILE_NAME      AS FILE_NAME 
+			     , S.PID            AS PID
+			     , CASE WHEN S.LOGIN_CHECK_YN = 'Y' THEN 'Yes'
+			            ELSE 'No' 
+			        END AS LOGIN_CHECK_YN
+			     , S.REG_DATETIME   AS REG_DATETIME
+			     , S.REG_USER_ID    AS REG_USER_ID
+			     , S.UPD_DATETIME   AS UPD_DATETIME
+			     , S.UPD_USER_ID    AS UPD_USER_ID
+	          from AP_SCREEN S WITH (NOLOCK)
+	          where 1=1
+					AND S.PROJECT_CODE = #{PROJECT_CODE}
+			<if test="SCREEN_ID != null and SCREEN_ID != ''" >
+			   and S.SCREEN_ID like ('%' + UPPER(#{SCREEN_ID}) + '%') 
+			</if>
+			<if test="SCREEN_NAME != null and SCREEN_NAME != ''" >
+			   and S.SCREEN_NAME like ('%' + #{SCREEN_NAME} + '%')
+			</if>
+			<if test="CATEGORY_CODE != null and CATEGORY_CODE != ''" >
+			   and S.CATEGORY_CODE = #{CATEGORY_CODE}
+			</if>
+			<if test="SCREEN_TYPE != null and SCREEN_TYPE != ''" >
+			   and S.SCREEN_TYPE = #{SCREEN_TYPE}
+			</if>
+			<if test="VIEW_TYPE != null and VIEW_TYPE != ''" >
+			   and S.VIEW_TYPE = #{VIEW_TYPE}
+			</if>
+			<if test="LOGIN_CHECK_YN != null and LOGIN_CHECK_YN != ''" >
+			   and S.LOGIN_CHECK_YN = #{LOGIN_CHECK_YN}
+			</if>
+<!-- 업무 관련 쿼리 :: End -->		  
+			) SUB	
+	</sql>
+	
+	<!-- 윈도우관리 목록 조회 -->
+	<select id="getScreenList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getScreenList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- 윈도우관리 목록 조회 - count -->
+	<select id="getScreenList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getScreenList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- 윈도우관리 목록 조회 - paging -->
+	<select id="getScreenList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getScreenList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		QueryId     : ScreenManageInquiry.getScreenListByAuto
+		Description : Screen 목록을 조회하는 쿼리 (AutoComplete)
+	 -->
+	<select id="getScreenListByAuto" parameterType="map" resultType="lmap">
+		select S.SCREEN_ID      AS SCREEN_ID
+		     , S.SCREEN_TYPE    AS SCREEN_TYPE
+		     , S.VIEW_TYPE      AS VIEW_TYPE
+		     , S.LAYOUT_TYPE    AS LAYOUT_TYPE
+		     , S.SCREEN_NAME    AS SCREEN_NAME
+          from AP_SCREEN S WITH (NOLOCK)
+          where 1=1
+		 	AND S.PROJECT_CODE = #{PROJECT_CODE}
+		<if test="SEARCH_SCREEN != null and SEARCH_SCREEN != ''" >
+		   and (S.SCREEN_ID like ('%' + UPPER(#{SEARCH_SCREEN}) + '%') or S.SCREEN_NAME like ( '%' + #{SEARCH_SCREEN} + '%')) 
+		</if>
+		<if test="SCREEN_ID != null and SCREEN_ID != ''" >
+		   and S.SCREEN_ID like '%' + UPPER(#{SCREEN_ID}) + '%' 
+		</if>
+		<if test="SCREEN_NAME != null and SCREEN_NAME != ''" >
+		   and S.SCREEN_NAME like ('%' + #{SCREEN_NAME} + '%')
+		</if>
+		 order by SCREEN_ID ASC
+	</select>
+	
+	<!--
+		QueryId     : ScreenManageInquiry.getScreen
+		Description : Screen 상세 조회하는 쿼리  
+	 -->
+	<select id="getScreen" parameterType="map" resultType="lmap">
+		SELECT
+	           a.SCREEN_ID      AS scrnId
+	         , a.CATEGORY_CODE  AS appCateCd
+	         , a.SCREEN_NAME	AS scrnNm
+	         , a.LAYOUT_TYPE AS scrnLaytTpCd
+	         , a.SCREEN_TYPE     AS scrnTpCd  
+	         , a.VIEW_TYPE AS scrnViewTpCd  
+	         , a.FILE_PATH   AS filePathNm  
+	         , a.FILE_NAME       AS fileNm
+	         , a.DESCRIPTION     AS scrnDscp
+	         , a.PID   AS metaPageId
+	         , a.LOGIN_CHECK_YN  AS LOGIN_CHECK_YN
+		  FROM AP_SCREEN a WITH (NOLOCK)
+		 WHERE a.SCREEN_ID = #{SCREEN_ID}
+	</select>
+	
+	<!--
+		Query id    : ScreenManageInquiry.isAvailableKey
+		Description : 사용 가능 키 여부 조사(주어진 키로 이미 등록된 화면 정보의 건수 조회)
+	-->
+	<select id="isAvailableKey" parameterType="String" resultType="boolean">
+		SELECT CASE WHEN COUNT(*) = 0 THEN 'true'
+		            ELSE 'false'
+		        END AS result 
+		  FROM AP_SCREEN WITH (NOLOCK)
+	     WHERE SCREEN_ID  = #{SCREEN_ID}
+	</select>
+	
+	<!--
+		Query id    : ScreenManageInquiry.isDupicatedFunction
+		Description : 화면 기능 중복 여부
+	-->
+	<select id="isDupicatedFunction" parameterType="map" resultType="boolean">
+		SELECT count(*) result
+		  FROM AP_SCREEN_FUNCTION WITH (NOLOCK)
+	     WHERE SCREEN_ID   = #{SCREEN_ID}
+		   and FUNCTION_ID = #{FUNCTION_NAME}
+	</select>
+	
+	<!--
+		Query id    : ScreenManageInquiry.isAvailabeAlias
+		Description : 화면-기능 매핑 Alias 등록 가능 여부
+	-->
+	<select id="isAvailabeAlias" parameterType="map" resultType="lmap">
+		SELECT CASE WHEN COUNT(*) = 0 THEN 'true'
+		            ELSE 'false'
+		        END AS IS_AVAILABLE
+		  FROM AP_SCREEN_FUNCTION WITH (NOLOCK)
+	     WHERE SCREEN_ID         = #{SCREEN_ID}
+		   and FUNCTION_ALIAS_ID = #{FUNCTION_ALIAS_ID}
+	</select>
+	
+	<!--
+		Query id    : ScreenManageInquiry.getListScreenFunc
+		Description : 화면 기능 목록 조회
+	-->
+	<select id="getListScreenFunc" parameterType="map" resultType="lmap">
+		SELECT S.SCREEN_ID             AS SCREEN_ID
+		     , S.FUNCTION_ID           AS FUNCTION_ID
+		     , S.START_FUNCTION_YN     AS START_FUNCTION_YN
+		     , F.FUNCTION_NAME         AS FUNCTION_NAME
+		     , (SELECT CODE_NAME
+                 		FROM SYS_CODE WITH (NOLOCK)
+                  		WHERE CODE_CATEGORY_ID='APMD_FUNCTION_TYPE' AND CODE=F.FUNCTION_TYPE ) AS FUNCTION_TYPE
+		     , S.FUNCTION_ALIAS_ID     AS FUNCTION_ALIAS_ID
+		     , CASE WHEN S.FUNCTION_ALIAS_ID = null THEN ''
+		            ELSE '[' + S.FUNCTION_ALIAS_ID + ']  ' + FA.FUNCTION_ALIAS_NAME
+		        END AS FUNCTION_ALIAS_NAME
+		     , FA.SORT_ORDER           AS SORT_ORDER
+		     , F.SERVICE_ID            AS SERVICE_ID
+		     , SVC.SERVICE_NAME        AS SERVICE_NAME
+		     , F.SCREEN_ID             AS SCREEN_ID
+		     , SCR.SCREEN_NAME         AS SCREEN_NAME
+		     , CASE WHEN F.FUNCTION_TYPE = 'SE' THEN F.SERVICE_ID
+		            ELSE F.SCREEN_ID
+		        END AS MODULE_ID
+			 , CASE WHEN F.FUNCTION_TYPE = 'SE' THEN SVC.SERVICE_NAME
+			        ELSE SCR.SCREEN_NAME
+			    END AS MODULE_NAME
+		  FROM AP_SCREEN_FUNCTION S WITH (NOLOCK)
+		 INNER JOIN AP_FUNCTION F WITH (NOLOCK)
+		    ON S.FUNCTION_ID = F.FUNCTION_ID
+		  LEFT OUTER JOIN AP_FUNCTION_ALIAS FA WITH (NOLOCK)
+		    ON S.FUNCTION_ALIAS_ID = FA.FUNCTION_ALIAS_ID
+		  LEFT OUTER JOIN AP_SERVICE SVC WITH (NOLOCK)
+		    ON F.SERVICE_ID = SVC.SERVICE_ID
+		  LEFT OUTER JOIN AP_SCREEN SCR WITH (NOLOCK)
+			ON F.SCREEN_ID = SCR.SCREEN_ID
+		 WHERE S.SCREEN_ID = #{SCREEN_ID}
+		 ORDER BY FUNCTION_TYPE DESC, SORT_ORDER, FUNCTION_ID
+	</select>
+	
+	<!--
+		Query id    : ScreenManageInquiry.getListScreenParam
+		Description : 화면 파라미터 목록 조회
+	-->
+	<select id="getListScreenParam" parameterType="String" resultType="lmap">
+		SELECT SCREEN_ID       AS SCREEN_ID
+		     , PARAMETER_NAME  AS PARAMETER_NAME
+		     , DEFAULT_VALUE   AS DEFAULT_VALUE
+		     , USE_YN          AS USE_YN
+          FROM AP_SCREEN_PARAMETER WITH (NOLOCK)
+		 WHERE SCREEN_ID        = #{SCREEN_ID}
+		 order by PARAMETER_NAME
+	</select>
+	
+	<!--
+		Query id    : ScreenManageInquiry.isAvailabeParameterName
+		Description : 화면-기능 매핑 Alias 등록 가능 여부
+	-->
+	<select id="isAvailabeParameterName" parameterType="map" resultType="lmap">
+		SELECT CASE WHEN COUNT(*) = 0 THEN 'true'
+		 		    ELSE 'false'
+		 		END AS IS_AVAILABLE 
+		  FROM AP_SCREEN_PARAMETER WITH (NOLOCK)
+	     WHERE SCREEN_ID      = #{SCREEN_ID}
+		   and PARAMETER_NAME = #{PARAMETER_NAME}
+	</select>
+	
+	<!--
+		Query id    : ScreenManageInquiry.registScreen
+		Description : 화면 등록
+	-->
+	<insert id="registScreen" parameterType="map">
+		insert into	AP_SCREEN (
+			  SCREEN_ID
+			, PROJECT_CODE
+			, CATEGORY_CODE
+			, SCREEN_TYPE
+			, VIEW_TYPE
+			, LAYOUT_TYPE
+			, SCREEN_NAME
+			, DESCRIPTION
+			, FILE_PATH
+			, FILE_NAME
+			, PID
+			, LOGIN_CHECK_YN
+			, REG_DATETIME
+			, REG_USER_ID
+			, UPD_DATETIME
+			, UPD_USER_ID 
+		)
+		values (
+			  #{SCREEN_ID}
+			, #{PROJECT_CODE}
+			, #{CATEGORY_CODE}
+			, #{SCREEN_TYPE}
+			, #{VIEW_TYPE}
+			, #{LAYOUT_TYPE}
+			, #{SCREEN_NAME}
+			, #{DESCRIPTION}
+			, #{FILE_PATH}
+			, #{FILE_NAME}
+			, #{PID}
+			, #{LOGIN_CHECK_YN}
+			, GETDATE()
+			, #{user.id}
+			, GETDATE()
+			, #{user.id}
+		)
+	</insert>
+	
+	<!--
+		Query id    : ScreenManageInquiry.registScreenFunc
+		Description : 화면 기능 등록
+	-->
+	<insert id="registScreenFunc" parameterType="map">
+		insert into	AP_SCREEN_FUNCTION (
+			  SCREEN_ID
+			, FUNCTION_ID
+			, START_FUNCTION_YN
+			, REG_DATETIME
+			, REG_USER_ID
+			, UPD_DATETIME
+			, UPD_USER_ID 
+			, FUNCTION_ALIAS_ID
+		)
+		values (
+			  #{SCREEN_ID}
+			, #{FUNCTION_ID}
+			, ISNULL(#{START_FUNCTION_YN}, 'N')
+			, GETDATE()
+			, #{user.id}
+			, GETDATE()
+			, #{user.id}
+			, ISNULL(CONVERT(VARCHAR,#{FUNCTION_ALIAS_ID}),'')
+		)
+	</insert>
+	
+	<!--
+		Query id    : ScreenManageInquiry.registScreenParam
+		Description : 화면 파라미터 등록
+	-->
+	<insert id="registScreenParam" parameterType="map">
+		insert into	AP_SCREEN_PARAMETER (
+			  SCREEN_ID
+			, PARAMETER_NAME
+			, DEFAULT_VALUE
+			, USE_YN
+			, REG_DATETIME
+			, REG_USER_ID
+			, UPD_DATETIME
+			, UPD_USER_ID 
+		)
+		values (
+			  #{SCREEN_ID}
+			, #{PARAMETER_NAME}
+			, #{DEFAULT_VALUE}
+			, ISNULL(#{USE_YN}, 'Y')
+			, GETDATE()
+			, #{user.id}
+			, GETDATE()
+			, #{user.id}
+		)
+	</insert>
+	
+	<!--
+		Query id    : ScreenManageInquiry.modifyScreen
+		Description : 화면 수정
+	-->
+	<update id="modifyScreen" parameterType="map">
+		update AP_SCREEN
+		   set SCREEN_TYPE    = #{SCREEN_TYPE}
+		     , VIEW_TYPE      = #{VIEW_TYPE}
+		     , LAYOUT_TYPE    = #{LAYOUT_TYPE}
+		     , SCREEN_NAME    = #{SCREEN_NAME}
+		     , DESCRIPTION    = #{DESCRIPTION}
+		     , FILE_PATH      = #{FILE_PATH}
+		     , FILE_NAME      = #{FILE_NAME}
+		     , PID            = #{PID_VALUE}
+		     , LOGIN_CHECK_YN = #{loginChkYn}
+		     , UPD_DATETIME   = GETDATE()
+		     , UPD_USER_ID    = #{user.id}
+		 WHERE SCREEN_ID      = #{SCREEN_ID}
+	</update>
+	
+	<!--
+		Query id    : ScreenManageInquiry.updateStartFuncYn
+		Description : 화면 기능 매핑.동기여부 수정 (미사용)
+	-->
+	<update id="updateStartFuncYn" parameterType="map">
+		update AP_SCREEN_FUNCTION A
+		   set START_FUNCTION_YN  = CASE WHEN A.START_FUNCTION_YN = 'Y' THEN 'N' ELSE 'Y' END
+		     , UPD_DATETIME       = GETDATE() 
+		     , UPD_USER_ID        = #{user.id}
+		 where SCREEN_ID          = #{SCREEN_ID}
+		   and FUNCTION_ID        = #{FUNCTION_ID}
+	</update>
+	
+	<!--
+		Query id    : ScreenManageInquiry.modifyScreenFunc
+		Description : 화면 기능 매핑.Alias, startYn 수정
+	-->
+	<update id="modifyScreenFunc" parameterType="map">
+		update AP_SCREEN_FUNCTION 
+		   set START_FUNCTION_YN  = #{START_FUNCTION_YN}
+		     , FUNCTION_ALIAS_ID  = #{FUNCTION_ALIAS_ID}
+		     , UPD_DATETIME       = GETDATE()
+		     , UPD_USER_ID        = #{user.id}
+		 where SCREEN_ID          = #{SCREEN_ID}
+		   and FUNCTION_ID        = #{FUNCTION_ID}
+	</update>
+	
+	<!--
+		Query id    : ScreenManageInquiry.updateScreenParameterUseFlag
+		Description : 화면 파라미터 사용여부 수정
+	-->
+	<update id="updateScreenParameterUseFlag" parameterType="map">
+		update AP_SCREEN_PARAMETER A
+		   set USE_YN 		  = CASE WHEN A.USE_YN = 'Y' THEN 'N' ELSE 'Y' END
+		     , UPD_DATETIME   = GETDATE()
+		     , UPD_USER_ID    = #{user.id}
+		 where SCREEN_ID      = #{SCREEN_ID}
+		   and PARAMETER_NAME = #{PARAMETER_NAME}
+	</update>
+	
+	<!--
+		Query id    : ScreenManageInquiry.modifyScreenParam
+		Description : 화면 파라미터 초기값 수정
+	-->
+	<update id="modifyScreenParam" parameterType="map">
+		update AP_SCREEN_PARAMETER 
+		   set USE_YN         = #{USE_YN}
+		     , DEFAULT_VALUE  = #{DEFAULT_VALUE}
+		     , UPD_DATETIME   = GETDATE()
+		     , UPD_USER_ID    = #{user.id}
+		 where SCREEN_ID      = #{SCREEN_ID}
+		   and PARAMETER_NAME = #{PARAMETER_NAME}
+	</update>
+	
+	<!--
+		Query id    : ScreenManageInquiry.removeScreen
+		Description : 화면 삭제
+	-->
+	<delete id="removeScreen" parameterType="map">
+		delete AP_SCREEN
+		 where SCREEN_ID = #{SCREEN_ID}
+	</delete>
+	
+	<!--
+		Query id    : ScreenManageInquiry.deleteAllScreenFunction
+		Description : 화면 기능 전체 삭제
+	-->
+	<delete id="removeAllScreenFunc" parameterType="map">
+		delete AP_SCREEN_FUNCTION
+		 where SCREEN_ID   = #{SCREEN_ID}
+	</delete>
+	
+	<!--
+		Query id    : ScreenManageInquiry.removeAllScreenParam
+		Description : 화면 파라미터 전체 삭제
+	-->
+	<delete id="removeAllScreenParam" parameterType="map">
+		delete AP_SCREEN_PARAMETER
+		 where SCREEN_ID   = #{SCREEN_ID}
+	</delete>
+	
+	<!--
+		Query id    : ScreenManageInquiry.removeAllMenuScreen
+		Description : 메뉴에 등록된 화면 전체 삭제
+	-->
+	<delete id="removeAllMenuScreen" parameterType="map">
+		delete AP_MENU_SCREEN
+		 where SCREEN_ID   = #{SCREEN_ID}
+	</delete>
+	
+	<!--
+		Query id    : ScreenManageInquiry.removeAllScreenAuth
+		Description : 화면 권한 전체 삭제
+	-->
+	<delete id="removeAllScreenAuth" parameterType="map">
+		delete AP_SCREEN_AUTH
+		 where SCREEN_ID   = #{SCREEN_ID}
+	</delete>
+	
+	<!--
+		Query id    : ScreenManageInquiry.updateScreenIdToNull
+		Description : 메뉴에 연결 url 전체 변경
+	-->
+	<update id="updateScreenIdToNull" parameterType="map">
+		update AP_MENU set
+			  CONNECT_URL = ''
+		  where CONNECT_URL = #{SCREEN_ID} 
+	</update>
+	
+	<!--
+		Query id    : ScreenManageInquiry.removeScreenFunc
+		Description : 화면 기능 삭제
+	-->
+	<delete id="removeScreenFunc" parameterType="map">
+		delete AP_SCREEN_FUNCTION
+		 where SCREEN_ID   = #{SCREEN_ID}
+		   and FUNCTION_ID = #{FUNCTION_ID}
+	</delete>
+	
+	<!--
+		Query id    : ScreenManageInquiry.removeScreenParam
+		Description : 화면 파라미터 삭제
+	-->
+	<delete id="removeScreenParam" parameterType="map">
+		delete AP_SCREEN_PARAMETER
+		 where SCREEN_ID      = #{SCREEN_ID}
+		   and PARAMETER_NAME = #{PARAMETER_NAME}
+	</delete>
+	
+	<!--
+		Query id    : ScreenManageInquiry.getProjectPath
+		Description : 프로젝트 경로 조회
+	-->
+	<select id="getProjectPath" parameterType="map" resultType="lmap">
+		select CODE_NAME
+          from SYS_CODE WITH (NOLOCK)
+		 where CODE_CATEGORY_ID = 'APMD_PROJECT_CODE'
+		   and CODE             = #{PROJECT_CODE}
+	</select>
+	
+	<!--
+		Query id    : ScreenManageInquiry.getScreenIdAll
+		Description : 모든 화면ID 조회
+	-->
+	<select id="getScreenIdAll" parameterType="map" resultType="lmap">
+	    SELECT SCREEN_ID 
+	      FROM AP_SCREEN WITH (NOLOCK)
+	</select>
+	
+	<!--
+		Query id    : ScreenManageInquiry.getMetaPageIdAll
+		Description : 모든 메타페이지ID 조회
+	-->
+	<select id="getMetaPageIdAll" parameterType="map" resultType="lmap">
+	    SELECT PID AS META_PAGE_ID
+  		  FROM AP_SCREEN WITH (NOLOCK)
+  		 WHERE VIEW_TYPE = 'M'
+	</select>
+	
+	<!--
+		Query id    : ScreenManageInquiry.getParamList
+		Description : 복사할 screen parameter 조회
+	-->
+	<select id="getParamList" parameterType="map" resultType="lmap">
+		SELECT PARAMETER_NAME
+				,DEFAULT_VALUE
+				,USE_YN
+		FROM AP_SCREEN_PARAMETER
+		WHERE SCREEN_ID = #{PARENT_SCREEN_ID}
+	</select>
+	
+	<!--
+		Query id    : ScreenManageInquiry.getFuncList
+		Description : 복사할 screen function 조회
+	-->
+	<select id="getFuncList" parameterType="map" resultType="lmap">
+        SELECT
+                  FNC.FUNCTION_ID     AS FUNCTION_ID
+                , FNC.FUNCTION_NAME   AS FUNCTION_NAME
+                , FNC.FUNCTION_TYPE   AS FUNCTION_TYPE
+                , FNC.DESCRIPTION     AS DESCRIPTION
+                , FNC.PROJECT_CODE    AS PROJECT_CODE
+                , FNC.CATEGORY_CODE   AS CATEGORY_CODE
+                , FNC.SERVICE_ID      AS SERVICE_ID
+                , FNC.SCREEN_ID       AS SCREEN_ID
+                , SF.FUNCTION_ALIAS_ID    AS FUNCTION_ALIAS_ID
+                , SF.START_FUNCTION_YN    AS START_FUNCTION_YN
+        FROM	AP_SCREEN_FUNCTION SF 
+       			LEFT OUTER JOIN AP_FUNCTION FNC
+       	ON		SF.SCREEN_ID = #{PARENT_SCREEN_ID}
+        WHERE   FNC.FUNCTION_ID = SF.FUNCTION_ID
+	</select>
+</mapper>

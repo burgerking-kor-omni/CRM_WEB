@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="ALM0002" screenType="detail" screenLayoutType="Popup" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>알리미 발송 등록화면</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/alm/</filePath>
+  <fileName>ALM0002</fileName>
+  <functions/>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

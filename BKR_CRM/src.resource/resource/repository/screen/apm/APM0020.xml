@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="APM0020" screenType="detail" screenLayoutType="Popup" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>APMD /  서비스 코드 수정(팝업)</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0020</fileName>
+  <functions>
+    <function id="FNCAPM0046" isStartFunction="false" functionName="서비스코드 정보 수정 호출" serviceId="SVCAPM0032" alias="MODIFY"/>
+    <function id="FNCAPM0047" isStartFunction="true" functionName="서비스코드 상세 조회 호출" serviceId="SVCAPM0033" alias=""/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

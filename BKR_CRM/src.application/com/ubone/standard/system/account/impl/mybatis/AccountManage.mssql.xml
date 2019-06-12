@@ -1,0 +1,328 @@
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="AccountManage">
+
+	<!--
+		Query id    : AccountManage.selectDuplicate
+		Description : 코드 그룹 조회
+	-->
+	<select id="selectDuplicate" parameterType="map" resultType="lmap">
+		 
+		SELECT COUNT(*) AS DUP_CNT FROM (
+				SELECT EMP_NO
+				  FROM SYS_USER
+				 WHERE EMP_NO = #{LOGIN_ID}
+				UNION ALL
+				SELECT LOGIN_ID
+				  FROM SYS_LOGIN
+				 WHERE LOGIN_ID = #{LOGIN_ID}) A
+
+	</select>
+	
+	<select id="selectLoginId" parameterType="map" resultType="lmap">
+		 
+		 SELECT  EMP_NO
+		 		   , INCUMBENT_CD
+		 		   , ISNULL(LOGIN_ID,'NO_DATA') AS LOGIN_ID
+		 		   , LOGIN_YN
+          		   , STATUS
+		 	 FROM SYS_USER
+		 	 	LEFT OUTER JOIN SYS_LOGIN ON SYS_USER.EMP_NO = SYS_LOGIN.LOGIN_ID
+		 	 	WHERE 1=1
+		 	 	AND EMP_NO = #{LOGIN_ID}
+		 
+	</select>
+	
+	<select id="selectMobPhone" parameterType="map" resultType="lmap">
+		 SELECT  MOBILE_NO
+		 	 FROM SYS_USER
+		 	 	WHERE 1=1
+		 	 	AND MOBILE_NO = #{MOBILE_NO}
+		 	 	AND EMP_NO = #{LOGIN_ID}
+	</select>
+	
+	<select id="selectEmail" parameterType="map" resultType="lmap">
+		 SELECT  EMAIL_DS
+		 	 FROM SYS_USER
+		 	 	WHERE 1=1
+		 	 	AND EMAIL_DS = #{EMAIL_DS}
+		 	 	AND EMP_NO = #{LOGIN_ID}
+	</select>
+	
+	<select id="getAccountRequestList" parameterType="map" resultType="lmap">
+		 SELECT SAR.REQ_NO
+	              , SAR.LOGIN_ID
+	              , SU.USER_ID
+	              , SAR.USER_NM
+	              , SAR.PASSWD
+	              , SAR.MOBILE_NO
+	              , SAR.EMAIL_DS
+	              , SAR.PURPOSE_DS
+	              , CONVERT(VARCHAR, SAR.REG_DT, 120) REG_DT
+	              , SAR.APPR_STATUS
+	              , CONVERT(VARCHAR, SAR.APPR_DT, 120) APPR_DT
+	              , SAR.USER_ID_APPR
+	              , (SELECT U.USER_NM FROM SYS_USER U WHERE U.USER_ID = SAR.USER_ID_APPR) AS USER_NM_APPR
+	              , SAR.DEPT_ID_APPR
+	              , SU.INCUMBENT_CD
+	        FROM SYS_ACCOUNT_REQ SAR
+	        	INNER JOIN SYS_USER SU
+	        		ON SAR.LOGIN_ID = SU.EMP_NO
+	       		WHERE 1=1
+	        		AND SAR.LOGIN_ID = #{LOGIN_ID}
+	        		ORDER BY SAR.REG_DT DESC
+	</select>
+	
+	
+	<select id="getAccountRequestDetail" parameterType="map" resultType="lmap">
+		SELECT REQ_NO,
+		       LOGIN_ID,
+		       PASSWD,
+		       USER_NM,
+		       MOBILE_NO,
+		       EMAIL_DS,
+		       PURPOSE_DS,
+		       REQ_TYPE,
+		       APPR_STATUS,
+		       APPR_DT,
+		       DEPT_ID_APPR,
+		       USER_ID_APPR,
+		       REG_DT
+		  FROM SYS_ACCOUNT_REQ
+		 WHERE 1=1
+		 	<choose>
+				<when test="REQ_NO != null and REQ_NO != ''">
+				AND REQ_NO = #{REQ_NO}
+				</when>
+				<otherwise>
+					<if test="LOGIN_ID != null and LOGIN_ID != ''">
+						AND LOGIN_ID = #{LOGIN_ID}
+					 </if>
+					 <if test="USER_NM != null and USER_NM != ''">
+						AND USER_NM = #{USER_NM}
+					 </if>
+					 <if test="EMAIL_DS != null and EMAIL_DS != ''">
+						AND EMAIL_DS = #{EMAIL_DS}
+					 </if>
+					 <if test="REQ_TYPE != null and REQ_TYPE != ''">
+						AND REQ_TYPE = #{REQ_TYPE}
+					 </if>
+					 <if test="APPR_STATUS != null and APPR_STATUS != ''">
+						AND APPR_STATUS = #{APPR_STATUS}
+					 </if>
+				</otherwise>
+			</choose>
+	</select>
+	
+	<!--
+		Query id    : AccountManage.insertAccountRequest
+		Description : 계정신청 등록
+	-->
+	<insert id="insertAccountRequest" parameterType="map">
+		<selectKey resultType="String" keyProperty="REQ_NO" order="BEFORE">
+			SELECT ISNULL(MAX(REQ_NO)+1, 1) FROM SYS_ACCOUNT_REQ
+		</selectKey>
+			INSERT INTO SYS_ACCOUNT_REQ (
+			               REQ_NO,
+			               LOGIN_ID,
+                           PASSWD,
+                           USER_NM,
+                           MOBILE_NO,
+                           EMAIL_DS,
+                           PURPOSE_DS,
+                           REQ_TYPE,
+                           REG_DT)
+		     VALUES (#{REQ_NO},
+		             #{LOGIN_ID},
+		             #{PASSWD},
+		             #{USER_NM},
+		             #{MOBILE_NO},
+		             #{EMAIL_DS},
+		             #{PURPOSE_DS},
+		             #{REQ_TYPE},
+		             SYSDATE)		
+	</insert>
+	
+	
+	<!--
+		Query id    : AccountManage.selectAccountRequest
+		Description : 계정신청목록 조회
+	-->
+	<sql id="selectAccountRequest_base">
+<!-- 페이징 공통 관련 쿼리 -->		  
+	   SELECT 
+	    <if test="ORDER_COLUMN == null or ORDER_COLUMN == ''">
+			  ROW_NUMBER() OVER( order by REG_DT DESC ) AS ROWNUM /* ROWNUM */
+		</if>
+		<if test="ORDER_COLUMN != null and ORDER_COLUMN != ''">
+			  ROW_NUMBER() OVER( order by ${ORDER_COLUMN} ${ORDER_ASC} ) AS ROWNUM /* ROWNUM */
+		</if>
+		    , SUB.*
+		 FROM (
+<!-- 업무 관련 쿼리 :: Begin -->
+				SELECT REQ_NO,
+			       LOGIN_ID,
+			       PASSWD,
+			       USER_NM,
+			       MOBILE_NO,
+			       EMAIL_DS,
+			       PURPOSE_DS,
+			       REQ_TYPE AS REQ_TYPE_CD,
+			       REQ_TYPE,
+			       APPR_STATUS,
+			       APPR_DT,
+			       DEPT_ID_APPR,
+			       USER_ID_APPR,
+			       REG_DT
+			  FROM SYS_ACCOUNT_REQ
+			 WHERE 1=1
+			 <if test="SEARCH_USER_NM != null and SEARCH_USER_NM != ''">
+				AND USER_NM LIKE '%' + #{SEARCH_USER_NM} + '%'
+			</if>
+			<if test="SEARCH_REQ_TYPE != null and SEARCH_REQ_TYPE != ''">
+				AND REQ_TYPE = #{SEARCH_REQ_TYPE}
+			</if>
+<!-- 업무 관련 쿼리 :: End -->		  
+			) SUB
+	</sql>
+
+	<!-- 계정신청목록 조회 -->
+	<select id="selectAccountRequest" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="selectAccountRequest_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- 계정신청목록 조회 - count -->
+	<select id="selectAccountRequest_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="selectAccountRequest_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- 계정신청목록 조회 - paging -->
+	<select id="selectAccountRequest_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="selectAccountRequest_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	
+	<!--
+		QueryId     : AccountManage.updateAccountRequestStatus
+		Description : 계정요청정보 승인상태변경
+	 -->
+	<update id="updateAccountRequestStatus" parameterType="map">
+		UPDATE SYS_ACCOUNT_REQ
+		   SET APPR_STATUS        = #{APPR_STATUS}
+		     , USER_ID_APPR      = #{user.id}
+		     , APPR_DT           = GETDATE()
+		     , DEPT_ID_APPR      = #{user.partCode} 
+         WHERE REQ_NO            = #{REQ_NO}
+	</update>
+	
+	
+	
+	<!-- 계정신청상태조회 -->
+	<select id="getAccountRequestStatus" parameterType="map" resultType="lmap">
+		SELECT REQ_NO,
+		       LOGIN_ID,
+		       PASSWD,
+		       USER_NM,
+		       MOBILE_NO,
+		       EMAIL_DS,
+		       PURPOSE_DS,
+		       REQ_TYPE AS REQ_TYPE_CD,
+		       REQ_TYPE,
+		       APPR_STATUS,
+		       APPR_DT,
+		       DEPT_ID_APPR,
+		       USER_ID_APPR,
+		       REG_DT
+		  FROM SYS_ACCOUNT_REQ
+		 WHERE LOGIN_ID = #{LOGIN_ID}
+		 ORDER BY REQ_NO DESC
+	</select>
+	
+	
+	<!-- 사용자정보조회 findId용 -->
+	<select id="findUserInfo" parameterType="map" resultType="lmap">
+		SELECT 
+               U.USER_ID
+             , U.USER_NM
+             , U.EMP_NO
+             , U.PHONE_NO
+             , U.MOBILE_NO
+             , U.EMAIL_DS
+             , L.LOGIN_ID 
+             , L.PASSWD 
+		  FROM SYS_USER U
+		 LEFT OUTER JOIN SYS_LOGIN L
+		   ON U.USER_ID = L.USER_ID
+		WHERE U.USER_NM = #{USER_NM}
+		  AND U.EMAIL_DS = #{EMAIL_DS} 
+		<if test="LOGIN_ID != null and LOGIN_ID != ''">
+			AND L.LOGIN_ID = #{LOGIN_ID}
+		</if> 
+	</select>
+	
+	
+	<!--
+		QueryId     : AccountManage.updatePassWord
+		Description : Login 정보 저장하는 쿼리  
+	-->
+	<update id="updatePassWord" parameterType="map">
+		UPDATE SYS_LOGIN
+		   SET PASSWD	= #{PASSWD}
+			 , BEF_PASSWD = PASSWD
+			 , CHNG_DT_PASSWD = GETDATE()
+         WHERE LOGIN_ID = #{LOGIN_ID}
+	</update>
+	
+	<!--
+		QueryId     : 
+		Description : 사용자 신청 승인 상태 변경 (승인)
+	 -->
+	<update id="updateAccountReq" parameterType="map">
+		UPDATE SYS_ACCOUNT_REQ
+		   SET APPR_STATUS    = 'ASSN'
+		       , USER_ID_APPR    = #{user.id}
+		       , APPR_DT           = GETDATE()
+		       , DEPT_ID_APPR    = #{user.partCode} 
+         WHERE LOGIN_ID = #{LOGIN_ID} AND REQ_NO = #{REQ_NO}
+	</update>
+	
+	<!--
+		QueryId     : 
+		Description : 사용자 신청 승인 상태 변경 (반려)
+	 -->
+	<update id="updateAccountReturn" parameterType="map">
+		UPDATE SYS_ACCOUNT_REQ
+		   SET APPR_STATUS    = 'RJCT'
+		       , USER_ID_APPR    = #{user.id}
+		       , APPR_DT           = GETDATE()
+		       , DEPT_ID_APPR    = #{user.partCode} 
+         WHERE LOGIN_ID = #{LOGIN_ID} AND REQ_NO = #{REQ_NO}
+	</update>
+	
+	<!--
+		QueryId     : 
+		Description : 신규 사용자 신청 사용자 정보 변경
+	 -->
+	<update id="updateUserInfo" parameterType="map">
+		UPDATE SYS_USER 
+              SET  USER_NM = #{USER_NM}
+                    , MOBILE_NO  = #{MOBILE_NO}
+                    , EMAIL_DS	 = #{EMAIL_DS}
+                    , INCUMBENT_CD = 'E'
+              WHERE EMP_NO = #{LOGIN_ID}
+	</update>
+	
+	<update id="updateUserIncumbent" parameterType="map">
+		UPDATE SYS_USER
+			SET INCUMBENT_CD = #{INCUMBENT_CD}
+			WHERE EMP_NO = #{loginId}
+	</update>
+	
+</mapper>

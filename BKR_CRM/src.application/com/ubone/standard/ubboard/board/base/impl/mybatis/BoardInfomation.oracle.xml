@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="BoardInfomation">
+
+	<!--
+		QueryId     : 
+		Description : 
+	 -->
+	<select id="getBoardInfo" parameterType="map" resultType="lmap">
+	    SELECT SB.ID_BOARD
+             , SBT.ID_BOARD_TYPE
+             , SB.DS_TITLE
+<!--              , SB.TP_THEME -->
+             , SB.CD_CATEGORY
+             , SB.TP_PARTITION
+             , SB.FG_AUTH_ACTIVE
+             , SB.DT_REG
+             , SB.ID_REG_EMP
+             , SB.DT_UPT
+             , SB.ID_UPT_EMP 
+          FROM SYS_BOARD SB
+          JOIN SYS_BOARD_TYPE SBT
+            ON SB.ID_BOARD = SBT.ID_BOARD
+		 WHERE SB.ID_BOARD = #{ID_BOARD}
+		   AND SB.FG_USE = 'A'
+		   AND SB.FG_DEL = 'N'
+	</select>
+	
+	<select id="getBoardType" parameterType="map" resultType="lmap">
+	    SELECT ID_BOARD_TYPE
+		     , FG_DATA_ITEM
+		     , FG_DATA_ITEM_NEW
+		     , FG_DATA_ITEM_FILE
+		     , FG_DATA_ITEM_REPLY
+		     , FG_NOTICE
+		     , CNT_NOTICE
+		     , FG_FILE
+		     , DS_FILE_EXTENSION
+		     , DS_FILE_VOLUME
+		     , CNT_MAX_FILE
+		     , FG_REPLY
+		     , FG_ANSWER
+		     , FG_PRE_NEXT
+		     , FG_GOOD_BAD
+		     , FG_EXCEL_DOWN
+		     , FG_TEXT_EDITOR
+		     , FG_INQUIRY_HISTORY
+		  FROM SYS_BOARD_TYPE
+		 WHERE ID_BOARD = #{ID_BOARD}
+	</select>
+	
+	<select id="getBoardTypeId" parameterType="map" resultType="String">
+	    SELECT ID_BOARD_TYPE
+	      FROM SYS_BOARD_TYPE
+	     WHERE ID_BOARD = #{ID_BOARD}
+	</select>
+	
+	<select id="hasBoardAdmin" parameterType="map" resultType="Integer">
+		SELECT COUNT(*) AS COUNT
+		  FROM SYS_BOARD_ADMIN
+		 WHERE ID_BOARD = #{ID_BOARD}
+		   AND ((ADMIN_TYPE = 'U' AND ADMIN_VALUE = #{user.id})
+		      OR (ADMIN_TYPE = 'R' AND ADMIN_VALUE IN 
+		      	<foreach collection="user.roles" item="ROLE" open="(" close=")" separator=",">
+		 			#{ROLE}
+		 		</foreach>
+		 		))
+	</select>
+	
+	
+</mapper>

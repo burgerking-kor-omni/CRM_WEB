@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Code">
+
+	<!--
+		Query id    : Code.insertCodeCategory
+		Description : 코드 유형 등록
+	-->
+	<insert id="insertCodeCategory" parameterType="map">
+		INSERT INTO SYS_CODE_CATEGORY(
+			  CODE_CATEGORY_ID  /* 코드유형ID*/
+			, CODE_TP /* 코드구분*/
+			, CODE_CATEGORY_NM  /* 코드유형명*/
+			, CONSTANT_REG_YN   /* 상수등록여부*/
+			, CACHE_YN    		/* 캐쉬여부*/
+			, CODE_QUERY_CONTENT/* 코드정의쿼리*/
+			, ENUM_CLASS_NAME   /* ENUM클래스명*/
+			, STATUS    		/* 상태*/
+			, CODE_CATEGORY_ID_UP /* 상위코드 */
+			, REG_DT    		/* 최초등록일시*/
+			, USER_ID_REG    	/* 최초등록자*/
+			, UPD_DT    		/* 최초수정일시*/
+			, USER_ID_UPD    	/* 최초수정자*/
+			, MAPPING_YN		/* 코드맵핑사용여부 */
+			, TABLE_ID			/*원천코드테이블ID*/
+			, CODE_COLUMN_ID	/*원천코드컬럼ID*/
+			, NAME_COLUMN_ID	/*원천명칭컬럼ID*/
+			)
+			VALUES (
+			  #{CODE_CATEGORY_ID}    /* 코드유형ID*/
+			, #{CODE_TP}    		 /* 코드구분*/
+			, #{CODE_CATEGORY_NM}    /* 코드유형명*/
+			, #{CONSTANT_REG_YN}     /* 상수등록여부*/
+			, #{CACHE_YN}    		 /* 캐쉬여부*/
+			, #{CODE_QUERY_CONTENT}  /* 코드정의쿼리*/
+			, #{ENUM_CLASS_NAME}     /* ENUM클래스명*/
+			, #{STATUS}    			 /* 상태*/
+			, #{CODE_CATEGORY_ID_UP} /* 상위코드 */
+			, CURRENT_TIMESTAMP 	 /* 최초등록일시*/
+	        , #{user.id}			 /* 최초등록자*/
+	        , CURRENT_TIMESTAMP		 /* 최초수정일시*/
+	        , #{user.id}			 /* 최초수정자*/
+	        , #{MAPPING_YN}			 /* 코드맵핑사용여부 */
+	        , #{TABLE_ID}			 /*원천코드테이블ID*/
+	        , #{CODE_COLUMN_ID} 	 /*원천코드컬럼ID*/
+	        , #{NAME_COLUMN_ID}		 /*원천명칭컬럼ID*/
+			)
+	</insert>
+
+	<!--
+		Query id    : Code.updateCodeCategory
+		Description : 코드 유형 수정
+	-->
+	<update id="updateCodeCategory" parameterType="map">
+		UPDATE SYS_CODE_CATEGORY
+		SET
+			  CODE_CATEGORY_ID	=	#{CODE_CATEGORY_ID}   /*코드유형ID*/
+			, CODE_TP	=	#{CODE_TP}    				  /*코드구분*/
+			, CODE_CATEGORY_NM	=	#{CODE_CATEGORY_NM}   /*코드유형명*/
+			, CONSTANT_REG_YN	=	#{CONSTANT_REG_YN}    /*상수등록여부*/
+			, CACHE_YN	=	#{CACHE_YN}    				  /*캐쉬여부*/
+			, CODE_QUERY_CONTENT	=	#{CODE_QUERY_CONTENT}    /*코드정의쿼리*/
+			, ENUM_CLASS_NAME	=	#{ENUM_CLASS_NAME}    /*ENUM클래스명*/
+			, STATUS	=	#{STATUS}    				  /*상태*/
+			, CODE_CATEGORY_ID_UP = #{CODE_CATEGORY_ID_UP}/* 상위코드 */
+			, UPD_DT	=	CURRENT_TIMESTAMP			  /*최초수정일시*/
+			, USER_ID_UPD	=	#{user.id}	    		  /*최초수정자*/
+			, MAPPING_YN = #{MAPPING_YN}				  /* 코드맵핑사용여부 */
+			, TABLE_ID	=	#{TABLE_ID}    				  /*원천코드테이블ID*/
+			, CODE_COLUMN_ID	=	#{CODE_COLUMN_ID}     /*원천코드컬럼ID*/
+			, NAME_COLUMN_ID	=	#{NAME_COLUMN_ID}     /*원천명칭컬럼ID*/
+		WHERE  CODE_CATEGORY_ID	=	#{CODE_CATEGORY_ID}   /*코드유형ID*/
+	</update>
+
+	<!--
+		Query id    : Code.deleteCodeCategory
+		Description : 코드 유형 삭제
+	-->
+	<delete id="deleteCodeCategory">
+		DELETE FROM SYS_CODE_CATEGORY
+		WHERE  CODE_CATEGORY_ID=#{CODE_CATEGORY_ID}    /*코드유형ID*/
+	</delete>
+
+	<!--
+		Query id    : Code.selectCodeCategoryList
+		Description : 코드 유형 목록 조회
+	-->
+	<sql id="selectCodeCategoryList_base">
+<!-- 페이징 공통 관련 쿼리 -->		  
+	   SELECT 
+	    <if test="ORDER_COLUMN == null or ORDER_COLUMN == ''">
+			  ROW_NUMBER() OVER( order by REG_DT DESC ) AS ROWNUM /* ROWNUM */
+		</if>
+		<if test="ORDER_COLUMN != null and ORDER_COLUMN != ''">
+			  ROW_NUMBER() OVER( order by ${ORDER_COLUMN} ${ORDER_ASC} ) AS ROWNUM /* ROWNUM */
+		</if>
+		    , SUB.*
+		 FROM (
+<!-- 업무 관련 쿼리 :: Begin -->
+			SELECT CODE_CATEGORY_ID    /* 코드유형ID	*/
+				 , CODE_CATEGORY_ID_UP /* 상위 코드유형ID	*/
+				 , CODE_TP /* 코드유형		*/
+				 , CODE_CATEGORY_NM    /* 코드유형명	*/
+				 , CONSTANT_REG_YN     /* 상수등록여부  */
+				 , CACHE_YN            /* 캐쉬여부		*/
+				 , CODE_QUERY_CONTENT  /* 코드정의쿼리  */
+				 , STATUS              /* 상태		*/
+				 , USER_ID_REG         /* 등록자ID	*/
+				 , (SELECT USER_NM
+				      FROM SYS_USER WITH( NOLOCK )
+				     WHERE USER_ID = S.USER_ID_REG)
+				    AS USER_NM 		   /* 등록자명      */
+				 , REG_DT              /* 등록일시		*/
+				 , MAPPING_YN /* 코드맵핑사용여부 */
+				 , TABLE_ID			   /*원천코드테이블ID*/
+				 , CODE_COLUMN_ID	   /*원천코드컬럼ID*/
+				 , NAME_COLUMN_ID	   /*원천명칭컬럼ID*/
+			FROM SYS_CODE_CATEGORY S WITH( NOLOCK )
+			WHERE 1=1
+			<if test="CODE_CATEGORY_ID != null and CODE_CATEGORY_ID != ''">
+				AND CODE_CATEGORY_ID LIKE '%' + #{CODE_CATEGORY_ID} + '%'
+			</if>
+			<if test="CODE_CATEGORY_ID_DETAIL != null and CODE_CATEGORY_ID_DETAIL != ''">
+				AND CODE_CATEGORY_ID = #{CODE_CATEGORY_ID_DETAIL}
+			</if>
+			<if test="CODE_CATEGORY_NM != null and CODE_CATEGORY_NM != ''">
+				AND CODE_CATEGORY_NM LIKE '%' + #{CODE_CATEGORY_NM} + '%'
+			</if>
+			<if test="CODE_TP != null and CODE_TP != ''">
+				AND CODE_TP = #{CODE_TP}
+			</if>
+			<if test="CODE_NAME != null and CODE_NAME != ''">
+				AND CODE_CATEGORY_ID in (
+										 SELECT CODE_CATEGORY_ID
+									 	 FROM SYS_CODE WITH( NOLOCK )
+										 WHERE CODE_NAME LIKE '%' + #{CODE_NAME} + '%'
+										)
+			</if>
+<!-- 업무 관련 쿼리 :: End -->		  
+			) SUB		
+	</sql>
+
+	<!-- 코드 유형 목록 조회 -->
+	<select id="selectCodeCategoryList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="selectCodeCategoryList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- 코드 유형 목록 조회 - count -->
+	<select id="selectCodeCategoryList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="selectCodeCategoryList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- 코드 유형 목록 조회 - paging -->
+	<select id="selectCodeCategoryList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="selectCodeCategoryList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+
+	<!--
+		Query id    : Code.insertCode
+		Description : 코드 등록
+	-->
+	<insert id="insertCode" parameterType="map">
+		INSERT INTO SYS_CODE(
+			  CODE_CATEGORY_ID /* 코드유형ID	*/
+			, CODE 			   /* 코드		*/
+			, CODE_NAME        /* 코드명		*/
+			, CODE_DS 		   /* 상세코드명	*/
+			, SORT_ORDER 	   /* 정렬순서		*/
+			, PARENT_CODE 	   /* 상위코드		*/
+			, STATUS 		   /* 상태		*/
+			, REG_DT 		   /* 최초등록일시	*/
+			, USER_ID_REG 	   /* 최초등록자	*/
+			, UPD_DT 		   /* 최초수정일시	*/
+			, USER_ID_UPD 	   /* 최초수정자	*/
+			)
+			VALUES (
+			  #{CODE_CATEGORY_ID} /* 코드유형ID	*/
+			, #{CODE} 			  /* 코드			*/
+			, #{CODE_NAME} 		  /* 코드명		*/
+			, #{CODE_DS} 		  /* 상세코드명	*/
+			, #{SORT_ORDER} 	  /* 정렬순서		*/
+			, #{PARENT_CODE} 	  /* 상위코드		*/
+			, #{STATUS} 		  /* 상태			*/
+			, CURRENT_TIMESTAMP   /* 최초등록일시	*/
+			, #{user.id} 	  	  /* 최초등록자	*/
+			, CURRENT_TIMESTAMP   /* 최초수정일시	*/
+			, #{user.id} 	      /* 최초수정자	*/
+			)
+	</insert>
+
+	<!--
+		Query id    : Code.selectCode
+		Description : 코드 조회
+	-->
+	<select id="selectCode" parameterType="map" resultType="lmap">
+		SELECT
+			  CODE 			   /* 코드		*/
+			, CODE_NAME        /* 코드명		*/
+			, CODE_DS 		   /* 상세코드명	*/
+			, SORT_ORDER 	   /* 정렬순서		*/
+			, PARENT_CODE 	   /* 상위코드		*/
+			, STATUS           /* 상태	*/
+			, CODE_CATEGORY_ID /* 코드카테고리ID */
+		FROM SYS_CODE WITH( NOLOCK )
+		WHERE 1=1
+		<if test="CODE_CATEGORY_ID != null and CODE_CATEGORY_ID != ''">
+			AND CODE_CATEGORY_ID = #{CODE_CATEGORY_ID}
+		</if>
+		<if test="CODE != null and CODE != ''">
+			AND CODE = #{CODE}
+		</if>
+		ORDER BY SORT_ORDER
+	</select>
+
+	<!--
+		Query id    : Code.updateCode
+		Description : 코드 수정
+	-->
+	<update id="updateCode" parameterType="map">
+		UPDATE SYS_CODE
+		SET	  CODE				=	#{CODE}   		 /*코드*/
+			, CODE_NAME			=	#{CODE_NAME}     /*코드명*/
+			, CODE_DS			=	#{CODE_DS}    	 /*상세코드명*/
+			, SORT_ORDER		=	#{SORT_ORDER}    /*정렬순서*/
+			, PARENT_CODE		=	#{PARENT_CODE}   /*상위코드*/
+			, STATUS			=	#{STATUS}    	 /*상태*/
+		WHERE CODE_CATEGORY_ID	=	#{CATEGORY_ID}    /*코드유형ID*/
+		AND   CODE				=	#{CODE}    		 /*코드*/
+	</update>
+
+	<!--
+		Query id    : Code.selectCodeGroup
+		Description : 코드 그룹 조회
+	-->
+	<select id="selectCodeGroup" parameterType="map" resultType="lmap">
+		SELECT    CODE_GROUP_ID      /* 코드그룹ID  */
+                , CODE_GROUP_NM      /* 코드그룹명   */
+          FROM   SYS_CODE_GROUP WITH( NOLOCK )
+        WHERE 1=1
+        <if test="CODE_CATEGORY_ID != null and CODE_CATEGORY_ID != ''">
+        	AND CODE_CATEGORY_ID = #{CODE_CATEGORY_ID}
+        </if>
+        GROUP BY CODE_GROUP_ID, CODE_GROUP_NM
+
+	</select>
+
+	<!--
+		Query id    : Code.insertCodeGroup
+		Description : 코드 그룹 등록
+	-->
+	<insert id="insertCodeGroup" parameterType="map">
+		INSERT INTO SYS_CODE_GROUP(
+			      CODE_GROUP_ID     /* 코드그룹번호*/
+				, CODE_CATEGORY_ID  /* 코드분류번호*/
+				, CODE    			/* 코드*/
+				, CODE_GROUP_NM     /* 코드그룹명*/
+    	)
+		SELECT #{CODE_GROUP_ID},
+			   CODE_CATEGORY_ID,
+			   CODE,
+	           #{CODE_GROUP_NM}
+		FROM SYS_CODE WITH( NOLOCK )
+		WHERE CODE_CATEGORY_ID = #{CODE_CATEGORY_ID}
+		<if test='CODE_SIZE == "1"'>
+			AND CODE = #{CODE}
+		</if>
+		<if test='CODE_SIZE != "1"'>
+		    AND CODE IN
+		   <foreach collection="CODE" item="CODE_ITEM" open="(" close=")" separator=",">
+		   		#{CODE_ITEM}
+		   </foreach>
+		</if>
+	</insert>
+
+	<!--
+		Query id    : Code.deleteCodeGroup
+		Description : 코드 그룹 삭제
+	-->
+	<delete id="deleteCodeGroup" parameterType="map">
+		DELETE FROM SYS_CODE_GROUP
+        WHERE CODE_CATEGORY_ID = #{CODE_CATEGORY_ID}
+        AND CODE_GROUP_ID = #{GROUP_ID}
+	</delete>
+
+	<!--
+		Query id    : Code.selectGroupCode
+		Description : 특정 그룹의 코드 조회
+	-->
+	<select id="selectGroupCode" parameterType="map" resultType="lmap">
+        SELECT
+			  CODE 			   /* 코드		*/
+			, CODE_NAME        /* 코드명		*/
+			, CODE_DS 		   /* 상세코드명	*/
+			, SORT_ORDER 	   /* 정렬순서		*/
+			, PARENT_CODE 	   /* 상위코드		*/
+			, STATUS 		   /* 상태		*/
+		FROM SYS_CODE WITH( NOLOCK )
+		WHERE 1=1
+        AND CODE IN(
+			        SELECT CODE
+			        FROM   SYS_CODE_GROUP WITH( NOLOCK )
+			        WHERE CODE_GROUP_ID = #{GROUP_ID}
+        		   )
+		AND CODE_CATEGORY_ID IN(
+						        SELECT CODE_CATEGORY_ID
+						        FROM   SYS_CODE_GROUP WITH( NOLOCK )
+						        WHERE CODE_GROUP_ID = #{GROUP_ID}
+        		   				)
+	</select>
+
+	<!--
+		Query id    : Code.selectCodeCategoryList
+		Description : 코드 유형 목록(팝업) 조회
+	-->
+	<sql id="selectCodeCategoryListPop_base">
+<!-- 페이징 공통 관련 쿼리 -->		  
+	   SELECT 
+	    <if test="ORDER_COLUMN == null or ORDER_COLUMN == ''">
+			  ROW_NUMBER() OVER( order by REG_DT DESC ) AS ROWNUM /* ROWNUM */
+		</if>
+		<if test="ORDER_COLUMN != null and ORDER_COLUMN != ''">
+			  ROW_NUMBER() OVER( order by ${ORDER_COLUMN} ${ORDER_ASC} ) AS ROWNUM /* ROWNUM */
+		</if>
+		    , SUB.*
+		 FROM (
+<!-- 업무 관련 쿼리 :: Begin -->
+			SELECT CODE_CATEGORY_ID    /* 코드유형ID	*/
+				 , CODE_CATEGORY_ID_UP /* 상위 코드유형ID	*/
+				 , CODE_TP /* 코드유형		*/
+				 , CODE_CATEGORY_NM    /* 코드유형명	*/
+				 , CONSTANT_REG_YN     /* 상수등록여부  */
+				 , CACHE_YN            /* 캐쉬여부		*/
+				 , CODE_QUERY_CONTENT  /* 코드정의쿼리  */
+				 , STATUS              /* 상태		*/
+				 , USER_ID_REG         /* 등록자ID	*/
+				 , (SELECT USER_NM
+				      FROM SYS_USER WITH( NOLOCK )
+				     WHERE USER_ID = S.USER_ID_REG)
+				    AS USER_NM 		   /* 등록자명      */
+				 , REG_DT              /* 등록일시		*/
+				 , MAPPING_YN /* 코드맵핑사용여부 */
+				 , TABLE_ID			   /*원천코드테이블ID*/
+				 , CODE_COLUMN_ID	   /*원천코드컬럼ID*/
+				 , NAME_COLUMN_ID	   /*원천명칭컬럼ID*/
+			FROM SYS_CODE_CATEGORY S WITH( NOLOCK )
+			WHERE 1=1
+			AND CODE_TP = 'ST'
+			<if test="CODE_CATEGORY_ID != null and CODE_CATEGORY_ID != ''">
+				AND CODE_CATEGORY_ID LIKE '%' + #{CODE_CATEGORY_ID} + '%'
+			</if>
+			<if test="CODE_CATEGORY_NM != null and CODE_CATEGORY_NM != ''">
+				AND CODE_CATEGORY_NM LIKE '%' + #{CODE_CATEGORY_NM} + '%'
+			</if>
+<!-- 업무 관련 쿼리 :: End -->		  
+			) SUB		
+	</sql>
+
+	<!-- 코드 유형 목록 조회 -->
+	<select id="selectCodeCategoryListPop" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="selectCodeCategoryListPop_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- 코드 유형 목록 조회 - count -->
+	<select id="selectCodeCategoryListPop_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="selectCodeCategoryListPop_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- 코드 유형 목록 조회 - paging -->
+	<select id="selectCodeCategoryListPop_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="selectCodeCategoryListPop_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<select id="selectCodeCategoryDetail" parameterType="map" resultType="lmap">
+	SELECT
+			   CODE_CATEGORY_ID    /* 코드유형ID	*/
+			 , CODE_CATEGORY_ID_UP /* 상위 코드유형ID	*/
+			 , CODE_TP /* 코드유형		*/
+			 , CODE_CATEGORY_NM    /* 코드유형명	*/
+			 , CONSTANT_REG_YN     /* 상수등록여부  */
+			 , CACHE_YN            /* 캐쉬여부		*/
+			 , CODE_QUERY_CONTENT  /* 코드정의쿼리  */
+			 , STATUS              /* 상태		*/
+			 , USER_ID_REG         /* 등록자ID	*/
+			 , (SELECT USER_NM
+			      FROM SYS_USER WITH( NOLOCK )
+			     WHERE USER_ID = S.USER_ID_REG)
+			    AS USER_NM 		   /* 등록자명      */
+			 , REG_DT              /* 등록일시		*/
+			 , MAPPING_YN /* 코드맵핑사용여부 */
+			 , TABLE_ID			   /*원천코드테이블ID*/
+			 , CODE_COLUMN_ID	   /*원천코드컬럼ID*/
+			 , NAME_COLUMN_ID	   /*원천명칭컬럼ID*/
+			 , ENUM_CLASS_NAME 
+		FROM SYS_CODE_CATEGORY S WITH( NOLOCK )
+		WHERE 1=1
+		<if test="CODE_CATEGORY_ID != null and CODE_CATEGORY_ID != ''">
+			AND CODE_CATEGORY_ID = #{CODE_CATEGORY_ID}
+		</if>
+		ORDER BY REG_DT DESC
+	</select>
+
+</mapper>

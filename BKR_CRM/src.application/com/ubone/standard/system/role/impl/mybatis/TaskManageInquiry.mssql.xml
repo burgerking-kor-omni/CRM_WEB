@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="TaskManageInquiry">
+		
+	<!-- 담당업무(시스템관리) 목록 조회 -->
+	<sql id="getTaskList_base">
+<!-- 페이징 공통 관련 쿼리 -->		  
+	   SELECT 
+	    <if test="ORDER_COLUMN == null or ORDER_COLUMN == ''">
+			  ROW_NUMBER() OVER( order by ROLE_ID DESC ) AS ROWNUM /* ROWNUM */
+		</if>
+		<if test="ORDER_COLUMN != null and ORDER_COLUMN != ''">
+			  ROW_NUMBER() OVER( order by ${ORDER_COLUMN} ${ORDER_ASC} ) AS ROWNUM /* ROWNUM */
+		</if>
+		    , SUB.*
+		 FROM (
+<!-- 업무 관련 쿼리 :: Begin -->
+			SELECT ROLE_ID     											/* 권한코드	    */
+				 , ROLE_NAME   											/* 권한명	    */
+				 , DESCRIPTION 											/* 설명		    */
+				 , ADMIN_YN    											/* 관리자여부   */
+				 , EXCEPT_MAP_YN   										/* 매핑제외여부 */		
+				 , STATUS    											/* 상태			*/
+			  FROM AP_ROLE
+			 WHERE 1=1
+			 <if test="ROLE_ID != null and ROLE_ID != ''">
+			 	AND ROLE_ID = #{ROLE_ID}      							/* 권한코드		*/                  
+			 </if>
+			 <if test="ROLE_NAME != null and ROLE_NAME != ''">
+				AND ROLE_NAME LIKE '%' + #{ROLE_NAME} + '%' 			/* 권한명		*/
+			 </if>
+<!-- 업무 관련 쿼리 :: End -->		  
+			) SUB
+	</sql>
+	
+	<!-- 담당업무(시스템관리) 목록 조회 -->
+	<select id="getTaskList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getTaskList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 담당업무(시스템관리) 목록 조회 - count -->
+	<select id="getTaskList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getTaskList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 담당업무(시스템관리) 목록 조회 - paging -->
+	<select id="getTaskList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getTaskList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!-- 담당업무(시스템관리) 목록 상세 -->
+	<sql id="getTaskDetail_base">
+<!-- 페이징 공통 관련 쿼리 -->		  
+	   SELECT 
+	    <if test="ORDER_COLUMN == null or ORDER_COLUMN == ''">
+			  ROW_NUMBER() OVER( order by REG_DATETIME DESC ) AS ROWNUM /* ROWNUM */
+		</if>
+		<if test="ORDER_COLUMN != null and ORDER_COLUMN != ''">
+			  ROW_NUMBER() OVER( order by ${ORDER_COLUMN} ${ORDER_ASC} ) AS ROWNUM /* ROWNUM */
+		</if>
+		    , SUB.*
+		 FROM (
+<!-- 업무 관련 쿼리 :: Begin -->
+		    		SELECT ROLE_ID    																/* 권한ID		  */
+				    , ROLE_NAME    														/* 권한명		  */
+				    , DESCRIPTION    													/* 설명			  */
+				    , SUBSTRING(COMP_CD,1,3) AS CD_SUBSD			 						/* 회사코드 1단계 */
+				    , COMP_CD    														/* 회사코드 2단계 */
+				    , STATUS    														/* 상태			  */
+				    , ADMIN_YN    														/* 관리자여부	  */
+				    , EXCEPT_MAP_YN    													/* 매핑제외여부	  */
+				    , REG_USER_ID    													/* 등록사용자ID	  */
+				    , UPD_USER_ID    													/* 수정사용자ID	  */
+				    , CONVERT(VARCHAR, REG_DATETIME, 120)  AS REG_DATETIME				/* 등록일시		  */
+				    , CONVERT(VARCHAR, UPD_DATETIME, 120)  AS UPD_DATETIME				/* 수정일시		  */
+	    		 FROM AP_ROLE
+				WHERE ROLE_ID= #{ROLE_ID}
+<!-- 업무 관련 쿼리 :: End -->		  
+			) SUB
+	</sql>
+	
+	<!-- 담당업무(시스템관리) 목록 조회 -->
+	<select id="getTaskDetail" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getTaskDetail_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 담당업무(시스템관리) 목록 조회 - count -->
+	<select id="getTaskDetail_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getTaskDetail_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 담당업무(시스템관리) 목록 조회 - paging -->
+	<select id="getTaskDetail_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getTaskDetail_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!-- 담당업무(시스템관리) 목록 조회(담당업무 권한자 구성 LIST) -->
+	<sql id="getTaskCompoList_base">
+<!-- 페이징 공통 관련 쿼리 -->		  
+	   SELECT 
+	    <if test="ORDER_COLUMN == null or ORDER_COLUMN == ''">
+			  ROW_NUMBER() OVER( order by ROLE_ID ASC ) AS ROWNUM /* ROWNUM */
+		</if>
+		<if test="ORDER_COLUMN != null and ORDER_COLUMN != ''">
+			  ROW_NUMBER() OVER( order by ${ORDER_COLUMN} ${ORDER_ASC} ) AS ROWNUM /* ROWNUM */
+		</if>
+		    , SUB.*
+		 FROM (
+<!-- 업무 관련 쿼리 :: Begin -->
+			SELECT AR.ROLE_ID
+	                , AR.ROLE_NAME
+	                , AR.DESCRIPTION
+	                , AR.COMP_CD
+	                , AR.STATUS
+	                , AR.ADMIN_YN
+	                , AR.EXCEPT_MAP_YN
+	                , CAST(ARC.ROLE_COMPOSITION_CODE AS VARCHAR) ROLE_COMPOSITION_CODE
+	                , CASE WHEN ARC.ROLE_COMPOSITION_TYPE = 'U' THEN (SELECT USER_NM FROM SYS_USER WITH (nolock) WHERE USER_ID = ARC.ROLE_COMPOSITION_CODE)
+	                       WHEN ARC.ROLE_COMPOSITION_TYPE = 'D' THEN (SELECT DEPT_NM FROM SYS_DEPARTMENT WITH (nolock) WHERE DEPT_ID = ARC.ROLE_COMPOSITION_CODE)
+	                       WHEN ARC.ROLE_COMPOSITION_TYPE = 'P' THEN (SELECT CODE_NAME FROM SYS_CODE WITH (nolock) WHERE CODE_CATEGORY_ID = 'POSITION_CD' AND CODE = ARC.ROLE_COMPOSITION_CODE)
+	                   END AS ROLE_COMPOSITION_CODE_NM
+	                , ARC.ROLE_COMPOSITION_TYPE
+	                , C.CODE_NAME ROLE_COMPOSITION_TYPE_NM
+	                , ARC.REG_USER_ID
+	                , U.USER_NM AS REG_USER_NM
+	                , ARC.REG_DATETIME
+	                , ARC.UPD_USER_ID
+	                , ARC.UPD_DATETIME
+	             FROM AP_ROLE AR WITH (nolock)
+	             INNER JOIN AP_ROLE_COMPOSITION ARC WITH (nolock)
+	                ON AR.ROLE_ID = ARC.ROLE_ID
+	             LEFT OUTER JOIN SYS_CODE C WITH (nolock)
+	                ON ARC.ROLE_COMPOSITION_TYPE = C.CODE AND CODE_CATEGORY_ID ='ROLE_COMPOSITION_TYPE'
+	             LEFT OUTER JOIN SYS_USER U WITH (nolock)
+	                ON ARC.UPD_USER_ID = U.USER_ID
+	             WHERE
+	      			AR.ROLE_ID= #{ROLE_ID}
+<!-- 업무 관련 쿼리 :: End -->		  
+			) SUB
+	</sql>
+	
+	<!-- 담당업무(시스템관리) 목록 조회 -->
+	<select id="getTaskCompoList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getTaskCompoList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 담당업무(시스템관리) 목록 조회 - count -->
+	<select id="getTaskCompoList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getTaskCompoList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 담당업무(시스템관리) 목록 조회 - paging -->
+	<select id="getTaskCompoList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getTaskCompoList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+			Query id    : "TaskManageInquiry.insertApRoleCompo"
+			Description : 담당업무 권한자 등록
+		-->
+   <insert id="insertApRoleCompo" parameterType="map">
+   		INSERT INTO AP_ROLE_COMPOSITION(
+			  ROLE_ID    												/* 권한ID 		*/
+			, ROLE_COMPOSITION_TYPE    									/* 권한구성유형 */
+			, ROLE_COMPOSITION_CODE    									/* 권한구성코드 */
+			, REG_USER_ID    											/* 등록사용자ID */
+			, REG_DATETIME    											/* 등록일시		*/
+			, UPD_USER_ID    											/* 수정사용자ID */
+			, UPD_DATETIME    											/* 수정일시		*/
+   			 )
+		VALUES (
+			  #{ROLE_ID}    											/* 권한ID		*/
+			, #{ROLE_COMPOSITION_TYPE}									/* 권한구성유형 */
+			, #{ROLE_COMPOSITION_CODE}    								/* 권한구성코드 */
+			, #{user.id}			    								/* 등록사용자ID */
+			, GETDATE()											/* 등록일시		*/
+			, #{user.id}			    								/* 수정사용자ID */
+			, GETDATE()											/* 수정일시		*/
+   		 )
+            
+   </insert>
+   
+   	<!--
+			Query id    : "TaskManageInquiry.deleteApRoleCompo"
+			Description : 담당업무 권한자 삭제
+		-->
+   <delete id="deleteApRoleCompo" parameterType="map">
+		DELETE FROM AP_ROLE_COMPOSITION
+			WHERE
+    			ROLE_ID=#{ROLE_ID}    								  	/* 권한ID		*/
+				AND ROLE_COMPOSITION_CODE=#{ROLE_COMPOSITION_CODE}    	/* 권한구성코드 */
+	</delete>
+	
+	<!--
+			Query id    : "TaskManageInquiry.insertTask"
+			Description : 담당업무(시스템관리) 등록
+		-->
+   <insert id="insertTask" parameterType="map">
+       		 INSERT INTO AP_ROLE(
+					  ROLE_ID   										/* 권한ID		*/
+					, ROLE_NAME   								 		/* 권한명		*/
+					, DESCRIPTION    									/* 설명*/
+					, COMP_CD    										/* 회사코드		*/
+					, STATUS    										/* 상태*/
+					, ADMIN_YN    										/* 관리자여부	*/
+					, EXCEPT_MAP_YN    									/* 매핑제외여부 */
+					, REG_USER_ID    									/* 등록사용자ID */
+					, REG_DATETIME    									/* 등록일시		*/
+					, UPD_USER_ID    									/* 수정사용자ID */
+					, UPD_DATETIME    									/* 수정일시		*/
+			    	)
+			VALUES (
+					  #{ROLE_ID}    									/* 권한ID		*/
+					, #{ROLE_NAME}    									/* 권한명		*/
+					, #{DESCRIPTION}    								/* 설명			*/
+					, #{COMP_CD}    									/* 회사코드		*/
+					, #{STATUS}    										/* 상태			*/
+					, #{ADMIN_YN}    									/* 관리자여부	*/
+					, #{EXCEPT_MAP_YN}    								/* 매핑제외여부 */
+				 	, #{user.id}		 								/* 등록사용자ID */
+					, GETDATE()	 								/* 등록일시 	*/
+					, #{user.id}			 							/* 수정사용자ID */
+					, GETDATE()									/* 수정일시		*/
+			    	)
+   </insert>
+   
+   <!--
+			Query id    : "TaskManageInquiry.updateTask"
+			Description : 담당업무(시스템관리) 상세 저장
+		-->
+   <update id="updateTask" parameterType="map">
+   		UPDATE AP_ROLE
+			SET
+				  UPD_USER_ID	=	#{user.id}						   	/* 수정사용자ID */
+				, UPD_DATETIME	=	GETDATE()    				/* 수정일시		*/
+				<if test="ROLE_NAME != null and ROLE_NAME !=''">
+				, ROLE_NAME	=	#{ROLE_NAME}   							/* 권한명		*/
+				</if>
+				<if test="DESCRIPTION != null and DESCRIPTION !=''">
+				, DESCRIPTION	=	#{DESCRIPTION}  					/* 설명			*/
+				</if>
+				<if test="COMP_CD != null and COMP_CD !=''">
+				, COMP_CD	=	#{COMP_CD}    							/* 회사코드		*/
+				</if>
+				<if test="STATUS != null and STATUS !=''">	
+				, STATUS	=	#{STATUS}   							/* 상태			*/
+				</if>
+				<if test="ADMIN_YN != null and ADMIN_YN !=''">
+				, ADMIN_YN	=	#{ADMIN_YN}  		  					/* 관리자여부	*/
+				</if>
+				<if test="EXCEPT_MAP_YN != null and EXCEPT_MAP_YN !=''">
+				, EXCEPT_MAP_YN	=	#{EXCEPT_MAP_YN}  					/* 매핑제외여부 */
+				</if>
+				  WHERE
+				      ROLE_ID	=	#{ROLE_ID}    						/* 권한ID		*/
+   </update>
+   
+   <!--
+			Query id    : "TaskManageInquiry.removeTask"
+			Description : 담당업무 삭제
+		-->
+   <delete id="removeTask" parameterType="map">
+		DELETE FROM AP_ROLE
+			WHERE
+    			ROLE_ID=#{ROLE_ID}    								  	/* 권한ID		*/
+	</delete>
+	
+	
+	<!--
+		Query id    : "TaskManageInquiry.selectRoleId"
+		Description : 권한ID 조회 쿼리 - 중복체크용
+	-->
+	<select id="selectRoleId" parameterType="map" resultType="lmap">
+	    SELECT ROLE_ID
+	      FROM AP_ROLE WITH (nolock)
+	     WHERE ROLE_ID = #{ROLE_ID}
+	</select>
+</mapper>
+

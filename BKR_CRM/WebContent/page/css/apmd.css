@@ -1,0 +1,17 @@
+/*
+ * APMD 관련 기능을 위한 CSS 파일
+ */
+
+@charset "utf-8";
+ 
+/* APMD Linker */
+.ub-frame.toolbar {position: absolute; height: 16px; top: 4px; left: 50%; width: 200px;text-align: center;margin-left: -100px; z-index:9999;}
+.ub-frame.toolbar .ub-layout.apmd-panel { position: relative;text-align: center;width: 100%;}
+.ub-frame.toolbar .ub-layout.apmd-panel a {color:#d31145; text-decoration: underline;}
+
+/* Message Editor*/
+.ub-control.label-resource {color:green; cursor: pointer; border: 1px solid green;}
+.ub-control.label-resource.nodata {color:red; border: 1px solid red;}
+.ub-control.message-column {cursor:pointer;}
+.ub-control.message-column.nodata {color:red; border: 1px solid red; }
+.ub-control .message-column-label { position: relative; left: -23px; top: 2px; z-index: 1; font-weight: bold; border: 1px solid black; color: white !important; background-color: black;}

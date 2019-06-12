@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ApiCoupon">
+
+	<!--
+		QueryId     : ApiCoupon.getCoupon
+		Description : 쿠폰 조회 
+	 -->
+	<select id="getCoupon" parameterType="map" resultType="lmap">
+		SELECT TC.CD_COUPON            /* 쿠폰코드 */
+		     , TC.NO_REQ               /* 다우계약번호 */
+		     , TC.TP_EXPIRY_DATE       /* 유효기간구분 */
+		     , TO_CHAR(TC.DT_EXPIRY_START, 'YYYYMMDDHH24MISS') AS DT_EXPIRY_START      /* 유효기간시작일 */
+		     , TO_CHAR(TC.DT_EXPIRY_END, 'YYYYMMDDHH24MISS') AS DT_EXPIRY_END          /* 유효기간종료일 */
+		  FROM CRMADMIN.TBS_COUPON TC
+		 WHERE TC.CD_COUPON = #{CD_COUPON}
+		   AND TC.DT_EXPIRY_START <![CDATA[<=]]> TO_DATE (TO_CHAR(SYSDATE, 'YYYYMMDD') || '000000', 'YYYYMMDDHH24MISS')
+		   AND TC.DT_EXPIRY_END >= TO_DATE (TO_CHAR(SYSDATE, 'YYYYMMDD') || '235959', 'YYYYMMDDHH24MISS')
+
+	</select>
+	
+	<!--
+		QueryId     : ApiCoupon.getCouponMapping
+		Description : 쿠폰핀 조회
+	 -->
+	<select id="getCouponMapping" parameterType="map" resultType="lmap">
+		SELECT TC.CD_COUPON            /* 쿠폰코드 */
+		     , TC.NM_COUPON            /* 쿠폰명 */
+		     , TC.DS_COUPON            /* 쿠폰설명 */
+		     , CASE WHEN CD_COUPON_OBJ = '4' THEN TO_CHAR(TCP.DT_EXPIRY_START, 'YYYY-MM-DD')
+                    ELSE  TO_CHAR(TC.DT_EXPIRY_START, 'YYYY-MM-DD')
+                END DT_EXPIRY_START /* 유효기간시작일 */
+             , CASE WHEN CD_COUPON_OBJ = '4' THEN TO_CHAR(TCP.DT_EXPIRY_END, 'YYYY-MM-DD')
+                    ELSE TO_CHAR(TC.DT_EXPIRY_END, 'YYYY-MM-DD')      
+                END DT_EXPIRY_END /* 유효기간종료일 */
+		     , TC.CD_COUPON_TARGET     /* 쿠폰대상(금액,상품) */
+		     , TC.CD_SALE_POLICY       /* 할인정책 */
+		     , TC.VAL_SALE_POLICY      /* 할인금액 */
+		     , TC.VAL_LIMIT_PRICE      /* 최소주문금액 */
+		     , TC.PRODUCT_PK           /* 할인상품 */
+		     , TC.PRODUCT_PK_REAL      /* 실제판매상품 */
+		     , TC.NO_REQ               /* 다우계약번호 */
+		     , TCP.NO_PIN              /* 핀일련번호 */
+		     , TCP.ID_MEMBER           /* 회원PK */
+		     , CASE WHEN CD_COUPON_OBJ = '4' THEN '9999' || TCP.PIN_NUM
+                    ELSE TCP.PIN_NUM
+                END PIN_NUM_A /* 핀번호 - 매장, 리워드 */
+		     , TCP.PIN_NUM AS PIN_NUM_B /* 핀번호 - 딜리버리, 킹오더 */
+		     , TCP.UDID                /* 기기ID */
+		     , TCP.AMT_USE             /* 사용금액 */
+		     , TCP.AMT_CANCEL          /* 취소금액 */
+		     , 'images/coupon/' || ATT_APP.KEY_NAME AS IMG_APP_URL
+		     , 'images/coupon/' || ATT_WEB.KEY_NAME AS IMG_WEB_URL
+		     , TC.NM_CUP_MENU            /* 쿠폰메뉴명 */
+		     , TC.REAL_CUP_PRICE         /* 쿠폰실제판매금액 */
+		     , TC.SALE_CUP_PRICE         /* 쿠폰할인판매금액 */
+		     , TC.SALE_CUP_RATE          /* 쿠폰할인률 */     
+		  FROM CRMADMIN.TBS_COUPON TC
+		  LEFT OUTER JOIN CRMADMIN.TBS_COUPON_PIN TCP
+		    ON TCP.CD_COUPON = TC.CD_COUPON
+		   AND TCP.STATUS <![CDATA[<>]]> 'C'
+		  LEFT OUTER JOIN (SELECT SAL.BIZ_KEY
+		                        , SUBSTR(SA.FILE_PATH, INSTR(SA.FILE_PATH, '/', -1) + 1) AS KEY_NAME
+		                     FROM CRMADMIN.SYS_ATTACH SA
+		                    INNER JOIN CRMADMIN.SYS_ATTACH_LINK SAL
+		                       ON SA.ATTACH_ID = SAL.ATTACH_ID
+		                    WHERE SAL.BIZ_TP = 'COUPON'
+		                      AND SA.ATTACH_TYPE = 'IMG_APP') ATT_APP
+		    ON ATT_APP.BIZ_KEY = TC.CD_COUPON
+		  LEFT OUTER JOIN (SELECT SAL.BIZ_KEY
+		                        , SUBSTR(SA.FILE_PATH, INSTR(SA.FILE_PATH, '/', -1) + 1) AS KEY_NAME
+		                     FROM CRMADMIN.SYS_ATTACH SA
+		                    INNER JOIN CRMADMIN.SYS_ATTACH_LINK SAL
+		                       ON SA.ATTACH_ID = SAL.ATTACH_ID
+		                    WHERE SAL.BIZ_TP = 'COUPON'
+		                      AND SA.ATTACH_TYPE = 'IMG_WEB') ATT_WEB
+		    ON ATT_WEB.BIZ_KEY = TC.CD_COUPON
+		 WHERE TC.CD_COUPON = #{CD_COUPON}
+		<if test="ID_MEMBER == null or ID_MEMBER == ''">
+			<if test="UDID != null and UDID != ''">
+		   AND TCP.UDID = #{UDID}
+			</if>			
+		</if>
+		<if test="ID_MEMBER != null and ID_MEMBER != ''">
+			<choose>
+				<when test="ID_MEMBER == 'NON'">
+					<if test='FG_APP == "Y"'>
+						<if test="UDID != null and UDID != ''">
+		   AND TCP.UDID = #{UDID}
+						</if>
+					</if>
+				</when>
+				<otherwise>
+		   AND (TCP.ID_MEMBER = #{ID_MEMBER} OR TCP.UDID = #{UDID}) 
+				</otherwise>
+			</choose>
+		</if>
+		<if test="NO_PIN != null and NO_PIN != ''">
+		   AND TCP.NO_PIN = #{NO_PIN}
+		</if>
+
+	</select>
+	
+	<!--
+		QueryId     : ApiCoupon.getCouponPin
+		Description : 쿠폰핀 조회
+	 -->
+	<select id="getCouponPin" parameterType="map" resultType="lmap">
+		SELECT NO_PIN            /* 핀일련번호 */
+			 , CD_COUPON         /* 쿠폰코드 */
+			 , ID_MEMBER         /* 회원PK */
+			 , STATUS            /* 상태(발급,사용,취소) */
+			 , ID_STORE_USE      /* 사용매장코드 */
+			 , ORDER_NO          /* 사용한주문번호 */
+			 , DT_PUBLISH        /* 발행일자 */
+			 , DT_USE            /* 사용일자 */
+			 , DT_REG            /* 등록일 */
+			 , TO_CHAR(DT_EXPIRY_START, 'YYYY-MM-DD') AS DT_EXPIRY_START   /* 유효시작일자 */
+			 , TO_CHAR(DT_EXPIRY_END, 'YYYY-MM-DD') AS DT_EXPIRY_END    /* 유효종료일 */
+			 , PIN_NUM           /* 핀번호 */
+			 , UDID              /* 기기ID */
+			 , AMT_USE           /* 사용금액 */
+			 , AMT_CANCEL        /* 취소금액 */
+		  FROM CRMADMIN.TBS_COUPON_PIN
+		 WHERE 1 = 1
+		<if test="PIN_NUM != null and PIN_NUM != ''">
+		   AND PIN_NUM = #{PIN_NUM}
+		</if>
+		<if test="NO_PIN != null and NO_PIN != ''">
+		   AND NO_PIN = #{NO_PIN}
+		</if>
+
+	</select>
+	
+	<!--
+		QueryId     : ApiCoupon.getCouponStoreExcept
+		Description : 제외매장 조회
+	 -->
+	<select id="getCouponStoreExcept" parameterType="map" resultType="lmap">
+		SELECT NM_STORE_EXCEPT
+		     , ID_STORE_EXCEPT
+		  FROM CRMADMIN.TBS_COUPON_STORE_EXCEPT
+		 WHERE CD_COUPON = #{CD_COUPON}
+		 ORDER BY NM_STORE_EXCEPT ASC
+
+	</select>
+	
+	<!--
+		QueryId     : ApiCoupon.getRewardCoupon
+		Description : 리워드 쿠폰 조회
+	 -->
+	<select id="getRewardCoupon" parameterType="map" resultType="lmap">
+		SELECT NO_MEMBER_STAMP_REWARD    /* 회원스템프리워드일련번호 */
+		     , CD_COUPON                 /* 쿠폰코드 */
+		     , DT_ACT_STAMP_EXCHANGE     /* 스템프교환가능일자 */
+		     , DT_STAMP_ISSUE            /* 스템프발급일자 */
+		     , FG_ISSUE                  /* 발급여부 */
+		     , ID_MEMBER                 /* 회원PK */
+		     , ORDER_NO                  /* 주문번호 */
+		     , TP_REWARD                 /* 리워드구분(5개,10개) */
+		     , CASE WHEN TO_DATE(TO_CHAR(DT_ACT_STAMP_EXCHANGE, 'YYYYMMDD') || '090000', 'YYYYMMDD HH24MISS') <![CDATA[<=]]> SYSDATE THEN 'Y'
+                    ELSE 'N'
+                END FG_USE
+		  FROM CRMADMIN.TBS_MEMBER_STAMP_REWARD
+		 WHERE FG_ISSUE = 'N'
+		   AND NO_MEMBER_STAMP_REWARD = #{NO_MEMBER_STAMP_REWARD}
+		   AND ID_MEMBER = #{ID_MEMBER}
+
+	</select>
+	
+	<!--
+		QueryId     : ApiCoupon.getCheckUseCoupon
+		Description : 쿠폰사용여부조회
+	 -->
+	<select id="getCheckUseCoupon" parameterType="map" resultType="lmap">
+		SELECT PIN_NUM
+		     , STATUS
+		  FROM CRMADMIN.TBS_COUPON_PIN  
+		 WHERE PIN_NUM = #{PIN_NUM}
+
+	</select>
+	
+	<!--
+		QueryId     : ApiCoupon.getCheckCouponStore
+		Description : 쿠폰 제외매장 여부 조회
+	 -->
+	<select id="getCheckCouponStore" parameterType="map" resultType="lmap">
+		SELECT TC.CD_COUPON
+		     , TCSE.ID_STORE_EXCEPT
+		     , TCSE.NM_STORE_EXCEPT
+		  FROM CRMADMIN.TBS_COUPON TC
+		 INNER JOIN CRMADMIN.TBS_COUPON_PIN TCP
+		    ON TC.CD_COUPON = TCP.CD_COUPON
+		 INNER JOIN CRMADMIN.TBS_COUPON_STORE_EXCEPT TCSE
+		    ON TC.CD_COUPON = TCSE.CD_COUPON
+		 WHERE TCSE.ID_STORE_EXCEPT = #{ID_STORE_USE}
+		<if test="CD_COUPON != null and CD_COUPON != ''">
+		   AND TCP.CD_COUPON = #{CD_COUPON}
+		</if>
+		<if test="PIN_NUM != null and PIN_NUM != ''">
+		   AND TCP.PIN_NUM = #{PIN_NUM}
+		</if>
+		   
+	</select>
+	
+	<!--
+		QueryId     : ApiCoupon.getCouponObj
+		Description : 쿠폰 대상 조회 
+	 -->
+	<select id="getCouponObj" parameterType="map" resultType="lmap">
+		SELECT TC.CD_COUPON
+		     , TC.CD_COUPON_OBJ
+		  FROM CRMADMIN.TBS_COUPON TC
+		 WHERE TC.CD_COUPON = #{CD_COUPON}
+
+	</select>
+	
+	<!-- ************************************************************** -->
+	<!-- ************************************************************** -->
+	<!-- ************************************************************** -->
+	
+	<!--
+		QueryId     : ApiCoupon.insertCouponPin
+		Description : 쿠폰핀 생성
+	 -->
+	<insert id="insertCouponPin" parameterType="map">
+		<selectKey keyProperty="SEQ_TBS_COUPON_PIN" resultType="String" order="BEFORE">
+			SELECT CRMADMIN.SEQ_TBS_COUPON_PIN.NEXTVAL FROM DUAL 
+		</selectKey>
+					
+		INSERT INTO CRMADMIN.TBS_COUPON_PIN
+		(
+			   NO_PIN            /* 핀일련번호 */
+			 , CD_COUPON         /* 쿠폰코드 */
+			 , ID_MEMBER         /* 회원PK */
+			 , STATUS            /* 상태(발급,사용,취소) */
+			 , ID_STORE_USE      /* 사용매장코드 */
+			 , ORDER_NO          /* 사용한주문번호 */
+			 , DT_PUBLISH        /* 발행일자 */
+			 , DT_USE            /* 사용일자 */
+			 , DT_REG            /* 등록일 */
+			 , DT_EXPIRY_START   /* 유효시작일자 */
+			 , DT_EXPIRY_END     /* 유효종료일 */
+			 , PIN_NUM           /* 핀번호 */
+			 , UDID              /* 기기ID */
+			 , AMT_USE           /* 사용금액 */
+			 , AMT_CANCEL        /* 취소금액 */
+		) VALUES (
+		       #{SEQ_TBS_COUPON_PIN}
+			 , #{CD_COUPON}
+			 , #{ID_MEMBER}
+			 , 'N'
+			 , NULL
+			 , NULL
+			 , SYSDATE
+			 , NULL
+			 , SYSDATE
+		<choose>
+			<when test="TP_EXPIRY_DATE == '00'">
+			 , TO_DATE(#{DT_EXPIRY_START}, 'YYYYMMDDHH24MISS')
+			 , TO_DATE(#{DT_EXPIRY_END}, 'YYYYMMDDHH24MISS')
+			</when>
+			<when test="TP_EXPIRY_DATE == '15'">
+			 , SYSDATE
+			 , SYSDATE + 15
+			</when>
+			<when test="TP_EXPIRY_DATE == '30'">
+			 , SYSDATE
+			 , SYSDATE + 30
+			</when>
+			<when test="TP_EXPIRY_DATE == '60'">
+			 , SYSDATE
+			 , SYSDATE + 60
+			</when>
+			<when test="TP_EXPIRY_DATE == '90'">
+			 , SYSDATE
+			 , SYSDATE + 90
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+			 , #{PIN_NUM}
+			 , #{UDID}
+			 , 0
+			 , 0
+		)
+	</insert>
+	
+	<!--
+		QueryId     : ApiCoupon.updateCouponPin
+		Description : 쿠폰상태변경 - 다우
+	 -->
+	<update id="updateCouponPin" parameterType="map">
+		UPDATE CRMADMIN.TBS_COUPON_PIN
+		   SET DT_PUBLISH    = SYSDATE           /* 발행일자 */
+		<if test="ID_MEMBER != null and ID_MEMBER != ''">
+			 , ID_MEMBER     = DECODE(#{ID_MEMBER}, 'NON', NULL, #{ID_MEMBER})      /* 회원PK */
+		</if>
+		<if test="UDID != null and UDID != ''">
+			 , UDID          = #{UDID}           /* 기기id */
+		</if>
+		 WHERE NO_PIN = (SELECT MIN(NO_PIN) AS NO_PIN
+						   FROM CRMADMIN.TBS_COUPON_PIN
+						  WHERE CD_COUPON = #{CD_COUPON}
+						    AND DT_PUBLISH IS NULL
+						    AND STATUS = 'N')
+
+	</update>
+	
+	<!--
+		QueryId     : ApiCoupon.updateRewardCouponPin
+		Description : 리워드 쿠폰상태변경 - 다우
+	 -->
+	<update id="updateRewardCouponPin" parameterType="map">
+		UPDATE CRMADMIN.TBS_COUPON_PIN
+		   SET DT_PUBLISH    = SYSDATE           /* 발행일자 */
+		     , DT_EXPIRY_START = TO_DATE(TO_CHAR(SYSDATE, 'YYYY-MM-DD') || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS')
+		     , DT_EXPIRY_END = TO_DATE(TO_CHAR(ADD_MONTHS(SYSDATE, 1), 'YYYY-MM-DD') || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+		<if test="ID_MEMBER != null and ID_MEMBER != ''">
+			 , ID_MEMBER     = #{ID_MEMBER}      /* 회원PK */
+		</if>
+		<if test="UDID != null and UDID != ''">
+			 , UDID          = #{UDID}           /* 기기id */
+		</if>
+		<if test="NO_MEMBER_STAMP_REWARD != null and NO_MEMBER_STAMP_REWARD != ''">
+			 , NO_MEMBER_STAMP_REWARD  = #{NO_MEMBER_STAMP_REWARD}           /* 회원스템프리워드일련번호 */
+		</if>
+		 WHERE NO_PIN = (SELECT MIN(NO_PIN) AS NO_PIN
+						   FROM CRMADMIN.TBS_COUPON_PIN
+						  WHERE CD_COUPON = #{CD_COUPON}
+						    AND DT_PUBLISH IS NULL
+						    AND STATUS = 'N')
+
+
+	</update>
+	
+	<!--
+		QueryId     : ApiCoupon.updateMemberCouponPin
+		Description : 회원번호 매핑
+	 -->
+	<update id="updateMemberCouponPin" parameterType="map">
+		UPDATE CRMADMIN.TBS_COUPON_PIN
+		   SET ID_MEMBER    = #{ID_MEMBER}      /* 회원PK */
+		 WHERE NO_PIN = #{NO_PIN}
+
+	</update>
+	
+	<!--
+		QueryId     : ApiCoupon.updateCouponUseDau
+		Description : 쿠폰상태변경 - 다우
+	 -->
+	<update id="updateCouponUseDau" parameterType="map">
+		UPDATE CRMADMIN.TBS_COUPON_PIN
+		<choose>
+			<when test="FG_OBJ.equals('Y'.toString())">
+		   SET STATUS             = 'N'
+			 , DT_USE             = NULL
+			 , AMT_USE            = 0
+			 , AMT_CANCEL         = 0
+			</when>
+			<otherwise>
+		   SET STATUS             = #{STATUS}                            /* 상태 */
+			 , DT_USE             = TO_DATE(#{USEDATE}, 'YYYYMMDDHH24MISS') /* 사용일자 */
+			 , AMT_USE            = TO_NUMBER(#{USE_AMT})                /* 사용가격 */
+			 , AMT_CANCEL         = TO_NUMBER(#{CANCEL_AMT})             /* 취소가격 */
+			</otherwise>
+		</choose>
+		 WHERE PIN_NUM = #{PIN_NUM}
+
+	</update>
+	
+	<!--
+		QueryId     : ApiCoupon.updateCouponUse
+		Description : 쿠폰상태변경
+	 -->
+	<update id="updateCouponUse" parameterType="map">
+		UPDATE CRMADMIN.TBS_COUPON_PIN
+		   SET STATUS             = #{STATUS}                            /* 상태 */
+			 , DT_USE             = SYSDATE                              /* 사용일자 */
+		<if test="ID_STORE_USE != null and ID_STORE_USE != ''">
+			 , ID_STORE_USE       = #{ID_STORE_USE}                      /* 사용매장코드 */
+		</if>
+		<if test="ORDER_NO != null and ORDER_NO != ''">
+			 , ORDER_NO           = #{ORDER_NO}                          /* 사용한주문번호 */
+		</if>
+		<if test="AMT_USE != null and AMT_USE != ''">
+			 , AMT_USE            = TO_NUMBER(#{AMT_USE})                /* 사용가격 */
+		</if>
+		<if test="AMT_CANCEL != null and AMT_CANCEL != ''">
+			 , AMT_CANCEL         = TO_NUMBER(#{AMT_CANCEL})             /* 취소가격 */
+		</if>
+		 WHERE NO_PIN = #{NO_PIN}
+
+	</update>
+	
+	<!--
+		QueryId     : ApiCoupon.updateRewardCoupon
+		Description : 리워드 쿠폰 변경
+	 -->
+	<update id="updateRewardCoupon" parameterType="map">
+		UPDATE CRMADMIN.TBS_MEMBER_STAMP_REWARD
+		   SET CD_COUPON              = #{CD_COUPON}   /* 쿠폰코드 */
+		     , DT_STAMP_ISSUE         = SYSDATE        /* 스템프발급일자 */
+		     , FG_ISSUE               = 'Y'            /* 발급여부 */
+		     , DT_UPT                 = SYSDATE
+		 WHERE NO_MEMBER_STAMP_REWARD = #{NO_MEMBER_STAMP_REWARD}
+		   AND ID_MEMBER              = #{ID_MEMBER}
+
+	</update>
+
+</mapper>
+ 

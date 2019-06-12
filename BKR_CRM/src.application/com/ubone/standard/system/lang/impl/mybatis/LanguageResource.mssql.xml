@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="LanguageResource">
+
+	<!-- 
+		Query ID 	: LanguageResource.getLanguageResourceDetail
+		Description : 다국어 리소스 상세 조회
+		writer		: 이창섭
+		date		: 2016-09-23
+	-->
+	<select id="getLanguageResourceDetail" parameterType="map" resultType="lmap">
+		SELECT SR.RES_ID	AS RES_ID
+			 , SR.RES_NM	AS MASTER_NM
+			 , SR.RES_TP	AS RES_TP
+		     , SRD.LANG_TP	AS LANG_TP
+		     , SRD.RES_NM	AS RES_NM
+		  FROM SYS_RESOURCE SR WITH( NOLOCK )
+		 INNER JOIN SYS_RESOURCE_DTL SRD
+		    ON SR.RES_ID = SRD.RES_ID
+		 WHERE 1 = 1
+		   AND SR.RES_ID = #{RES_ID}
+    </select>
+    
+    <!-- 
+		Query ID 	: LanguageResource.insertSysResource
+		Description : 다국어 리소스 등록 - SYS_RESOURCE
+		writer		: 이창섭
+		date		: 2016-09-23
+	-->
+	<insert id="insertSysResource" parameterType="map">
+		INSERT INTO SYS_RESOURCE (
+			   RES_ID
+			 , RES_TP
+			 , TABLE_NM
+			 , COLUMN_NM
+			 , RES_NM
+			 , REG_DT
+			 , USER_ID_REG
+			 , UPD_DT
+			 , USER_ID_UPD
+		) VALUES (
+			   #{RES_ID}
+			 , #{RES_TP}
+			 , #{TABLE_NM}
+			 , #{COLUMN_NM}
+			 , #{RES_NM}
+			 , CURRENT_TIMESTAMP
+			 , #{user.id}
+			 , CURRENT_TIMESTAMP
+			 , #{user.id}
+		)
+	</insert>
+    
+    <!-- 
+		Query ID 	: LanguageResource.insertSysResourceDtl
+		Description : 다국어 리소스 등록/수정 - SYS_RESOURCE_DTL
+		writer		: 이창섭
+		date		: 2016-09-23
+	-->
+	<insert id="insertSysResourceDtl" parameterType="map">
+		INSERT INTO SYS_RESOURCE_DTL (
+			   RES_ID
+			 , LANG_TP
+			 , RES_NM
+			 , REG_DT
+			 , USER_ID_REG
+			 , UPD_DT
+			 , USER_ID_UPD
+		) VALUES (
+			   #{RES_ID}
+			 , #{LANG_TP}
+			 , #{RES_NM}
+			 , CURRENT_TIMESTAMP
+			 , #{user.id}
+			 , CURRENT_TIMESTAMP
+			 , #{user.id}
+		)
+	</insert>
+    
+    <!-- 
+		Query ID 	: LanguageResource.updateSysResource
+		Description : 다국어 리소스 수정 - SYS_RESOURCE
+		writer		: 이창섭
+		date		: 2016-09-23
+	-->
+	<update id="updateSysResource" parameterType="map">
+		UPDATE SYS_RESOURCE
+		   SET RES_NM		= #{RES_NM}
+		   	 , TABLE_NM		= #{TABLE_NM}
+		   	 , COLUMN_NM	= #{COLUMN_NM}
+		     , UPD_DT		= CURRENT_TIMESTAMP
+		     , USER_ID_UPD	= #{user.id}
+		 WHERE RES_ID = #{RES_ID}
+	</update>
+    
+    <!-- 
+		Query ID 	: LanguageResource.deleteSysResourceDtl
+		Description : 다국어 리소스 수정/삭제 - SYS_RESOURCE_DTL 삭제
+		writer		: 이창섭
+		date		: 2016-09-23
+	-->
+	<delete id="deleteSysResourceDtl" parameterType="map">
+		DELETE SYS_RESOURCE_DTL
+		 WHERE RES_ID = #{RES_ID}
+	</delete>
+    
+    <!-- 
+		Query ID 	: LanguageResource.deleteSysResource
+		Description : 다국어 리소스 삭제 - SYS_RESOURCE 삭제
+		writer		: 이창섭
+		date		: 2016-09-23
+	-->
+	<delete id="deleteSysResource" parameterType="map">
+		DELETE SYS_RESOURCE
+		 WHERE RES_ID = #{RES_ID}
+	</delete>
+	
+	<!-- 
+		Query ID 	: LanguageResource.getLanguageResourceList
+		Description : 다국어 리소스 목록 조회
+		writer		: 이창섭
+		date		: 2016-09-28
+	-->
+	<sql id="getLanguageResourceList_base">
+		SELECT SR.RES_ID
+<choose>
+	<when test="LANG_TP != null and LANG_TP != ''">
+			 , SRD.RES_NM
+	</when>
+	<otherwise>
+			 , SR.RES_NM
+	</otherwise>
+</choose>
+             , SR.RES_TP
+             , CONVERT(CHAR(16), SR.REG_DT, 120) AS REG_DT
+          FROM SYS_RESOURCE SR WITH( NOLOCK )
+<if test="LANG_TP != nuill and LANG_TP != ''">
+		 INNER JOIN SYS_RESOURCE_DTL SRD
+		    ON SR.RES_ID = SRD.RES_ID
+		   AND SRD.LANG_TP = #{LANG_TP}
+</if>
+         WHERE 1 = 1
+<if test="RES_ID != null and RES_ID != ''">
+		   AND SR.RES_ID LIKE '%' + #{RES_ID} + '%'
+</if>
+<if test="RES_NM != null and RES_NM != ''">
+		   AND SR.RES_NM LIKE '%' + #{RES_NM} + '%'
+</if>
+<if test="RES_CATEGORY != null and RES_CATEGORY != ''">
+		   AND SR.RES_ID LIKE #{RES_CATEGORY} + '%'
+</if>
+         ORDER BY SR.REG_DT DESC
+	</sql>
+	
+	<select id="getLanguageResourceList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getLanguageResourceList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<select id="getLanguageResourceList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getLanguageResourceList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<select id="getLanguageResourceList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getLanguageResourceList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!-- 
+		Query ID 	: LanguageResource.getResIdByCode
+		Description : 공통코드용 다국어 리소스 ID 조회
+		writer		: 이창섭
+		date		: 2016-10-05
+	-->
+	<select id="getResIdByCode" parameterType="map" resultType="lmap">
+		SELECT RES_ID 
+		  FROM SYS_CODE WITH( NOLOCK )
+		 WHERE CODE_CATEGORY_ID = #{CODE_CATEGORY_ID} 
+		   AND RES_ID IS NOT NULL
+	</select>
+	
+</mapper>

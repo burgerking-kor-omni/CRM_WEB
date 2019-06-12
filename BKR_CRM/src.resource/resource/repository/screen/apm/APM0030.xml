@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="APM0030" screenType="list" screenLayoutType="Popup" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>APMD /  화면관리 / 메타연동 (팝업)</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0030</fileName>
+  <functions>
+    <function id="FNCAPM0066" isStartFunction="false" functionName="시스템관리 / 메타연동화면 목록 조회 호출" serviceId="SVCAPM0069" alias="INQUIRY"/>
+    <function id="FNCAPM0067" isStartFunction="false" functionName="시스템관리 / 메타연동 화면등록 호출" serviceId="SVCAPM0070" alias="REGIST"/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

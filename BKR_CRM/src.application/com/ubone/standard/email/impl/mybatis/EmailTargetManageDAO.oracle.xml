@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="EmailTargetManage">
+	<!--
+		QueryId     : EmailTargetManage.getEmailTargetList
+		Description : VOC유형 별 이메일 발송 대상 목록 
+	 -->
+	<sql id="getEmailTargetList_base">
+		SELECT 
+		    TVD.ID_TARGET
+		    ,TVD.NM_TARGET
+		    ,TVD.DS_TARGET
+		    ,TVD.DS_EMAIL
+		    ,TO_CHAR(TVD.DT_REG, 'YYYY-MM-DD') AS DT_REG
+		    ,ID_REG_USER
+		    ,SU1.USER_NM AS NM_REG_USER
+		    ,TO_CHAR(TVD.DT_UPT, 'YYYY-MM-DD') AS DT_UPT
+		    ,ID_UPT_USER
+		    ,SU2.USER_NM AS NM_UPT_USER
+		FROM TBS_VOC_DISPATCH TVD
+		INNER JOIN SYS_USER SU1
+			ON TVD.ID_REG_USER = SU1.USER_ID
+		INNER JOIN SYS_USER SU2
+			ON TVD.ID_UPT_USER = SU2.USER_ID
+		WHERE 1=1
+		<if test="ID_TARGET != null and ID_TARGET != ''">
+			AND TVD.ID_TARGET = #{ID_TARGET}
+		</if>
+		<if test="NM_TARGET_SEARCH != null and NM_TARGET_SEARCH != ''">
+			AND TVD.NM_TARGET LIKE ('%' || UPPER(#{NM_TARGET_SEARCH}) ||'%')
+		</if>
+		<if test="DS_EMAIL_SEARCH != null and DS_EMAIL_SEARCH != ''">
+			AND TVD.DS_EMAIL LIKE '%'|| #{DS_EMAIL_SEARCH} ||'%'
+		</if>
+		ORDER BY TVD.NM_TARGET, TVD.DT_REG DESC
+	</sql>
+
+	<select id="getEmailTargetList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getEmailTargetList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	<select id="getEmailTargetList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getEmailTargetList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	<select id="getEmailTargetList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getEmailTargetList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		QueryId     : EmailTargetManage.getEmailTargetDetailList
+		Description : VOC유형 별 이메일 발송 대상 상세 목록 
+	 -->
+	<select id="getEmailTargetDetailList" parameterType="map" resultType="lmap">
+		SELECT
+		    SC.CODE_CATEGORY_ID
+		    ,SC.CODE AS CD_TARGET_VALUE
+		    ,SC.CODE_NAME AS CD_TARGET
+		    ,SC.SORT_ORDER
+		    ,TVDC.ID_TARGET  
+		    ,NVL2(TVDC.FG_CC,TVDC.FG_CC,'N') AS FG_CC
+		    ,NVL2(TVDC.FG_USE,TVDC.FG_USE,'N') AS FG_USE              
+		    ,TO_CHAR(TVDC.DT_REG, 'YYYY-MM-DD') AS DT_UPT
+		    ,TVDC.ID_REG_USER 
+		    ,TO_CHAR(TVDC.DT_UPT, 'YYYY-MM-DD') AS DT_UPT      
+		    ,TVDC.ID_UPT_USER
+		FROM(
+		    SELECT
+		        SC.CODE_CATEGORY_ID
+		        ,SC.CODE
+		        ,SC.CODE_NAME
+		        ,SC.SORT_ORDER
+		    FROM SYS_CODE SC
+		    WHERE 1=1
+		    AND CODE_CATEGORY_ID = 'CD_VOC_DISPATCH'
+		    ORDER BY SC.SORT_ORDER
+		) SC
+		LEFT OUTER JOIN (
+		    SELECT
+		        TVDC.ID_TARGET  
+		      ,TVDC.CD_TARGET   
+		      ,TVDC.FG_CC       
+		      ,TVDC.FG_USE      
+		      ,TVDC.DT_REG      
+		      ,TVDC.ID_REG_USER 
+		      ,TVDC.DT_UPT      
+		      ,TVDC.ID_UPT_USER
+		    FROM TBS_VOC_DISPATCH_CATEGORY TVDC
+		    WHERE 1=1
+		    AND TVDC.ID_TARGET = #{ID_TARGET}
+		) TVDC
+		ON TVDC.CD_TARGET = SC.CODE
+	</select>
+	
+	<!--
+		QueryId     : EmailTargetManage.insertVocDispatch
+		Description : 이메일 발송 대상 등록
+	 -->
+	<insert id="insertVocDispatch" parameterType="map">
+	
+		<selectKey keyProperty="ID_TARGET" resultType="String" order="BEFORE">
+			SELECT SEQ_TBS_VOC_DISPATCH.NEXTVAL FROM DUAL
+		</selectKey>
+	
+		INSERT INTO CRMADMIN.TBS_VOC_DISPATCH
+		(
+			ID_TARGET  
+			,NM_TARGET    
+			,DS_TARGET    
+			,DS_EMAIL     
+			,DT_REG       
+			,ID_REG_USER  
+			,DT_UPT       
+			,ID_UPT_USER  
+		)
+		VALUES
+		(
+			#{ID_TARGET}  
+			,'NEW-Name'  
+			,#{DS_TARGET}    
+			,'NEW-Email'        
+			,SYSDATE
+			,#{user.id}
+			,SYSDATE
+			,#{user.id}
+		)
+	</insert>
+	
+	<!--
+		QueryId     : EmailTargetManage.insertVocDispatchCategory
+		Description : 이메일 발송 대상 상세 유형 등록
+	 -->
+	<insert id="insertVocDispatchCategory" parameterType="map">
+		INSERT INTO CRMADMIN.TBS_VOC_DISPATCH_CATEGORY
+		(
+			ID_TARGET    
+			,CD_TARGET   
+			,FG_CC       
+			,FG_USE      
+			,DT_REG      
+			,ID_REG_USER 
+			,DT_UPT      
+			,ID_UPT_USER  
+		)
+		VALUES
+		(
+			#{ID_TARGET}    
+			,#{CD_TARGET}   
+			,#{FG_CC}      
+			,#{FG_USE}      
+			,SYSDATE
+			,#{user.id}
+			,SYSDATE
+			,#{user.id}
+		)
+	</insert>
+	
+	<!--
+		QueryId     : EmailTargetManage.updateVocDispatch
+		Description : 이메일 발송 대상 수정
+	 -->
+	<update id="updateVocDispatch" parameterType="map">
+		UPDATE CRMADMIN.TBS_VOC_DISPATCH
+		 SET 
+			NM_TARGET   = #{NM_TARGET}    
+			,DS_TARGET   = #{DS_TARGET}    
+			,DS_EMAIL    = #{DS_EMAIL}     
+			,DT_UPT      = SYSDATE
+			,ID_UPT_USER = #{user.id} 
+		WHERE ID_TARGET = #{ID_TARGET}
+	</update>
+	
+	<!--
+		QueryId     : EmailTargetManage.updateVocDispatchCategory
+		Description : 이메일 발송 대상 상세 유형 수정
+	 -->
+	<update id="updateVocDispatchCategory" parameterType="map">
+		UPDATE CRMADMIN.TBS_VOC_DISPATCH_CATEGORY
+		 SET 
+			CD_TARGET    = #{CD_TARGET}
+			,FG_CC       = #{FG_CC}
+			,FG_USE      = #{FG_USE}
+			,DT_UPT      = SYSDATE
+			,ID_UPT_USER = #{user.id} 
+		WHERE ID_TARGET = #{ID_TARGET}
+	</update>
+	
+	<!--
+		QueryId     : EmailTargetManage.deleteVocDispatch
+		Description : 이메일 발송 대상 유형 삭제
+	 -->
+	<delete id="deleteVocDispatch" parameterType="map">
+		DELETE FROM CRMADMIN.TBS_VOC_DISPATCH
+		WHERE ID_TARGET = #{ID_TARGET}
+	</delete>
+	<!--
+	
+		QueryId     : EmailTargetManage.deleteVocDispatchCategory
+		Description : 이메일 발송 대상 상세 유형 삭제
+	 -->
+	<delete id="deleteVocDispatchCategory" parameterType="map">
+		DELETE FROM CRMADMIN.TBS_VOC_DISPATCH_CATEGORY
+		WHERE ID_TARGET = #{ID_TARGET}
+	</delete>
+	
+</mapper>
+ 

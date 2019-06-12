@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<screenBuilder id="APM0041" screenType="detail" screenLayoutType="Popup" isLoginCheck="false" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>다국어 리소스 데이터 상세 팝업</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0041</fileName>
+  <functions>
+    <function id="FNCAPM0091" isStartFunction="false" functionName="다국어 리소스 상세 조회 호출" serviceId="SVCAPM0089" alias="INQUIRY"/>
+    <function id="FNCAPM0092" isStartFunction="false" functionName="다국어 리소스 수정 호출" serviceId="SVCAPM0090" alias="MODIFY"/>
+    <function id="FNCAPM0093" isStartFunction="false" functionName="다국어 리소스 삭제 호출" serviceId="SVCAPM0091" alias="REMOVE"/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

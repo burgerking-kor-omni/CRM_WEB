@@ -1,0 +1,759 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ApiUser">
+
+	<!--
+		QueryId     : ApiUser.getMember
+		Description : 회원 정보 조회 
+	 -->
+	<select id="getMember" parameterType="map" resultType="lmap">
+		SELECT TM.ID_MEMBER              /* 회원PK */
+		     , TM.BRCD_MEMBER            /* 회원바코드 */
+		     , TM.NO_KIOSK               /* 키오스크회원번호 */
+		     , TM.NM_MEMBER              /* 회원명 */
+		     , TM.DS_EMAIL               /* 회원이메일 */
+		     , TM.NO_PHONE               /* 회원전화번호 */
+		     , TM.PASSWD                 /* 비밀번호 */
+		     , TM.DT_CHNG_PASSWD         /* 비밀번호최종변경일 */
+		     , TM.DT_AFTER_CHNG_PASSWD   /* 비밀번호나중에변경일 */
+		     , TM.YN_TEMP_PASSWD         /* 임시비밀번호발급여부 */
+		     , TM.CD_STATUS              /* 회원상태 */
+		     , TM.CD_GRADE               /* 등급코드 */
+		     , TM.DT_CHNG_GRADE          /* 회원등급변경일자 */
+		     , TM.CNT_STAMP              /* 스템프갯수 */
+		     , TM.DT_BIRTH               /* 생년월일 */
+		     , TM.BIRTHDAY               /* 생일 */
+		     , TM.CD_AGE                 /* 연령대 */
+		     , TM.CD_GENDER              /* 성별 */
+		     , TM.NO_CAR                 /* 차량번호 */
+		     , TM.CD_JOIN_PATH           /* 가입경로 */
+		     , TM.CD_JOIN_SITE           /* 가입사이트 */
+		     , TM.DT_JOIN                /* 가입일 */
+		     , TM.REG_IP                 /* 등록IP */
+		     , TM.YN_CONFIRM             /* 인증여부 */
+		     , TM.YN_CONFIRM_RE          /* 재인증여부 */
+		     , TM.CD_PIN                 /* 회원핀코드 */
+		     , TM.DI                     /* 실명인증확인값 */
+		     , TM.DT_CONFIRM             /* 실명인증일 */
+		     , TM.YN_SMS_RECV            /* SMS수신여부 */
+		     , TM.DT_SMS_RECV            /* SMS수신동의일 */
+		     , TM.YN_EMAIL_RECV          /* EMAIL수신여부 */
+		     , TM.DT_EMAIL_RECV          /* EMAIL수신동의일 */
+		     , TM.YN_PRIVACY_AGREE       /* 개인정보수집동의여부 */
+		     , TM.DT_PRIVACY_AGREE       /* 개인정보수집동의일 */
+		     , TM.YN_BKR_AGREE           /* 버거킹이용약관동의여부 */
+		     , TM.DT_BKR_AGREE           /* 버거킹이용약관동의일 */
+		     , TM.DT_DORMANCY            /* 휴면처리일 */
+		     , TM.TOKEN_PK               /* 토큰PK */
+		     , TM.WEB_TOKEN_PK           /* WEB토큰PK */
+		     , TM.CNT_FAIL_LOGIN         /* 로그인실패건수 */
+		     , TM.DT_LAST_LOGIN          /* 최종로그인일시 */
+		     , TM.MIG_TARGET_CHNN        /* 마이그대상채널 */
+		     , TM.DT_REG                 /* 최초등록일시 */
+		     , TM.ID_REG_USER            /* 최초등록자 */
+		     , TM.DT_UPT                 /* 최근수정일시 */
+		     , TM.ID_UPT_USER            /* 최근수정자 */
+		     , ROUND(SYSDATE - TM.DT_CHNG_PASSWD) + 1 AS DAY_CHNG_PW
+		     , DECODE(TM.DT_AFTER_CHNG_PASSWD, NULL, 'N', 'Y') AS FG_AFTER
+		     , CASE WHEN TM.DT_AFTER_CHNG_PASSWD <![CDATA[<=]]> SYSDATE THEN 'Y'
+		            ELSE 'N'
+		        END FG_AFTER_CHNG
+		  FROM CRMADMIN.TBS_MEMBER TM
+		 WHERE 1 = 1
+		<if test="BRCD_MEMBER != null and BRCD_MEMBER != ''">
+		   AND TM.BRCD_MEMBER = #{BRCD_MEMBER}
+		</if>
+		<if test="DS_EMAIL != null and DS_EMAIL != ''">
+		   AND TM.DS_EMAIL = #{DS_EMAIL}
+		</if>
+		<if test="ID_MEMBER != null and ID_MEMBER != ''">
+		   AND TM.ID_MEMBER = #{ID_MEMBER}
+		</if>
+		<if test="DI != null and DI != ''">
+		   AND TM.DI = #{DI}
+		</if>
+
+	</select>
+	
+	<!--
+		QueryId     : ApiUser.getMemberSns
+		Description : 회원 정보 조회 - SNS
+	 -->
+	<select id="getMemberSns" parameterType="map" resultType="lmap">
+		SELECT TM.ID_MEMBER              /* 회원PK */
+		     , TM.BRCD_MEMBER            /* 회원바코드 */
+		     , TM.NO_KIOSK               /* 키오스크회원번호 */
+		     , TM.NM_MEMBER              /* 회원명 */
+		     , TM.DS_EMAIL               /* 회원이메일 */
+		     , TM.NO_PHONE               /* 회원전화번호 */
+		     , TM.PASSWD                 /* 비밀번호 */
+		     , TM.DT_CHNG_PASSWD         /* 비밀번호최종변경일 */
+		     , TM.DT_AFTER_CHNG_PASSWD   /* 비밀번호나중에변경일 */
+		     , TM.YN_TEMP_PASSWD         /* 임시비밀번호발급여부 */
+		     , TM.CD_STATUS              /* 회원상태 */
+		     , TM.CD_GRADE               /* 등급코드 */
+		     , TM.DT_CHNG_GRADE          /* 회원등급변경일자 */
+		     , TM.CNT_STAMP              /* 스템프갯수 */
+		     , TM.DT_BIRTH               /* 생년월일 */
+		     , TM.BIRTHDAY               /* 생일 */
+		     , TM.CD_AGE                 /* 연령대 */
+		     , TM.CD_GENDER              /* 성별 */
+		     , TM.NO_CAR                 /* 차량번호 */
+		     , TM.CD_JOIN_PATH           /* 가입경로 */
+		     , TM.CD_JOIN_SITE           /* 가입사이트 */
+		     , TM.DT_JOIN                /* 가입일 */
+		     , TM.REG_IP                 /* 등록IP */
+		     , TM.YN_CONFIRM             /* 인증여부 */
+		     , TM.YN_CONFIRM_RE          /* 재인증여부 */
+		     , TM.CD_PIN                 /* 회원핀코드 */
+		     , TM.DI                     /* 실명인증확인값 */
+		     , TM.DT_CONFIRM             /* 실명인증일 */
+		     , TM.YN_SMS_RECV            /* SMS수신여부 */
+		     , TM.DT_SMS_RECV            /* SMS수신동의일 */
+		     , TM.YN_EMAIL_RECV          /* EMAIL수신여부 */
+		     , TM.DT_EMAIL_RECV          /* EMAIL수신동의일 */
+		     , TM.YN_PRIVACY_AGREE       /* 개인정보수집동의여부 */
+		     , TM.DT_PRIVACY_AGREE       /* 개인정보수집동의일 */
+		     , TM.YN_BKR_AGREE           /* 버거킹이용약관동의여부 */
+		     , TM.DT_BKR_AGREE           /* 버거킹이용약관동의일 */
+		     , TM.DT_DORMANCY            /* 휴면처리일 */
+		     , TM.TOKEN_PK               /* 토큰PK */
+             , TM.WEB_TOKEN_PK           /* WEB토큰PK */
+		     , TM.CNT_FAIL_LOGIN         /* 로그인실패건수 */
+		     , TM.DT_LAST_LOGIN          /* 최종로그인일시 */
+		     , TM.MIG_TARGET_CHNN        /* 마이그대상채널 */
+		     , TM.DT_REG                 /* 최초등록일시 */
+		     , TM.ID_REG_USER            /* 최초등록자 */
+		     , TM.DT_UPT                 /* 최근수정일시 */
+		     , TM.ID_UPT_USER            /* 최근수정자 */
+		     , ROUND(SYSDATE - TM.DT_CHNG_PASSWD) + 1 AS DAY_CHNG_PW
+		     , DECODE(TM.DT_AFTER_CHNG_PASSWD, NULL, 'N', 'Y') AS FG_AFTER
+		     , CASE WHEN TM.DT_AFTER_CHNG_PASSWD <![CDATA[<=]]> SYSDATE THEN 'Y'
+		            ELSE 'N'
+		        END FG_AFTER_CHNG
+		     , TMS.TP_SNS             /* SNS구분(네이버,삼성 등) */
+		     , TMS.SN_SNS             /* 고유번호 */
+		  FROM CRMADMIN.TBS_MEMBER TM
+		 INNER JOIN CRMADMIN.TBS_MEMBER_SNS TMS
+		    ON TM.ID_MEMBER = TMS.ID_MEMBER
+		 WHERE TMS.TP_SNS = #{TP_SNS} 
+		   AND TMS.SN_SNS = #{SN_SNS}
+
+	</select>
+	
+	<!--
+		QueryId     : ApiUser.getMemberAuto
+		Description : 회원 정보 조회 - Auto
+	 -->
+	<select id="getMemberAuto" parameterType="map" resultType="lmap">
+		SELECT TM.ID_MEMBER           /* 회원PK */
+		     , TM.BRCD_MEMBER         /* 회원바코드 */
+		     , TM.NM_MEMBER           /* 회원명 */
+		     , TM.DS_EMAIL            /* 회원이메일 */
+		     , TM.NO_PHONE            /* 회원전화번호 */
+		     , TM.PASSWD              /* 비밀번호 */
+		     , TM.DT_CHNG_PASSWD      /* 비밀번호최종변경일 */
+		     , ROUND(SYSDATE - TM.DT_CHNG_PASSWD) + 1 AS DAY_CHNG_PW
+		     , TM.DT_AFTER_CHNG_PASSWD/* 비밀번호나중에변경일 */
+		     , DECODE(TM.DT_AFTER_CHNG_PASSWD, NULL, 'N', 'Y') AS FG_AFTER
+		     , CASE WHEN TM.DT_AFTER_CHNG_PASSWD <![CDATA[<=]]> SYSDATE THEN 'Y'
+		            ELSE 'N'
+		        END FG_AFTER_CHNG
+		     , TM.YN_TEMP_PASSWD      /* 임시비밀번호발급여부 */
+		     , TM.CD_STATUS           /* 회원상태 */
+		     , TM.CD_GRADE            /* 회원등급 */
+		     , TM.CNT_STAMP           /* 스탬프갯수 */
+		     , TM.DT_BIRTH            /* 생년월일 */
+		     , TM.BIRTHDAY            /* 생일 */
+		     , TM.CD_AGE              /* 연령대 */
+		     , TM.CD_GENDER           /* 성별 */
+		     , TM.NO_CAR              /* 차량번호 */
+		     , TM.CD_JOIN_PATH        /* 가입경로 */
+		     , TM.CD_JOIN_SITE        /* 가입사이트 */
+		     , TM.DT_JOIN             /* 가입일 */
+		     , TM.REG_IP              /* 등록IP */
+		     , TM.YN_CONFIRM          /* 인증여부 */
+		     , TM.YN_CONFIRM_RE       /* 재인증여부 */
+		     , TM.CD_PIN              /* 회원핀코드 */
+		     , TM.DI                  /* 실명인증확인값 */
+		     , TM.DT_CONFIRM          /* 실명인증일 */
+		     , TM.YN_SMS_RECV         /* SMS수신여부 */
+		     , TM.DT_SMS_RECV         /* SMS수신허용일 */
+		     , TM.YN_EMAIL_RECV       /* EMAIL수신여부 */
+		     , TM.DT_EMAIL_RECV       /* EMAIL수신허용일 */
+		     , TM.YN_PRIVACY_AGREE    /* 개인정보수집동의여부 */
+		     , TM.DT_PRIVACY_AGREE    /* 개인정보수집동의일 */
+		     , TM.YN_BKR_AGREE        /* 버거킹이용약관동의여부 */
+		     , TM.DT_BKR_AGREE        /* 버거킹이용약관동의일 */
+		     , TM.DT_DORMANCY         /* 휴면처리일 */
+		     , TM.MIG_TARGET_CHNN     /* 마이그대상채널 */
+		     , TM.CNT_FAIL_LOGIN      /* 로그인실패건수 */
+		     , TM.DT_REG              /* 최초등록일시 */
+		     , TM.ID_REG_USER         /* 최초등록자 */
+		     , TM.DT_UPT              /* 최근수정일시 */
+		     , TM.ID_UPT_USER         /* 최근수정자 */
+		     , TM.TOKEN_PK               /* 토큰PK */
+             , TM.WEB_TOKEN_PK           /* WEB토큰PK */
+		  FROM CRMADMIN.TBS_MEMBER TM
+		 WHERE TM.ID_MEMBER = #{ID_MEMBER}
+			<choose>
+				<when test="CONNECT_GUBUN == '01'">
+		   AND TM.TOKEN_PK = #{APP_TOKEN}
+				</when>
+				<when test="CONNECT_GUBUN == '02'">
+		   AND TM.WEB_TOKEN_PK = #{APP_TOKEN} 
+				</when>
+				<otherwise>
+				</otherwise>
+			</choose>
+
+	</select>
+	
+	<!--
+		QueryId     : ApiUser.getMemberTokenFirst
+		Description : 회원 로그인 처리 - 신규앱 최초 로그인
+	 -->
+	<select id="getMemberTokenFirst" parameterType="map" resultType="lmap">
+		SELECT TM.ID_MEMBER           /* 회원PK */
+		     , TM.BRCD_MEMBER         /* 회원바코드 */
+		     , TM.NM_MEMBER           /* 회원명 */
+		     , TM.DS_EMAIL            /* 회원이메일 */
+		     , TM.NO_PHONE            /* 회원전화번호 */
+		     , TM.PASSWD              /* 비밀번호 */
+		     , TM.DT_CHNG_PASSWD      /* 비밀번호최종변경일 */
+		     , ROUND(SYSDATE - TM.DT_CHNG_PASSWD) + 1 AS DAY_CHNG_PW
+		     , TM.DT_AFTER_CHNG_PASSWD/* 비밀번호나중에변경일 */
+		     , DECODE(TM.DT_AFTER_CHNG_PASSWD, NULL, 'N', 'Y') AS FG_AFTER
+		     , CASE WHEN TM.DT_AFTER_CHNG_PASSWD <![CDATA[<=]]> SYSDATE THEN 'Y'
+		            ELSE 'N'
+		        END FG_AFTER_CHNG
+		     , TM.YN_TEMP_PASSWD      /* 임시비밀번호발급여부 */
+		     , TM.CD_STATUS           /* 회원상태 */
+		     , TM.CD_GRADE            /* 회원등급 */
+		     , TM.CNT_STAMP           /* 스탬프갯수 */
+		     , TM.DT_BIRTH            /* 생년월일 */
+		     , TM.BIRTHDAY            /* 생일 */
+		     , TM.CD_AGE              /* 연령대 */
+		     , TM.CD_GENDER           /* 성별 */
+		     , TM.NO_CAR              /* 차량번호 */
+		     , TM.CD_JOIN_PATH        /* 가입경로 */
+		     , TM.CD_JOIN_SITE        /* 가입사이트 */
+		     , TM.DT_JOIN             /* 가입일 */
+		     , TM.REG_IP              /* 등록IP */
+		     , TM.YN_CONFIRM          /* 인증여부 */
+		     , TM.YN_CONFIRM_RE       /* 재인증여부 */
+		     , TM.CD_PIN              /* 회원핀코드 */
+		     , TM.DI                  /* 실명인증확인값 */
+		     , TM.DT_CONFIRM          /* 실명인증일 */
+		     , TM.YN_SMS_RECV         /* SMS수신여부 */
+		     , TM.DT_SMS_RECV         /* SMS수신허용일 */
+		     , TM.YN_EMAIL_RECV       /* EMAIL수신여부 */
+		     , TM.DT_EMAIL_RECV       /* EMAIL수신허용일 */
+		     , TM.YN_PRIVACY_AGREE    /* 개인정보수집동의여부 */
+		     , TM.DT_PRIVACY_AGREE    /* 개인정보수집동의일 */
+		     , TM.YN_BKR_AGREE        /* 버거킹이용약관동의여부 */
+		     , TM.DT_BKR_AGREE        /* 버거킹이용약관동의일 */
+		     , TM.DT_DORMANCY         /* 휴면처리일 */
+		     , TM.MIG_TARGET_CHNN     /* 마이그대상채널 */
+		     , TM.CNT_FAIL_LOGIN      /* 로그인실패건수 */
+		     , TM.DT_REG              /* 최초등록일시 */
+		     , TM.ID_REG_USER         /* 최초등록자 */
+		     , TM.DT_UPT              /* 최근수정일시 */
+		     , TM.ID_UPT_USER         /* 최근수정자 */
+		     , TM.TOKEN_PK               /* 토큰PK */
+             , TM.WEB_TOKEN_PK           /* WEB토큰PK */
+		  FROM CRMADMIN.TBS_MEMBER TM
+		 WHERE TM.DS_EMAIL = #{DS_EMAIL}
+		   AND TM.TOKEN_PK = #{APP_TOKEN}
+
+	</select>
+	
+	<!--
+		QueryId     : ApiUser.checkJoin
+		Description : 회원 정보 중복 체크
+	 -->
+	<select id="checkJoin" parameterType="map" resultType="lmap">
+		SELECT TM.ID_MEMBER           /* 회원PK */
+		  FROM CRMADMIN.TBS_MEMBER TM
+		 WHERE 1 = 1
+			<choose>
+				<when test="CHK_GUBUN == '01'">
+		   AND DS_EMAIL = #{DS_EMAIL}
+				</when>
+				<when test="CHK_GUBUN == '02'">
+		   AND TM.NM_MEMBER = #{NM_MEMBER}
+		   AND TM.NO_PHONE = #{NO_PHONE} 
+				</when>
+				<when test="CHK_GUBUN == '03'">
+		   AND TM.DI = #{DI}
+				</when>
+				<otherwise>
+		   AND 1 = 2
+				</otherwise>
+			</choose>
+
+	</select>
+	
+	<!--
+		QueryId     : ApiUser.findMemberId
+		Description : 회원 ID 찾기
+	 -->
+	<select id="findMemberId" parameterType="map" resultType="lmap">
+		SELECT TM.ID_MEMBER AS "id_member"          /* 회원PK */
+		     , SUBSTR(TM.DS_EMAIL, 0, INSTR(TM.DS_EMAIL,'@')-4) || '***' || SUBSTR(TM.DS_EMAIL, INSTR(TM.DS_EMAIL,'@')) AS "ds_email"
+		     , TO_CHAR(TM.DT_JOIN, 'YYYY-MM-DD HH24:MI:SS') AS "dt_join"
+		  FROM CRMADMIN.TBS_MEMBER TM
+		 WHERE TM.NM_MEMBER = #{NM_MEMBER}
+		   AND TM.NO_PHONE = #{NO_PHONE} 
+
+	</select>
+	
+	<!--
+		QueryId     : ApiUser.getResetMember
+		Description : 비밀번호 초기화 대상 조회
+	 -->
+	<select id="getResetMember" parameterType="map" resultType="lmap">
+		SELECT TM.ID_MEMBER           /* 회원PK */
+		  FROM CRMADMIN.TBS_MEMBER TM
+		 WHERE TM.NM_MEMBER = #{NM_MEMBER}
+		   AND TM.DS_EMAIL = #{DS_EMAIL} 
+
+	</select>
+	
+	<!--
+		QueryId     : ApiUser.checkPasswd
+		Description : 비밀번호 초기화 대상 조회
+	 -->
+	<select id="checkPasswd" parameterType="map" resultType="lmap">
+		SELECT TM.ID_MEMBER           /* 회원PK */
+		  FROM CRMADMIN.TBS_MEMBER TM
+		 WHERE TM.ID_MEMBER = #{ID_MEMBER}
+		   AND TM.PASSWD = #{PASSWD}
+
+	</select>
+	
+	<!--
+		QueryId     : ApiUser.getSns
+		Description : SNS 유저 조회
+	 -->
+	<select id="getSns" parameterType="map" resultType="lmap">
+		SELECT NO_SNS
+		     , ID_MEMBER
+		     , TP_SNS
+		     , SN_SNS
+		  FROM CRMADMIN.TBS_MEMBER_SNS
+		 WHERE TP_SNS = #{TP_SNS} 
+		   AND SN_SNS = #{SN_SNS} 
+
+	</select>
+	
+	<!--
+		QueryId     : ApiUser.getSnsMember
+		Description : SNS 유저 조회
+	 -->
+	<select id="getSnsMember" parameterType="map" resultType="lmap">
+		SELECT ID_MEMBER
+		  FROM CRMADMIN.TBS_MEMBER
+		 WHERE DS_EMAIL = #{DS_EMAIL_SNS}
+	</select>
+	
+	<!-- ************************************************************** -->
+	<!-- ************************************************************** -->
+	<!-- ************************************************************** -->
+	
+	<!--
+		QueryId     : ApiUser.insertMember
+		Description : 회원가입
+	 -->
+	<insert id="insertMember" parameterType="map">
+		<selectKey keyProperty="SEQ_TBS_MEMBER" resultType="String" order="BEFORE">
+			SELECT CRMADMIN.SEQ_TBS_MEMBER.NEXTVAL FROM DUAL 
+		</selectKey>
+					
+		INSERT INTO CRMADMIN.TBS_MEMBER
+		(
+			   ID_MEMBER                       /* 회원PK */
+			 , BRCD_MEMBER                     /* 회원바코드 */
+			 , NO_KIOSK                        /* 키오스크회원번호 */
+			 , NM_MEMBER                       /* 회원명 */
+			 , DS_EMAIL                        /* 회원이메일 */
+			 , NO_PHONE                        /* 회원전화번호 */
+			 , PASSWD                          /* 비밀번호 */
+			 , DT_CHNG_PASSWD                  /* 비밀번호최종변경일 */
+			 , DT_AFTER_CHNG_PASSWD            /* 비밀번호나중에변경일 */
+			 , YN_TEMP_PASSWD                  /* 임시비밀번호발급여부 */
+			 , CD_STATUS                       /* 회원상태 */
+			 , CD_GRADE                        /* 회원등급 */
+			 , DT_CHNG_GRADE                   /* 회원등급변경일자 */
+			 , CNT_STAMP                       /* 스탬프갯수 */
+			 , DT_BIRTH                        /* 생년월일 */
+			 , BIRTHDAY                        /* 생일 */
+			 , CD_AGE                          /* 연령대 */
+			 , CD_GENDER                       /* 성별 */
+			 , NO_CAR                          /* 차량번호 */
+			 , CD_JOIN_PATH                    /* 가입경로 */
+			 , CD_JOIN_SITE                    /* 가입사이트 */
+			 , DT_JOIN                         /* 가입일 */
+			 , REG_IP                          /* 등록IP */
+			 , YN_CONFIRM                      /* 인증여부 */
+			 , YN_CONFIRM_RE                   /* 재인증여부 */
+			 , CD_PIN                          /* 회원핀코드 */
+			 , DI                              /* 실명인증확인값 */
+			 , DT_CONFIRM                      /* 실명인증일 */
+			 , YN_SMS_RECV                     /* SMS수신여부 */
+			 , DT_SMS_RECV                     /* SMS수신허용일 */
+			 , YN_EMAIL_RECV                   /* EMAIL수신여부 */
+			 , DT_EMAIL_RECV                   /* EMAIL수신허용일 */
+			 , YN_PRIVACY_AGREE                /* 개인정보수집동의여부 */
+			 , DT_PRIVACY_AGREE                /* 개인정보수집동의일 */
+			 , YN_BKR_AGREE                    /* 버거킹이용약관동의여부 */
+			 , DT_BKR_AGREE                    /* 버거킹이용약관동의일 */
+			 , DT_DORMANCY                     /* 휴면처리일 */
+			 , TOKEN_PK                        /* 푸쉬토큰PK */
+			 , CNT_FAIL_LOGIN                  /* 로그인실패건수 */
+			 , MIG_TARGET_CHNN                 /* 마이그대상채널 */
+			 , DT_LAST_LOGIN                   /* 최종로그인일시 */
+			 , DT_REG                          /* 최초등록일시 */
+			 , ID_REG_USER                     /* 최초등록자 */
+			 , DT_UPT                          /* 최근수정일시 */
+			 , ID_UPT_USER                     /* 최근수정자 */
+		) VALUES (
+		       #{SEQ_TBS_MEMBER}
+		     , LPAD(#{SEQ_TBS_MEMBER}, 10, 0)
+		     , NULL
+		     , #{NM_MEMBER}
+		     , #{DS_EMAIL}
+		     , #{NO_PHONE}
+		     , #{PASSWD}
+		     , SYSDATE
+		     , NULL
+		     , 'N'
+		     , 'A'
+		     , '01'
+		     , SYSDATE
+		     , 0
+		     , REPLACE(#{DT_BIRTH}, '-', '')
+		     , REPLACE(#{BIRTHDAY}, '-', '')
+		     , #{CD_AGE}
+		     , #{CD_GENDER}
+		     , #{NO_CAR}
+		     , #{CD_JOIN_PATH}
+		     , #{CD_JOIN_SITE}
+		     , SYSDATE
+		     , #{REG_IP}
+		     , #{YN_CONFIRM}
+		     , #{YN_CONFIRM_RE}
+		     , #{CD_PIN}
+		     , #{DI}
+		     , DECODE(#{YN_CONFIRM}, 'Y', SYSDATE, NULL)
+		     , #{YN_SMS_RECV}
+		     , DECODE(#{YN_SMS_RECV}, 'Y', SYSDATE, NULL)
+		     , #{YN_EMAIL_RECV}
+		     , DECODE(#{YN_EMAIL_RECV}, 'Y', SYSDATE, NULL)
+		     , #{YN_PRIVACY_AGREE}
+		     , DECODE(#{YN_PRIVACY_AGREE}, 'Y', SYSDATE, NULL)
+		     , #{YN_BKR_AGREE}
+		     , DECODE(#{YN_BKR_AGREE}, 'Y', SYSDATE, NULL)
+		     , NULL
+		     , #{TOKEN_PK}
+		     , 0
+		     , NULL
+		     , NULL
+		     , SYSDATE
+		     , #{SEQ_TBS_MEMBER}
+		     , SYSDATE
+		     , #{SEQ_TBS_MEMBER}
+		)
+		    
+	</insert>
+	
+	<!--
+		QueryId     : ApiUser.updateLoginFailCnt
+		Description : login 실패건수 증가
+	 -->
+	<update id="updateLoginFailCnt" parameterType="map">
+		UPDATE CRMADMIN.TBS_MEMBER
+		   SET CNT_FAIL_LOGIN = CNT_FAIL_LOGIN + 1
+		 WHERE DS_EMAIL = #{DS_EMAIL}
+
+	</update>
+	
+	<!--
+		QueryId     : ApiUser.updateTempPassword
+		Description : 임시비밀번호 발급시 수정
+	 -->
+	<update id="updateTempPassword" parameterType="map">
+		UPDATE CRMADMIN.TBS_MEMBER
+		   SET PASSWD = #{PASSWD}
+		     , YN_TEMP_PASSWD = 'Y'
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+
+	</update>
+	
+	<!--
+		QueryId     : ApiUser.updateMember
+		Description : 회원정보수정 - 전화번호, SMS/EMAIL수신동의여부
+	 -->
+	<update id="updateMember" parameterType="map">
+		UPDATE CRMADMIN.TBS_MEMBER
+		   SET DT_UPT = SYSDATE
+		<if test="NM_MEMBER != null and NM_MEMBER != ''">
+		     , NM_MEMBER = #{NM_MEMBER}
+		</if>
+		<if test="NO_PHONE != null and NO_PHONE != ''">
+		     , NO_PHONE = #{NO_PHONE}
+		</if>
+		<if test="YN_SMS_RECV != null and YN_SMS_RECV != ''">
+			<if test='FLAG_SMS_RECV =="Y"'>
+				<if test='YN_SMS_RECV =="Y"'>
+		     , YN_SMS_RECV = #{YN_SMS_RECV}
+		     , DT_SMS_RECV = SYSDATE
+				</if>
+				<if test='YN_SMS_RECV =="N"'>
+		     , YN_SMS_RECV = #{YN_SMS_RECV}
+		     , DT_SMS_RECV = NULL
+				</if>
+			</if>
+		</if>		   
+		<if test="YN_EMAIL_RECV != null and YN_EMAIL_RECV != ''">
+			<if test='FLAG_EMAIL_RECV =="Y"'>
+				<if test='YN_EMAIL_RECV =="Y"'>
+		     , YN_EMAIL_RECV = #{YN_EMAIL_RECV}
+		     , DT_EMAIL_RECV = SYSDATE
+				</if>
+				<if test='YN_EMAIL_RECV =="N"'>
+		     , YN_EMAIL_RECV = #{YN_EMAIL_RECV}
+		     , DT_EMAIL_RECV = NULL
+				</if>
+			</if>
+		</if>
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+
+	</update>
+	
+	<!--
+		QueryId     : ApiUser.updateMemberPw
+		Description : 회원정보수정 - 비밀번호
+	 -->
+	<update id="updateMemberPw" parameterType="map">
+		UPDATE CRMADMIN.TBS_MEMBER
+		   SET PASSWD = #{PASSWD}
+		     , DT_CHNG_PASSWD = SYSDATE
+		     , DT_AFTER_CHNG_PASSWD = NULL
+		     , YN_TEMP_PASSWD = 'N'
+		     , DT_UPT = SYSDATE
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+
+	</update>
+	
+	<!--
+		QueryId     : ApiUser.updateDormancy
+		Description : 휴먼정보해제
+	 -->
+	<update id="updateDormancy" parameterType="map">
+		UPDATE CRMADMIN.TBS_MEMBER
+		   SET CD_STATUS = 'A'
+		     , DT_DORMANCY = NULL
+		     , DT_CHNG_PASSWD = SYSDATE
+		     , DT_UPT = SYSDATE
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+
+	</update>
+	
+	<!--
+		QueryId     : ApiUser.updateChangeLater
+		Description : 비밀번호 나중변경일 수정
+	 -->
+	<update id="updateChangeLater" parameterType="map">
+		UPDATE CRMADMIN.TBS_MEMBER
+		   SET DT_AFTER_CHNG_PASSWD = SYSDATE + 30
+		     , DT_UPT = SYSDATE
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+
+	</update>
+	
+	<!--
+		QueryId     : ApiUser.updateAddTermsAgree
+		Description : 추가 약관 동의
+	 -->
+	<update id="updateAddTermsAgree" parameterType="map">
+		UPDATE CRMADMIN.TBS_MEMBER
+		   SET YN_BKR_AGREE = 'Y'
+		     , DT_BKR_AGREE = SYSDATE
+		     , DT_UPT = SYSDATE
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+
+	</update>
+	
+	<!--
+		QueryId     : ApiUser.insertDelMember
+		Description : 회원 탈퇴 테이블 정보 저장
+	 -->
+	<insert id="insertDelMember" parameterType="map">
+		INSERT INTO CRMADMIN.TBS_MEMBER_DEL
+		(
+			   ID_MEMBER                       /* 회원PK */
+			 , DT_DEL                          /* 탈퇴일자 */
+			 , TP_DEL                          /* 탈퇴구분 */
+			 , DS_DEL                          /* 탈퇴사유 */
+			 , DT_REG                          /* 최초등록일시 */
+			 , ID_REG_USER                     /* 최초등록자 */
+			 , DT_UPT                          /* 최근수정일시 */
+			 , ID_UPT_USER                     /* 최근수정자 */
+			 , CD_AGE
+			 , CD_GENDER
+			 , CD_GRADE
+		) VALUES (
+		       #{ID_MEMBER}
+		     , SYSDATE
+		     , #{TP_DEL}
+		     , #{DS_DEL}
+		     , SYSDATE
+		     , #{ID_MEMBER}
+		     , SYSDATE
+		     , #{ID_MEMBER}
+		     , #{CD_AGE}
+		     , #{CD_GENDER}
+		     , #{CD_GRADE}
+		)
+		    
+	</insert>
+	
+	<!--
+		QueryId     : ApiUser.deletelMember
+		Description : 회원 탈퇴
+	 -->
+	<delete id="deletelMember" parameterType="map">
+		DELETE CRMADMIN.TBS_MEMBER
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+
+	</delete>
+	
+	<!--
+		QueryId     : ApiUser.deletelMemberAddr
+		Description : 회원 주소 탈퇴
+	 -->
+	<delete id="deletelMemberAddr" parameterType="map">
+		DELETE CRMADMIN.TBS_MEMBER_ADDRESS
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+
+	</delete>
+	
+	<!--
+		QueryId     : ApiUser.deletelSnsMember
+		Description : 회원 SNS 탈퇴
+	 -->
+	<delete id="deletelSnsMember" parameterType="map">
+		DELETE CRMADMIN.TBS_MEMBER_SNS
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+
+	</delete>
+	
+	<!--
+		QueryId     : ApiUser.insertMemberSns
+		Description : 회원 SNS 정보 저장
+	 -->
+	<insert id="insertMemberSns" parameterType="map">
+		<selectKey keyProperty="SEQ_TBS_MEMBER_SNS" resultType="String" order="BEFORE">
+			SELECT CRMADMIN.SEQ_TBS_MEMBER_SNS.NEXTVAL FROM DUAL 
+		</selectKey>
+		
+		INSERT INTO CRMADMIN.TBS_MEMBER_SNS
+		(
+			   NO_SNS                       /* 회원PK */
+			 , ID_MEMBER                    /* 탈퇴일자 */
+			 , TP_SNS                       /* 탈퇴구분 */
+			 , SN_SNS                       /* 탈퇴사유 */
+			 , DT_REG                       /* 최초등록일시 */
+			 , ID_REG_USER                  /* 최초등록자 */
+			 , DT_UPT                       /* 최근수정일시 */
+			 , ID_UPT_USER                  /* 최근수정자 */
+		) VALUES (
+		       #{SEQ_TBS_MEMBER_SNS}
+		     , #{ID_MEMBER}
+		     , #{TP_SNS}
+		     , #{SN_SNS}
+		     , SYSDATE
+		     , #{ID_MEMBER}
+		     , SYSDATE
+		     , #{ID_MEMBER}
+		)
+		    
+	</insert>
+	
+	<!--
+		QueryId     : ApiUser.updateMemberInfo
+		Description : SNS 로그인시 회원 성별, 생일정보 수정
+	 -->
+	<update id="updateMemberInfo" parameterType="map">
+		UPDATE CRMADMIN.TBS_MEMBER
+		   SET DT_UPT = SYSDATE
+		<if test="CD_GENDER != null and CD_GENDER != ''">
+			, CD_GENDER = #{CD_GENDER}
+		</if>
+		<if test="BIRTHDAY != null and BIRTHDAY != ''">
+		     , BIRTHDAY = #{BIRTHDAY}
+		</if>
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+
+	</update>
+	
+	<!--
+		QueryId     : ApiUser.updateLoginMember
+		Description : 최종 로그인 일시 수정
+	 -->
+	<update id="updateLoginMember" parameterType="map">
+		UPDATE CRMADMIN.TBS_MEMBER
+		   SET DT_LAST_LOGIN = SYSDATE
+		     , DT_UPT = SYSDATE
+		     <choose>
+				<when test="CONNECT_GUBUN == '01'">
+		     , TOKEN_PK = TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS') || '-' || #{TOKEN_PK}
+				</when>
+				<when test="CONNECT_GUBUN == '02'">
+		     , WEB_TOKEN_PK = TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS') || '-' || #{WEB_TOKEN_PK} 
+				</when>
+				<otherwise>
+				</otherwise>
+			</choose>
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+
+	</update>
+	
+	<!--
+		QueryId     : ApiUser.insertMemberRecord
+		Description : 회원 정보 변경 이력 저장
+	 -->
+	<insert id="insertMemberRecord" parameterType="map">
+		<selectKey keyProperty="SEQ_TBS_MEMBER_RECORD" resultType="String" order="BEFORE">
+			SELECT CRMADMIN.SEQ_TBS_MEMBER_RECORD.NEXTVAL FROM DUAL 
+		</selectKey>
+		
+		INSERT INTO CRMADMIN.TBS_MEMBER_RECORD
+		(
+			   NO_ITEM_RECD                 /* 회원정보변경일련번호 */
+			 , ID_MEMBER                    /* 회원PK */
+			 , CD_CHNG_ITEM                 /* 변경항목 */
+			 , VAL_ITEM_BR                  /* 변경전_VAL */
+			 , VAL_ITEM_AF                  /* 변경후_VAL */
+			 , DT_REG                       /* 최초등록일시 */
+			 , ID_REG_USER                  /* 최초등록자 */
+			 , DT_UPT                       /* 최근수정일시 */
+			 , ID_UPT_USER                  /* 최근수정자 */
+		) VALUES (
+		       #{SEQ_TBS_MEMBER_RECORD}
+		     , #{ID_MEMBER}
+		     , #{CD_CHNG_ITEM}
+		     , #{VAL_ITEM_BR}
+		     , #{VAL_ITEM_AF}
+		     , SYSDATE
+		     , #{ID_MEMBER}
+		     , SYSDATE
+		     , #{ID_MEMBER}
+		)
+		    
+	</insert>
+
+</mapper>
+ 

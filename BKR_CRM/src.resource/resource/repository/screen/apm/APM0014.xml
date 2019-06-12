@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="APM0014" screenType="detail" screenLayoutType="Default" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>APMD /  Function 상세</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0014</fileName>
+  <functions>
+    <function id="FNCAPM0079" isStartFunction="false" functionName="기능관리 연결화면 목록 조회 호출" serviceId="SVCAPM0079" alias="INQUIRY"/>
+    <function id="FNCAPM0002" isStartFunction="false" functionName="Screen 목록 조회 함수 (AutoComplete) 호출" serviceId="SVCAPM0002" alias="USERDEFINED2"/>
+    <function id="FNCAPM0019" isStartFunction="false" functionName="서비스 목록 조회 (자동완성) 호출" serviceId="SVCAPM0010" alias="USERDEFINED1"/>
+    <function id="FNCAPM0035" isStartFunction="false" functionName="기능관리 기능 수정 호출" serviceId="SVCAPM0043" alias="MODIFY"/>
+    <function id="FNCAPM0036" isStartFunction="false" functionName="기능관리 기능 삭제 호출" serviceId="SVCAPM0040" alias="REMOVE"/>
+    <function id="FNCAPM0080" isStartFunction="false" functionName="기능관리 연결화면 삭제 호출" serviceId="SVCAPM0080" alias="USERDEFINED3"/>
+    <function id="FNCAPM0037" isStartFunction="true" functionName="기능관리 상세정보 조회 호출" serviceId="SVCAPM0020" alias=""/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

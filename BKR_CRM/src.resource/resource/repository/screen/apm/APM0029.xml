@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="APM0029" screenType="register" screenLayoutType="Default" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>APMD /  마스크 관리 / 마스크 등록</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0029</fileName>
+  <functions>
+    <function id="FNCAPM0062" isStartFunction="false" functionName="마스크관리 마스크 등록 호출" serviceId="SVCAPM0056" alias="REGIST"/>
+    <function id="FNCAPM0063" isStartFunction="true" functionName="마스크관리 기본정보 조회 (dummy) 호출" serviceId="SVCAPM0050" alias=""/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

@@ -1,0 +1,86 @@
+<html>
+	<header>
+		<script type="text/javascript" src="/uxl/ext/jquery/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+		
+		<script type="text/javascript">
+			$(document).ready(function(){
+				$('#btnConvert').click(function(){
+					convertXml2MyBatis();
+				});
+
+				$('#sourceText').scroll(function(event){
+					$('#targetText').scrollTop($(this).scrollTop());
+					event.stopPropagation();
+				});
+				
+				$('#targetText').scroll(function(event){
+					$('#sourceText').scrollTop($(this).scrollTop());
+					event.stopPropagation();
+				});
+				
+				var convertXml2MyBatis = function(){
+					var regExp = [
+							  {from:/<!DOCTYPE sqlMap[\s|\r|\w|\"|\-|\/|\.|\:]*>/, to:'<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">'}
+							, {from:/<sqlMap namespace=(.*)>/g, to:'<mapper namespace=$1>'}
+							, {from:/<\/sqlMap[/s| ]*>/, to:'</mapper>'}
+							, {from:/parameterClass/g, to:'parameterType'}
+							, {from:/resultClass/g, to:'resultType'}
+							, {from:/\#(.*)\#/g, to:'#{$1}'}
+							, {from:/\$(.*)\$/g, to:'${$1}'}
+							, {from:/<isNotNull[/s| ]+property=[\"|\']+(.*)[\"|\']+[/s| ]*>/g, to:'<if test="$1 != null">'}
+							, {from:/<\/isNotNull[/s| ]*>/g, to:'</if>'}
+							, {from:/<isNull[/s| ]+property=[\"|\']+(.*)[\"|\']+>/g, to:'<if test="$1 == null">'}
+							, {from:/<\/isNull[/s| ]*>/g, to:'</if>'}
+							, {from:/<isNotEmpty[/s| ]+property=[\"|\']+(.*)[\"|\']+[/s| ]*>/g, to:'<if test="$1 != \'\'">'}
+							, {from:/<\/isNotEmpty[/s| ]*>/g, to:'</if>'}
+							, {from:/<isEmpty[/s| ]+property=[\"|\']+(.*)[\"|\']+[/s| ]*>/g, to:'<if test="$1 == \'\'">'}
+							, {from:/<\/isEmpty[/s| ]*>/g, to:'</if>'}
+							, {from:/<isEqual[/s| ]+property=[\"|\']+(.*)[\"|\']+[/s| ]+compareValue=\"(.*)\"[/s| ]*>/g, to:'<if test="$1 == \'$2\'">'}
+							, {from:/<\/isEqual[/s| ]*>/g, to:'</if>'}
+							, {from:/<isNotEqual[/s| ]+property=[\"|\']+(.*)[\"|\']+[/s| ]+compareValue=\"(.*)\"[/s| ]*>/g, to:'<if test="$1 != \'$2\'">'}
+							, {from:/<\/isNotEqual[/s| ]*>/g, to:'</if>'}
+
+							];
+
+					var sourceText = $('#sourceText').val();
+					
+					for(var i=0; i<regExp.length; i++){
+						sourceText = sourceText.replace(regExp[i].from, regExp[i].to);
+					}
+					
+					$('#targetText').val(sourceText);
+				};
+			});
+		</script>
+	</header>
+	<body>
+		<form action="" method="post"> 
+			<table style="width: 100%; height:100%;">
+				<tr height="30px">
+					<td colspan="2">
+						<h3>Converter iBatis Xml to MyBatis Xml</h3>
+					</td>
+				</tr>
+				<tr height="30px">
+					<td width="50%">From</td>
+					<td width="50%">To</td>
+				</tr>
+				<tr height="*">
+					<td width="50%">
+						<textarea id="sourceText" name="sourceText" style="width:100%; height:100%;" ></textarea>
+					</td>
+					<td width="50%">
+						<textarea id="targetText" name="targetText" style="width:100%; height:100%;" ></textarea>
+					</td>
+				</tr>
+				<tr height="30px">
+					<td></td>
+					<td align="right">
+						<input type="button" id="btnConvert" value="convert">
+					</td>
+				</tr>
+			</table>
+		</form>
+	</body>
+</html>

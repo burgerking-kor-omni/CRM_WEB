@@ -1,0 +1,128 @@
+@charset "utf-8";
+
+/* 디자인 구현 (베이스 소스를 기반으로 플젝 디자인별 적용)  */
+/* common */
+.ub-control.table.normal tbody th .radio, 
+.ub-control.table.normal tbody td .radio, 
+.ub-control.table.normal tbody th .input-checkbox, 
+.ub-control.table.normal tbody td .input-checkbox, 
+.ub-control.table.normal tbody th .cbox, 
+.ub-control.table.normal tbody td .cbox {top:-1px;}
+
+
+/* search */
+.ub-control.button.search:hover {background:url('../../images/common/btn_srch_bg.gif') no-repeat 0 0;}
+.ub-control.button.search:hover a {background:url('../../images/common/btn_srch_bg.gif') no-repeat 100% 0;}
+
+/* jqgrid */
+.ui-jqgrid {border-top:2px solid #666 !important;}
+.ui-jqgrid tr.jqgrow td {height:28px;}
+.ui-jqgrid tr.ui-state-hover, 
+.ui-jqgrid tr.ui-state-highlight {background-color:#edfbff !important;}
+.ui-state-highlight, 
+.ui-widget-content .ui-state-highlight, 
+.ui-widget-header .ui-state-highlight {color:#444;}
+.ui-jqgrid tr.jqgrow td .ub-layout.button.inner {margin:0;}
+.ui-jqgrid .ui-jqgrid-hbox .ui-state-default, 
+.ui-jqgrid .ui-jqgrid-hbox .ui-state-default a {font-size:12px;}
+
+
+/* table */
+.ub-control.table.normal {border-top:1px solid #666;}
+
+
+/* tab */
+.ub-control.tab .ui-tabs-nav .ui-state-active {background:url('../../images/site/common/bg_tabs_nav_on.gif') no-repeat 100% 0;}
+.ub-control.tab .ui-tabs-nav .ui-state-active .ui-tabs-anchor {background:url('../../images/site/common/bg_tabs_nav_on.gif') no-repeat 0 0;}
+.ub-control.tab .ui-tabs-nav .ui-state-active .ui-tabs-anchor label {color:#444;}
+
+
+/* datepicker  */
+.ui-datepicker {z-index: 100 !important;}
+.ui-datepicker .ui-datepicker-today .ui-state-default {background:#18ace0;}
+
+
+/* dialog */
+.ui-dialog.ui-widget-content {border:0;}
+.ui-dialog .ui-dialog-content.ui-widget-content {border-left:1px solid #7c7c7c; border-right:1px solid #7c7c7c;}
+.ui-dialog .ui-dialog-buttonpane.ui-widget-content {border-left:1px solid #7c7c7c; border-right:1px solid #7c7c7c; border-bottom:1px solid #7c7c7c;}
+.ui-dialog .ui-dialog-titlebar {border:1px solid #1e3d7d !important; background:#264b9a;}
+
+/* title */
+h2.ub-control.title.hfold .ico-fold {right:10px; background:url('../../images/site/common/ico_fold.gif') no-repeat 0 0;}
+
+
+/* buttons */
+/* .ub-layout.button.inner {margin:0 0 5px;} */
+.ub-control.button.icon a span {margin-right:3px;}
+.ub-control.button.top {height:auto; padding-left:0; background:none;}
+.ub-control.button.top a {height: 21px; padding:2px 8px 1px 11px; border-radius:3px; color:#fff; font-size:13px; border:1px solid #139ccc; background:#18ace0;}
+.ub-control.button.top:hover {background:none;}
+.ub-control.button.top:hover a {background:#18ace0;}
+.ub-layout.button.bottom .ub-control.button.bottom {height:auto; padding:0; background:none;}
+.ub-layout.button.bottom .ub-control.button.bottom a {height:21px; padding:2px 11px 1px; border-radius:3px; color:#fff; font-size:13px;  border:1px solid #2e53a2; line-height:17px; background:#345baf;}
+.ub-layout.button.bottom .ub-control.button.bottom:hover {background:none;}
+.ub-layout.button.bottom .ub-control.button.bottom:hover a {background:#345baf;}
+.ub-layout.button.bottom .ub-control.button.bottom.left {height:auto; padding:0; background:none;}
+.ub-layout.button.bottom .ub-control.button.bottom.left a {height:21px; padding:2px 11px 1px; border-radius:3px; color:#fff; font-size:13px; border:1px solid #a2a2a2; background:#b6b6b6;}
+.ub-layout.button.bottom .ub-control.button.bottom.left:hover {background:none;}
+.ub-layout.button.bottom .ub-control.button.bottom.left:hover a {background:#b6b6b6;}
+th .ub-control.button.inner, 
+td .ub-control.button.inner {margin:0 0 0 3px;}
+.ub-layout.button.inner .ub-control.button.inner span {margin-left:0;}
+.ub-layout.button.inner .ub-control.button.inner a, 
+.ub-control.button.inner a, 
+.ub-control.button.inner .button, 
+.ub-control.button.inner .input {height:24px; padding:0 15px 0 0; line-height:21px;}
+.ub-layout.button.inner .ub-control.button.inner, 
+.ub-control.button.inner,
+th .ub-control.button.inner, 
+td .ub-control.button.inner {height:auto; padding:0; background:none;}
+.ub-layout.button.inner .ub-control.button.inner a,
+.ub-control.button.inner a,
+th .ub-control.button.inner a, 
+td .ub-control.button.inner a {height:22px; padding:0 15px; border:1px solid #ccc;  border-radius:3px; line-height: 18px; background:linear-gradient(to top, #eaeaea, #fdfdfd, #fff);}
+.ub-control.button.inner a span {vertical-align:top; line-height:20px;}
+.ub-layout.button.inner .ub-control.button.inner:hover, 
+.ub-control.button.inner:hover,
+th .ub-control.button.inner:hover, 
+td .ub-control.button.inner:hover {background:none;}
+.ub-layout.button.inner .ub-control.button.inner:hover a, 
+.ub-control.button.inner:hover a, 
+.ub-control.button.inner:hover .button, 
+.ub-control.button.inner:hover .input,
+th .ub-control.button.inner:hover a, 
+td .ub-control.button.inner:hover a {background:linear-gradient(to top, #eaeaea, #fdfdfd, #fff);}
+h2.ub-control.title .ub-layout.button.inner .ub-control.button.inner a, 
+h3.ub-control.title .ub-layout.button.inner .ub-control.button.inner a, 
+h2.ub-control.title .ub-control.button.inner a, 
+h3.ub-control.title .ub-control.button.inner a {height:22px; padding:0 10px 0 0; color:#264b9a; border:0;}
+
+
+/* icon */ 
+span.ico-register {background:url('../../images/site/common/ico_btn.png') no-repeat 0 0;}
+span.ico-list {top:0; background:url('../../images/site/common/ico_btn.png') no-repeat 0 -25px;}
+span.ico-find {margin-top:0; background:url('../../images/site/common/ico_btn.png') no-repeat 0 -52px;}
+span.ico-print {background:url('../../images/site/common/ico_btn.png') no-repeat -27px -23px;}
+
+
+/* login */
+.ub-layout.login {background:none;}
+.ub-layout.login .login-content .logo-area h1 {padding:0; margin:0 0 36px 0; text-align:center;}
+.ub-layout.login .login-content {width:378px; margin-top:-305px; margin-left:-189px;}
+.ub-layout.login .login-content .logo-area {height:auto; background:none;}
+.ub-layout.login .login-content fieldset {width:auto; padding:0; background:none;}
+.ub-layout.login .login-content .login-form {box-shadow:none; border:0;}
+.ub-layout.login .login-content .pw-insert {margin-top:0;}
+.ub-layout.login .login-content .login-form .login-inputtext input { height:57px;padding:1px 10px 2px 49px; margin:0 0 21px 0;  color:#999; font-size:16px; font-weight:normal;border:1px solid #dcdcdc;}
+.ub-layout.login .login-content .login-form .id-insert .login-inputtext input {background:url('../../images/site/common/ico_id_login.gif') no-repeat 18px 17px;}
+.ub-layout.login .login-content .login-form .pw-insert .login-inputtext input {background:url('../../images/site/common/ico_pw_login.gif') no-repeat 17px 16px;}
+.ub-layout.login .login-content .login-form .login-inputtext input:focus {border:1px solid #dcdcdc;}
+.ub-layout.login .login-content .login-idcheck .checkbox {margin-top:3px;}
+.ub-layout.login .login-content .login-form label {padding-left:3px;}
+.ub-layout.login .login-content .login-btn {top:inherit; left:0;}
+.ub-layout.login .login-content .login-idcheck {margin-top:80px; padding-left:0; text-align:left;}
+.ub-layout.login .login-content .login-idcheck .checkbox {display:none;}
+.ub-layout.login .login-content .login-form .checkbox + .save {display:inline-block; cursor:pointer; position:relative; padding-left:25px; margin-right:15px; font-size:16px; font-weight:normal;}
+.ub-layout.login .login-content .login-form .checkbox +  .save:before {content:" "; display:inline-block; width:14px; height:14px; margin-right:10px; position:absolute; left:0; bottom:1px; border:1px solid #959595; background-color:#fff;}
+.ub-layout.login .login-content .login-form .checkbox:checked +  .save:before {background:url('../../images/site/common/ico_arr_check.gif') no-repeat 0 2px;}

@@ -1,0 +1,70 @@
+APMD의 화면설정에서 화면별 초기 로딩시의 기본값을 설정한다.
+초기 설정할 파라미터 명과 파라미터 값을 저장할 경우
+설정된 화면 최초 호출시 설정된 값이 적용된다.
+정적인 특정값을 적을 경우에는 해당 값을 그대로 적고
+예외적인 예약어로부터 특정값을 설정할 수 있다.
+
+모든 예약어의 키워드는 {} 괄호로 쌓여 있어야 한다.
+*. 해당 예약어 규칙은 서비스 코드 설정시 코드 필터링 정보 작성시에도 동일하게 적용된다.
+
+
+1. 사용자 정보를 초기값으로 설정 할 경우
+   {user.id}
+   {user.name}
+   {user.partCode}
+   처럼 {user.원하는값} 형식으로 초기값을 설정한다.
+
+
+2. config.xml 에 정의된 값으로 설정 할 경우
+   {config.framework.pagesize}
+   {config.framework.blocksize}
+   처럼 {config.원하는값} 형식으로 초기값을 설정한다.
+
+
+3. constant.xml 에 정의된 값으로 설정 할 경우
+   {constant.framework.key.screen}
+   {constant.framework.key.menu}
+   처럼 {constant.원하는값} 형식으로 초기값을 설정한다.
+
+
+4. 특정 날짜 값으로 설정 할 경우
+   {date.NOW_YMD}
+   {date.PREV_D1}
+   {date.NEXT_M1}
+   처럼 {date.날짜규칙} 형식으로 초기값을 설정한다.
+   
+    *. 날짜 규칙
+      1. 현재일 기준의 날짜 값을 사용 할경우
+         NOW_Y : 현재연도
+         NOW_M : 현재월
+         NOW_YM : 현재년월
+         NOW_YMD : 현재년월일
+         NOW_YMDH : 현재년월일시
+         NOW_YMDHM : 현재년월일시분
+         NOW_ + '' or NOW_ + 기타모든값 : 현재년월일시초
+    
+      2. 특정일 기준의 날짜 값을 사용 할경우
+         이전일자
+         PREV_D1 : 오늘 - 1일
+         PREV_D2 : 오늘 - 2일
+             .
+             .
+             .
+             .
+         PREV_D{N} : 오늘 - N일
+         PREV_W1 : 오늘 - 1주
+         PREV_M1 : 오늘 - 1달
+         PREV_Y1 : 오늘 - 1년
+         NOW_Y0101 : 현재년에 1월1일
+    
+         이후일자
+         NEXT_D1 : 오늘 + 1일
+         NEXT_D2 : 오늘 + 2일
+             .
+             .
+             .
+             .
+         NEXT_D{N} : 오늘 + N일
+         NEXT_W1 : 오늘 + 1주
+         NEXT_M1 : 오늘 + 1달
+         NEXT_Y1 : 오늘 + 1년

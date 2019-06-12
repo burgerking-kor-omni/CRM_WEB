@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<screenBuilder id="APM0042" screenType="list" screenLayoutType="Default" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>다국어 리소스 관리</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0042</fileName>
+  <functions>
+    <function id="FNCAPM0094" isStartFunction="false" functionName="다국어 리소스 목록 조회 호출" serviceId="SVCAPM0092" alias="INQUIRY"/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

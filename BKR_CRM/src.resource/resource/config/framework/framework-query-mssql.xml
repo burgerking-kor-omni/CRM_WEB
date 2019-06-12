@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties version="1.0">
+
+	<entry key="query.screen.definition">
+		SELECT P.SCREEN_ID    screenId
+		     , P.PROJECT_CODE applicationId
+		     , P.SCREEN_NAME  screenName
+		     , P.SCREEN_TYPE  screenType
+		     , P.VIEW_TYPE    screenViewType
+		     , P.LAYOUT_TYPE  screenLayoutType
+		     , P.FILE_PATH    filePath
+		     , P.FILE_NAME    fileName
+		     , P.PID          metaPageId
+		     , ISNULL(LOGIN_CHECK_YN, 'N')	loginCheckYn
+		     , P.UPD_DATETIME lastUpdateTimestamp
+		  FROM AP_SCREEN P WITH (NOLOCK)
+		 WHERE P.SCREEN_ID = :screenId
+	</entry>
+	
+	<entry key="query.screen.function">
+		SELECT A.FUNCTION_ID                     functionId
+		     , ISNULL(A.START_FUNCTION_YN, 'N')  isStartFunction
+		     , B.FUNCTION_NAME                   functionName
+		     , B.FUNCTION_TYPE                   functionType
+		     , B.SERVICE_ID                      serviceId
+		     , A.FUNCTION_ALIAS_ID               alias
+		  FROM AP_SCREEN_FUNCTION A WITH (NOLOCK)
+		     , AP_FUNCTION        B WITH (NOLOCK)
+		 WHERE A.SCREEN_ID   = :screenId
+		   and A.FUNCTION_ID = B.FUNCTION_ID
+	</entry>
+	
+	<entry key="query.screen.function.auth">
+		SELECT FUNCTION_ID      functionId
+		     , ROLE_ID          roleId
+		     , EXECUTE_AUTH     executeAuth
+		     , RETRIVE_LEVEL    retriveLevel
+		     , ADMIN_YN         isAdmin
+		  FROM AP_FUNCTION_AUTH WITH (NOLOCK)
+		 WHERE SCREEN_ID   = :screenId
+	</entry>
+	
+	<entry key="query.screen.auth">
+		SELECT ROLE_ID        roleId
+		  FROM AP_SCREEN_AUTH WITH (NOLOCK)
+		 WHERE SCREEN_ID = :screenId
+	</entry>
+	
+	<entry key="query.screen.parameter">
+		SELECT PARAMETER_NAME    parameterName
+		     , DEFAULT_VALUE     defaultValue
+		     , ISNULL(USE_YN, 'Y')  isActive
+		  FROM AP_SCREEN_PARAMETER WITH (NOLOCK)
+		 WHERE SCREEN_ID   = :screenId
+	</entry>
+	
+	<entry key="query.service.definition">
+		SELECT SERVICE_ID                       serviceId
+		     , PROJECT_CODE                     applicationId
+		     , SERVICE_NAME                     serviceName
+		     , SERVICE_TYPE                     serviceType
+		     , CALL_TYPE                        callType
+		     , CLASS_NAME                       className
+		     , METHOD_NAME                      methodName
+		     , ISNULL(PAGING_YN, 'N')              isPaging
+		     , PAGING_COUNT                     pagingCount
+		     , ISNULL(FIND_COND_SAVE_YN, 'N')      isFindConditionSave
+		     , UPD_DATETIME                     lastUpdateTimestamp
+		     , ISNULL(IS_PROTECTED_RESOURCE, 'N')  isProtectedResource
+		     , ISNULL(HAS_LINKED_FILE, 'N')        hasLinkedFile
+		     , ISNULL(IS_INDUCED_EVENT, 'N')       isInducedEvent
+		     , LINKED_WORK_CATEGORY             linkedWorkCategory
+		     , LINKED_ACTIVITY_TYPE             linkedWorkActivityType
+		     , ISNULL(IS_WORKFLOW_CREATION, 'N')	isWorkflowCreation
+		     , ISNULL(WORKFLOW_EXEC_LOCATION, 'T') workflowExecLocation
+		     , WORKFLOW_BIZ_TYPE				workflowBizType
+		     , WORKFLOW_ACTIVITY				workflowActivity
+		     , ISNULL(IS_WORKFLOW_TRIGGER, 'N')	isWorkflowTrigger
+		     , WORKFLOW_EVENT_NAME				workflowEventName
+		     , WORKFLOW_DETAIL_BIZ_TYPE			workflowDetailBizType
+		     , ISNULL(ENCRYPT_COLUMNS, '')		encryptColumns
+		     , ISNULL(LOGIN_CHECK_YN, 'N')		loginCheckYn
+		  FROM AP_SERVICE WITH (NOLOCK)
+		 WHERE SERVICE_ID = :serviceId
+	</entry>
+	
+	<entry key="query.service.code">
+		SELECT CODE_CATEGORY_ID            codeCategoryId
+		     , ISNULL(SLEEP_INCLUDE_YN, 'N')  isSleepIncluded
+		     , ALIAS                       alias
+		     , FILTER_VALUE                filter
+		  FROM AP_SERVICE_CODE WITH (NOLOCK)
+		 WHERE SERVICE_ID = :serviceId
+	</entry>
+	
+	<entry key="query.service.query">
+		SELECT QUERY_ID     queryId
+		     , QUERY_TYPE   queryType
+		     , DATALIST_ID  dataListId
+		  FROM AP_SERVICE_QUERY WITH (NOLOCK)
+		 WHERE SERVICE_ID = :serviceId
+		 ORDER BY RUN_ORDER
+	</entry>
+
+	<entry key="query.service.mask">
+		SELECT MASK_ID      maskId
+		     , POINTCUT_CD  pointCutCd
+		     , DATALIST_ID  dataListId
+		     , COLUMN_NAME  columnName
+		  FROM AP_SERVICE_MASK WITH (NOLOCK)
+		 WHERE SERVICE_ID = :serviceId
+	</entry>
+	
+	<entry key="query.screen.record.01">
+		INSERT INTO AP_SCREEN_RUN_LOG
+		           (
+		                RUN_LOG_SN
+		              , MENU_ID
+		              , MENU_FULL_NAME
+		              , APPLICATION_ID
+		              , CATEGORY_CODE
+		              , SCREEN_ID
+		              , SCREEN_NAME
+		              , PARAM_VALUE
+		              , LOGIN_ID
+		              , USER_ID
+		              , USER_ROLES
+		              , CLIENT_IP_ADDR
+		              , CLIENT_BROWSER
+		              , RUN_DATETIME
+		              , RUN_ELAPSE_TIME
+		              , REG_DATETIME
+		           )
+		  VALUES
+		           (
+		                :id	/* RUN_LOG_SN */
+		              , (SELECT MENU_ID FROM AP_MENU_SCREEN	WITH (NOLOCK) WHERE SCREEN_ID = :screenId)     /* MENU_ID */
+		              , (SELECT dbo.FN_GET_MENU_FULL_NAME(MENU_ID) FROM AP_MENU_SCREEN	WITH (NOLOCK) WHERE SCREEN_ID = :screenId) /* MENU_FULL_NAME */
+		              , :applicationId      /* APPLICATION_ID */
+		              , (SELECT CATEGORY_CODE FROM AP_SCREEN WITH (NOLOCK) WHERE SCREEN_ID = :screenId)                        /* CATEGORY_CODE */
+		              , :screenId           /* SCREEN_ID */
+		              , :screenName         /* SCREEN_NAME */
+		              , :paramValue         /* PARAM_VALUE */
+		              , :loginId            /* LOGIN_ID */
+		              , :userId             /* USER_ID */
+		              , :userRoles          /* USER_ROLES */
+		              , :clientIpAddr       /* CLIENT_IP_ADDR */
+		              , :clientBrowser      /* CLIENT_BROWSER */
+		              , :screenStartDate    /* RUN_DATETIME */
+		              , :elapsedTime        /* RUN_ELAPSE_TIME */
+		              , GETDATE()       /* REG_DATETIME */
+		           )	
+	</entry>
+	
+	<entry key="query.service.record.01">
+		INSERT INTO AP_SERVICE_RUN_LOG
+		           (
+		                RUN_LOG_SN
+		              , MENU_ID
+		              , MENU_FULL_NAME
+		              , APPLICATION_ID
+		              , CATEGORY_CODE
+		              , SCREEN_ID
+		              , SCREEN_NAME
+		              , FUNCTION_ALIAS_ID
+		              , FUNCTION_ALIAS_NAME
+		              , FUNCTION_ID
+		              , FUNCTION_NAME
+		              , SERVICE_ID
+		              , SERVICE_NAME
+		              , PARAM_VALUE
+		              , LOGIN_ID
+		              , USER_ID
+		              , USER_ROLES
+		              , CLIENT_IP_ADDR
+		              , RUN_DATETIME
+		              , RUN_ELAPSE_TIME
+		              , RUN_RESULT_CODE
+		              , ERROR_LOG_SN
+		              , REG_DATETIME
+		           )
+		  VALUES
+		           (
+		                :id	/* RUN_LOG_SN */
+		              , (SELECT MENU_ID FROM AP_MENU_SCREEN	WITH (NOLOCK) WHERE SCREEN_ID = :screenId)     /* MENU_ID */
+		              , (SELECT dbo.FN_GET_MENU_FULL_NAME(MENU_ID) FROM AP_MENU_SCREEN	WITH (NOLOCK) WHERE SCREEN_ID = :screenId) /* MENU_FULL_NAME */
+		              , :applicationId      /* APPLICATION_ID */
+		              , (SELECT CATEGORY_CODE FROM AP_SCREEN WITH (NOLOCK) WHERE SCREEN_ID = :screenId)                        /* CATEGORY_CODE */
+		              , :screenId           /* SCREEN_ID */
+		              , :screenName         /* SCREEN_NAME */
+		              , :functionAliasId    /* FUNCTION_ALIAS_ID */
+		              , (SELECT FUNCTION_ALIAS_NAME FROM AP_FUNCTION_ALIAS WITH (NOLOCK) WHERE FUNCTION_ALIAS_ID = :functionAliasId)  /* FUNCTION_ALIAS_NAME */
+		              , :functionId         /* FUNCTION_ID */
+		              , :functionName       /* FUNCTION_NAME */
+		              , :serviceId          /* SERVICE_ID */
+		              , :serviceName        /* SERVICE_NAME */
+		              , :paramValue         /* PARAM_VALUE */
+		              , :loginId            /* LOGIN_ID */
+		              , :userId             /* USER_ID */
+		              , :userRoles          /* USER_ROLES */
+		              , :clientIpAddr       /* CLIENT_IP_ADDR */
+		              , :serviceDate        /* RUN_DATETIME */
+		              , :elapsedTime        /* RUN_ELAPSE_TIME */
+		              , :resultStatusCode   /* RUN_RESULT_CODE */
+		              , :serviceErrorId     /* ERROR_LOG_SN */
+		              , GETDATE()       /* REG_DATETIME */
+		           )	
+	</entry>
+	
+	<entry key="query.service.error.01">
+		SELECT SEQ_AP_SERVICE_ERROR_LOG.nextval AS ERROR_LOG_SN FROM DUAL
+	</entry>
+	
+	<entry key="query.service.error.02">
+		INSERT INTO AP_SERVICE_ERROR_LOG (
+		       ERROR_LOG_SN
+		     , ERROR_CLASS_NAME
+		     , ERROR_MESSAGE
+		     , PARAMETER_INFO_SNAPSHOT
+		     , REG_DATETIME
+		)
+		VALUES (
+		       :id
+		     , :errorType
+		     , :errorMessage
+		     , :parameterString
+		     , GETDATE()
+		)
+	</entry>
+	
+	<entry key="query.hotlink.info">
+	    SELECT A.HOTLINK_ID     hotLinkId
+	         , A.HOTLINK_TYPE   hotLinkType
+	         , A.MENU_ID        menuId
+	         , M.MENU_NAME      menuName
+	         , A.SCREEN_ID      screenId
+	         , A.PARAM          param
+	      FROM (
+	            SELECT H.HOTLINK_ID
+	                 , H.HOTLINK_TYPE
+	                 , ISNULL(H.MENU_ID, MS.MENU_ID) MENU_ID
+	                 , H.SCREEN_ID
+	                 , H.PARAM
+	              FROM AP_HOTLINK H WITH (NOLOCK)
+	              LEFT OUTER JOIN AP_MENU_SCREEN MS WITH (NOLOCK)
+	             ON H.SCREEN_ID = MS.SCREEN_ID
+	          WHERE 1=1
+	            AND H.HOTLINK_ID = :hotLinkId 
+	           ) A
+	         , AP_MENU M
+	     WHERE A.MENU_ID = M.MENU_ID
+	</entry>
+
+	<entry key="query.message.list.all">
+       SELECT '' AS MLNGRSCID
+            , '' AS LANGCD
+            , '' AS MLNGRSCNM
+            , '' AS FRSTREGDTTM
+	   EXCEPT
+       SELECT '' AS MLNGRSCID
+            , '' AS LANGCD
+            , '' AS MLNGRSCNM
+            , '' AS FRSTREGDTTM
+	</entry>
+
+	<entry key="query.message.list">
+       SELECT '' AS MLNGRSCID
+            , '' AS LANGCD
+            , '' AS MLNGRSCNM
+            , '' AS FRSTREGDTTM
+	   EXCEPT
+       SELECT '' AS MLNGRSCID
+            , '' AS LANGCD
+            , '' AS MLNGRSCNM
+            , '' AS FRSTREGDTTM
+	</entry>
+	
+	<!--
+		시퀀스의 다음값을 구하는 쿼리
+		
+		1. LOOP_YN = 'N'인 경우 현재값+1
+		2. LOOP_YN = 'Y' 이고 현재값+1 > MAX_VAL 보다 큰경우는 MIN_VAL로 설정한다.
+		3. LOOP_YN = 'Y' 이고 현재값+1 < MIN_VAL 보다 작은경우는 MIN_VAL로 설정한다.
+	 -->
+	<entry key="query.sequence.set.nextval">
+	<![CDATA[
+		UPDATE SYS_SEQUENCE
+		   SET CURR_VAL = CASE WHEN LOOP_YN = 'Y' THEN
+	                               CASE WHEN ISNULL(CURR_VAL, 0) + 1 > MAX_VAL THEN MIN_VAL
+	                                   WHEN ISNULL(CURR_VAL, 0) + 1 < MIN_VAL THEN MIN_VAL
+	                                   ELSE ISNULL(CURR_VAL, 0) + 1
+	                               END
+	                           ELSE ISNULL(CURR_VAL, 0) + 1
+	                      END
+             , UPD_DT = GETDATE()
+		 WHERE SEQ_ID = :sequenceId
+	]]>
+	</entry>
+
+	<entry key="query.sequence.get.currval">
+		SELECT CURR_VAL
+		  FROM SYS_SEQUENCE WITH (NOLOCK)
+		 WHERE SEQ_ID = :sequenceId
+	</entry>
+	
+</properties>

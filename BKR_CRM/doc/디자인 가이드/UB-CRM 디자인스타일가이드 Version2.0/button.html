@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="ko">
+<head>
+	<meta charset="utf-8" />
+	<title>(주)유비원 스타일 가이드</title>
+	<link type="text/css" rel="stylesheet" href="./css/shCoreDefault.css"/>
+	<link type="text/css" rel="stylesheet" href="./css/style.css"/>
+	<link type="text/css" rel="stylesheet" href="./css/jquery.mCustomScrollbar.css"/>
+	<script type="text/javascript" src="./js/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="./js/html5.js"></script>
+	<script type="text/javascript" src="./js/shCore.js"></script>
+	<script type="text/javascript" src="./js/shBrushJScript.js"></script>
+	<script type="text/javascript" src="./js/shBrushCss.js"></script>
+	<script type="text/javascript" src="./js/shBrushXml.js"></script>
+	<script type="text/javascript" src="./js/jquery.mCustomScrollbar.concat.min.js"></script>
+	<script type="text/javascript">
+		jQuery(function(){
+		   jQuery('a[href^=#]').click(function() {
+			  var speed = 500;  // 스크롤 속도
+			  var href= jQuery(this).attr("href");
+			  var target = jQuery(href == "#" || href == "" ? 'html' : href);
+			  var position = target.offset().top;
+			  jQuery('body,html').animate({scrollTop:position}, speed, 'swing');
+			  return false;
+		   });
+		}); //부드럽게 페이지내 이동위해 사용
+		SyntaxHighlighter.all(); //syntaxhighlighter
+	</script>
+</head>
+
+<body>
+	<!-- S : wrap -->
+	<div id="wrap">
+		<!-- S : header-->
+		<div id="header">
+			<header class="gd-header">
+				<h1>
+					<a href="index.html"><img src="./images/h1_logo.png" alt="ubone" /></a>
+					<strong class="gd-ver">Style Guide
+						<strong class="ver">Ver2.1</strong>
+					</strong>
+				</h1>
+			</header>
+		</div>
+		<!-- E : header-->
+		<div id="container">
+			<!-- S : lnb-->
+			<div id="lnb">
+				<div class="lnb-inner">
+					<div class="tit-rcnt">
+						<h2>CSS Guide</h2>
+						<!-- <span class="rcnt"><a href="#"><img src="./images/btn_all_view.png" alt="전체보기" /></a></span> -->
+					</div>
+					<nav class="gd-nav">
+						<div class="menu">
+							<ul>
+								<li>
+									<button class="fold">하위메뉴 있음</button>
+									<a href="index.html"><strong>공통</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="index.html#gd01-1"><strong>메뉴</strong></a></li>
+										</ul>
+									</div>
+								</li>
+								<li class="sub-open">
+									<button class="fold">하위메뉴 있음</button>
+									<a href="detail.html"><strong>상세화면</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="detail.html#gd03-1"><strong>상태바</strong></a></li>
+											<li><a href="detail.html#gd03-2"><strong>기본 테이블</strong></a></li>
+											<li><a href="detail.html#gd03-3"><strong>변형 테이블</strong></a></li>
+										</ul>
+									</div>
+								</li>
+								<li class="sub-open">
+									<button class="fold">하위메뉴 있음</button>
+									<a href="etc.html"><strong>기타</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="etc.html#gd04-1"><strong>통계</strong></a></li>
+											<li><a href="etc.html#gd04-2"><strong>탭&amp;파일첨부&amp;페이징</strong></a></li>
+											<li><a href="etc.html#gd04-3"><strong>설명문구</strong></a></li>
+											<li><a href="etc.html#gd04-4"><strong>로딩바</strong></a></li>
+											<li><a href="etc.html#gd04-5"><strong>그래프컬러 가이드</strong></a></li>
+										</ul>
+									</div>
+								</li>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="popup.html"><strong>팝업</strong></a>
+								</li>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="button.html"><strong>버튼</strong></a>
+								</li>
+								<li class="sub-open">
+									<button class="fold">하위메뉴 있음</button>
+									<a href="board.html"><strong>게시판</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="board.html#gd07-1"><strong>목록</strong></a></li>
+											<li><a href="board.html#gd07-2"><strong>상세</strong></a></li>
+											<li><a href="board.html#gd07-3"><strong>등록</strong></a></li>
+										</ul>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</nav>
+				</div>
+			</div>
+			<!-- E : lnb -->
+			<!-- S : content -->
+			<div id="content">
+				<!-- S : 버튼 -->
+				<section class="section" id="gd06">
+					<div class="h3-tit">
+						<h3>버튼</h3>
+					</div>
+
+					<div class="h4-tit">
+						<h4>Page Control Button</h4>
+					</div>
+					<div class="sub-desc01">
+						<p>화면의 주요업무를 컨드롤하는 버튼으로 컨텐츠 <strong class="gd-txt-color01">최상단 또는 최하단</strong>에 배치한다.</p>
+					</div>
+					<div class="ex-view">
+						<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+						<img src="./images/ex/ex_btn01.gif" alt="최상단 버튼 예시 화면">
+					</div>
+					<div class="source">
+						<h5>HTML Code</h5>
+						<pre class="brush: xml;">
+							<div class="ub-layout button top">
+								<span class="ub-control button top icon" id="register">
+									<a href="#none" title="register"><span class="ico-register"></span>등록</a>
+								</span>
+								<span class="ub-control button top icon" id="list">
+									<a href="#none" title="list"><span class="ico-list"></span>목록</a>
+								</span>
+								<span class="ub-control button top icon" id="find">
+									<a href="#none" title="find"><span class="ico-find"></span>찾기</a>
+								</span>
+								<span class="ub-control button top icon" id="print">
+									<a href="#none" title="print"><span class="ico-print"></span>인쇄</a>
+								</span>
+							</div>
+						</pre>
+					</div>
+					<div class="sub-desc02">
+						<p>
+							버튼레이아웃 (메타): top / 로케이션 (메타): top<br />
+							아이콘 들어가는 버튼 : 최상단 버튼(page control button. ex - 목록, 등록, 찾기)과 엑셀 다운로드
+						</p>
+					</div>
+
+					<div class="ex-view">
+						<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+						<img src="./images/ex/ex_btn02.gif" alt="하단 왼쪽버튼 예시 화면">
+					</div>
+					<div class="source">
+						<h5>HTML Code</h5>
+						<pre class="brush: xml;">
+							<-- 버튼 다단 레이아웃 -->
+							<div class="ub-layout button bottom">
+								<div class="ub-layout floatBox">
+									<div class="ub-layout leftBox">
+										<span class="ub-control button bottom left icon" title="왼쪽 버튼">
+											<a href="#none" title="btn"><span></span>왼쪽 버튼</a>
+										</span>
+									</div>
+									<div class="ub-layout rightBox">
+										<span class="ub-control button bottom icon" id="btnUpdate" title="수정">
+											<a href="#none" title="Save"><span class="ico-save"></span>수정</a>
+										</span>
+										<span class="ub-control button bottom icon" id="btnDelete" title="삭제">
+											<a href="#none" title="Delete"><span class="ico-delete"></span>삭제</a>
+										</span>
+									</div>
+								</div>
+							</div>
+							<--// 버튼 다단 레이아웃 -->
+						</pre>
+					</div>
+					<div class="sub-desc02">
+						<p>버튼 레이아웃 (메타): bottom / 로케이션 (메타): bottom , 왼쪽 하단 버튼일 경우엔 bottom left<br />
+							<strong class="gd-txt-color01">버튼 레이아웃 bottom > 다단 레이아웃 > 왼(오른)쪽 레이아웃 > 버튼 컨트롤</strong>
+						</p>
+					</div>
+					<div class="ex-view">
+						<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+						<img src="./images/ex/ex_btn03.gif" alt="하단 버튼 예시 화면">
+					</div>
+					<div class="source">
+						<h5>HTML Code</h5>
+						<pre class="brush: xml;">
+							<div class="ub-layout button bottom" style="text-align:right;">
+								<span class="ub-control button bottom icon" id="btnUpdate">
+									<a href="#none" title="Save"><span class=""></span>저장</a>
+								</span>
+								<span class="ub-control button bottom icon" id="btnDelete">
+									<a href="#none" title="Delete"><span class=""></span>삭제</a>
+								</span>
+							</div>
+						</pre>
+					</div>
+					<div class="sub-desc02">
+						<p>버튼레이아웃 (메타): bottom / 로케이션 (메타): bottom <br />버튼이 양쪽 동시에 나올때는 <strong class="gd-txt-color01">다단 레이아웃</strong> 이용</p>
+					</div>
+
+					<div class="h4-tit">
+						<h4>Grid Control Button</h4>
+					</div>
+					<div class="sub-desc01">
+						<p>
+							<strong class="gd-txt-color01">테이블 상단우측에 배치</strong>되어 테이블의 데이터를 저장, 삭제, 그리드 정보안내 등을 컨트롤 한다.
+						</p>
+					</div>
+					<div class="ex-view">
+						<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+						<img src="./images/ex/ex_btn04.gif" alt=" 예시 화면">
+					</div>
+					<div class="source">
+						<h5>HTML Code</h5>
+						<pre class="brush: xml;">
+							<div class="ub-layout button inner" style="text-align:right;">
+								<span class="ub-control button inner icon" id="regIssList">
+									<a href="#none" title="이슈제기"><span></span>이슈제기</a>
+								</span>
+								<span class="ub-control button inner icon" id="excelBtn">
+									<a href="#none" title="엑셀"><span class="ico-excel"></span>엑셀</a>
+								</span>
+							</div>
+						</pre>
+					</div>
+					<div class="sub-desc02">
+						<p>버튼레이아웃 (메타): inner / 로케이션 (메타): inner<br />엑셀버튼의 경우만, (ico-excel클래스를 추가하여) 버튼에 아이콘이 삽입되어지게 해준다.</p>
+					</div>
+
+					<div class="ex-view">
+						<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+						<img src="./images/ex/ex_btn09.gif" alt=" 예시 화면">
+					</div>
+					<div class="source">
+						<h5>HTML Code</h5>
+						<pre class="brush: xml;">
+							<-- 버튼 다단 레이아웃 -->
+							<div class="ub-layout button inner">
+								<div class="ub-layout floatbox">
+									<div class="ub-layout leftbox">
+										<span class="ub-control button inner icon">
+											<a href="#none" title="고객정보수정"><span></span>고객정보수정</a>
+										</span>
+									</div>
+									<div class="ub-layout rightbox">
+										<span class="ub-control button inner icon" id="excelBtn">
+											<a href="#none" title="엑셀"><span class="ico-excel"></span>엑셀</a>
+										</span>
+										<span class="ub-control button inner icon">
+											<a href="#none" title="고객정보수정">고객정보수정</a>
+										</span>
+									</div>
+								</div>
+							</div>
+							<-- //버튼 다단 레이아웃 -->
+						</pre>
+					</div>
+					<div class="sub-desc02">
+						<strong class="gd-txt-color01">버튼 레이아웃 (메타) : 버튼 레이아웃 inner > 다단 레이아웃 > 왼(오른)쪽 레이아웃 > 버튼 컨트롤</strong>
+					</div>
+
+					<div class="h4-tit">
+						<h4>Contents Control Button</h4>
+					</div>
+					<div class="sub-desc01">
+						<p><strong class="gd-txt-color01">타이틀 옆이나 테이블 안에 위치</strong>하여 단일 데이터나 정보를 컨트롤 한다.</p>
+					</div>
+					<div class="ex-view">
+						<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+						<img src="./images/ex/ex_btn05.gif" alt=" 예시 화면">
+					</div>
+					<div class="source">
+						<h5>HTML Code</h5>
+						<pre class="brush: xml;">
+							<!-- 타이틀 바로 옆 -->
+							<h2 class="ub-control title">타이틀
+								<span class="ub-control button inner icon" id="btnAddParameter">
+									<a href="#none" title="추가"><span></span>추가</a>
+								</span>
+								<div class="ub-layout button inner" style="text-align:right;">
+									<span class="ub-control button inner" id="btnAddParameter">
+										<a href="#none" title="추가"><span></span>추가</a>
+									</span>
+								</div>
+							</h2>
+							<!-- //타이틀 바로 옆 -->
+							<!-- 타이틀과 같은 선상의 오른쪽 -->
+							<h2 class="ub-control title hfold" for="cusInfo" hfold="1">
+								타이틀
+								<div class="ub-layout button inner" style="text-align:right;">
+									<span class="ub-control button inner">
+										<a href="#none" title="고객종합안내">고객정보수정</a>
+									</span>
+								</div>
+								<span class="ico-fold on"></span>
+							</h2>
+							<!-- //타이틀과 같은 선상의 오른쪽 -->
+						</pre>
+					</div>
+					<div class="ex-view">
+						<h5><img src="./images/txt_bad_ex.gif" alt="잘못된 예시화면"></h5>
+						<img src="./images/ex/ex_bad_btn02.gif" alt="타이틀-버튼 잘못된 예시 화면">
+					</div>
+					<div class="source">
+						<h5>HTML Code</h5>
+						<pre class="brush: xml;">
+							<div class="ub-layout floatBox">
+								<div class="ub-layout leftBox">
+									<h2 class="ub-control title" for="step_layout" hfold="0" initclose="0">단계정보<label class="ub-control label"></label></h2>
+								</div>
+								<div class="ub-layout rightBox">
+									<span class="ub-control button inner icon" id="add_row"><a href="#none" title="Save"><span class="ico-save"></span>추가</a></span>
+								</div>
+							</div>
+						</pre>
+					</div>
+					<div class="sub-desc02">
+						<p>타이틀과 같은 선상에 있는 버튼의 케이스의 잘못된 예제로, 타이틀 안에 버튼레이아웃(inner)넣어 그린다.<br />위의 예시화면처럼 작성한다.</p>
+					</div>
+
+					<div class="ex-view">
+						<h5><img src="./images/txt_bad_ex.gif" alt="잘못된 예시화면"></h5>
+						<img src="./images/ex/ex_bad_btn01.gif" alt="하단 왼쪽버튼 예시 화면">
+					</div>
+					<div class="sub-desc02">
+						<p>최상단 타이틀이 아닐경우 Contents Control Button 가이드 기준하여 그린다.(상단 참고, 최상단 타이틀일 경우 최상단에 위치하는 버튼 이용)</p>
+					</div>
+
+					<div class="ex-view">
+						<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+						<img src="./images/ex/ex_btn06.gif" alt=" 예시 화면">
+					</div>
+					<div class="source">
+						<h5>HTML Code</h5>
+						<pre class="brush: xml;">
+							<span class="ub-control button inner icon" id="kindVocHisPop">
+								<a href="#none" title="VOC이력"><span></span>VOC이력</a>
+							</span>
+						</pre>
+					</div>
+					<div class="sub-desc02">
+						<p>로케이션 (메타): inner</p>
+					</div>
+
+					<div class="h4-tit">
+						<h4>Search Control Button</h4>
+					</div>
+					<div class="sub-desc01">
+						<p><strong class="gd-txt-color01">검색영역 안에 위치</strong>하여 정보를 조회한다.</p>
+					</div>
+					<div class="ex-view">
+						<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+						<img src="./images/ex/ex_btn07.gif" alt=" 예시 화면">
+					</div>
+					<div class="source">
+						<h5>HTML Code</h5>
+						<pre class="brush: xml;">
+							<div class="ub-layout search">
+								<span class="search-ltbg"></span>
+								<span class="search-rtbg"></span>
+								<span class="search-lbbg"></span>
+								<span class="search-rbbg"></span>
+								<form id="searchForm" name="searchForm">
+									<table class="ub-control table normal ">
+									<colgroup>
+										<col>
+										<col>
+										<col>
+										<col>
+									</colgroup>
+									<tbody>
+										<tr id="layout-1_1">
+											<th id="layout-1_1_1"><label class="ub-control label">제목+내용</label></th>
+											<td id="layout-1_1_2"><input type="text" class="ub-control input-text " id="DS_TITLE" name="DS_TITLE" value="" style="text-align:left;width:180px;"></td>
+											<th id="layout-1_1_3"><label class="ub-control label">등록일자</label></th>
+											<td id="layout-1_1_4"><input type="text" class="ub-control input-text calendar  hasDatepicker" id="DT_REG_START" name="DT_REG_START" metaformat="date" value="" style="text-align:left;width:100px;"><img class="ui-datepicker-trigger" src="/page/images/common/calendar.gif" alt="Calandar" title="Calandar"><label class="ub-control label">~</label><input type="text" class="ub-control input-text calendar  hasDatepicker" id="DT_REG_END" name="DT_REG_END" metaformat="date" value="" style="text-align:left;width:100px;"><img class="ui-datepicker-trigger" src="/page/images/common/calendar.gif" alt="Calandar" title="Calandar"></td>
+										</tr>
+									</tbody>
+									</table>
+									<!-- 검색버튼 -->
+									<span class="ub-control button search" id="search">
+										<a href="#none" title="Search">검색</a>
+									</span>
+									<!-- //검색버튼 -->
+								</form>
+							</div>
+						</pre>
+					</div>
+					<div class="sub-desc02">
+						<p>버튼레이아웃 (메타): x /  로케이션 (메타): x</p>
+					</div>
+
+
+					<div class="h4-tit">
+						<h4>Popup Control Button</h4>
+					</div>
+					<div class="ex-view">
+						<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+						<img src="./images/ex/ex_btn08.gif" alt="팝업 버튼 예시 화면">
+					</div>
+					<div class="source">
+						<h5>HTML Code</h5>
+						<pre class="brush: xml;">
+							<div class="ub-layout button bottom">
+								<span class="ub-control button bottom icon" id="conFirm">
+									<a href="#none" title="Save"><span></span>확인</a>
+								</span>
+							</div>
+						</pre>
+					</div>
+					<div class="sub-desc02">
+						<p>버튼레이아웃 (메타): bottom / 로케이션 (메타): bottom</p>
+					</div>
+
+					<div class="h4-tit">
+						<h4>아이콘</h4>
+					</div>
+					<div class="ex-view">
+						<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+						<img src="./images/ex/ex_ico01.gif" alt="아이콘 예시 화면">
+					</div>
+				</section>
+				<!-- E :버튼  -->
+			</div>
+			<!-- E : content -->
+		</div><!-- E : container -->
+	</div><!-- E : wrap -->
+</body>
+</html>

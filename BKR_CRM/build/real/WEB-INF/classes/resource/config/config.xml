@@ -1,0 +1,332 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties version="1.0">
+	<!-- Application 마다 독립적인 세팅이 필요한 설정값 -->
+	
+	<!--
+	================================================
+	기본 설정
+	================================================
+	-->
+	<!-- application name -->
+	<!-- 
+	설정값으로 프로젝트별 공통 쿼리와, script 파일명을 유추한다.
+	예) voc 로 설정할 경우 -> resource/config/framework/query-voc.xml
+	                          resource/config/message/message-projectname.xml
+	                          webContent/page/js/voc.js
+	                          webContent/velocity/macro/voc.vm
+	-->
+	<entry key="framework.application.id">P000000002</entry>
+	<entry key="framework.application.name">BKR_CRM</entry>
+	<!-- application url -->
+	<entry key="framework.application.url">http://localhost/projectname</entry>
+	<!-- application theme -->
+	<entry key="framework.application.theme">start</entry>
+	<!-- application mode : local/dev/staging/real -->
+	<entry key="framework.application.mode">real</entry>
+	<!-- velocity view resource root path -->
+	<entry key="framework.view.velocity.root">/velocity</entry>
+	<!-- jsp view resource root path -->
+	<entry key="framework.view.jsp.root">/WEB-INF/jsp</entry>
+	<!-- application view file path -->
+	<entry key="framework.view.app.path">/app</entry>
+	<!-- 시스템 기본 encoding -->
+	<entry key="framework.encoding">utf-8</entry>
+	<!-- 시스템 서비스 결과 포맷 -->
+	<entry key="framework.resultformat">json</entry>
+	<!-- 시스템 email -->
+	<entry key="framework.system.email">webmaster@ubqone.com</entry>
+	<!-- 시스템 phone number -->
+	<entry key="framework.system.phone">024221240</entry>
+
+	<!-- 
+	  ================================================
+	  다국어 관련 설정 
+	    - 언어코드는 Java에서 사용되는 언어코드를 사용할 것 (ko-한글, en-영어, ja-일본어, zh-중국어)
+	  ================================================
+	-->
+	<!-- 다국어 사용여부 : true or false -->
+	<entry key="framework.locale.use.muliti.language">true</entry>
+	<!-- 시스템 초기 언어 설정 : ko -->
+	<entry key="framework.locale.default.language">ko</entry>
+	<!-- 시스템 사용 언어 리스트 : 구분자(;)로 처리함. -->
+	<entry key="framework.locale.use.language.code">ko;en</entry>
+
+	<!-- 
+	  ================================================
+	  VIEW 관련 설정
+	  ================================================
+	-->
+	<!-- MDI View 사용여부 -->
+	<entry key="framework.view.mdi.mode">false</entry>
+	
+	<!-- 
+	  ================================================
+	  페이징 관련 설정
+	  ================================================
+	-->
+	<!-- 시스템 기본 페이징 사이즈 -->
+	<entry key="framework.pagesize">10</entry>
+	<!-- 시스템 기본 블럭 사이즈 -->
+	<entry key="framework.blocksize">10</entry>
+	
+	<!-- 
+	  ================================================
+	  시간 포맷 관련 설정
+	  ================================================
+	-->
+	<!-- 시스템 기본 Time 포맷 -->
+	<entry key="framework.timeformat">yyyy-MM-dd HH:mm:ss</entry>
+	<!-- 시스템 기본 Time 포맷 년 -->
+	<entry key="framework.timeformat.y">yyyy</entry>
+	<!-- 시스템 기본 Time 포맷 월 -->
+	<entry key="framework.timeformat.m">MM</entry>
+	<!-- 시스템 기본 Time 포맷 일 -->
+	<entry key="framework.timeformat.d">dd</entry>
+	<!-- 시스템 기본 Time 포맷 일 -->
+	<entry key="framework.timeformat.h">HH</entry>
+	<!-- 시스템 기본 Time 포맷 일 -->
+	<entry key="framework.timeformat.mi">mm</entry>
+	<!-- 시스템 기본 Time 포맷 일 -->
+	<entry key="framework.timeformat.s">ss</entry>
+	<!-- 시스템 기본 Time 포맷 년월 -->
+	<entry key="framework.timeformat.ym">yyyy-MM</entry>
+	<!-- 시스템 기본 Time 포맷 년월일 -->
+	<entry key="framework.timeformat.ymd">yyyy-MM-dd</entry>
+	<!-- 시스템 기본 Time 포맷 년월일시 -->
+	<entry key="framework.timeformat.ymdhm">yyyy-MM-dd HH</entry>
+	<!-- 시스템 기본 Time 포맷 년월일시분 -->
+	<entry key="framework.timeformat.ymdhm">yyyy-MM-dd HH:mm</entry>
+	
+	
+	<!--
+	================================================
+	ui-meta 관련 설정
+	================================================
+	-->
+<!-- 	<entry key="uimeta.file.path">/meta</entry> -->
+<!-- 	<entry key="com.ubone.system.logger.dir">c:/log/ub_base/meta</entry> -->
+	
+	<!--
+		com.ubone.meta.jdbc properties는 선택사항 일반적으로 WAS에서 제공하는 풀을 사용
+	 -->
+<!-- 	<entry key="com.ubone.meta.jdbc.ds">java:comp/env/jdbc/meta</entry> -->
+<!-- 	<entry key="com.ubone.meta.dbms">hsqldb</entry> -->
+	
+	<!--
+		WebSphere 에서 HSQL Connection Pool Provider 를 제공하지 않아 자체 풀을 사용
+	 -->
+<!-- 	<entry key="com.ubone.meta.jdbc">dbcp</entry> -->
+<!-- 	<entry key="com.ubone.meta.jdbc.ds">jdbc:apache:commons:dbcp:/pool</entry> -->
+<!-- 	<entry key="com.ubone.meta.dbms">HSQLDB</entry> -->
+	
+
+	
+	<!--
+	================================================
+	Database 관련 설정
+	================================================
+	-->
+	<!-- application db datasource jndi name  -->
+	<entry key="app.db.jndi">java:comp/env/jdbc/application</entry>
+	<entry key="app.db.databasetype">oracle</entry>
+
+	<!-- extend1 db datasource jndi name  -->
+	<!-- <entry key="ext1.db.jndi">java:comp/env/jdbc/hpc</entry> -->
+	<!-- extend2 db datasource jndi name  -->
+	
+	<!-- 2019.03.05 rims 연동관련 추가 -->
+	<entry key="rims.db.jndi">java:comp/env/jdbc/rims</entry>
+	
+<!-- 	<entry key="ext2.db.jndi">java:comp/env/jdbc/extend2</entry> -->
+	<!-- extend3 db datasource jndi name  -->
+<!-- 	<entry key="ext3.db.jndi">java:comp/env/jdbc/extend3</entry> -->
+
+	<!--
+	================================================
+	file upload 관련 설정
+	================================================
+	-->
+	<!-- 업로드 path -->
+	<entry key="framework.upload.path">/data/webapps/files/bkr</entry>
+	
+	<!-- 파일 업로드 건수 제한 -->
+	<entry key="framework.upload.count.limit">10</entry>
+	<!-- 파일 사이즈 제한(단위 MB) -->
+	<entry key="framework.upload.size.limit">10</entry>
+	<!-- 
+		업로드 확장자 제한 유형 (default : WHITE)
+	    * BLACK - Black List : 명기된 확장자만 업로드 할 수 없는 방식
+	    * WHITE - White List : 명기된 확장자만 업로드 할 수 있는 방식
+	 -->
+	<entry key="framework.upload.ext.limit.type">WHITE</entry>
+	<!-- 업로드 확장자 제한 리스트 -->
+	<entry key="framework.upload.ext.limit.list">hwp;doc;xls;xlsx;ppt;bmp;pptx;png;gif;jpg;jpeg;txt;</entry>
+
+
+	<!-- 
+	================================================
+	서비스 관련 설정
+	================================================
+	-->
+	<!-- Work Category class name 설정-->
+	<entry key="framework.service.work_category">com.ubone.ApplicationWorkCategory</entry> 
+	<!-- Workflow Activity class name 설정-->
+	<entry key="framework.service.workflow_activity">com.ubone.ApplicationWorkflowActivity</entry> 
+	
+	<!-- Custom Service(SO/DAO객체) profiler 활성여부 설정 -->
+	<entry key="framework.service.profilerenabled">false</entry>
+	<!-- 
+		서비스 실행 이력  설정   
+			level 1 : 모든 서비스 호출 이력 저장 
+			level 2 : 에러 발생 호출 이력 저장
+			level 3 : 모든 서비스 호출 이력 저장 안함 
+			recordbufferlength : 모든 서비스 호출 이력 저장시 버퍼 용량 설정
+	-->
+	<entry key="framework.service.logginglevel">1</entry>
+	<entry key="framework.service.recordbufferlength">1</entry>
+
+	<!--
+	================================================
+	메뉴 관련 설정
+	================================================
+	-->	
+	<entry key="framework.menu.max.level">3</entry>
+
+	<!-- 
+	================================================
+	보안/권한 관련 설정
+	================================================
+	-->
+	<!-- 메뉴 보안 설정 : 메뉴 접근 제어 사용 여부를 설정한다 -->
+	<entry key="framework.security.menu.enabled">true</entry>
+	<!-- 화면 보안 설정 : 화면 접근 제어 사용 여부를 설정한다 -->
+	<entry key="framework.security.screen.enabled">true</entry>
+	<!-- Function 보안 설정 : 서비스 호출 제어 사용 여부를 설정한다 -->
+	<entry key="framework.security.function.enabled">true</entry>
+	<!-- 서비스 보안 설정 : 서비스 호출 제어 사용 여부를 설정한다 -->
+	<entry key="framework.security.service.enabled">false</entry>
+	<!-- 데이타 보안 설정 : 데이타 조회 범위 제한 사용 여부를 설정한다 -->
+	<entry key="framework.security.data.enabled">false</entry>
+	
+
+	<!-- 
+	================================================
+	Meta Caching Service 설정
+	================================================
+	-->
+	<!-- 화면 캐쉬 설정  -->
+	<entry key="framework.caching.screen.enabled">false</entry>
+	<!-- 서비스 캐쉬 설정 -->
+	<entry key="framework.caching.service.enabled">false</entry>
+	<!-- 코드 캐쉬 설정 -->
+	<entry key="framework.caching.code.enabled">false</entry>
+	<!-- 메세지 캐쉬 설정 -->
+	<entry key="framework.caching.user.enabled">false</entry>
+	<!-- 
+	================================================
+	Meta Caching Cluster 설정
+	================================================
+	-->
+	<!-- 캐쉬 클러스터 설정  -->
+	<entry key="framework.caching.cluster.enabled">true</entry>
+	<!-- 캐쉬 클러스터 호출 URL 설정  -->
+	<entry key="framework.caching.cluster.call.url">/cache/flush.json</entry>
+	<!-- 캐쉬 클러스터 서버리스트 설정  -->
+	<entry key="framework.caching.cluster.list">http://10.10.90.42,http://10.10.100.42</entry>
+	
+	<!-- 
+	  ================================================
+	  Hazelcast 관련 설정
+	  - framework.hazelcast.group.name      : Hazelcast Group 명
+	  - framework.hazelcast.group.password  : Hazelcast Group 패스워드
+	  - framework.hazelcast.network.port    : Hazelcast 연동 포트(5001)
+	  - framework.hazelcast.network.members : Hazelcast 연동 멤버 리스트 - 공유서버리스트
+	  ================================================
+	-->
+	<entry key="framework.hazelcast.group.name">ubone</entry>
+	<entry key="framework.hazelcast.group.password">ubone</entry>
+	<entry key="framework.hazelcast.network.port">5001</entry>
+	<!-- 로컬단독 사용시 -->
+	<entry key="framework.hazelcast.network.members">127.0.0.1</entry>
+	<!-- 멀티서버 사용시 -->
+	<!-- 	<entry key="framework.hazelcast.network.members">192.168.101.20,192.168.101.28,192.168.101.225</entry> -->
+
+	
+	
+	<!-- 
+	================================================
+	하단 메뉴 생성 tab 사용여부 설정
+	================================================
+	-->
+	<!--하단 메뉴탭 사용 true/false  -->
+	<entry key="bottom.layout.tabs.enabled">false</entry>
+	
+	<!-- 
+	================================================
+	SSL 인증 사용여부 설정
+	================================================
+	-->
+	<entry key="sslEnabled">true</entry>
+	
+	<!-- 
+	================================================
+	Login Password 암호화 적용여부 설정
+	================================================
+	-->
+	<entry key="encrypt.password.enabled">true</entry>
+	
+	<!-- 
+	================================================
+	다우연동
+	================================================
+	-->
+	<entry key="dau.dev.domain">https://atomtest.donutbook.co.kr:14076</entry>
+	<entry key="dau.dev.site.id">10000967</entry>
+	<entry key="dau.dev.cooper.id">SC0124</entry>
+	<entry key="dau.dev.cooper.pw">ttju61!@</entry>
+	
+<!-- 	<entry key="dau.real.domain">https://atomtest.donutbook.co.kr:14076</entry> -->
+<!-- 	<entry key="dau.real.site.id">10000967</entry> -->
+<!-- 	<entry key="dau.real.cooper.id">SC0124</entry> -->
+<!-- 	<entry key="dau.real.cooper.pw">ttju61!@</entry> -->
+	
+	<entry key="dau.real.domain">https://atom.donutbook.co.kr:443</entry>
+	<entry key="dau.real.site.id">10001578</entry>
+	<entry key="dau.real.cooper.id">SC0790</entry>
+	<entry key="dau.real.cooper.pw">yjye91@@</entry>
+	
+	<!-- 
+	================================================
+	다우 핀 연동
+	================================================
+	-->
+	<entry key="dau.pin.call_ctn">1599-0505</entry>
+	<entry key="dau.pin.issue_count">1</entry>
+	<entry key="dau.pin.rcv_ctn">01111111111</entry>
+	<entry key="dau.pin.send_msg">쿠폰요청</entry>
+	<entry key="dau.pin.pay_id">-</entry>
+	<entry key="dau.pin.booking_no">-</entry>
+
+	<entry key="dau.dev.pin_url">http://deliveryapp.co.kr/</entry>
+	<entry key="dau.real.pin_url">http://deliveryapp.co.kr/</entry>
+	
+	<!-- 
+	================================================
+	S3 연동정보
+	================================================
+	-->
+	<entry key="amazonaws.dev.s3.bucket">an2-bkr-dev-omni</entry>
+	<entry key="amazonaws.dev.s3.region">Seoul</entry>
+	<entry key="amazonaws.dev.s3.user">an2-bkr-dev-omni-s3</entry>
+	<entry key="amazonaws.dev.s3.accesskey">AKIAIXZBPLO33BGLVUTQ</entry>
+	<entry key="amazonaws.dev.s3.secretkey">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</entry>
+	
+	<entry key="amazonaws.real.s3.bucket">an2-bkr-prd-omni</entry>
+	<entry key="amazonaws.real.s3.region">Seoul</entry>
+	<entry key="amazonaws.real.s3.user">an2-bkr-prd-omni-s3</entry>
+	<entry key="amazonaws.real.s3.accesskey">AKIAJNCLDUV3YDM7KWNQ</entry>
+	<entry key="amazonaws.real.s3.secretkey">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</entry>
+	
+</properties>

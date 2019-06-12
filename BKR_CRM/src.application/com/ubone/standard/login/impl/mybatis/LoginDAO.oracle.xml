@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="LoginDAO">
+	<!--
+		QueryId     : LoginDAO.getLoginInfo
+		Description : 로그인 정보를 조회하는 쿼리  
+	 -->
+	<select id="getLoginInfo" parameterType="map" resultType="lmap">
+        SELECT /* 로그인 정보 */
+               A.USER_ID			AS USER_ID         	/*[필수] 사용자ID */
+             , A.LOGIN_ID			AS LOGIN_ID			/*[필수] 로그인ID */
+             , A.PASSWD             AS PASSWD           /*[필수] 패스워드 */
+             , ''                   AS BEF_PASSWD       /*[필수] 패스워드 */
+             , NVL(A.CHNG_DT_PASSWD, A.REG_DT) AS CHNG_DT_PASSWD  /*[필수] 패스워드 변경일시 */
+             , A.LOGIN_YN           AS LOGIN_YN         /*[필수] 로그인여부 */
+             , A.LOGIN_CNT          AS LOGIN_CNT        /*[필수] 로그인 횟수 */
+             , A.LANG_CD            AS LANG_CD          /*[필수] 언어코드 */
+             , A.STATUS             AS STATUS           /*[필수] 로그인 상태코드 */
+             , A.LOGIN_FAIL_CNT     AS LOGIN_FAIL_CNT   /*[필수] 로그인 실패 횟수 */
+             , A.LOGIN_DT           AS LOGIN_DT         /*[필수] 최종로그인 일시 */
+             , A.LOGIN_IP           AS LOGIN_IP         /*[필수] 최종로그인IP */
+             , A.SESSION_ID         AS SESSION_ID       /*[필수] 최종세션ID */
+             /* 사용자 정보 */
+             , B.USER_NM			AS USER_NM			/*[필수] 사용자명 */ 
+             , B.EMP_NO             AS EMP_NO			/*[필수] 사원번호 */
+             , B.COMPANY_CD         AS COMPANY_CD		/*[필수] 회사코드 */
+             , ''                   AS COMPANY_NM		/*[필수] 회사명 */
+             , B.DEPT_ID            AS DEPT_ID			/*[필수] 부서코드 */
+             , C.DEPT_NM            AS DEPT_NM			/*[필수] 부서명 */
+             , B.EMAIL_DS           AS EMAIL_DS         /*[필수] 이메일주소 */
+             , B.MOBILE_NO          AS MOBILE_NO        /*[필수] 휴대폰번호 */
+             , B.PHONE_NO           AS PHONE_NO         /*[옵션] 전화번호 */
+             , B.POSITION_CD        AS POSITION_CD		/*[옵션] 직위코드 */
+             , ''                   AS POSITION_NM		/*[옵션] 직위명 */
+             , B.DUTY_CD			AS DUTY_CD			/*[옵션] 직책코드 */	
+             , (SELECT DEPT_ID_UP
+             	  FROM SYS_DEPARTMENT
+             	 WHERE DEPT_ID=B.DEPT_ID) AS DEPT_ID_UP	/*[옵션] 상위부서코드 */
+             , (SELECT DEPT_ID FROM SYS_DEPARTMENT C
+                                              WHERE LEVEL_DS='1'
+                                              START WITH C.DEPT_ID = B.DEPT_ID
+                                              CONNECT BY PRIOR C.DEPT_ID_UP = C.DEPT_ID) CD_BRANCH /*[옵션] 점코드 */
+             , (SELECT DEPT_NM FROM SYS_DEPARTMENT C
+                                              WHERE LEVEL_DS='1'
+                                              START WITH C.DEPT_ID = B.DEPT_ID
+                                              CONNECT BY PRIOR C.DEPT_ID_UP = C.DEPT_ID) NM_BRANCH /*[옵션] 점이름 */
+          FROM SYS_LOGIN A
+             , SYS_USER  B
+             , SYS_DEPARTMENT C
+         WHERE A.USER_ID  = B.USER_ID
+           AND B.DEPT_ID  = C.DEPT_ID(+)
+		<if test="loginId != null"><!-- ID로 조회시 -->
+           AND A.LOGIN_ID = #{loginId}
+		</if>           
+		<if test="loginToken != null"><!-- 토큰으로 조회시 -->
+           AND A.SESSION_ID = #{loginToken}
+           AND A.LOGIN_IP   = #{loginIp}
+		</if>           
+	</select>
+
+	<!--
+		QueryId     : LoginDAO.getListUserRole
+		Description : 로그인시 사용할 사용자 롤 정보 조회  
+	 -->
+	<select id="getListUserRole" parameterType="map" resultType="lmap">
+		SELECT A.ROLE_ID        AS ROLE_ID
+		     , B.ADMIN_YN       AS ADMIN_YN
+		     , B.EXCEPT_MAP_YN  AS EXCEPT_MAP_YN
+          FROM AP_ROLE_COMPOSITION A
+             , AP_ROLE B
+         WHERE A.ROLE_ID = B.ROLE_ID
+           AND (
+                  (A.ROLE_COMPOSITION_TYPE = 'U' and A.ROLE_COMPOSITION_CODE = #{userId})
+               OR (A.ROLE_COMPOSITION_TYPE = 'D' and A.ROLE_COMPOSITION_CODE = #{partCode})
+               )
+	</select>
+
+	<!--
+		QueryId     : LoginDAO.updateFirstLoginUserConfig
+		Description : 최초 로그인시 사용자 설정정보 저장  
+	 -->
+	<update id="updateFirstLoginUserConfig" parameterType="map">
+		UPDATE KfTbLogin
+		   SET pwd               = :newPwd
+             , befPwd            = :pwd
+             , userLangCd        = :userLangCd
+             , pwdUpdDttm        = current_timestamp()
+		     , lastUpdUserId     = :lastUpdUserId
+		     , lastUpdDttm       = current_timestamp()
+		     , lastUpdUserIpAddr = :lastUpdUserIpAddr
+         WHERE id.siteId         = :siteId
+		   AND id.appId          = :appId
+		   AND id.loginId        = :loginId
+	</update>
+
+	<!--
+		QueryId     : LoginDAO.updatePwd
+		Description : 최초 로그인시 사용자 설정정보 저장  
+	 -->
+	<update id="updatePwd" parameterType="map">
+		UPDATE KfTbLogin
+		   SET pwd               = :newPwd
+             , befPwd            = :befPwd
+             , pwdUpdDttm        = current_timestamp()
+		     , lastUpdUserId     = :lastUpdUserId
+		     , lastUpdDttm       = current_timestamp()
+		     , lastUpdUserIpAddr = :lastUpdUserIpAddr
+         WHERE id.siteId         = :siteId
+		   AND id.appId          = :appId
+		   AND id.loginId        = :loginId
+	</update>
+
+	<!--
+		QueryId     : LoginDAO.updateLoginStatus
+		Description : 로그인 상태 변경  
+	 -->
+	<update id="updateLoginStatus" parameterType="map">
+		UPDATE SYS_LOGIN
+		   SET LOGIN_YN = #{loginYn} 
+		     , STATUS   = #{status}
+         WHERE LOGIN_ID = #{loginId}
+	</update>
+
+	<!--
+		QueryId     : LoginDAO.updatePersonInfo
+		Description : 최초 로그인시 사용자 설정정보 저장  
+	 -->
+	<update id="updatePersonInfo" parameterType="map">
+		UPDATE KfTbLogin
+		   SET userLangCd        = :userLangCd
+		     , lastUpdUserId     = :lastUpdUserId
+		     , lastUpdDttm       = current_timestamp()
+		     , lastUpdUserIpAddr = :lastUpdUserIpAddr
+         WHERE id.siteId         = :siteId
+		   AND id.appId          = :appId
+		   AND id.loginId        = :loginId
+	</update>
+	
+	<!--
+		QueryId     : UserDAO.deleteLoginInfo
+		Description : Login 정보 삭제하는 쿼리  
+	 -->
+	<delete id="deleteLoginInfo" parameterType="map">
+		DELETE FROM KfTbLogin
+         WHERE id.siteId  = :siteId
+		   AND id.appId   = :appId
+		   AND id.loginId = :loginId
+	</delete>
+	
+	<!--
+		Query id    : LoginDAO.insertLoginInfo
+		Description : 로그인정보 등록
+	-->
+	<insert id="insertLoginInfo" parameterType="map">
+			INSERT INTO SYS_LOGIN (LOGIN_ID,
+			                       PASSWD,
+			                       CHNG_DT_PASSWD,
+			                       USER_ID,
+			                       LOGIN_YN,
+			                       LOGIN_IP,
+			                       LOGIN_DT,
+			                       SESSION_ID,
+			                       LOGIN_CNT,
+			                       LOGIN_ID_SSO,
+			                       PASSWD_SSO,
+			                       STATUS,
+			                       REG_DT,
+			                       DEPT_ID_REG,
+			                       USER_ID_REG,
+			                       LOGIN_FAIL_CNT,
+			                       LANG_CD,
+			                       BEF_PASSWD)
+			     VALUES (#{LOGIN_ID},
+			             #{PASSWD},
+			             SYSDATE,
+			             #{USER_ID},
+			             'Y',
+			             '',
+			             '',
+			             '',
+			             0,
+			             '',
+			             #{PASSWD_SSO},
+			             '00',
+			             SYSDATE,
+			             #{user.partCode},
+			             #{user.id},
+			             0,
+			             'ko',
+			             '')		
+	</insert>
+	
+	<update id="updateLoginInfo" parameterType="map">
+			UPDATE SYS_LOGIN SET   
+			                       PASSWD = #{PASSWD},
+			                       CHNG_DT_PASSWD = SYSDATE,
+			                       
+			                       LOGIN_YN = 'Y',
+			                       LOGIN_IP = '',
+			                       LOGIN_DT = '',
+			                       SESSION_ID = '',
+			                       LOGIN_CNT = 0,
+			                       LOGIN_ID_SSO = '',
+			                       PASSWD_SSO = #{PASSWD_SSO},
+			                       STATUS = '00',
+			                       LOGIN_FAIL_CNT = 0,
+			                       LANG_CD = 'ko',
+			                       BEF_PASSWD =''
+			              WHERE LOGIN_ID = #{LOGIN_ID}
+			     
+	</update>
+	
+	<!--
+		QueryId     : LoginDAO.updaePwdFailCount
+		Description : 로그인실패카운트 증가
+	 -->
+	<update id="updaePwdFailCount" parameterType="map">
+		UPDATE SYS_LOGIN
+		SET    LOGIN_DT       = sysdate,
+		       LOGIN_FAIL_CNT = LOGIN_FAIL_CNT +1
+		WHERE  LOGIN_ID       = #{a_username}
+	</update>
+	
+	<!--
+		QueryId     : LoginDAO.updateLoginInfoForSuccess
+		Description : 로그인 성공이후 처리
+	 -->
+	<update id="updateLoginInfoForSuccess" parameterType="map">
+		UPDATE SYS_LOGIN 
+		   SET LOGIN_IP   = #{loginIp}
+             , LOGIN_DT   = SYSDATE
+             , SESSION_ID = #{sessionId}
+             , LOGIN_CNT  = NVL(LOGIN_CNT, 0) + 1  
+             , LOGIN_FAIL_CNT = 0
+         WHERE LOGIN_ID   = #{loginId}
+	</update>
+	
+	<!--
+		Query id    : LoginDAO.insertApRoleCompostion
+		Description : 사용자 권한 등록
+	-->
+	<insert id="insertApRoleCompostion" parameterType="map">
+		INSERT INTO AP_ROLE_COMPOSITION
+		(
+			ROLE_ID
+			,ROLE_COMPOSITION_TYPE
+			,ROLE_COMPOSITION_CODE
+			,REG_USER_ID
+			,REG_DATETIME
+			,UPD_USER_ID
+			,UPD_DATETIME
+		) VALUES (
+			#{CD_ROLE}
+			,'U'
+			,#{USER_ID}
+			,#{user.id}
+		    ,SYSDATE
+		    ,#{user.id}
+		    ,SYSDATE			
+		)
+	</insert>
+	
+	<!--
+		QueryId     : 
+		Description :  
+	 -->
+	<update id="updateSysLogin" parameterType="map">
+		UPDATE SYS_LOGIN
+			  SET  PASSWD = #{PASSWD}
+			 		, CHNG_DT_PASSWD = SYSDATE 
+		  WHERE LOGIN_ID = #{LOGIN_ID} 
+	</update>
+	
+	<!--
+		QueryId     : 
+		Description :  
+	 -->
+	<update id="updateApRoleCompstion" parameterType="map">
+		UPDATE AP_ROLE_COMPOSITION
+			 SET ROLE_ID = #{CD_ROLE}
+			 	 , UPD_USER_ID = #{user.id}
+			 	 , UPD_DATETIME = SYSDATE
+		  WHERE ROLE_COMPOSITION_CODE = #{USER_ID}
+	</update>
+	
+	<delete id="deleteApRoleCompstion" parameterType="map">
+		DELETE FROM AP_ROLE_COMPOSITION
+			WHERE ROLE_COMPOSITION_TYPE = 'U' AND ROLE_COMPOSITION_CODE = #{USER_ID}
+	</delete>
+</mapper>
+ 

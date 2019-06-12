@@ -1,0 +1,922 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="BoardDAO">
+
+    <!-- 기본검색조건 -->
+	<sql id="search-list">
+	   <if test="SEARCH_KEY=='DS_TITLE' ">
+	        DS_TITLE LIKE '%' + #{SEARCH_VALUE} + '%'
+	   </if>
+	   <if test="SEARCH_KEY=='DS_CONTENT'">
+	   		DS_CONTENT LIKE '%' + #{SEARCH_VALUE} + '%'
+	   </if>
+	   <if test="SEARCH_KEY=='REG_USER_NM'">
+	        ID_REG_EMP IN (SELECT USER_ID FROM SYS_USER WITH (NOLOCK) WHERE USER_NM LIKE '%' + #{SEARCH_VALUE} + '%')
+	   </if>
+	</sql>
+	
+	<!-- 게시판목록 조회 -->	
+	<sql id="getBoardList_base">
+	     SELECT TOP 100 PERCENT ROW_NUMBER () OVER (ORDER BY CONVERT (NUMERIC, A.NO_GROUP) DESC, A.SEQ_ORDER ASC) ROWNUM, A.*
+          FROM (
+					    SELECT SBA.ID_ARTICLE
+					    	 , (SELECT COUNT(*) FROM SYS_BOARD_REPLY WHERE ID_BOARD = SBA.ID_BOARD AND ID_ARTICLE = SBA.ID_ARTICLE AND ID_SUB = SBA.ID_SUB AND FG_DEL = 'N') AS REPLY_COUNT
+						     , SBA.ID_BOARD
+						     , SBA.ID_SUB
+						     , SBA.NM_CATEGORY
+						     , SBA.DS_TITLE
+						     , SBA.DS_CONTENT
+                             , SBA.NO_ARTICLE
+						     , SBA.NO_GROUP
+						     , SBA.ID_PARENT_ARTICLE
+						     , SBA.DEPTH
+						     , SBA.SEQ_ORDER
+						     , CASE (SELECT FG_INQUIRY_HISTORY FROM SYS_BOARD_TYPE WITH (NOLOCK) WHERE ID_BOARD = #{ID_BOARD})
+							   WHEN 'N' THEN ISNULL(SBA.CNT_HIT, 0)
+							    ELSE (SELECT COUNT(*) 
+							            FROM SYS_BOARD_INQUIRY_HISTORY WITH (NOLOCK)
+							           WHERE ID_BOARD = #{ID_BOARD} 
+								     AND ID_ARTICLE = SBA.ID_ARTICLE 
+								     AND (ID_SUB = #{ID_SUB} OR ID_SUB = '*'))
+							   END AS CNT_HIT
+						     , ISNULL(SBA.CNT_GOOD ,   0) AS CNT_GOOD
+						     , ISNULL(SBA.CNT_BAD  ,   0) AS CNT_BAD
+						     , ISNULL(SBA.FG_DEL   , 'N') AS FG_DEL
+						     , ISNULL(SBA.FG_NOTICE, 'N') AS FG_NOTICE
+						     , CASE CONVERT(CHAR(8), SBA.DT_REG, 112)
+						         	WHEN CONVERT(CHAR(8), GETDATE(), 112) THEN CONVERT(CHAR(8), SBA.DT_REG, 108)
+									ELSE CONVERT(CHAR(10), SBA.DT_REG, 120)
+								END AS REG_DATETIME
+						     , CASE CONVERT(CHAR(8), SBA.DT_REG, 112) WHEN CONVERT(CHAR(8), GETDATE(), 112) THEN 'Y' ELSE 'N' END AS IS_NEW
+						     , (SELECT COUNT(*)            FROM SYS_ATTACH_LINK SAL WITH (NOLOCK) LEFT OUTER JOIN SYS_ATTACH SA WITH (NOLOCK) ON SAL.ATTACH_ID = SA.ATTACH_ID WHERE BIZ_TP = 'BOARD' AND BIZ_KEY = SBA.ID_BOARD+'|'+SBA.ID_ARTICLE+'|'+SBA.ID_SUB AND ATTACH_TYPE = 'dndFile') AS CNT_FILE
+						     , (SELECT TOP 1 SAL.ATTACH_ID FROM SYS_ATTACH_LINK SAL WITH (NOLOCK) LEFT OUTER JOIN SYS_ATTACH SA WITH (NOLOCK) ON SAL.ATTACH_ID = SA.ATTACH_ID WHERE BIZ_TP = 'BOARD' AND BIZ_KEY = SBA.ID_BOARD+'|'+SBA.ID_ARTICLE+'|'+SBA.ID_SUB AND CONTENT_TYPE LIKE '%image%') AS ID_IMAGE
+						     , (SELECT COUNT(ID_ARTICLE) FROM SYS_BOARD_ARTICLE WITH (NOLOCK) WHERE ID_PARENT_ARTICLE = SBA.ID_ARTICLE) AS CNT_ANSWER
+						     , SBA.ID_REG_EMP AS REG_USER_ID
+						     , (SELECT COUNT(*) FROM SYS_BOARD_ARTICLE WITH (NOLOCK) WHERE ID_PARENT_ARTICLE = SBA.ID_ARTICLE AND ID_BOARD = #{ID_BOARD} AND FG_DEL = 'N' AND (ID_SUB = #{ID_SUB} OR ID_SUB = '*')) AS CHILD_COUNT
+		                     , CASE WHEN SD.DEPT_NM IS NOT NULL
+							        THEN '['+SD.DEPT_NM+'] '+SU.USER_NM 
+									ELSE SU.USER_NM
+							   END AS REG_USER_NM
+						     , SD.DEPT_NM AS REG_DEPT_NM			     
+						  FROM SYS_BOARD_ARTICLE SBA WITH (NOLOCK)
+                          LEFT OUTER JOIN SYS_USER SU WITH (NOLOCK)
+                            ON SBA.ID_REG_EMP = SU.USER_ID
+                          LEFT OUTER JOIN SYS_DEPARTMENT SD WITH (NOLOCK)
+                            ON SU.DEPT_ID = SD.DEPT_ID
+						 WHERE SBA.ID_BOARD = #{ID_BOARD}
+                           AND (ID_SUB = #{ID_SUB} OR ID_ARTICLE IN (SELECT ID_ARTICLE
+																	  FROM SYS_BOARD_ARTICLE WITH (NOLOCK) 
+																	 WHERE ID_BOARD = #{ID_BOARD}
+																	   AND ID_SUB = '*'
+																	   AND NO_GROUP IN (            
+																	        SELECT ID_ARTICLE 
+																	          FROM SYS_BOARD_ARTICLE_SHARE WITH (NOLOCK) 
+																	         WHERE ID_BOARD =  #{ID_BOARD} 
+																	           AND ID_SUB = '*' 
+																	           AND ID_SHARE_TARGET =  #{ID_SUB})))
+						   <if test="SEARCH_VALUE != null and SEARCH_VALUE != ''">
+					     	  AND <include refid="search-list"/>
+					       </if>
+					       <if test="NM_CATEGORY != null and NM_CATEGORY != ''">
+					           AND SBA.NM_CATEGORY = #{NM_CATEGORY}
+					       </if>
+			   ) A
+		 WHERE A.FG_DEL = 'N'
+            OR (A.FG_DEL = 'Y' AND A.CHILD_COUNT != 0)
+         ORDER BY CONVERT(NUMERIC, A.NO_GROUP) DESC, A.SEQ_ORDER ASC
+	</sql>
+
+	<select id="getBoardList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getBoardList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<select id="getBoardList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getBoardList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<select id="getBoardList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getBoardList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+
+	<!--
+		QueryId     : BoardDAO.getBoardNoticeList
+		Description : 게시판 공지글 목록 조회
+	 -->
+	<select id="getBoardNoticeList" parameterType="map" resultType="lmap">
+	    SELECT sub_i.*
+	      FROM (
+			    SELECT TOP ${CNT_NOTICE} SBA.ID_ARTICLE
+				     , SBA.ID_BOARD
+				     , SBA.ID_SUB
+				     , SBA.NM_CATEGORY
+				     , SBA.DS_TITLE
+				     , SBA.NO_GROUP
+				     , SBA.ID_PARENT_ARTICLE
+				     , SBA.DEPTH
+				     , SBA.SEQ_ORDER
+				     , CASE (SELECT FG_INQUIRY_HISTORY FROM SYS_BOARD_TYPE WITH (NOLOCK) WHERE ID_BOARD = #{ID_BOARD}) 
+				            WHEN 'N' THEN ISNULL(SBA.CNT_HIT, 0)
+					    ELSE (SELECT COUNT(*) 
+					            FROM SYS_BOARD_INQUIRY_HISTORY WITH (NOLOCK)
+						       WHERE ID_BOARD = #{ID_BOARD}
+						         AND ID_ARTICLE = SBA.ID_ARTICLE
+						     AND (ID_SUB = #{ID_SUB} OR ID_SUB = '*'))
+				       END AS CNT_HIT
+				     , ISNULL(SBA.CNT_GOOD ,   0) AS CNT_GOOD
+				     , ISNULL(SBA.CNT_BAD  ,   0) AS CNT_BAD
+				     , ISNULL(SBA.FG_DEL   , 'N') AS FG_DEL
+				     , ISNULL(SBA.FG_NOTICE, 'N') AS FG_NOTICE
+				     , CASE 
+				         	WHEN CONVERT(CHAR(8), SBA.DT_REG, 112) = CONVERT(CHAR(8), GETDATE(), 112) THEN CONVERT(CHAR(8), SBA.DT_REG, 108)
+							ELSE CONVERT(CHAR(10), SBA.DT_REG, 120)
+						END AS REG_DATETIME
+				     , SBA.ID_REG_EMP AS REG_USER_ID
+                     , CASE WHEN SD.DEPT_NM IS NOT NULL
+					        THEN '['+SD.DEPT_NM+'] '+SU.USER_NM 
+							ELSE SU.USER_NM
+					   END AS REG_USER_NM
+				  FROM SYS_BOARD_ARTICLE SBA WITH (NOLOCK)
+				  LEFT OUTER JOIN SYS_USER SU WITH (NOLOCK)
+				    ON SBA.ID_REG_EMP = SU.USER_ID
+				  LEFT OUTER JOIN SYS_DEPARTMENT SD WITH (NOLOCK)
+				    ON SU.DEPT_ID = SD.DEPT_ID
+				 WHERE SBA.ID_BOARD = #{ID_BOARD}
+				   AND SBA.FG_DEL = 'N'
+				   AND SBA.FG_NOTICE = 'Y'
+			       AND (ID_SUB = #{ID_SUB} OR ID_ARTICLE IN (SELECT ID_ARTICLE
+																	  FROM SYS_BOARD_ARTICLE WITH (NOLOCK) 
+																	 WHERE ID_BOARD = #{ID_BOARD}
+																	   AND ID_SUB = '*'
+																	   AND NO_GROUP IN (            
+																	        SELECT ID_ARTICLE 
+																	          FROM SYS_BOARD_ARTICLE_SHARE WITH (NOLOCK) 
+																	         WHERE ID_BOARD =  #{ID_BOARD} 
+																	           AND ID_SUB = '*' 
+																	           AND ID_SHARE_TARGET =  #{ID_SUB})))
+				 ORDER BY SBA.DT_REG DESC
+			   ) sub_i
+	</select>
+	
+	<!--
+		QueryId     : BoardDAO.insertBoardArticle
+		Description : 게시물 등록
+	 -->
+	<insert id="insertBoardArticle" parameterType="map">
+	    INSERT INTO SYS_BOARD_ARTICLE(
+			   ID_ARTICLE
+			 , ID_BOARD
+			 , ID_SUB
+			 , NM_CATEGORY
+			 , DS_TITLE
+			 , DS_CONTENT
+			 , NO_ARTICLE
+			 , NO_GROUP
+			 , DEPTH
+			 , SEQ_ORDER
+			 , CNT_HIT
+			 , CNT_GOOD
+			 , CNT_BAD
+			 , FG_DEL
+			 , FG_NOTICE
+			 , DT_REG
+			 , ID_REG_EMP
+			 , DT_UPT
+			 , ID_UPT_EMP  	
+		) VALUES (
+			   #{SEQ_ID_ARTICLE}
+			 , #{ID_BOARD}
+			 , #{ID_SUB}
+			 , #{NM_CATEGORY}
+			 , #{DS_TITLE}
+			 , #{DS_CONTENT}
+			 , #{NO_ARTICLE}
+			 , #{NO_GROUP} 
+			 , 0
+			 , 0
+			 , 0
+			 , 0
+			 , 0
+			 , 'N'
+			 , ISNULL(#{FG_NOTICE}, 'N')
+			 , GETDATE()
+			 , #{user.id}
+			 , GETDATE()
+			 , #{user.id}
+		)
+	</insert>
+	
+	<!--
+		QueryId     : BoardDAO.getArticleDetail
+		Description : 게시물 상세조회
+	 -->
+	<select id="getArticleDetail" parameterType="map" resultType="lmap">
+	    SELECT SBA.ID_ARTICLE
+		     , SBA.ID_BOARD
+			 , SBA.ID_SUB
+		     , SBA.NM_CATEGORY
+		     , SBA.DS_TITLE
+		     , SBA.DS_CONTENT
+		     , SBA.NO_ARTICLE
+		     , SBA.NO_GROUP
+		     , SBA.ID_PARENT_ARTICLE
+		     , SBA.DEPTH
+		     , SBA.SEQ_ORDER
+		     , SBA.CNT_HIT
+		     , SBA.CNT_GOOD
+		     , SBA.CNT_BAD
+		     , SBA.FG_DEL
+		     , SBA.FG_NOTICE
+		     , CONVERT(CHAR(16), SBA.DT_REG, 120) AS REG_DATETIME
+		     , SBA.ID_REG_EMP AS REG_USER_ID
+             , CASE WHEN SD.DEPT_NM IS NOT NULL
+			        THEN '['+SD.DEPT_NM+'] '+SU.USER_NM 
+					ELSE SU.USER_NM
+			   END AS REG_USER_NM
+             , (SELECT CODE_NAME FROM SYS_CODE WITH (NOLOCK) WHERE CODE_CATEGORY_ID = 'CD_DUTY' AND CODE = SU.DUTY_CD) AS DUTY_CD 
+		     , (SELECT TOP 1 SAL.ATTACH_ID FROM SYS_ATTACH_LINK SAL WITH (NOLOCK) LEFT OUTER JOIN SYS_ATTACH SA WITH (NOLOCK) ON SAL.ATTACH_ID = SA.ATTACH_ID 
+		         WHERE BIZ_TP = 'BOARD' AND BIZ_KEY = SBA.ID_BOARD+'|'+SBA.ID_ARTICLE+'|'+SBA.ID_SUB AND CONTENT_TYPE LIKE '%image%') AS ID_IMAGE
+		  FROM SYS_BOARD_ARTICLE SBA WITH (NOLOCK)
+		  LEFT OUTER JOIN SYS_USER SU WITH (NOLOCK)
+		    ON SBA.ID_REG_EMP = SU.USER_ID
+		  LEFT OUTER JOIN SYS_DEPARTMENT SD WITH (NOLOCK)
+            ON SU.DEPT_ID = SD.DEPT_ID
+		 WHERE SBA.ID_ARTICLE = #{ID_ARTICLE}
+		   AND SBA.ID_BOARD = #{ID_BOARD}
+	       AND SBA.ID_SUB = #{ID_SUB}
+	       AND SBA.FG_DEL = 'N'
+	</select>
+	
+	<!--
+		QueryId     : BoardDAO.getPreArticle
+		Description : 게시물 이전글 조회
+	 -->
+	<select id="getPreArticle" parameterType="map" resultType="lmap">
+        SELECT TOP 1
+               SBA.ID_ARTICLE
+             , SBA.ID_SUB
+             , SBA.DS_TITLE
+		     , CONVERT(CHAR(16), SBA.DT_REG, 120) AS REG_DATETIME
+             , CASE WHEN SD.DEPT_NM IS NOT NULL
+			        THEN '['+SD.DEPT_NM+'] '+SU.USER_NM 
+					ELSE SU.USER_NM
+			   END AS REG_USER_NM
+          FROM SYS_BOARD_ARTICLE SBA WITH (NOLOCK)
+		  LEFT OUTER JOIN SYS_USER SU WITH (NOLOCK)
+		    ON SBA.ID_REG_EMP = SU.USER_ID
+		  LEFT OUTER JOIN SYS_DEPARTMENT SD WITH (NOLOCK)
+            ON SU.DEPT_ID = SD.DEPT_ID
+         WHERE ID_BOARD =  #{ID_BOARD}
+           AND FG_DEL = 'N'
+           AND DEPTH = 0
+           AND (ID_SUB =  #{ID_SUB} OR ID_ARTICLE IN (SELECT ID_ARTICLE FROM SYS_BOARD_ARTICLE_SHARE WITH (NOLOCK) WHERE ID_BOARD = #{ID_BOARD} AND ID_SHARE_TARGET = #{ID_SUB})) 
+           AND CONVERT(NUMERIC, NO_ARTICLE) <![CDATA[>]]> CONVERT(NUMERIC, #{NO_ARTICLE})
+           <if test="SEARCH_VALUE != null and SEARCH_VALUE != ''">
+	     	  AND <include refid="search-list"/>
+	       </if>
+         ORDER BY CONVERT(NUMERIC, NO_GROUP) ASC, SEQ_ORDER ASC
+	</select>
+	
+	<!--
+		QueryId     : BoardDAO.getNextArticle
+		Description : 게시물 다음글 조회
+	 -->
+	<select id="getNextArticle" parameterType="map" resultType="lmap">	    
+        SELECT TOP 1
+               SBA.ID_ARTICLE
+             , SBA.ID_SUB
+             , SBA.DS_TITLE
+		     , CONVERT(CHAR(16), SBA.DT_REG, 120) AS REG_DATETIME
+             , CASE WHEN SD.DEPT_NM IS NOT NULL
+			        THEN '['+SD.DEPT_NM+'] '+SU.USER_NM 
+					ELSE SU.USER_NM
+			   END AS REG_USER_NM
+          FROM SYS_BOARD_ARTICLE SBA WITH (NOLOCK)
+		  LEFT OUTER JOIN SYS_USER SU WITH (NOLOCK)
+		    ON SBA.ID_REG_EMP = SU.USER_ID
+		  LEFT OUTER JOIN SYS_DEPARTMENT SD WITH (NOLOCK)
+            ON SU.DEPT_ID = SD.DEPT_ID
+         WHERE ID_BOARD = #{ID_BOARD}
+           AND FG_DEL = 'N'
+           AND DEPTH = 0
+           AND (ID_SUB = #{ID_SUB} OR ID_ARTICLE IN ((SELECT ID_ARTICLE FROM SYS_BOARD_ARTICLE_SHARE WITH (NOLOCK) WHERE ID_BOARD = #{ID_BOARD} AND ID_SHARE_TARGET = #{ID_SUB})))
+           AND CONVERT(NUMERIC, NO_ARTICLE) <![CDATA[<]]> CONVERT(NUMERIC, #{NO_ARTICLE})
+           <if test="SEARCH_VALUE != null and SEARCH_VALUE != ''">
+	     	  AND <include refid="search-list"/>
+	       </if>
+          ORDER BY CONVERT(NUMERIC, NO_GROUP) DESC, SEQ_ORDER ASC
+	</select>
+	
+	<!--
+		QueryId     : BoardDAO.getArticleReplyCount
+		Description : 게시물 댓글수 조회
+	 -->
+	<select id="getArticleReplyCount" parameterType="map" resultType="Integer">
+	    SELECT COUNT(*) AS REPLY_TOTAL_COUNT
+	      FROM SYS_BOARD_REPLY WITH (NOLOCK)
+	     WHERE ID_ARTICLE = #{ID_ARTICLE}
+			   AND ID_BOARD = #{ID_BOARD}
+			   AND ID_SUB = #{ID_SUB} 
+			   AND FG_DEL = 'N'
+	</select>
+	
+	<!--
+		QueryId     : BoardDAO.getArticleReply
+		Description : 게시물 댓글목록 조회
+	 -->
+	<select id="getArticleReply" parameterType="map" resultType="lmap">
+		SELECT * FROM(
+	          SELECT ROW_NUMBER() OVER (ORDER BY CONVERT(NUMERIC, NO_GROUP) DESC, SEQ_ORDER ASC) AS ROWSEQ, A.*
+	            FROM (
+	                   SELECT 
+		                       SBR.ID_ARTICLE
+		                     , SBR.ID_REPLY
+		                     , SBR.ID_SUB
+		                     , SBR.DS_CONTENT_REPLY
+		                     , SBR.NO_GROUP
+		                     , SBR.ID_PARENT_REPLY
+		                     , SBR.DEPTH
+		                     , SBR.SEQ_ORDER
+		                     , SBR.FILES
+		                     , SBR.FG_DEL
+		                     , CONVERT(CHAR(16), GETDATE(), 120) AS REG_DATETIME
+		                     , SBR.ID_REG_EMP AS REG_USER_ID
+		                     , CASE WHEN SD.DEPT_NM IS NOT NULL
+							        THEN '['+SD.DEPT_NM+'] '+SU.USER_NM 
+									ELSE SU.USER_NM
+							   END AS REG_USER_NM
+		                     , (SELECT COUNT(*) FROM SYS_BOARD_REPLY WITH (NOLOCK) WHERE ID_PARENT_REPLY = SBR.ID_REPLY AND ID_BOARD =  #{ID_BOARD}) AS CHILD_COUNT
+		                  FROM SYS_BOARD_REPLY SBR WITH (NOLOCK)
+		                  LEFT OUTER JOIN SYS_USER SU WITH (NOLOCK)
+		                    ON SBR.ID_REG_EMP = SU.USER_ID
+		                  LEFT OUTER JOIN SYS_DEPARTMENT SD WITH (NOLOCK)
+		                    ON SU.DEPT_ID = SD.DEPT_ID
+		                 WHERE SBR.ID_ARTICLE = #{ID_ARTICLE}
+						   AND SBR.ID_BOARD = #{ID_BOARD}
+						   AND SBR.ID_SUB = #{ID_SUB}
+		                 
+	                ) A
+	          WHERE (FG_DEL = 'N' OR (FG_DEL = 'Y' AND CHILD_COUNT != 0))
+	         ) A
+        WHERE 1=1
+        <if test="MIN_ROW_SEQ != null and MIN_ROW_SEQ != ''">
+		   AND ROWSEQ <![CDATA[>]]> #{MIN_ROW_SEQ}  
+		</if>
+		<if test="MAX_ROW_SEQ != null and MAX_ROW_SEQ != ''">
+		   AND ROWSEQ <![CDATA[<=]]> #{MAX_ROW_SEQ}  
+		</if>
+		ORDER BY ROWSEQ DESC
+	</select> 
+	
+	<!--
+		QueryId     : BoardDAO.getArticleReplyFiles
+		Description : 게시물 댓글 첨부파일 조회
+	 -->
+	<select id="getArticleReplyFiles" parameterType="map" resultType="lmap">
+		SELECT SAL.BIZ_KEY AS ID_REPLY
+             , SA.ATTACH_ID
+             , SA.FILE_NM
+             , SA.CONTENT_TYPE
+          FROM SYS_ATTACH SA WITH (NOLOCK)
+          LEFT OUTER JOIN SYS_ATTACH_LINK SAL WITH (NOLOCK)
+            ON SA.ATTACH_ID = SAL.ATTACH_ID
+         WHERE 1=1
+		   AND SA.ATTACH_ID IN
+		 <foreach collection="REPLY_FILES" item="FILE" open="(" close=")" separator=",">
+		 	#{FILE}
+		 </foreach>
+	</select>
+	
+	<!--
+		QueryId     : BoardDAO.getReplyDetail
+		Description : 댓글 상세 조회
+	 -->
+	<select id="getReplyDetail" parameterType="map" resultType="lmap">
+	    SELECT ID_ARTICLE
+	    	 , ID_REPLY
+	         , ID_BOARD
+	         , ID_SUB
+	         , DS_CONTENT_REPLY
+	         , NO_GROUP
+	         , ID_PARENT_REPLY
+	         , DEPTH
+	         , SEQ_ORDER
+	         , FILES
+	         , FG_DEL
+	         , ID_REG_EMP AS REG_USER_ID
+	      FROM SYS_BOARD_REPLY WITH (NOLOCK)
+	     WHERE ID_ARTICLE = #{ID_ARTICLE}
+	       AND ID_REPLY = #{ID_REPLY}
+	       AND ID_BOARD = #{ID_BOARD}
+	       AND ID_SUB = #{ID_SUB}
+	</select>
+	
+	<!--
+		QueryId     : BoardDAO.insertReply
+		Description : 댓글 등록
+	 -->
+	<insert id="insertReply" parameterType="map">
+	    INSERT INTO SYS_BOARD_REPLY(
+		       ID_ARTICLE
+		     , ID_REPLY
+		     , ID_BOARD
+		     , ID_SUB
+		     , DS_CONTENT_REPLY
+		     , NO_GROUP
+		     , ID_PARENT_REPLY
+		     , DEPTH
+		     , SEQ_ORDER
+		     , FILES
+		     , FG_DEL
+		     , DT_REG
+		     , ID_REG_EMP
+		     , DT_UPT
+		     , ID_UPT_EMP
+		)VALUES(
+		       #{ID_ARTICLE}
+		     , #{SEQ_ID_REPLY}
+		     , #{ID_BOARD}
+		     , #{ID_SUB}
+		     , #{DS_CONTENT_REPLY}
+		     , #{NO_GROUP}		     
+		     , #{ID_PARENT_REPLY}
+		     , #{DEPTH}
+		     , #{SEQ_ORDER}
+		     , #{FILES}
+		     , 'N'
+		     , GETDATE()
+		     , #{user.id}
+		     , GETDATE()
+		     , #{user.id}
+		) 
+	</insert>
+	
+	<!--
+		QueryId     : BoardDAO.updateReply
+		Description : 댓글 수정
+	 -->
+	<update id="updateReply" parameterType="map">
+	    UPDATE SYS_BOARD_REPLY
+	       SET DS_CONTENT_REPLY = #{DS_CONTENT_REPLY}
+	         , FILES = #{FILES}
+	         , DT_UPT = GETDATE()
+	         , ID_UPT_EMP = #{user.id}
+	     WHERE ID_BOARD = #{ID_BOARD}
+	       AND ID_ARTICLE = #{ID_ARTICLE}
+	       AND ID_REPLY = #{ID_REPLY}
+	       AND ID_SUB = #{ID_SUB}
+	</update>
+	
+	<!--
+		QueryId     : BoardDAO.increasedHitCount
+		Description : 게시물 조회수 증가
+	 -->
+	<update id="increasedHitCount" parameterType="map">
+	    UPDATE SYS_BOARD_ARTICLE 
+	       SET CNT_HIT = CNT_HIT+1
+	     WHERE ID_ARTICLE = #{ID_ARTICLE}	    
+	       AND ID_BOARD = #{ID_BOARD}
+	       AND ID_SUB = #{ID_SUB}
+	</update>
+	
+	<!--
+		QueryId     : BoardDAO.deleteArticle
+		Description : 게시물 삭제
+	 -->
+	<update id="deleteArticle" parameterType="map">
+	    UPDATE SYS_BOARD_ARTICLE
+	       SET FG_DEL = 'Y'
+	     WHERE ID_BOARD = #{ID_BOARD}
+	       AND ID_ARTICLE = #{ID_ARTICLE}
+	       AND ID_SUB = #{ID_SUB}
+	</update>
+	
+	<!--
+		QueryId     : BoardDAO.deleteAllArticle
+		Description : 게시물 삭제 (ID_SUB 관련 글 모두)
+	 -->
+	<update id="deleteAllArticle" parameterType="map">
+	    UPDATE SYS_BOARD_ARTICLE
+	       SET FG_DEL = 'Y'
+	     WHERE ID_BOARD = #{ID_BOARD}
+	       AND ID_ARTICLE = #{ID_ARTICLE}
+	</update>
+	
+	<!--
+		QueryId     : BoardDAO.deleteReply
+		Description : 댓글 삭제
+	 -->
+	<update id="deleteReply" parameterType="map">
+	    UPDATE SYS_BOARD_REPLY
+	       SET FG_DEL = 'Y'
+	     WHERE ID_REPLY = #{ID_REPLY}
+	       AND ID_BOARD = #{ID_BOARD}
+	       AND ID_ARTICLE = #{ID_ARTICLE}
+	       AND ID_SUB = #{ID_SUB}
+	</update>
+	
+	<!--
+		QueryId     : BoardDAO.deleteAllReply
+		Description : 전체 댓글 삭제
+	 -->
+	<update id="deleteAllReply" parameterType="map">
+	    UPDATE SYS_BOARD_REPLY
+	       SET FG_DEL = 'Y'
+	     WHERE ID_ARTICLE = #{ID_ARTICLE}
+	       AND ID_BOARD = #{ID_BOARD}
+	       AND ID_SUB = #{ID_SUB}
+	</update>
+	
+	<!--
+		QueryId     : BoardDAO.hideAnswer
+		Description : 답글 숨김
+	 -->
+	<update id="hideAnswer" parameterType="map">
+	    UPDATE SYS_BOARD_ARTICLE SET
+	           FG_DEL = 'Y'
+	     WHERE ID_ARTICLE IN (SELECT ID_ARTICLE
+	     						FROM SYS_BOARD_ARTICLE WITH (NOLOCK)
+	     					   WHERE ID_BOARD = #{ID_BOARD}
+	     					     AND ID_SUB = #{ID_SUB}
+	     					   START WITH ID_ARTICLE = #{ID_ARTICLE}
+	     					 CONNECT BY PRIOR ID_ARTICLE = ID_PARENT_ARTICLE
+	     					 )
+		   AND ID_BOARD = #{ID_BOARD}
+		   AND ID_SUB = #{ID_SUB}
+	</update>
+	
+	<!--
+		QueryId     : BoardDAO.checkEvaluation
+		Description : 게시물 평가 조회
+	 -->
+	<select id="checkEvaluation" parameterType="map" resultType="Integer">
+	    SELECT COUNT(*)
+	      FROM SYS_BOARD_EVALUATION WITH (NOLOCK)
+	     WHERE ID_ARTICLE = #{ID_ARTICLE}
+	       AND CD_EVALUATION = #{CD_EVALUATION}
+	       AND USER_ID = #{user.id}
+	       AND ID_BOARD = #{ID_BOARD}
+	       AND ID_SUB = #{ID_SUB}
+	</select>
+	
+	<!--
+		QueryId     : BoardDAO.evaluationArticle
+		Description : 게시물 평가
+	 -->
+	<insert id="evaluationArticle" parameterType="map">
+	    INSERT INTO SYS_BOARD_EVALUATION(
+	           ID_ARTICLE
+	         , CD_EVALUATION
+	         , USER_ID
+	         , ID_BOARD
+	         , ID_SUB
+	         , DT_REG
+	         , ID_REG_EMP
+	         , DT_UPT
+	         , ID_UPT_EMP
+	   	)VALUES(
+	   		   #{ID_ARTICLE}
+	   		 , #{CD_EVALUATION}
+	   		 , #{user.id}
+	   		 , #{ID_BOARD}
+	   		 , #{ID_SUB}
+	   		 , GETDATE()
+	   		 , #{user.id}
+	   		 , GETDATE()
+	   		 , #{user.id}
+	   	)
+	</insert>
+	
+    <!--
+        QueryId     : BoardDAO.updateArticleGoodBad
+        Description : 게시물 추천/반대 정보 업데이트
+     -->
+    <update id="updateArticleGoodBad" parameterType="map">
+        UPDATE SYS_BOARD_ARTICLE 
+           SET CNT_GOOD = (
+                            SELECT COUNT(*)
+                              FROM SYS_BOARD_EVALUATION WITH (NOLOCK)
+                             WHERE ID_ARTICLE = #{ID_ARTICLE}
+                               AND ID_BOARD = #{ID_BOARD}
+                               AND ID_SUB = #{ID_SUB}
+                               AND CD_EVALUATION = '01'
+                           )
+             , CNT_BAD = (
+                            SELECT COUNT(*)
+                              FROM SYS_BOARD_EVALUATION WITH (NOLOCK)
+                             WHERE ID_ARTICLE = #{ID_ARTICLE}
+                               AND ID_BOARD = #{ID_BOARD}
+                               AND ID_SUB = #{ID_SUB}
+                               AND CD_EVALUATION = '02'
+                           )
+         WHERE ID_ARTICLE = #{ID_ARTICLE}
+           AND ID_BOARD = #{ID_BOARD}
+           AND ID_SUB = #{ID_SUB}
+    </update>
+	
+	<!--
+		QueryId     : BoardDAO.updateArticle
+		Description : 게시물 수정
+	 -->
+	<update id="updateArticle" parameterType="map">
+		UPDATE SYS_BOARD_ARTICLE SET
+		       NM_CATEGORY = #{NM_CATEGORY}
+		     , DS_TITLE = #{DS_TITLE}
+		     , DS_CONTENT = #{DS_CONTENT}
+		     , FG_NOTICE = #{FG_NOTICE}
+		     , DT_UPT = GETDATE()
+		     , ID_UPT_EMP = #{user.id}
+		 WHERE ID_ARTICLE = #{ID_ARTICLE}
+		   AND ID_BOARD = #{ID_BOARD}
+<!-- 		   AND ID_SUB IN -->
+<!-- 		   <foreach collection="ID_SUB" item="SUB_ITEM" open="(" close=")" separator=","> -->
+<!-- 		   		#{SUB_ITEM} -->
+<!-- 		   </foreach> -->
+		   AND ID_SUB = #{ID_SUB}
+	</update>
+	
+	<!--
+		QueryId     : BoardDAO.resortArticleOrder
+		Description : 게시물 정렬순서 재정렬
+	 -->
+	<update id="resortArticleOrder" parameterType="map">
+	    UPDATE SYS_BOARD_ARTICLE SET
+	           SEQ_ORDER = SEQ_ORDER + 1
+	     WHERE NO_GROUP = #{NO_GROUP}
+	       AND ID_BOARD = #{ID_BOARD}
+	       AND SEQ_ORDER > #{SEQ_ORDER}
+	       AND ID_SUB = #{ID_SUB}
+	</update>
+	
+	<!--
+		QueryId     : BoardDAO.resortReplyOrder
+		Description : 댓글 정렬순서 재정렬
+	 -->
+	<update id="resortReplyOrder" parameterType="map">
+	    UPDATE SYS_BOARD_REPLY SET
+	           SEQ_ORDER = SEQ_ORDER + 1
+	     WHERE NO_GROUP = #{NO_GROUP}
+	       AND ID_BOARD = #{ID_BOARD}
+	       AND ID_ARTICLE = #{ID_ARTICLE}
+	       AND SEQ_ORDER > #{SEQ_ORDER}
+	       AND ID_SUB = #{ID_SUB}
+	</update>
+	
+	<!--
+		QueryId     : BoardDAO.insertAnswer
+		Description : 답글 등록
+	 -->
+	<insert id="insertAnswer" parameterType="map">
+	    INSERT INTO SYS_BOARD_ARTICLE(
+        	   ID_ARTICLE
+			 , ID_BOARD
+			 , ID_SUB
+			 , NM_CATEGORY
+			 , DS_TITLE
+			 , DS_CONTENT
+			 , ID_PARENT_ARTICLE
+			 , NO_ARTICLE
+			 , NO_GROUP
+			 , DEPTH
+			 , SEQ_ORDER
+			 , CNT_HIT
+			 , CNT_GOOD
+			 , CNT_BAD
+			 , FG_DEL
+			 , FG_NOTICE
+			 , DT_REG
+			 , ID_REG_EMP
+			 , DT_UPT
+			 , ID_UPT_EMP
+        )VALUES(
+        	   #{SEQ_ID_ARTICLE}
+        	 , #{ID_BOARD}
+        	 , #{ID_SUB}
+        	 , #{NM_CATEGORY}
+        	 , #{DS_TITLE}
+        	 , #{DS_CONTENT}
+        	 , #{ID_PARENT_ARTICLE}
+        	 , #{NO_ARTICLE}
+        	 , #{NO_GROUP}
+        	 , #{DEPTH}+1
+        	 , #{SEQ_ORDER}+1
+        	 , 0
+        	 , 0
+        	 , 0
+        	 , 'N'
+        	 , 'N'
+        	 , GETDATE()
+        	 , #{user.id}
+        	 , GETDATE()
+        	 , #{user.id}
+        )
+	</insert>
+	
+	<!--
+		QueryId     : BoardDAO.getAnswerList
+		Description : 답글 목록 조회
+	 -->
+	<select id="getAnswerList" parameterType="map" resultType="lmap">
+	    SELECT SBA.ID_ARTICLE
+		     , SBA.ID_BOARD
+		     , SBA.ID_SUB
+		     , SBA.NM_CATEGORY
+		     , SBA.DS_TITLE
+		     , SBA.DS_CONTENT
+		     , SBA.DT_REG AS REG_DATETIME
+		     , SBA.ID_REG_EMP AS REG_USER_ID
+             , CASE WHEN SD.DEPT_NM IS NOT NULL
+			        THEN '['+SD.DEPT_NM+'] '+SU.USER_NM 
+					ELSE SU.USER_NM
+			   END AS REG_USER_NM
+		  FROM SYS_BOARD_ARTICLE SBA WITH (NOLOCK)
+		  LEFT OUTER JOIN SYS_USER SU WITH (NOLOCK)
+		    ON SBA.ID_REG_EMP = SU.USER_ID
+		  LEFT OUTER JOIN SYS_DEPARTMENT SD WITH (NOLOCK)
+		    ON SU.DEPT_ID = SD.DEPT_ID
+		 WHERE SBA.ID_PARENT_ARTICLE = #{ID_ARTICLE}
+		   AND SBA.ID_BOARD = #{ID_BOARD}
+	       AND SBA.ID_SUB = #{ID_SUB}
+		   AND SBA.FG_DEL = 'N'
+		   AND SBA.FG_NOTICE = 'N'
+		 ORDER BY SBA.ID_ARTICLE ASC
+	</select>
+	
+	<!--
+		QueryId     : BoardDAO.checkCountInquiryHistory
+		Description : 조회이력 체크
+	 -->
+	<select id="checkCountInquiryHistory" parameterType="map" resultType="Integer">
+	    SELECT COUNT(*) AS CHK_COUNT
+	      FROM SYS_BOARD_INQUIRY_HISTORY WITH (NOLOCK)
+	     WHERE ID_BOARD = #{ID_BOARD}
+	       AND ID_ARTICLE = #{ID_ARTICLE}
+	       AND ID_SUB = #{ID_SUB}
+	       AND ID_USER = #{user.id}
+	</select>
+	
+	<!--
+		QueryId     : BoardDAO.insertInquiryHistory
+		Description : 조회이력 등록
+	 -->
+	<insert id="insertInquiryHistory" parameterType="map">
+	    INSERT INTO SYS_BOARD_INQUIRY_HISTORY(
+	    	   ID_BOARD
+	    	 , ID_ARTICLE
+	    	 , ID_HISTORY
+	    	 , ID_SUB
+	    	 , ID_USER
+	    	 , DT_INQUIRY
+	    )VALUES(
+	    	   #{ID_BOARD}
+	    	 , #{ID_ARTICLE}
+	    	 , #{SEQ_SYS_BOARD_INQUIRY_HISTORY}
+	    	 , #{ID_SUB}
+	    	 , #{user.id}
+	    	 , GETDATE() 
+	    )
+	</insert>
+	
+	<!-- 조회이력 목록 조회 -->
+	<sql id="getInquiryHistoryList_base">
+	    SELECT SBIH.ID_BOARD
+	    	 , SBIH.ID_ARTICLE
+	    	 , SBIH.ID_HISTORY
+	    	 , SBIH.ID_USER
+	    	 , SU.USER_NM AS NM_USER
+	    	 , SD.DEPT_NM AS NM_DEPT
+	    	 , CONVERT(CHAR(16), SBIH.DT_INQUERY, 120)
+	   	  FROM SYS_BOARD_INQUIRY_HISTORY SBIH WITH (NOLOCK)
+	   	  LEFT OUTER JOIN SYS_USER SU WITH (NOLOCK)
+	   	    ON SBIH.ID_USER = SU.USER_ID
+	   	  LEFT OUTER JOIN SYS_DEPARTMENT SD WITH (NOLOCK)
+	   	    ON SU.DEPT_ID = SD.DEPT_ID
+	   	 WHERE ID_BOARD = #{ID_BOARD}
+	   	   AND ID_ARTICLE = #{ID_ARTICLE}
+	       AND SBIH.ID_SUB = #{ID_SUB}
+	   	   <if test="USER_NM != null and USER_NM != ''">
+	           AND SU.USER_NM LIKE '%' + #{USER_NM} + '%'
+	       </if>
+	   	 ORDER BY SBIH.DT_INQUIRY DESC
+	</sql>
+	
+	<select id="getInquiryHistoryList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getInquiryHistoryList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<select id="getInquiryHistoryList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getInquiryHistoryList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<select id="getInquiryHistoryList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getInquiryHistoryList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		QueryId     : BoardDAO.getInquiryCount
+		Description : 조회수 조회
+	 -->
+	<select id="getInquiryCount" parameterType="map" resultType="Integer">
+	    SELECT COUNT(*) AS CNT_INQUIRY
+		  FROM SYS_BOARD_INQUIRY_HISTORY WITH (NOLOCK)
+		 WHERE ID_BOARD = #{ID_BOARD}
+		   AND ID_ARTICLE = #{ID_ARTICLE}
+		   AND ID_SUB = #{ID_SUB}
+	</select>
+	
+	<!--
+		QueryId     : BoardDAO.getSharedArticleList
+		Description : 공유된 게시물 SUBID 조회
+	 -->
+	<select id="getSharedArticleList" parameterType="map" resultType="lmap">
+	    SELECT ID_SUB
+	      FROM SYS_BOARD_ARTICLE WITH (NOLOCK)
+	     WHERE ID_BOARD = #{ID_BOARD}
+	       AND ID_ARTICLE = #{ID_ARTICLE}
+	       AND ID_SUB NOT IN
+	       <foreach collection="ID_SUB" item="SUB_ITEM" open="(" close=")" separator=",">
+		   		#{SUB_ITEM}
+		   </foreach>
+	</select>
+	
+	<insert id="insertPushTargetByBoard" parameterType="map">
+	    INSERT INTO SYS_BOARD_PUSH_TARGET(
+	    	   ID_BOARD
+	    	 , ID_SUB
+	    	 , ID_USER
+	    	 , DT_REG
+	    )VALUES(
+	    	   #{ID_BOARD}
+	    	 , #{ID_SUB}
+	    	 , #{user.id}
+	    	 , GETDATE()
+	    )
+	</insert>
+	
+	<delete id="removePushTargetByBoard" parameterType="map">
+	    DELETE
+	      FROM SYS_BOARD_PUSH_TARGET
+	     WHERE ID_BOARD = #{ID_BOARD}
+	       AND ID_SUB = #{ID_SUB}
+	       AND ID_USER = #{user.id}
+	</delete>
+	
+	<select id="listAdditionalInfo" parameterType="map" resultType="lmap">
+	    SELECT CASE WHEN COUNT(*) = 0 THEN 'N'
+			 		ELSE 'Y'
+			 	END AS FG_PUSH
+	      FROM SYS_BOARD_PUSH_TARGET WITH (NOLOCK)
+	     WHERE ID_BOARD = #{ID_BOARD}
+	       AND ID_SUB = #{ID_SUB}
+	       AND ID_USER= #{user.id}
+	</select>
+	
+	<insert id="insertBoardArticleShare" parameterType="map">
+	    INSERT INTO SYS_BOARD_ARTICLE_SHARE(
+	    	   ID_BOARD
+	    	 , ID_ARTICLE
+	    	 , ID_SUB
+	    	 , ID_SHARE_TARGET
+	    	 , TP_SHARE_TARGET
+	    	 , NM_SHARE_TARGET
+	    )VALUES(
+	    	   #{ID_BOARD}
+	    	 , #{ID_ARTICLE}
+	    	 , #{ID_SUB}
+	    	 , #{ID_SHARE_TARGET}
+	    	 , #{TP_SHARE_TARGET}
+	    	 , #{NM_SHARE_TARGET}
+	    )
+	</insert>
+	
+	<delete id="removeAllBoardArticleShare" parameterType="map">
+	    DELETE
+	      FROM SYS_BOARD_ARTICLE_SHARE
+	     WHERE ID_BOARD = #{ID_BOARD}
+	       AND ID_ARTICLE = #{ID_ARTICLE}
+	       AND ID_SUB = #{ID_SUB}
+	</delete>
+	
+	<select id="getArticleShareList" parameterType="map" resultType="lmap">
+	    SELECT ID_SHARE_TARGET AS CD_SHARE
+		     , TP_SHARE_TARGET AS TP_SHARE
+		     , NM_SHARE_TARGET AS NM_SHARE
+		  FROM SYS_BOARD_ARTICLE_SHARE WITH (NOLOCK)
+		 WHERE ID_BOARD = #{ID_BOARD}
+		   AND ID_ARTICLE = #{ID_ARTICLE}
+		   AND ID_SUB = #{ID_SUB}
+	</select>
+	
+</mapper>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="AlimyLogin">
+	<!--
+		QueryId     : AlimyLogin.selectAlimyLoginInfo
+		Description : 알리미 로그인 정보 조회  
+	 -->
+	<select id="selectAlimyLoginInfo" parameterType="map" resultType="lmap">
+		SELECT * 
+		  FROM SYS_LOGIN_ALIMY
+		 WHERE LOGIN_ID = #{LOGIN_ID}
+	</select>
+
+	<!--
+		QueryId     : AlimyLogin.updateAlimyLoginInfo
+		Description : 알리미 로그인 정보 업데이트  
+	 -->
+	<update id="updateAlimyLoginInfo" parameterType="map">
+		UPDATE SYS_LOGIN_ALIMY
+		   SET CLIENT_IP    = #{CLIENT_IP}
+             , CLIENT_PORT  = #{CLIENT_PORT}
+             , SESSION_ID   = #{SESSION_ID}
+		     , LOGIN_TOKEN  = #{LOGIN_TOKEN}
+             , LOGIN_DT     = CURRENT_TIMESTAMP
+         WHERE LOGIN_ID     = #{LOGIN_ID}
+	</update>
+
+	<!--
+		QueryId     : AlimyLogin.insertAlimyLoginInfo
+		Description : 알리미 로그인 정보 신규등록  
+	 -->
+	<insert id="insertAlimyLoginInfo" parameterType="map">
+		INSERT INTO SYS_LOGIN_ALIMY(
+			  LOGIN_ID
+			, USER_ID
+			, CLIENT_IP
+            , CLIENT_PORT
+            , SESSION_ID
+		    , LOGIN_TOKEN
+            , LOGIN_DT
+		) VALUES (
+			  #{LOGIN_ID}
+			, #{USER_ID}
+			, #{CLIENT_IP}
+            , #{CLIENT_PORT}
+            , #{SESSION_ID}
+		    , #{LOGIN_TOKEN}
+            , CURRENT_TIMESTAMP
+       	)
+	</insert>
+</mapper>
+ 

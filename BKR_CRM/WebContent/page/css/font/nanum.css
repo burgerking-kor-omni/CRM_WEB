@@ -1,0 +1,97 @@
+@charset "utf-8";
+
+/* - ver1.0 (ver2.0은 1280기준 플젝 이후 업그레이드 예정) 
+ 	- 배포 시작 : 2017년 3월 
+ 	- 나눔고딕 폰트를 사용시 적용   	
+ */
+
+@font-face {
+  font-family: 'Nanum Gothic'; font-style: normal; font-weight: 400;
+  src: url('../../font/NanumGothic-Regular.eot');
+  src: url('../../font/NanumGothic-Regular.woff') format('woff'),
+       url('../../font/NanumGothic-Regular.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Nanum Gothic'; font-style: normal; font-weight: 700;
+  src: url('../../font/NanumGothic-Bold.eot');
+  src:url('../../font/NanumGothic-Bold.woff') format('woff'),
+       url('../../font/NanumGothic-Bold.ttf') format('truetype');
+}
+
+html,
+body {font-family:'Nanum Gothic','Malgun Gothic', '맑은 고딕';}
+
+/** 레이아웃 관련 **/
+.ub-layout.menu nav .ub-control.menu .depth02 li a {padding-top:3px !important; padding-bottom:4px !important; background-position:9px 11px !important;} 
+.ub-page.popup .ub-frame.body .ub-layout.button.bottom .ub-control.button a {height:19px; padding:3px 13px 0 0;}
+
+/* simplemenu */
+nav .ub-control.menu .menu-sub-box ul li.menu-sub-item a {font-family:'Nanum Gothic';}
+
+.ub-frame.body h2.ub-control.title {padding-top:7px; padding-bottom:1px;}
+
+/** 스타일 관련 **/
+input,
+.input-text,
+textarea,
+.textarea,
+select,
+.select  {font-family:'Nanum Gothic';}
+
+/* 검색 및 테이블 */
+.ub-layout.search .ub-control.table.normal th label {background-position:0 6px}
+.ub-control.table.normal th label {background-position:0 6px;}
+
+/* 버튼 */
+.ub-control.button.top a {height:20px; padding-top:5px; padding-bottom:1px;}
+.ub-control.button.bottom a {height:20px; padding-top:4px;}
+.ub-control.button.inner a {height:18px; padding:4px 13px 0 0;}
+.ub-control.button.search a {height:19px; padding:2px 15px 3px 0;}
+.ub-control.button.inner a {height:21px; padding-top:3px;}
+th .ub-control.button.inner a, 
+td .ub-control.button.inner a {height:20px; padding-top:2px; line-height:18.5px;}
+.ui-jqgrid th .ub-control.button.inner a, 
+.ui-jqgrid td .ub-control.button.inner a {height:21px; padding-top:1px;}
+.ub-layout.button.bottom .ub-control.button.bottom a {height:21px; padding-top:5px;}
+.ub-page.popup .ub-frame.body .pop-tail .ub-layout.button.bottom .ub-control.button.bottom a {height:19px; padding-top:3px;}
+.ub-layout.button.inner .ub-control.button.inner a, 
+.ub-control.button.inner a {height:21px; padding-top:3px; line-height:17px;}
+
+
+h2.ub-control.title .ub-layout.button.inner,
+h3.ub-control.title .ub-layout.button.inner {top:4px;}
+
+.ub-layout.login .login-content .login-form .login-inputtext input {line-height:1;}
+
+/* ui-widget */
+.ui-widget {font-family:'Nanum Gothic','나눔고딕';}
+
+/* ui-jqgrid */
+.ui-jqgrid {font-size:12px;}
+.ui-jqgrid tr.jqgrow td {font-family:'Nanum Gothic','나눔고딕';}
+.ui-jqgrid .ui-jqgrid-htable th div {font-family:'Nanum Gothic','나눔고딕'; font-size:12px;}
+
+/* ui-dialog */
+.ui-dialog .ui-dialog-titlebar {padding-top:6px; padding-bottom:10px;}
+
+/* ui-datepicker */
+.ui-datepicker {font-family:'Nanum Gothic','나눔고딕';}
+.ui-datepicker .ui-datepicker-year,
+.ui-datepicker .ui-datepicker-month {font-family:'Nanum Gothic','나눔고딕';}
+.ui-datepicker select.ui-datepicker-year {width:62px;}
+.ui-datepicker select.ui-datepicker-month {width:58px;}
+.ui-datepicker table {font-size:12px;}
+
+/* ui-dynatree */
+ul.dynatree-container {font-family:'Nanum Gothic','나눔고딕';}
+
+/* multi-select */
+.ui-multiselect {font-family:'Nanum Gothic','나눔고딕';}
+
+/* board */
+.ub-layout.board-sch .ub-control.button.search a {height:20px !important; padding-top:1px !important;}
+.ub-page.board .ub-layout.button.bottom .ub-control.button.bottom a {height:22px !important; line-height:1.6; padding-top:1px !important;}
+.ub-control.stit .title {padding-top:6px !important;}
+.ub-layout.comment .reply-area .re-write a {padding-top:12px !important; line-height:16px !important;}
+.notice-chk .input-checkbox {top:0;}
+.ub-control.bbs-view .bbs-tit .tit {margin:12px 0 8px !important;}

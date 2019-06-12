@@ -1,0 +1,110 @@
+.attachFile {display:block;position:relative;padding-left:70px;min-height:18px;padding-top:5px;}
+.swfupload {
+	/*margin-top:-9px;*/position:absolute;top:4px;left:0;
+}
+.swfupload .upload-button {background-image:url(../img/upload.jpg);background-position:0 0; cursor: pointer;}
+.swfupload .upload-button:hover {background-position:0px 19px;}
+.swfupload-form {visibility:hidden; height: 0px;} /* Safari에서 form을 display:none;으로 설정하면 파일찾기 기능이 동작하지 않음.*/
+
+.attachFile .swfupload {/*margin-top:5px;*/}
+div.filefieldset {
+	width: 343px;
+	margin: 0px 0px 5px 0px;
+	/*border:  1px solid #D9E4FF;*/
+	padding: 0px 5px 0px;
+}
+div.filefieldset .ui-icon {width:12px;height:11px;background-image:url(../../../../page/images/common/ico_delete_btn.gif);background-position:0 0;}
+div.filefieldset span.legend {
+	display:inline-block;
+	position: relative;
+	font-weight: bold;
+	color: #1e80b5;
+	padding-left:3px;
+}
+.progressWrapper {
+	overflow: hidden;
+}
+.progressContainer {
+	margin: 5px 0;
+	padding: 6px 10px 1px;
+	border: solid 1px #afcad2;
+	background-color: #e8f6fa;
+	overflow: hidden;
+}
+.progressName {
+	font-weight: 700;
+	height: 14px;
+	text-align: left;
+	white-space: nowrap;
+	overflow: hidden;
+}
+.progressBarInProgress,
+.progressBarComplete,
+.progressBarError {
+	font-size: 0;
+	width: 0%;
+	height: 2px;
+	background-color: blue;
+	margin-top: 2px;
+}
+.progressBarComplete {
+	width: 100%;
+	background-color: green;
+	visibility: hidden;
+}
+.progressBarStatus {
+	margin-top: 2px;
+	font-size: 7pt;
+	font-family: Arial;
+	text-align: left;
+	white-space: nowrap;
+	color:#1e80b5;
+}
+/* Error */
+.progress_red {
+	border: solid 1px #e3b3a6;
+	background-color: #faece8;
+}
+.progress_red .progressBarStatus {color:#a33232;font-size:8pt;}
+.progress_red .progressName {display:none;}
+/* Current */
+.progress_green {
+	border: solid 1px #DDF0DD;
+	background-color: #EBFFEB;
+}
+/* Complete */
+.progress_blue {
+	border: solid 1px #CEE2F2;
+	background-color: #F0F5FF;
+}
+/* -- SWFUpload Object Styles ------------------------------- */
+.swfupload {
+	vertical-align: top;
+}
+
+/* -- file link Styles ------------------------------- */
+.file_link, .file_link span, .delete_link, .delete_link span  { 
+	display:inline-block; 
+	text-decoration:none !important; 
+  	cursor:pointer;
+	white-space: nowrap;
+}
+.file_link, .delete_link {
+	padding:3px 10px 3px; 
+	overflow:visible;
+	margin:0px;	
+}
+.file_link span { 
+	width:290px;
+	color:#000; 
+	overflow: hidden;
+	text-overflow:ellipsis;
+}
+.file_link:hover span { 
+	color:#df4c18; 
+}
+.delete_link span { 
+}
+.delete_link:hover span { 
+	color:#df4c18; 
+}

@@ -1,0 +1,25 @@
+//## 일반적인 finder
+  		$('#ID_DEPT_ACT').finder();
+  		$('#ID_EMP_ACT').finder();
+  		
+  		
+//## 조직과 사용자가 연계되는 finder
+		// 부서
+		$('#ID_DEPT_ACT').finder({
+			selected: function(detail) {
+				jQuery.finder.removeItem('ID_EMP_ACT');	// 부서검색에서 하나의 값이 선택되면 사용자는 초기화
+			},			
+			removed: function(id) {
+				jQuery.finder.removeItem('ID_EMP_ACT');	// 선택된 부서가 삭제되면 사용자는 초기화
+			}
+		});
+		
+		// 사용자
+    	$('#ID_EMP_ACT').finder({
+    		departmentObjectId: 'ID_DEPT_ACT',
+			selected: function(detail) {
+				jQuery.finder.addItem('ID_DEPT_ACT', detail.DEPT_ID, null, function() {
+					jQuery.finder.removeItem('ID_EMP_ACT');
+				});
+			}
+    	});

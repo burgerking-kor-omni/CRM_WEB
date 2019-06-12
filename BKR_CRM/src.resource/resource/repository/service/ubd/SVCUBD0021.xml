@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<serviceBuilder id="SVCUBD0021" isProtectedResource="false" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <serviceName>게시판 댓글 상세 조회</serviceName>
+  <serviceType type="Read">
+  	<paging isPaging="false" pagingCount="-1"/>
+    <isFindConditionSave>false</isFindConditionSave>
+  </serviceType>
+  <serviceComponentType type="Custom">
+    <className>com.ubone.standard.ubboard.board.base.service.BoardSO</className>
+    <methodName>getReplyDetail</methodName>
+    <linkedFile>true</linkedFile>
+    <inducedEvent>false</inducedEvent>
+    <linkedWorkCategory>REPLY</linkedWorkCategory>
+    <linkedActivity></linkedActivity>
+  </serviceComponentType>
+  <serviceCodes/>
+  <serviceMasks>
+  	<serviceMask id="MASK0001" pointCut="AfterSO" dataListId="replyDetail" columnName="DS_CONTENT_REPLY"/>    
+  </serviceMasks>
+</serviceBuilder>

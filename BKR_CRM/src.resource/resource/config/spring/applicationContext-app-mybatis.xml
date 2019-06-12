@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+	<!--
+	================================================================================
+	Application MyBatis-sqlmap 관련 Configuration -> MyBatis 관련 설정.
+	Application 의 ORM으로 IBATIS를 사용할 경우에 사용. sqlmap-config.xml파일의 경로명과,
+	sqlmap 컨피그 파일들의 경로명을 설정한다.
+	================================================================================
+	-->
+	<bean id="simpleNativeJdbcExtractor"
+		class="org.springframework.jdbc.support.nativejdbc.SimpleNativeJdbcExtractor" />
+	<!--
+	<bean id="simpleNativeJdbcExtractor"
+		class="org.springframework.jdbc.support.nativejdbc.SimpleNativeJdbcExtractor" />
+	<bean id="webSphereNativeJdbcExtractor"
+		class="org.springframework.jdbc.support.nativejdbc.WebSphereNativeJdbcExtractor" />
+	<bean id="webLogicNativeJdbcExtractor "
+		class="org.springframework.jdbc.support.nativejdbc.WebLogicNativeJdbcExtractor " />
+	<bean id="commonsDbcpNativeJdbcExtractor "
+		class="org.springframework.jdbc.support.nativejdbc.CommonsDbcpNativeJdbcExtractor " />
+	-->
+		
+
+	<!-- oracle jdbc lob Handler -->
+	<bean id="oracleLobHandler" class="org.springframework.jdbc.support.lob.OracleLobHandler">
+		<property name="nativeJdbcExtractor" ref="simpleNativeJdbcExtractor" />
+	</bean>
+
+	<!-- default lob Handler -->
+	<bean id="defaultLobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler" />
+
+	<!-- application Session Factory -->
+	<bean id="sqlSessionFactory" class="com.ubone.framework.dao.RefreshableSqlSessionFactoryBean"		
+		p:mapperLocations="classpath*:com/ubone/**/mybatis/*.${app.db.databasetype}.xml" 
+		p:configLocation="classpath:/resource/config/mybatis/mybatis-config-${app.db.databasetype}.xml" 
+		p:dataSource-ref="applicationDataSource" />
+
+	<!-- MyBatis 기본 템플릿 -->
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactory"/>
+	</bean>
+	<!-- UB 세션 템플릿 - 서비스 정보 추가 -->
+<!-- 	<bean id="sqlSessionTemplate" class="com.ubone.framework.dao.UbSqlSessionTemplate"> -->
+<!-- 		<constructor-arg ref="sqlSessionFactory"/> -->
+<!-- 	</bean> -->
+	
+
+	<!-- meta Session Factory -->
+	<bean id="metaSessionFactory" class="com.ubone.framework.dao.RefreshableSqlSessionFactoryBean"		
+		p:mapperLocations="classpath*:com/ubone/**/mybatis/*.meta.xml" 
+		p:configLocation="classpath:/resource/config/mybatis/mybatis-config-meta.xml" 
+		p:dataSource-ref="metaDataSource" />
+
+	<!-- MyBatis 기본 템플릿 -->
+	<bean id="metaSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="metaSessionFactory"/>
+	</bean>
+	
+	<!-- 2019.03.05 rims 연동관련 추가 -->
+	<bean id="rimsSessionFactory" class="com.ubone.framework.dao.RefreshableSqlSessionFactoryBean"		
+		p:mapperLocations="classpath*:com/ubone/**/mybatis/*.${app.db.databasetype}.xml" 
+		p:configLocation="classpath:/resource/config/mybatis/mybatis-config-${app.db.databasetype}.xml" 
+		p:dataSource-ref="rimsDataSource" />
+	<bean id="rimsSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="rimsSessionFactory"/>
+	</bean>
+
+	<!-- UB 세션 템플릿 - 서비스 정보 추가 -->
+<!-- 	<bean id="sqlSessionTemplate" class="com.ubone.framework.dao.UbSqlSessionTemplate"> -->
+<!-- 		<constructor-arg ref="sqlSessionFactory"/> -->
+<!-- 	</bean> -->
+	
+	<!-- extend1 Session Factory -->
+	<!-- <bean id="extend1SessionFactory" class="com.ubone.framework.dao.RefreshableSqlSessionFactoryBean"		
+		p:mapperLocations="classpath*:com/ubone/**/mybatis/*.extend1.xml" 
+		p:configLocation="classpath:/resource/config/mybatis/mybatis-config-extend1.xml" 
+		p:dataSource-ref="extend1DataSource" /> -->
+
+	<!-- <bean id="extend1SessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="extend1SessionFactory"/>
+	</bean> -->
+
+</beans>

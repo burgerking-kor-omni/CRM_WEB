@@ -1,0 +1,19 @@
+/* Side Menu */
+.sidemenu ul, .sidemenu li {
+	list-style-type:none;
+}
+.sidemenu ul {
+	padding:6px 4px 2px 4px; 
+	margin:12px;
+	padding:0px;
+}
+.sidemenu li {
+	padding:6px; 
+	margin:0px 0px 2px 0px; 
+	cursor:pointer;
+}
+.sidemenu .ui-icon {
+	display:inline-block;
+	position:relative;
+	float:left;
+}

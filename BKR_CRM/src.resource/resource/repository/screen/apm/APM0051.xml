@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<screenBuilder id="APM0051" screenType="tree" screenLayoutType="Popup" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>시스템관리 / 프로그램 권한 관리 / Screen 조회 팝업 (XML용) (다국어용)</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0051</fileName>
+  <functions>
+    <function id="FNCSYS0293" isStartFunction="false" functionName="Screen 검색 팝업 - 화면트리 목록조회 (XML용) (다국어용) 호출" serviceId="SVCSYS0277" alias="INQUIRY"/>
+    <function id="FNCSYS0294" isStartFunction="false" functionName="Screen 검색 팝업 - 화면트리 목록조회 Lazy (XML용) (다국어용) 호출" serviceId="SVCSYS0278" alias="USERDEFINED1"/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

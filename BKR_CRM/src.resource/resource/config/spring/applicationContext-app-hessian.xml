@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+	        http://www.springframework.org/schema/util    http://www.springframework.org/schema/util/spring-util-3.2.xsd			
+			">
+
+	<!-- Hessian Function Service Call-Service -->
+	<bean id="hessianFunctionServiceSender" class="com.ubone.interfaces.hessian.sender.HessianFunctionServiceSender"/>
+
+	<!-- HessianServer Receiver Service -->
+	<bean id="hessianUrlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+	    <property name="mappings">
+	        <props>
+<!-- 	            <prop key="/hessianService.do">hessianService</prop> -->
+<!-- 	            <prop key="/hessianFrameworkService.do">hessianFrameworkServiceExporter</prop> -->
+<!-- 	            <prop key="/hessianCommonService.do">hessianCommonServiceExporter</prop> -->
+	            <prop key="/hessianFunctionService.do">hessianFunctionServiceExporter</prop>
+	            <prop key="/hessianJdbcDaoService.do">hessianJdbcDaoServiceExporter</prop>
+	        </props>
+	    </property>
+	</bean>
+
+	<!-- Define Hessian ServiceExporter -->
+<!-- 	<bean id="hessianService" class="com.ubone.interfaces.hessian.BaseHessianServiceExporter"> -->
+<!-- 	    <property name="service"> -->
+<!-- 	    	<bean class="com.ubone.example.hessian.HessianServiceSO"/> -->
+<!-- 	    </property> -->
+<!-- 	    <property name="serviceInterface" value="com.ubone.interfaces.hessian.service.HessianService" /> -->
+<!-- 	</bean> -->
+
+	<!-- 
+		Framework 서비스 Exporter
+	 -->
+<!-- 	<bean id="hessianFrameworkServiceExporter" class="com.ubone.interfaces.hessian.BaseHessianServiceExporter"> -->
+<!-- 	    <property name="service"> -->
+<!-- 	    	<bean class="com.ubone.interfaces.hessian.service.HessianFrameworkServiceImpl"/> -->
+<!-- 	    </property> -->
+<!-- 	    <property name="serviceInterface" value="com.ubone.interfaces.hessian.service.HessianFrameworkService" /> -->
+<!-- 	</bean> -->
+
+	<!-- 
+		공통 서비스 Exporter
+	 -->
+<!-- 	<bean id="hessianCommonServiceExporter" class="com.ubone.interfaces.hessian.BaseHessianServiceExporter"> -->
+<!-- 	    <property name="service"> -->
+<!-- 	    	<bean class="com.ubone.standard.login.service.HessianCommonServiceImpl"/> -->
+<!-- 	    </property> -->
+<!-- 	    <property name="serviceInterface" value="com.ubone.standard.login.service.HessianCommonService" /> -->
+<!-- 	</bean> -->
+	
+	<!-- Define Hessian Function ServiceExporter -->
+	<bean id="hessianFunctionServiceExporter" class="com.ubone.interfaces.hessian.BaseHessianServiceExporter">
+	    <property name="service">
+	    	<bean class="com.ubone.interfaces.hessian.service.HessianFunctionServiceImpl"/>
+	    </property>
+	    <property name="serviceInterface" value="com.ubone.interfaces.hessian.service.HessianFunctionService" />
+	</bean>
+
+	<!-- Define Hessian Jdbc DAO ServiceExporter -->
+	<bean id="hessianJdbcDaoServiceExporter" class="com.ubone.interfaces.hessian.BaseHessianServiceExporter">
+	    <property name="service">
+	    	<bean class="com.ubone.interfaces.hessian.service.HessianJdbcDaoServiceImpl"/>
+	    </property>
+	    <property name="serviceInterface" value="com.ubone.interfaces.hessian.service.HessianJdbcDaoService" />
+	</bean>
+
+</beans>

@@ -1,0 +1,606 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="BoardManage">
+
+	<!--
+		QueryId     : BoardManage.getList
+		Description : 게시판 리스트을 조회한다.
+	 -->
+	<sql id="getList_base">
+	    SELECT TOP 100 PERCENT
+			   ROW_NUMBER () OVER (ORDER BY SB.ID_BOARD ASC) AS rownum
+	    	 , SB.ID_BOARD            AS ID_BOARD
+             , SBT.ID_BOARD_TYPE     AS ID_BOARD_TYPE
+             , SC.CODE_NAME          AS NM_BOARD_TYPE
+             , SB.DS_TITLE            AS DS_TITLE
+<!--              , TO_CHAR(SB.DT_REG, 'YYYY-MM-DD')    AS REG_DATETIME -->
+			 , CONVERT(CHAR(10), SB.DT_REG, 120) AS REG_DATETIME
+             , SB.ID_REG_EMP        AS REG_USER_ID
+             , SU.USER_NM            AS REG_USER_NM
+             , (SELECT CODE_NAME FROM SYS_CODE WHERE CODE = SB.FG_USE AND CODE_CATEGORY_ID = 'STATUS') AS FG_USE
+          FROM SYS_BOARD SB WITH (NOLOCK)
+          LEFT OUTER JOIN SYS_BOARD_TYPE SBT WITH (NOLOCK)
+            ON SB.ID_BOARD = SBT.ID_BOARD
+          LEFT OUTER JOIN SYS_USER SU WITH (NOLOCK)
+            ON SB.ID_REG_EMP = SU.USER_ID
+          LEFT OUTER JOIN SYS_CODE SC WITH (NOLOCK)
+            ON SBT.ID_BOARD_TYPE = SC.CODE AND SC.CODE_CATEGORY_ID = 'BOARD_TYPE_CD'
+         WHERE 1=1
+           AND SB.FG_DEL = 'N'
+		  <if test="ID_BOARD != null and ID_BOARD != ''">
+		      AND UPPER(SB.ID_BOARD) = UPPER(#{ID_BOARD})
+		  </if>
+		  <if test="DS_TITLE != null and DS_TITLE != ''">
+		      AND UPPER(SB.DS_TITLE) LIKE '%' + UPPER(#{DS_TITLE}) + '%'
+		  </if>
+		 ORDER BY SB.ID_BOARD ASC
+	</sql>
+	
+	<!-- 게시판 목록 조회 -->
+	<select id="getList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- 게시판 목록 조회 - count -->
+	<select id="getList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- 게시판 목록 조회 - paging -->
+	<select id="getList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		QueryId     : BoardManage.boardClone
+		Description : 게시판을 복제한다.
+	 -->
+	<insert id="boardClone" parameterType="map">
+	    INSERT INTO SYS_BOARD(
+	    	   ID_BOARD
+	    	 , DS_TITLE
+	    	 , CD_CATEGORY
+	    	 , TP_PARTITION
+	    	 , FG_AUTH_ACTIVE
+	    	 , FG_USE
+	    	 , FG_DEL
+	    	 , DT_REG
+	    	 , ID_REG_EMP
+	    	 , DT_UPT
+	    	 , ID_UPT_EMP
+	    )
+	    SELECT #{NEW_ID_BOARD} AS ID_BOARD
+	         , DS_TITLE + ' - 복사본'
+	         , CD_CATEGORY
+	         , TP_PARTITION
+	         , FG_AUTH_ACTIVE
+	         , FG_USE
+	         , FG_DEL
+	         , GETDATE()
+	         , #{user.id}
+	         , GETDATE()
+	         , #{user.id}
+	      FROM SYS_BOARD
+	     WHERE ID_BOARD = #{ID_BOARD}
+	</insert>
+	
+	<!--
+		QueryId     : BoardManage.boardTypeClone
+		Description : 게시판 유형을 복제한다.
+	 -->
+	<insert id="boardTypeClone" parameterType="map">
+	    INSERT INTO SYS_BOARD_TYPE(
+	    	   ID_BOARD
+	    	 , ID_BOARD_TYPE
+	    	 , FG_DATA_ITEM
+	    	 , FG_DATA_ITEM_NEW
+	    	 , FG_DATA_ITEM_FILE
+	    	 , FG_DATA_ITEM_REPLY
+	    	 , FG_NOTICE
+	    	 , CNT_NOTICE
+	    	 , FG_FILE
+	    	 , DS_FILE_EXTENSION
+	    	 , DS_FILE_VOLUME
+	    	 , CNT_MAX_FILE
+	    	 , FG_REPLY
+	    	 , FG_ANSWER
+	    	 , FG_PRE_NEXT
+	    	 , FG_GOOD_BAD
+<!-- 	    	 , FG_EXCEL_DOWN -->
+<!-- 	    	 , FG_TEXT_EDITOR -->
+	    	 , FG_INQUIRY_HISTORY
+	    	 , DT_REG
+	    	 , ID_REG_EMP
+	    	 , DT_UPT
+	    	 , ID_UPT_EMP
+	    )
+	    SELECT #{NEW_ID_BOARD}
+	    	 , ID_BOARD_TYPE
+	    	 , FG_DATA_ITEM
+	    	 , FG_DATA_ITEM_NEW
+	    	 , FG_DATA_ITEM_FILE
+	    	 , FG_DATA_ITEM_REPLY
+	    	 , FG_NOTICE
+	    	 , CNT_NOTICE
+	    	 , FG_FILE
+	    	 , DS_FILE_EXTENSION
+	    	 , DS_FILE_VOLUME
+	    	 , CNT_MAX_FILE
+	    	 , FG_REPLY
+	    	 , FG_ANSWER
+	    	 , FG_PRE_NEXT
+	    	 , FG_GOOD_BAD
+<!-- 	    	 , FG_EXCEL_DOWN -->
+<!-- 	    	 , FG_TEXT_EDITOR -->
+	    	 , FG_INQUIRY_HISTORY
+	    	 , GETDATE()
+	    	 , #{user.id}
+	    	 , GETDATE()
+	    	 , #{user.id}
+	      FROM SYS_BOARD_TYPE WITH (NOLOCK)
+	     WHERE ID_BOARD = #{ID_BOARD}
+	</insert>
+	
+	<insert id="boardAdminClone" parameterType="map">
+	    INSERT INTO SYS_BOARD_ADMIN(
+	    	   ID_BOARD
+	    	 , ADMIN_TYPE
+	    	 , ADMIN_VALUE
+	    	 , DT_REG
+	    	 , ID_REG_EMP
+	    	 , DT_UPT
+	    	 , ID_UPT_EMP
+	    )
+	    SELECT #{NEW_ID_BOARD}
+	         , ADMIN_TYPE
+	         , ADMIN_VALUE
+	         , GETDATE()
+	         , #{user.id}
+	         , GETDATE()
+	         , #{user.id}
+	      FROM SYS_BOARD_ADMIN
+	     WHERE ID_BOARD = #{ID_BOARD}
+	</insert>
+	
+	<!--
+		QueryId     : BoardManage.regist
+		Description : 게시판을 신규 등록한다.
+	 -->
+	<insert id="regist" parameterType="map">
+	    INSERT INTO SYS_BOARD(
+	    	   ID_BOARD
+	    	 , DS_TITLE
+	    	 , CD_CATEGORY
+	    	 , TP_PARTITION
+	    	 , FG_AUTH_ACTIVE
+	    	 , FG_USE
+	    	 , FG_DEL
+	    	 , DT_REG
+	    	 , ID_REG_EMP
+	    	 , DT_UPT
+	    	 , ID_UPT_EMP
+	    )VALUES(
+	    	   #{ID_BOARD}
+	    	 , #{DS_TITLE}
+	    	 , #{CD_CATEGORY}
+	    	 , #{TP_PARTITION}
+	    	 , 'N'
+	    	 , 'A'
+	    	 , 'N'
+	    	 , GETDATE()
+	    	 , #{user.id}
+	    	 , GETDATE()
+	    	 , #{user.id} 
+	    )
+	</insert>
+	
+	<!--
+		QueryId     : BoardManage.registType
+		Description : 게시판유형을 신규 등록한다.
+	 -->
+	<insert id="registType" parameterType="map">
+	    INSERT INTO SYS_BOARD_TYPE(
+	    	   ID_BOARD
+	    	 , ID_BOARD_TYPE
+	    	 , FG_DATA_ITEM
+	    	 , FG_DATA_ITEM_NEW
+	    	 , FG_DATA_ITEM_FILE
+	    	 , FG_DATA_ITEM_REPLY
+	    	 , FG_NOTICE
+	    	 , CNT_NOTICE
+	    	 , FG_FILE
+	    	 , DS_FILE_EXTENSION
+	    	 , DS_FILE_VOLUME
+	    	 , CNT_MAX_FILE
+	    	 , FG_REPLY
+	    	 , FG_ANSWER
+	    	 , FG_PRE_NEXT
+	    	 , FG_GOOD_BAD
+<!-- 	    	 , FG_EXCEL_DOWN -->
+<!-- 	    	 , FG_TEXT_EDITOR -->
+	    	 , FG_INQUIRY_HISTORY
+	    	 , DT_REG
+	    	 , ID_REG_EMP
+	    	 , DT_UPT
+	    	 , ID_UPT_EMP
+	    )VALUES(
+	    	   #{ID_BOARD}
+	    	 , #{ID_BOARD_TYPE}
+	    	 , 'Y'
+	    	 , 'Y'
+	    	 , 'Y'
+	    	 , 'Y'
+	    	 , 'Y'
+	    	 , '3'
+	    	 , 'Y'
+	    	 , NULL
+	    	 , NULL
+	    	 , NULL
+	    	 , 'Y'
+	    	 , 'Y'
+	    	 , 'Y'
+	    	 , 'Y'
+<!-- 	    	 , 'Y' -->
+<!-- 	    	 , 'Y' -->
+	    	 , 'N'
+	    	 , GETDATE()
+	    	 , #{user.id}
+	    	 , GETDATE()
+	    	 , #{user.id}
+	    )
+	</insert>
+	
+	<!--
+		QueryId     : BoardManage.registSequence
+		Description : 게시판의 시퀀스를 등록한다.
+	 -->
+	<insert id="registSequence" parameterType="map">
+    	<selectKey keyProperty="SEQ_ID" resultType="String" order="BEFORE">
+            SELECT #{SEQ_ID}
+		</selectKey>
+	    INSERT INTO SYS_SEQUENCE(
+	    	   SEQ_ID
+	    	 , SEQ_NM
+	    	 , CURR_VAL
+	    	 , MIN_VAL
+	    	 , MAX_VAL
+	    	 , LOOP_YN
+	    	 , UPD_DT
+	    )VALUES(
+	    	   #{SEQ_ID}
+	    	 , #{SEQ_ID}
+	    	 , 0
+	    	 , 0
+	    	 , 999999999999
+	    	 , 'N'
+	    	 , GETDATE()
+	    )
+	</insert>
+	
+	<!--
+		QueryId     : BoardManage.getDetail
+		Description : 게시판 상세를 조회한다
+	 -->
+	<select id="getDetail" parameterType="map" resultType="lmap">
+	    SELECT SB.ID_BOARD        AS ID_BOARD
+             , SBT.ID_BOARD_TYPE  AS ID_BOARD_TYPE
+             , SB.DS_TITLE        AS DS_TITLE
+             , SB.CD_CATEGORY     AS CD_CATEGORY
+             , SB.TP_PARTITION	  AS TP_PARTITION
+             , SB.FG_AUTH_ACTIVE  AS FG_AUTH_ACTIVE
+             , SB.FG_USE		  AS FG_USE
+             , SB.DT_REG    	  AS REG_DATETIME
+             , SB.ID_REG_EMP      AS REG_USER_ID
+             , SU.USER_NM         AS REG_USER_NM
+             , SB.DT_UPT    	  AS UPD_DATETIME
+             , SB.ID_UPT_EMP      AS UPD_USER_ID
+             , SUU.USER_NM        AS UPD_USER_NM
+          FROM SYS_BOARD SB
+          LEFT OUTER JOIN SYS_BOARD_TYPE SBT WITH (NOLOCK)
+            ON SB.ID_BOARD = SBT.ID_BOARD
+          LEFT OUTER JOIN SYS_USER SU WITH (NOLOCK)
+            ON SB.ID_REG_EMP = SU.USER_ID
+          LEFT OUTER JOIN SYS_USER SUU WITH (NOLOCK)
+            ON SB.ID_UPT_EMP = SUU.USER_ID
+		 WHERE SB.ID_BOARD = #{ID_BOARD}
+	</select>
+	
+	<select id="getTypeDetail" parameterType="map" resultType="lmap">
+	    SELECT ID_BOARD
+	    	 , ID_BOARD_TYPE
+	    	 , FG_DATA_ITEM
+	    	 , FG_DATA_ITEM_NEW
+	    	 , FG_DATA_ITEM_FILE
+	    	 , FG_DATA_ITEM_REPLY
+	    	 , FG_NOTICE
+	    	 , CNT_NOTICE
+	    	 , FG_FILE
+	    	 , DS_FILE_EXTENSION
+	    	 , DS_FILE_VOLUME
+	    	 , CNT_MAX_FILE
+	    	 , FG_REPLY
+	    	 , FG_ANSWER
+	    	 , FG_PRE_NEXT
+	    	 , FG_GOOD_BAD
+<!-- 	    	 , FG_EXCEL_DOWN -->
+<!-- 	    	 , FG_TEXT_EDITOR -->
+	    	 , FG_INQUIRY_HISTORY
+	    	 , DT_REG		AS REG_DATETIME
+	    	 , ID_REG_EMP	AS REG_USER_ID
+	    	 , DT_UPT		AS UPD_DATETIME
+	    	 , ID_UPT_EMP	AS UPD_USER_ID
+	      FROM SYS_BOARD_TYPE WITH (NOLOCK)
+	     WHERE ID_BOARD = #{ID_BOARD} 
+	</select>
+	
+	<!--
+		QueryId     : BoardManage.modify
+		Description : 게시판 상세정보를 수정한다.
+	 -->
+	<update id="modify" parameterType="map">
+	    UPDATE SYS_BOARD SET
+		       DS_TITLE = #{DS_TITLE}
+		     , CD_CATEGORY   = #{CD_CATEGORY}
+		     , TP_PARTITION  = #{TP_PARTITION}
+		     , FG_USE = #{FG_USE}
+		     , DT_UPT = GETDATE()
+		     , ID_UPT_EMP = #{user.id}
+		 WHERE ID_BOARD = #{ID_BOARD}
+	</update>
+	
+	<!--
+		QueryId     : BoardManage.remove
+		Description : 게시판을 삭제처리한다.
+	 -->
+	<update id="remove" parameterType="map">
+	    UPDATE SYS_BOARD SET
+	           FG_DEL = 'Y'
+	     WHERE ID_BOARD = #{ID_BOARD}
+	</update>
+	
+	<!--
+		QueryId     : BoardManage.removeType
+		Description : 게시판 유형정보를 삭제한다.
+	 -->
+	<delete id="removeType" parameterType="map">
+	    DELETE
+	      FROM SYS_BOARD_TYPE
+	     WHERE ID_BOARD = #{ID_BOARD}
+	</delete>
+	
+	<!--
+		QueryId     : BoardManage.removeAdminAll
+		Description : 게시판 관리자정보를 전체 삭제한다.
+	 -->
+	<delete id="removeAdminAll" parameterType="map">
+	    DELETE
+	      FROM SYS_BOARD_ADMIN
+	     WHERE ID_BOARD = #{ID_BOARD}
+	</delete>
+	
+	<!--
+		QueryId     : BoardManage.modifyType
+		Description : 게시판 유형정보를 수정한다.
+	 -->
+	<update id="modifyType" parameterType="map">
+	    UPDATE SYS_BOARD_TYPE SET
+	           ID_BOARD_TYPE 		= #{ID_BOARD_TYPE}
+	         , FG_DATA_ITEM 		= #{FG_DATA_ITEM}
+	         , FG_DATA_ITEM_NEW		= #{FG_DATA_ITEM_NEW}
+	         , FG_DATA_ITEM_FILE 	= #{FG_DATA_ITEM_FILE}
+	         , FG_DATA_ITEM_REPLY 	= #{FG_DATA_ITEM_REPLY}
+	         , FG_NOTICE 			= #{FG_NOTICE}
+	         , CNT_NOTICE 			= #{CNT_NOTICE}
+	         , FG_FILE 				= #{FG_FILE}
+	         , DS_FILE_EXTENSION 	= #{DS_FILE_EXTENSION}
+	         , DS_FILE_VOLUME 		= #{DS_FILE_VOLUME}
+	         , CNT_MAX_FILE			= #{CNT_MAX_FILE}
+	         , FG_REPLY 			= #{FG_REPLY}
+	         , FG_ANSWER 			= #{FG_ANSWER}
+	         , FG_PRE_NEXT 			= #{FG_PRE_NEXT}
+	         , FG_GOOD_BAD 			= #{FG_GOOD_BAD}
+<!-- 	         , FG_EXCEL_DOWN 		= #{FG_EXCEL_DOWN} -->
+<!-- 	         , FG_TEXT_EDITOR 		= #{FG_TEXT_EDITOR} -->
+	         , FG_INQUIRY_HISTORY	= #{FG_INQUIRY_HISTORY}
+	         , DT_UPT 		= GETDATE()
+	         , ID_UPT_EMP 			= #{user.id}
+	     WHERE ID_BOARD = #{ID_BOARD}
+	</update>
+	
+	<sql id="getAdminList_base">
+	    SELECT TOP 100 PERCENT
+			   ROW_NUMBER () OVER (ORDER BY SBA.DT_REG DESC) AS rownum
+	         , SBA.ADMIN_TYPE
+		     , SC.CODE_NAME  AS ADMIN_TYPE_NM
+		     , SBA.ADMIN_VALUE
+<!-- 		     , DECODE(SBA.ADMIN_TYPE, 'U', (SELECT USER_NM FROM SYS_USER WHERE USER_ID = SBA.ADMIN_VALUE)
+		                            , 'R', (SELECT ROLE_NAME FROM AP_ROLE WHERE ROLE_ID = SBA.ADMIN_VALUE)
+		             ) 			AS ADMIN_VALUE_NM -->
+			 , CASE WHEN SBA.ADMIN_TYPE = 'U' THEN (SELECT USER_NM FROM SYS_USER WHERE USER_ID = SBA.ADMIN_VALUE)
+				    WHEN SBA.ADMIN_TYPE = 'R' THEN (SELECT ROLE_NAME FROM AP_ROLE WHERE ROLE_ID = SBA.ADMIN_VALUE)
+			   END AS ADMIN_VALUE_NM		             
+		     , SBA.DT_REG		AS REG_DATETIME
+		     , SBA.ID_REG_EMP	AS REG_USER_ID
+		     , SU.USER_NM 		AS REG_USER_NM
+		  FROM SYS_BOARD_ADMIN SBA WITH (NOLOCK)
+		  LEFT OUTER JOIN SYS_CODE SC WITH (NOLOCK)
+		    ON SBA.ADMIN_TYPE = SC.CODE AND SC.CODE_CATEGORY_ID ='BOARD_ADMIN_TYPE'
+		  LEFT OUTER JOIN SYS_USER SU WITH (NOLOCK)
+		    ON SBA.ID_REG_EMP = SU.USER_ID
+		 WHERE ID_BOARD = #{ID_BOARD}
+	</sql>
+	
+	<!-- 관리자 목록 조회 -->
+	<select id="getAdminList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getAdminList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- 관리자 목록 조회 - count -->
+	<select id="getAdminList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getAdminList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- 관리자 목록 조회 - paging -->
+	<select id="getAdminList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getAdminList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		QueryId     : BoardManage.registAdmin
+		Description : 게시판 관리자정보를 등록한다.
+	 -->
+	<insert id="registAdmin" parameterType="map">
+	    INSERT INTO SYS_BOARD_ADMIN(
+	    	   ID_BOARD
+	    	 , ADMIN_TYPE
+	    	 , ADMIN_VALUE
+	    	 , DT_REG
+	    	 , ID_REG_EMP
+	    	 , DT_UPT
+	    	 , ID_UPT_EMP
+	    ) VALUES (
+	    	   #{ID_BOARD}
+	    	 , #{ADMIN_TYPE}
+	    	 , #{ADMIN_VALUE}
+	    	 , GETDATE()
+	    	 , #{user.id}
+	    	 , GETDATE()
+	    	 , #{user.id}
+	    )
+	</insert>
+	
+	<!--
+		QueryId     : BoardManage.removeAdmin
+		Description : 게시판 관리자정보를 삭.제.한.다.
+	 -->
+	<delete id="removeAdmin" parameterType="map">
+	    DELETE 
+	      FROM SYS_BOARD_ADMIN
+	     WHERE ID_BOARD = #{ID_BOARD}
+	       AND ADMIN_VALUE = #{ADMIN_VALUE}
+	</delete>
+
+	<!--
+		QueryId     : BoardManage.updateBoardAuthActive
+		Description : 게시판 권한 활성화여부를 수정한다.
+	 -->
+	<update id="updateBoardAuthActive" parameterType="map">
+	    UPDATE SYS_BOARD
+	       SET FG_AUTH_ACTIVE = #{FG_AUTH_ACTIVE}
+	     WHERE ID_BOARD = #{ID_BOARD}
+	</update>
+	
+	<sql id="getBoardAuthList_base">
+	    SELECT SBA.ID_ROLE  AS ID_ROLE
+	         , AR.ROLE_NAME AS NM_ROLE
+	      FROM SYS_BOARD_AUTH SBA WITH (NOLOCK)
+	      LEFT OUTER JOIN AP_ROLE AR WITH (NOLOCK)
+	        ON SBA.ID_ROLE = AR.ROLE_ID
+	     WHERE ID_BOARD = #{ID_BOARD}
+	</sql>
+	
+	<!-- 게시판권한 목록 조회 -->
+	<select id="getBoardAuthList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getBoardAuthList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- 게시판권한 목록 조회 - count -->
+	<select id="getBoardAuthList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getBoardAuthList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- 게시판권한 목록 조회 - paging -->
+	<select id="getBoardAuthList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getBoardAuthList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		QueryId     : BoardManage.registRole
+		Description : 게시판 권한정보를 등록한다.
+	 -->
+	<insert id="registRole" parameterType="map">
+	    INSERT INTO SYS_BOARD_AUTH(
+	    	   ID_BOARD
+	    	 , ID_ROLE
+	    	 , DT_REG
+	    	 , ID_REG_EMP
+	    	 , DT_UPT
+	    	 , ID_UPT_EMP
+	    ) VALUES (
+	    	   #{ID_BOARD}
+	    	 , #{ID_ROLE}
+	    	 , GETDATE()
+	    	 , #{user.id}
+	    	 , GETDATE()
+	    	 , #{user.id}
+	    )
+	</insert>
+	
+	<!--
+		QueryId     : BoardManage.removeRole
+		Description : 게시판 권한정보를 삭제한다.
+	 -->
+	<delete id="removeRole" parameterType="map">
+	    DELETE 
+	      FROM SYS_BOARD_AUTH
+	     WHERE ID_BOARD = #{ID_BOARD}
+	       AND ID_ROLE = #{ID_ROLE}
+	</delete>
+	
+	<select id="getMessageInfo" parameterType="map" resultType="lmap">
+	    SELECT TP_MESSAGE
+		     , DS_MESSAGE
+		     , FG_USE 
+		  FROM SYS_BOARD_MESSAGE_INFO WITH (NOLOCK)
+		 WHERE ID_BOARD = #{ID_BOARD}
+
+	</select>
+	
+	<insert id="registMessageInfo" parameterType="map">
+	    INSERT INTO SYS_BOARD_MESSAGE_INFO(
+	    	   ID_BOARD
+	    	 , TP_MESSAGE
+	    	 , DS_MESSAGE
+	    	 , FG_USE
+	    	 , DT_REG
+	    	 , ID_REG_EMP
+	    	 , DT_UPT
+	    	 , ID_UPT_EMP
+	    )VALUES(
+	    	   #{ID_BOARD}
+	    	 , #{TP_MESSAGE}
+	    	 , #{DS_MESSAGE}
+	    	 , #{FG_USE}
+	    	 , GETDATE()
+	    	 , #{user.id}
+	    	 , GETDATE()
+	    	 , #{user.id}
+	    )
+	</insert>
+	
+	<delete id="removeMessageInfo" parameterType="map">
+	    DELETE
+	      FROM SYS_BOARD_MESSAGE_INFO
+	     WHERE ID_BOARD = #{ID_BOARD}
+	</delete>
+	
+</mapper>

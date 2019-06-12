@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="Message">
+	
+	<!--
+		Query id    : Message.insert
+		Description : 메세지 정보 등록
+	-->
+	<insert id="insert" parameterType="map">
+		<selectKey keyProperty="ID_DISPATCH_RUN" resultType="String" order="BEFORE">
+			SELECT SEQ_TBS_DISPATCH_RUN.NEXTVAL FROM DUAL
+		</selectKey>
+			
+								
+		insert into TBS_DISPATCH_RUN (
+			  ID_DISPATCH_RUN
+			, TP_BIZ
+			, ID_BIZ_KEY
+			, TP_DISPATCH_METHOD
+			, ID_EMP_DISPATCH
+			, ID_DEPT_DISPATCH
+			, DS_EMAIL_SEND
+			, ID_PHONE_SEND
+			, DS_TITLE_DISPATCH
+			, DS_CONTENT
+			, DS_DISPATCH
+			, DT_DISPATCH_OCCUR
+			, DT_DISPATCH_PLAN
+			, DS_URL
+			, FG_DEL
+			, TP_STATUS_DISPATCH
+			, TP_DISPATCH_AUTO
+			, ID_EMP_REG
+			, ID_DEPT_REG
+			, DT_REG
+			, ID_EMP_UPT
+			, ID_DEPT_UPT
+			, DT_UPT
+			, CD_DISPATCH_BIZ
+		)
+		VALUES (
+			  #{ID_DISPATCH_RUN}
+			, '01'  
+			, CASE 
+				WHEN #{workCategory} = 'VOC' THEN REPLACE(#{workKeys}, '|', '')  
+				WHEN #{workCategory} = 'REQUEST' THEN (SELECT ID_VOC || ID_SUB_VOC FROM TBS_VOC_REQUEST WHERE SEQ_VOC_REQ=#{workKeys} AND ROWNUM=1)
+				WHEN #{workCategory} = 'APPLY' THEN (SELECT ID_VOC || ID_SUB_VOC FROM TBS_VOC_APPLY WHERE SEQ_VOC_APPL=#{workKeys} AND ROWNUM=1)
+				ELSE #{workKeys}
+			  END	
+			, #{channelType}
+			, #{sender.employeeId}
+			, #{sender.departmentId}
+			, #{sender.email}
+			, #{sender.phoneNumber}
+			, #{title}
+			, #{message}
+			, #{dsDispatch}
+			, #{occuredDate}
+			, #{planDate}
+			, #{url}
+			, 'N'
+			, 'S0'
+			, '01'
+			, #{user.id}
+			, #{user.partCode}
+			, SYSDATE
+			, #{user.id}
+			, #{user.partCode}
+			, SYSDATE
+			, #{cdDispatchBiz}
+		)
+	</insert>
+	
+	<!--
+		Query id    : Message.insertTarget
+		Description : 메세지 대상자 Rule 등록
+	-->
+	<insert id="insertTarget" parameterType="map">
+	
+		<selectKey keyProperty="ID_DISPATCH_RUN_TARGET" resultType="String" order="BEFORE">
+			SELECT SEQ_TBS_DISPATCH_RUN_TARGET.NEXTVAL FROM DUAL
+		</selectKey>
+				
+		insert into TBS_DISPATCH_RUN_TARGET (
+			  ID_DISPATCH_RUN_TARGET
+			, ID_DISPATCH_RUN
+			, TP_DISPATCH_TARGET
+			, ID_CUST_DISPATCH
+			, ID_EMP_DISPATCH_TARGET
+			, ID_DEPT_DISPATCH_TARGET
+			, DS_EMAIL_RECV
+			, ID_PHONE_RECV
+			, ID_EMP_REG
+			, ID_DEPT_REG
+			, DT_REG
+			, ID_EMP_UPT
+			, ID_DEPT_UPT
+			, DT_UPT
+			, NM_PARTNER
+		)
+		VALUES (
+			  #{ID_DISPATCH_RUN_TARGET}
+			, #{messageId}
+			, #{recipientType}
+			, #{customerId}
+			, #{employeeId}
+			, #{departmentId}
+			, #{email}
+			, #{phoneNumber}
+			, #{user.id}
+			, #{user.partCode}
+			, SYSDATE
+			, #{user.id}
+			, #{user.partCode}
+			, SYSDATE
+			, #{nmPartner}
+		)
+	</insert>
+
+	<!--
+		메세지 Rule 목록 조회 
+	 -->
+	<select id="getRuleList" parameterType="map" resultType="lmap">
+		select M.ID_MESSAGE_RULE
+		     , M.TP_BIZ
+		     , M.TP_EVENT
+		     , M.TP_DISPATCH_METHOD
+		     , M.DS_DESC
+		     , ST.DS_TITLE DS_TITLE_MESSAGE
+		     , ST.DS_CONTENT
+		     , M.DS_URL
+		     , M.ID_TEMPLATE
+		     , M.TP_MESSAGE_SENDER
+		     , M.ID_EMP_SEND
+		     , M.TP_MESSAGE_TARGET
+		     , M.ID_EMP_TARGET
+		     , M.ID_ROLE_TARGET
+		     , M.ID_DEPT_TARGET
+		     , M.DS_CONDITION1
+		     , M.DS_CONDITION2
+		     , M.DS_CONDITION3
+		     , M.DS_CONDITION4
+		     , M.DS_CONDITION5
+		     , M.DS_CONDITION6
+		     , M.FG_USE
+		     , M.FG_DEL
+		     , M.ID_EMP_REG
+		     , M.ID_DEPT_REG
+		     , M.DT_REG
+		     , M.ID_EMP_UPD
+		     , M.ID_DEPT_UPD
+		     , M.DT_UPD
+		     , M.CD_DISPATCH_BIZ
+		  from TBS_MESSAGE_RULE M
+		     , SYS_TEMPLATE ST
+		 where M.FG_DEL = 'N'
+		   AND M.ID_MESSAGE_RULE = ST.CD_NOTIFICATION(+)
+	  	<if test="TP_BIZ != null and TP_BIZ !=''">
+	  	   and M.TP_BIZ = #{TP_BIZ}
+		</if>
+	  	<if test="TP_EVENT != null and TP_EVENT !=''">
+	  	   and M.TP_EVENT = #{TP_EVENT}
+		</if>
+	  	<if test="FG_USE != null and FG_USE !=''">
+	  	   and M.FG_USE = #{FG_USE}
+		</if>
+	  	<if test="TP_DISPATCH_METHOD != null and TP_DISPATCH_METHOD !=''">
+	  	   and M.TP_DISPATCH_METHOD = #{TP_DISPATCH_METHOD}
+		</if>
+	  	<if test="DS_TITLE_MESSAGE != null and DS_TITLE_MESSAGE !=''">
+	  	   and M.DS_TITLE_MESSAGE LIKE '%'|| #{DS_TITLE_MESSAGE} ||'%'
+		</if>
+		<if test="ORDER_COLUMN == ''">ORDER BY M.TP_BIZ, M.TP_EVENT, M.TP_MESSAGE_TARGET DESC</if>
+	</select>
+	
+	<!--
+		메세지 Rule 목록 조회 
+	 -->
+	<sql id="getMessageRuleList_base">
+		select M.ID_MESSAGE_RULE
+		     , M.TP_BIZ
+		     , M.TP_EVENT
+		     , M.TP_DISPATCH_METHOD
+		     , M.DS_DESC
+		     , M.DS_TITLE_MESSAGE
+		     , M.DS_CONTENT
+		     , M.DS_URL
+		     , M.ID_TEMPLATE
+		     , M.TP_MESSAGE_SENDER
+		     , M.ID_EMP_SEND
+		     , M.TP_MESSAGE_TARGET
+		     , M.ID_EMP_TARGET
+		     , M.ID_ROLE_TARGET
+		     , M.ID_DEPT_TARGET
+		     , M.DS_CONDITION1
+		     , M.DS_CONDITION2
+		     , M.DS_CONDITION3
+		     , M.DS_CONDITION4
+		     , M.DS_CONDITION5
+		     , M.DS_CONDITION6
+		     , M.FG_USE
+		     , M.FG_DEL
+		     , M.ID_EMP_REG
+		     , M.ID_DEPT_REG
+		     , M.DT_REG
+		     , M.ID_EMP_UPD
+		     , M.ID_DEPT_UPD
+		     , M.DT_UPD
+		  from TBS_MESSAGE_RULE M
+		 where M.FG_DEL = 'N'
+	  	<if test="TP_BIZ != null and TP_BIZ !=''">
+	  	   and M.TP_BIZ = #{TP_BIZ}
+		</if>
+	  	<if test="TP_EVENT != null and TP_EVENT !=''">
+	  	   and M.TP_EVENT = #{TP_EVENT}
+		</if>
+	  	<if test="FG_USE != null and FG_USE !=''">
+	  	   and M.FG_USE = #{FG_USE}
+		</if>
+	  	<if test="TP_DISPATCH_METHOD != null and TP_DISPATCH_METHOD !=''">
+	  	   and M.TP_DISPATCH_METHOD = #{TP_DISPATCH_METHOD}
+		</if>
+	  	<if test="DS_TITLE_MESSAGE != null and DS_TITLE_MESSAGE !=''">
+	  	   and M.DS_TITLE_MESSAGE LIKE '%'|| #{DS_TITLE_MESSAGE} ||'%'
+		</if>
+		   ORDER BY 1 DESC
+	</sql>
+	
+	<!-- 메세지 Rule 목록 조회  -->
+	<select id="getMessageRuleList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top"/>
+		<include refid="getMessageRuleList_base"/>
+		<include refid="common.order-bottom"/>
+	</select>
+	
+	<!-- 메세지 Rule 목록 조회 count -->	
+	<select id="getMessageRuleList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top"/>
+		<include refid="getMessageRuleList_base"/>
+		<include refid="common.count-bottom"/>
+	</select>
+	
+	<!-- 메세지 Rule 목록 조회 paging -->	
+	<select id="getMessageRuleList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top"/>
+		<include refid="getMessageRuleList_base"/>
+		<include refid="common.paging-bottom"/>
+	</select>
+
+</mapper>

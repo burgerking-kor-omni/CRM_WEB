@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="UBD0001" screenType="list" screenLayoutType="Popup" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>UB-Board 게시물 조회로그 조회 팝업</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/ubd/</filePath>
+  <fileName>UBD0001</fileName>
+  <functions>
+    <function id="FNCUBD0020" isStartFunction="false" functionName="게시물 조회로그 목록 조회 호출" serviceId="SVCUBD0020" alias="INQUIRY"/>
+  </functions>
+  <defaultParameters/>
+</screenBuilder>

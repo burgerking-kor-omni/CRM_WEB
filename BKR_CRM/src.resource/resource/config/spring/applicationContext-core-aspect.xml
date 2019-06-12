@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+	<!--
+	================================================================================
+	AOP 관련 Configuration
+	================================================================================
+	-->
+	<!-- Annotation 기반 AspectJ 사용 선언-->
+	<aop:aspectj-autoproxy proxy-target-class="true"/>
+
+	<!-- Custom Service 실행 정보 Profiler -->
+	<bean id="customComponentProfiler" class="com.ubone.framework.aspects.CustomComponentProfiler"
+		p:isEnabled="${framework.service.profilerenabled}" />
+
+	<!-- 서비스 호출 이력 관리 -->
+	<bean id="serviceCallStack" class="com.ubone.framework.aspects.ServiceCallStack" />
+
+	<!-- 서비스 logging -->
+	<bean id="serviceLogger" class="com.ubone.framework.aspects.ServiceLoggerFilter" p:loggingLevel="${framework.service.logginglevel}" >
+		<property name="excludedUrlPatterns">
+			<list>
+				<value>/**/function/GRP0005/USERDEFINED1.ub</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 서비스 에러 처리 -->
+	<bean id="serviceExceptionHandler" class="com.ubone.framework.aspects.ServiceExceptionHandler"
+		p:serviceLoggingLevel="${framework.service.logginglevel}" />
+	
+	<!-- 서비스 보안 AOP -->
+	<bean id="serviceSecurity" class="com.ubone.framework.aspects.ServiceSecurity" />
+
+	<!-- 서비스 지원(페이징 지원 및 목록 검색 이력 저장 및 복구 처리) -->
+	<bean id="srviceSupport" class="com.ubone.framework.aspects.ServiceSupport" />
+
+	<!-- 서비스 코드 주입 AOP -->
+	<bean id="serviceCodeInjection" class="com.ubone.framework.aspects.ServiceCodeInjection" />
+
+	<!-- 서비스 이벤트 모니터링 -->
+	<bean id="serviceEventCatcher" class="com.ubone.framework.aspects.ServiceEventCatcher" />
+	
+	<!-- Data 조회범위 제한 -->
+	<!--
+		 forceApplySqlMapService - 서비스 호출 유형이 SqlMap 인 경우 Data 조회범위 제한 적용 여부를 설정
+	 -->
+	<bean id="dataAccessQualifier" class="com.ubone.framework.aspects.DataAccessQualifier"
+		p:forceApplySqlMapService="true" />
+
+	<!-- 화면 logging -->
+	<bean id="screenLogger" class="com.ubone.framework.aspects.ScreenLoggerFilter" p:loggingLevel="${framework.service.logginglevel}" >
+		<property name="excludedUrlPatterns">
+			<list>
+				<value>/**/GRP0005.ub</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 화면 보안 AOP -->
+	<bean id="screenSecurity" class="com.ubone.framework.aspects.ScreenSecurity" />
+	
+	<!-- 화면 기능 보안 AOP -->
+	<bean id="screenFunctionSecurity" class="com.ubone.framework.aspects.ScreenFunctionSecurity" />
+
+	<!-- Data 변환 처리 AOP -->
+	<bean id="dataConversion" class="com.ubone.framework.aspects.DataConversion">
+		<property name="maskConverters">
+			<list>
+				<ref bean="maskCustomConverter" />
+				<bean class="com.ubone.framework.data.mask.MaskReplaceConverter" />
+				<bean class="com.ubone.framework.data.mask.MaskRegExpConverter" />
+				<bean class="com.ubone.framework.data.mask.MaskFormatConverter" />
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 사용자데이터 변환기 설정 -->
+	<bean id="maskCustomConverter" class="com.ubone.framework.data.mask.MaskCustomConverter">
+		<property name="customConverters">
+			<list>
+				<bean class="com.ubone.standard.mask.CustomerInfoConverter"/>
+				<bean class="com.ubone.standard.mask.XSSDecodeConverter"/>
+			</list>
+		</property>
+	</bean>
+</beans>

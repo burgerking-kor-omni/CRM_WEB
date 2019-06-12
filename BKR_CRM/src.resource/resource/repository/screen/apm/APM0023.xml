@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="APM0023" screenType="list" screenLayoutType="Popup" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>APMD /  화면관리 목록 (팝업)</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0023</fileName>
+  <functions>
+    <function id="FNCAPM0001" isStartFunction="false" functionName="화면 목록 조회 호출" serviceId="SVCAPM0001" alias="INQUIRY"/>
+    <function id="FNCAPM0002" isStartFunction="false" functionName="Screen 목록 조회 함수 (AutoComplete) 호출" serviceId="SVCAPM0002" alias="USERDEFINED1"/>
+    <function id="FNCAPM0003" isStartFunction="true" functionName="화면관리 기본정보 조회(dummy) 호출" serviceId="SVCAPM0016" alias=""/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

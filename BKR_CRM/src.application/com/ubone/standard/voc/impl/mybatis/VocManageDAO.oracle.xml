@@ -1,0 +1,651 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="VocManage">
+	<!--
+		QueryId     : VocManage.getVocList
+		Description : VOC 목록 조회
+	 -->
+	<sql id="getVocList_base">
+		SELECT TVM.ID_VOC
+			 , TO_CHAR(DT_VOC_REG,'YYYY-MM-DD') AS DT_VOC_REG
+			 , TO_CHAR(DT_REG,'YYYY-MM-DD HH24:MI:SS') AS DT_REG
+			 , TVM.BIZ_CHNN
+			 , TVM.NM_CUST
+			 , TVM.DS_EMAIL
+			 , TVM.NO_PHONE
+			 , TVM.DS_TITLE
+			 , TVM.CD_ACT_CAUSE
+			 , TVM.CD_VOC_STATUS AS CD_STATUS
+			 , CASE WHEN SU.USER_NM IS NULL AND DT_VOC_ACT IS NOT NULL THEN '콜센터'
+			 		ELSE SU.USER_NM END  AS NM_ACT_EMP
+			 , TO_CHAR(TVM.DT_VOC_ACT, 'YYYY-MM-DD') AS DT_VOC_ACT
+             , CAUSE1.CODE_NAME ||' > '|| CAUSE2.CODE_NAME AS NM_VOC_CAUSE
+			 , TVM.FG_MEMBER
+			 , MST.STOR_NM AS NM_STORE
+		  FROM CRMADMIN.TBS_VOC_MASTER TVM
+		  LEFT OUTER JOIN CRMADMIN.SYS_USER SU
+		    ON SU.USER_ID = TVM.ID_ACT_EMP
+		  LEFT OUTER JOIN CRMADMIN.SYS_CODE CAUSE1
+		    ON CAUSE1.CODE = SUBSTR(TVM.CD_VOC_CAUSE,0,2)
+		   AND CAUSE1.CODE_CATEGORY_ID = 'CD_VOC_CAUSE_1'
+		  LEFT OUTER JOIN CRMADMIN.SYS_CODE CAUSE2
+		    ON CAUSE2.CODE = TVM.CD_VOC_CAUSE
+		   AND CAUSE2.CODE_CATEGORY_ID = 'CD_VOC_CAUSE_2'
+		  LEFT OUTER JOIN OMNI.OMNI_STOR_APP MST
+		    ON MST.STOR_CD = TVM.ID_STORE
+		   AND MST.CMP_CD = 'BKR'
+		   AND MST.SALES_ORG_CD = '1000'
+		   AND MST.STOR_STATUS = '1'
+		   AND SUBSTR(MST.STOR_CD, 4, 1) != 9
+		   AND TO_CHAR(SYSDATE, 'YYYYMMDD') >= MST.SALES_START_DATE 
+		 WHERE TVM.FG_DEL = 'N'
+		   AND TVM.CD_VOC_STATUS != '03'
+		  	<if test="CD_VOC_CAUSE_2 != null and CD_VOC_CAUSE_2 != ''">
+		  		AND TVM.CD_VOC_CAUSE = #{CD_VOC_CAUSE_2}
+		  	</if>
+		  	<if test="CD_VOC_CAUSE_1 != null and CD_VOC_CAUSE_1 != ''">
+		  		AND TVM.CD_VOC_CAUSE LIKE #{CD_VOC_CAUSE_1}||'%'
+		  	</if>
+			<if test="NM_MEMBER != null and NM_MEMBER != ''">
+				AND TVM.NM_CUST = #{NM_MEMBER}
+			</if>
+			<if test="NO_PHONE != null and NO_PHONE != ''">
+				AND TVM.NO_PHONE = #{NO_PHONE}
+			</if>
+			<if test="DS_EMAIL != null and DS_EMAIL != ''">
+				AND UPPER(TVM.DS_EMAIL) LIKE '%'|| UPPER(#{DS_EMAIL}) ||'%'
+			</if>
+			<if test="DS_TITLE != null and DS_TITLE != ''">
+				AND TVM.DS_TITLE LIKE '%'|| #{DS_TITLE} ||'%'
+			</if>
+			<if test="CD_BIZ_CHNN != null and CD_BIZ_CHNN != ''">
+				<choose>
+					<when test='BIZ_CHNN_SIZE == "1"'>
+						AND TVM.BIZ_CHNN = #{CD_BIZ_CHNN}
+					</when>
+					<otherwise>
+						AND TVM.BIZ_CHNN IN 
+						<foreach collection="CD_BIZ_CHNN" item="CD_CHNN" open="(" close=")" separator=",">
+					   		#{CD_CHNN}
+					   </foreach>
+					</otherwise>
+				</choose>
+			</if>
+			
+			<if test="CD_ACT_CAUSE != null and CD_ACT_CAUSE != ''">
+				AND TVM.CD_ACT_CAUSE = #{CD_ACT_CAUSE}
+			</if>
+			
+			<if test="DT_REG_START != null and DT_REG_START != ''">
+				AND TVM.DT_REG >= TO_DATE(#{DT_REG_START}||' 000000','YYYY-MM-DD HH24MISS')
+			</if>
+			<if test="DT_REG_END != null and DT_REG_END != ''">
+				AND TO_DATE(#{DT_REG_END}||' 235959','YYYY-MM-DD HH24MISS') >= TVM.DT_REG
+			</if>
+			
+			<if test="DT_ACT_START != null and DT_ACT_START != ''">
+				AND TVM.DT_VOC_ACT >= TO_DATE(#{DT_ACT_START}||' 000000','YYYY-MM-DD HH24MISS')
+			</if>
+			<if test="DT_ACT_END != null and DT_ACT_END != ''">
+				AND TO_DATE(#{DT_ACT_END}||' 235959','YYYY-MM-DD HH24MISS') >= TVM.DT_VOC_ACT
+			</if>
+			
+			<if test="CD_VOC_STATUS != null and CD_VOC_STATUS != ''">
+				AND TVM.CD_VOC_STATUS = #{CD_VOC_STATUS}
+			</if>
+			
+			<if test="ID_VOC != null and ID_VOC != ''">
+				AND TVM.ID_VOC LIKE UPPER('%'||#{ID_VOC}||'%')
+			</if>
+			
+			<if test="NM_STORE != null and NM_STORE != ''">
+				AND MST.STOR_NM LIKE '%'||#{NM_STORE}||'%'
+			</if>
+			<if test="ID_STORE != null and ID_STORE != ''">
+				AND TVM.ID_STORE = #{ID_STORE}
+			</if>
+			
+			<if test="NM_USER != null and NM_USER != ''">
+				AND SU.USER_NM LIKE '%'||#{NM_USER}||'%'
+			</if>
+			<if test="ID_USER != null and ID_USER != ''">
+				AND TVM.ID_ACT_EMP = #{ID_USER}
+			</if>
+			ORDER BY TVM.DT_REG DESC
+	</sql>
+	<!-- VOC 목록 조회 -->
+	<select id="getVocList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getVocList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- VOC 목록 조회 - count -->
+	<select id="getVocList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getVocList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- VOC 목록 조회 - paging -->
+	<select id="getVocList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getVocList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		QueryId     : VocManage.getVocDetail
+		Description : VOC 상세 조회
+	 -->
+	<select id="getVocDetail" parameterType="map" resultType="lmap">
+		SELECT TVM.ID_VOC
+             , TVM.BIZ_CHNN
+             , CHNN.CODE_NAME AS NM_CHNN
+             , TVM.ID_BIZ_KEY
+             , TVM.ORDER_NO
+             , TVM.ID_STORE
+             , MST.STOR_NM AS NM_STORE
+             , TVM.FG_MEMBER
+             , TVM.ID_MEMBER
+             , TVM.NM_CUST
+             , TVM.NO_PHONE
+             , TVM.DS_EMAIL
+             , TVM.YN_PRIVACY_AGREE
+             , TVM.YN_SENSITIVE_AGREE
+             , TVM.YN_PRIVACY_ORDER_AGREE
+             , TVM.YN_SENSITIVE_ORDER_AGREE
+             , TVM.CD_VOC_STATUS
+             , STAT.CODE_NAME AS NM_VOC_STATUS
+             , TVM.CD_ACT_CAUSE
+             , TVM.DS_ACT_CONT
+             , TO_CHAR(NVL(TVM.DT_VOC_ACT,SYSDATE), 'YYYY-MM-DD') AS DT_VOC_ACT
+             , TVM.ID_ACT_EMP
+             , NVL(USER_ACT.USER_NM, '콜센터' ) AS NM_ACT_EMP
+             , TVM.ID_ACT_DEPT
+             , SUBSTR(TVM.CD_VOC_CAUSE,0,2) AS CD_VOC_CAUSE_1
+             , TVM.CD_VOC_CAUSE AS CD_VOC_CAUSE_2
+             , TVM.DS_TITLE
+             , TVM.DS_CONT
+             , TVM.DS_DISPATCH_CONT
+             , TVM.FG_DEL
+             , TO_CHAR(TVM.DT_REG, 'YYYY-MM-DD HH24:MI:SS') AS DT_REG
+             , TVM.ID_REG_USER
+             , TO_CHAR(TVM.DT_UPT, 'YYYY-MM-DD') AS DT_UPT
+             , TVM.ID_UPT_USER
+             , TO_CHAR(TVM.DT_VOC_REG, 'YYYY-MM-DD') AS DT_VOC_REG
+             , TVM.PAYMENT_TYPE
+             , PAYTP.CODE_NAME AS NM_PAYMENT_TYPE
+             , TVM.PAYMENT_PRC
+             , TO_CHAR(TVM.DT_ORDER, 'YYYY-MM-DD HH24:MI:SS') AS DT_ORDER
+             , TVM.MENU_NM
+             , OMN.MENU_CD
+             , TVM.FG_SEND
+         FROM CRMADMIN.TBS_VOC_MASTER TVM
+         LEFT outer join (SELECT ORDER_NO,
+                       SUBSTR(
+                        XMLAGG(
+                            XMLELEMENT(A ,',', MENU_NM) ORDER BY ORDER_NO).EXTRACT('//text()').GETSTRINGVAL()
+                       , 2) AS MENU_NM,
+                       SUBSTR(
+                        XMLAGG(
+                            XMLELEMENT(A ,',', MENU_CD) ORDER BY ORDER_NO).EXTRACT('//text()').GETSTRINGVAL()
+                       , 2) AS MENU_CD
+                  FROM OMNI.OMNI_ORDER_MENU
+                 GROUP BY ORDER_NO) OMN
+            ON OMN.ORDER_NO = TVM.ORDER_NO
+         LEFT OUTER JOIN CRMADMIN.SYS_USER USER_ACT
+           ON USER_ACT.USER_ID = TVM.ID_ACT_EMP
+         LEFT OUTER JOIN CRMADMIN.SYS_USER USER_NOW
+           ON USER_NOW.USER_ID =  #{user.id}
+         LEFT OUTER JOIN CRMADMIN.SYS_CODE CHNN
+           ON CHNN.CODE = TVM.BIZ_CHNN
+          AND CHNN.CODE_CATEGORY_ID = 'CD_BIZ_CHNN'
+         LEFT OUTER JOIN OMNI.OMNI_STOR_APP MST
+           ON MST.STOR_CD = TVM.ID_STORE
+          AND MST.CMP_CD = 'BKR'
+          AND MST.SALES_ORG_CD = '1000'
+          AND MST.STOR_STATUS = '1'
+          AND SUBSTR(MST.STOR_CD, 4, 1) != '9'
+          AND TO_CHAR(SYSDATE, 'YYYYMMDD') >= MST.SALES_START_DATE 
+         LEFT OUTER JOIN CRMADMIN.SYS_CODE STAT
+		    ON STAT.CODE = TVM.CD_VOC_STATUS
+		   AND STAT.CODE_CATEGORY_ID = 'CD_VOC_STATUS'
+		 LEFT OUTER JOIN CRMADMIN.SYS_CODE PAYTP
+            ON PAYTP.CODE = TVM.PAYMENT_TYPE
+           AND PAYTP.CODE_CATEGORY_ID = 'PAYMENT_TYPE'
+		WHERE TVM.ID_VOC = #{ID_VOC}
+	</select>
+	
+	<!--
+		QueryId     : VocManage.getVocFileList
+		Description : VOC 상세 첨부파일 조회
+	 -->
+	<select id="getVocFileList" parameterType="map" resultType="lmap">
+		SELECT ID_VOC
+		     , FILE_NM
+		     , FILE_KEY
+		  FROM CRMADMIN.TBS_VOC_ATTACH
+		 WHERE ID_VOC = #{ID_VOC}
+	</select>
+	
+	<!--
+		QueryId     : VocManage.updateVocDetail
+		Description : VOC 상세 조회
+	 -->
+	<update id="updateVocDetail" parameterType="map">
+		UPDATE CRMADMIN.TBS_VOC_MASTER
+		   SET CD_VOC_CAUSE = #{CD_VOC_CAUSE_2}
+		   	 , CD_ACT_CAUSE = #{CD_ACT_CAUSE}
+		   	 , DS_ACT_CONT = #{DS_ACT_CONT}
+		   	 , DS_DISPATCH_CONT = #{DS_DISPATCH_CONT}
+		   	 , FG_SEND = #{FG_SEND}
+		 <if test='CD_VOC_STATUS == "02"'>
+		 	 , CD_VOC_STATUS = '02'
+		 	 , FG_ACT_CRM = 'Y'
+		   	 , DT_VOC_ACT = SYSDATE
+		   	 , ID_ACT_EMP = #{user.id}
+		 </if>
+		 WHERE ID_VOC = #{ID_VOC}
+	</update>
+	
+	<!--
+		QueryId     : VocManage.deleteVoc
+		Description : VOC 상세 삭제처리
+	 -->
+	<update id="deleteVoc" parameterType="map">
+		UPDATE CRMADMIN.TBS_VOC_MASTER
+		   SET FG_DEL = 'Y'
+		     , DT_UPT = SYSDATE
+		     , ID_UPT_USER = #{user.id}
+		 WHERE ID_VOC = #{ID_VOC}
+	</update>
+
+
+	<!--
+		QueryId     : VocManage.getOrderInfo
+		Description : VOC 정보조회
+	 -->
+	<select id="getOrderInfo" parameterType="map" resultType="lmap">
+		SELECT OM.ORDER_CHN
+			 , CHN.CODE_NAME AS NM_ORDER_CHN
+			 , OM.ID_MEMBER
+			 , TM.CD_STATUS
+             , OM.STOR_CD
+             , MS.STOR_NM
+             , TO_CHAR(OM.REG_DATE,'YYYY-MM-DD HH24:MI:SS') AS DT_ORDER
+             , OM.PAYMENT_TYPE
+             , PAYTP.CODE_NAME AS NM_PAYMENT_TYPE
+             , OMN.MENU_CD
+             , OM.ORDER_NM
+             , OM.PAYMENT_PRC
+             , CASE WHEN TM.NM_MEMBER IS NULL THEN 'N' ELSE 'Y' END AS YN_MEMBER
+             , NVL(TM.NM_MEMBER, OM.ORDER_MEMBER_NM) AS NM_MEMBER
+             , NVL(TM.NO_PHONE, ORDER_TELNO) AS NO_PHONE
+             , TM.DS_EMAIL
+             , TVM.YN_PRIVACY_AGREE         /*개인정보수집동의여부*/
+             , TVM.YN_SENSITIVE_AGREE         /*민감정보수집동의여부*/
+             , TVM.YN_PRIVACY_ORDER_AGREE     /*개인정보제3자제공동의여부*/
+             , TVM.YN_SENSITIVE_ORDER_AGREE    /*민감정보제3자제공동의여부*/
+             , OM.POS_ORDER_NO
+             , OM.CALL_ORDER_NO
+          FROM OMNI.OMNI_ORDER_MAIN OM
+          LEFT OUTER JOIN OMNI.OMNI_STOR_APP MS
+            ON OM.STOR_CD = MS.STOR_CD
+           AND MS.CMP_CD = 'BKR'
+           AND MS.SALES_ORG_CD = '1000'
+           AND MS.STOR_STATUS = '1'
+           AND SUBSTR(MS.STOR_CD, 4, 1) != '9'
+           AND TO_CHAR(SYSDATE, 'YYYYMMDD') >= MS.SALES_START_DATE 
+          LEFT outer join (SELECT ORDER_NO,
+                       SUBSTR(
+                        XMLAGG(
+                            XMLELEMENT(A ,',', MENU_NM) ORDER BY ORDER_NO).EXTRACT('//text()').GETSTRINGVAL()
+                       , 2) AS MENU_NM,
+                       SUBSTR(
+                        XMLAGG(
+                            XMLELEMENT(A ,',', MENU_CD) ORDER BY ORDER_NO).EXTRACT('//text()').GETSTRINGVAL()
+                       , 2) AS MENU_CD
+                  FROM OMNI.OMNI_ORDER_MENU
+                 GROUP BY ORDER_NO) OMN
+            ON OMN.ORDER_NO = OM.ORDER_NO
+          LEFT OUTER JOIN CRMADMIN.TBS_MEMBER TM
+            ON OM.ID_MEMBER = TM.ID_MEMBER
+          LEFT OUTER JOIN CRMADMIN.TBS_VOC_MASTER TVM
+            ON OM.ORDER_NO = TVM.ORDER_NO
+          LEFT OUTER JOIN CRMADMIN.SYS_CODE CHN
+            ON CHN.CODE = OM.ORDER_CHN
+           AND CHN.CODE_CATEGORY_ID = 'CD_BIZ_CHNN'
+          LEFT OUTER JOIN CRMADMIN.SYS_CODE PAYTP
+            ON PAYTP.CODE = OM.PAYMENT_TYPE
+           AND PAYTP.CODE_CATEGORY_ID = 'PAYMENT_TYPE'
+		 WHERE OM.ORDER_NO = #{ORDER_NO}
+		
+	</select>
+	
+	<!--
+		QueryId     : VocManage.getVocAutoComplete
+		Description : VOC유형 자동완성
+	 -->
+	<select id="getVocAutoComplete" parameterType="map" resultType="lmap">
+		SELECT CAUSE1.CODE AS CD_CAUSE1
+			  ,CAUSE2.CODE AS CD_CAUSE2
+		      ,CAUSE2.CODE_NAME AS CAUSE2
+		      ,CAUSE1.CODE_NAME AS CAUSE1
+          FROM CRMADMIN.SYS_CODE CAUSE1
+          LEFT OUTER JOIN CRMADMIN.SYS_CODE CAUSE2
+            ON CAUSE1.CODE = CAUSE2.PARENT_CODE
+           AND CAUSE2.CODE_CATEGORY_ID = 'CD_VOC_CAUSE_2'
+         WHERE CAUSE1.CODE_CATEGORY_ID = 'CD_VOC_CAUSE_1'
+           AND CAUSE2.CODE_NAME LIKE '%'||#{NM_CAUSE}||'%'
+	</select>
+	
+	<!--
+		QueryId     : VocManage.insertVoc
+		Description : VOC 등록
+	 -->
+	<insert id="insertVoc" parameterType="map">
+		INSERT INTO CRMADMIN.TBS_VOC_MASTER
+		(
+			  ID_VOC                   /* VOC ID */
+			, BIZ_CHNN                 /* 접수채널          */
+			, ID_BIZ_KEY               /* 업무별ID         */
+			, ORDER_NO                 /* 주문번호          */
+			, ID_STORE                 /* 매장ID          */
+			, FG_MEMBER                /* 회원여부          */
+			, ID_MEMBER                /* 회원PK          */
+			, NM_CUST                  /* 이름            */
+			, NO_PHONE                 /* 연락처           */
+			, DS_EMAIL                 /* 이메일           */
+			, YN_PRIVACY_AGREE         /* 개인정보수집동의여부    */
+			, YN_SENSITIVE_AGREE       /* 민감정보수집동의여부    */
+			, YN_PRIVACY_ORDER_AGREE   /* 개인정보제3자제공동의여부 */
+			, YN_SENSITIVE_ORDER_AGREE /* 민감정보제3자제공동의여부 */
+			, CD_VOC_STATUS            /* VOC상태  */
+			, CD_VOC_CAUSE             /* VOC접수유형*/
+			, DS_TITLE                 /* 제목     */
+			, DS_CONT                  /* 내용     */
+			, FG_DEL                   /* 삭제여부   */
+			, DT_REG                   /* 최초등록일시 */
+			, ID_REG_USER              /* 최초등록자  */
+			, DT_UPT                   /* 최근수정일시 */
+			, ID_UPT_USER              /* 최근수정자  */
+			, DT_VOC_REG               /* VOC 발생일*/
+			, MENU_NM                  /* 메뉴 명  */
+			, PAYMENT_TYPE             /* 결제 방법  */
+			, PAYMENT_PRC              /* 결제 금액  */
+			, DT_ORDER                 /* 주문일자   */
+			, CD_STATUS				   /* 회원상태          */
+			, POS_ORDER_NO             /* POS 주문번호  */
+			, OMNI_ORDER_NO            /* OMNI 주문번호 */
+			, CALL_ORDER_NO            /* CALL 주문번호 */
+			
+		)
+		VALUES
+		(
+			  #{ID_VOC}
+			, #{BIZ_CHNN}
+			, #{ID_BIZ_KEY}
+			, #{ORDER_NO}
+			, #{STOR_CD}
+			, #{FG_MEMBER}
+			, #{ID_MEMBER}
+			, #{NM_CUST}
+			, #{NO_PHONE}
+			, #{DS_EMAIL}
+			, 'Y'
+			, 'Y'
+			, 'Y'
+			, 'Y'
+			, '01'
+			, #{CD_VOC_CAUSE}
+			, #{DS_TITLE}
+			, #{DS_CONT}
+			, 'N'
+			, SYSDATE
+			, #{user.id}
+			, SYSDATE
+			, #{user.id}
+			, TO_DATE(#{DT_VOC_REG}, 'YYYY-MM-DD')
+			, #{MENU_NM}
+			, #{PAYMENT_TYPE}
+			, REPLACE(#{PAYMENT_PRC},',','')
+			, TO_DATE(#{DT_ORDER}, 'YYYY-MM-DD HH24:MI:SS')
+			, #{CD_STATUS}
+			, #{POS_ORDER_NO}
+			, #{ORDER_NO}
+			, #{CALL_ORDER_NO}
+		)
+	</insert>
+	
+	<!--
+		QueryId     : VocManage.getStoreList
+		Description : 매장목록 조회
+	 -->
+	<sql id="getStoreList_base">
+		SELECT STOR_CD
+			 , STOR_NM
+			 , TEL_NO
+			 , ADDR_1
+			 , ADDR_2
+			 , DECODE(DLVYN,'0','N','Y') AS DLVYN
+			 , DECODE(KORD_YN,'0','N','Y') AS KORD_YN
+			 , DRT_FRCS_TYPE
+			 , CASE WHEN DIRVE_TH = '1' THEN 'Y'
+			 		ELSE 'N' END DIRVE_TH
+			 , STOR_STATUS AS OPER_TYPE
+		  FROM OMNI.OMNI_STOR_APP MST
+		 WHERE 1=1
+		   AND MST.CMP_CD = 'BKR'
+		   AND MST.SALES_ORG_CD = '1000'
+		   AND MST.STOR_STATUS = '1'
+		   AND SUBSTR(MST.STOR_CD, 4, 1) != 9
+		   AND TO_CHAR(SYSDATE, 'YYYYMMDD') >= MST.SALES_START_DATE 
+		 	<if test="STOR_CD != null and STOR_CD != ''">
+		 		AND STOR_CD LIKE '%'|| #{STOR_CD} ||'%'
+		 	</if>
+		 	<if test="STOR_NM != null and STOR_NM != ''">
+		 		AND STOR_NM LIKE '%'|| #{STOR_NM} ||'%'
+		 	</if>
+		 	<if test="TEL_NO != null and TEL_NO != ''">
+		 		AND REPLACE(TEL_NO,'-','') LIKE '%'||REPLACE(#{TEL_NO},'-','')||'%'
+		 	</if>
+		 	<if test="DLVYN != null and DLVYN != ''">
+		 		AND DLVYN = DECODE(#{DLVYN},'Y','1','0')
+		 	</if>
+		 	<if test="KORD_YN != null and KORD_YN != ''">
+		 		AND KORD_YN = DECODE(#{KORD_YN},'Y','1','0')
+		 	</if>
+		 	<if test="DRT_FRCS_TYPE != null and DRT_FRCS_TYPE != ''">
+		 		AND DRT_FRCS_TYPE = #{DRT_FRCS_TYPE}
+		 	</if>
+		 	<if test="CLOSE != null and CLOSE != ''">
+		 		AND STOR_STATUS = #{CLOSE}
+		 	</if>
+		 	<if test="YN_FLAG != null and YN_FLAG != ''">
+		 		AND DIRVE_TH = #{YN_FLAG}
+		 	</if>
+		 ORDER BY STOR_NM ASC 
+	</sql>
+	<!-- 매장찾기 목록 조회 -->
+	<select id="getStoreList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getStoreList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 매장찾기 목록 조회 - count -->
+	<select id="getStoreList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getStoreList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+	
+	<!-- 매장찾기 목록 조회 - paging -->
+	<select id="getStoreList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getStoreList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		QueryId     : VocManage.getStoreAutoComplete
+		Description : 매장명 자동완성 조회
+	 -->
+	<select id="getStoreAutoComplete" parameterType="map" resultType="lmap">
+		SELECT STOR_CD
+			 , STOR_NM
+		  FROM OMNI.OMNI_STOR_APP MST
+		 WHERE STOR_NM LIKE #{STOR_NM}||'%'
+		   AND MST.CMP_CD = 'BKR'
+		   AND MST.SALES_ORG_CD = '1000'
+		   AND MST.STOR_STATUS = '1'
+		   AND SUBSTR(MST.STOR_CD, 4, 1) != 9
+		   AND TO_CHAR(SYSDATE, 'YYYYMMDD') >= MST.SALES_START_DATE 
+	</select>
+	
+	<!--
+		QueryId     : VocManage."getUserAutoComplete"
+		Description : 사용자명 자동완성 조회
+	 -->
+	<select id="getUserAutoComplete" parameterType="map" resultType="lmap">
+		SELECT USER_ID
+			 , USER_NM
+		  FROM CRMADMIN.SYS_USER
+		 WHERE USER_NM LIKE #{NM_USER_SEARCH}||'%'
+	</select>
+	
+	
+	<!--
+		QueryId     : VocManage.getVocListToExcel
+		Description : VOC목록 엑셀 다운로드 목록 조회
+	 -->
+	<select id="getVocListToExcel" parameterType="map" resultType="lmap">
+		SELECT ROWNUM AS "순번"
+		     , TO_CHAR(TVM.DT_REG,'YYYY-MM-DD') AS "날짜"
+		     , TO_CHAR(TVM.DT_REG,'HH24:MI') AS "시간"
+		     , MSTD1.DISTRCT_NM AS "광역"
+		     , MSTD2.DISTRCT_NM AS "지역"
+		     , MST.STOR_NM AS "매장명"
+		     , '' AS "점장"
+		     , '' AS "Shift MGR"
+		     , CASE WHEN CAUSE2.CODE = '02001' THEN 'S분류'                     
+		             WHEN CAUSE2.CODE = '02002'
+		               OR CAUSE2.CODE = '02003'
+		               OR CAUSE2.CODE = '02004'
+		               OR CAUSE2.CODE = '02005'
+		             THEN '1분류'                     
+		             WHEN CAUSE2.CODE = '02006'
+		               OR CAUSE2.CODE = '02007' 
+		             THEN '2분류'                     
+		             ELSE '3분류' END AS "분류"
+		     , CAUSE1.CODE_NAME ||' > '|| CAUSE2.CODE_NAME AS "구분"
+		     , TVM.NM_CUST AS  "고객명"
+		     , TVM.NO_PHONE AS "연락처"
+		     , TVM.DS_EMAIL AS "이메일"
+		     , TVM.DS_TITLE AS "제목"
+		     , TVM.DS_CONT	AS "내용"
+		     , TVM.DS_ACT_CONT AS "처리내용"
+		     , VRCD.CODE_NAME AS "처리상태"
+		     , '' AS "비고"
+		  FROM CRMADMIN.TBS_VOC_MASTER TVM
+		 INNER JOIN CRMADMIN.SYS_CODE CAUSE2
+		    ON TVM.CD_VOC_CAUSE = CAUSE2.CODE 
+		   AND CAUSE2.CODE_CATEGORY_ID = 'CD_VOC_CAUSE_2'
+		 INNER JOIN CRMADMIN.SYS_CODE CAUSE1
+		    ON CAUSE2.PARENT_CODE = CAUSE1.CODE
+		   AND CAUSE1.CODE_CATEGORY_ID = 'CD_VOC_CAUSE_1'
+		  LEFT OUTER JOIN OMNI.MST_STOR MST
+		    ON MST.STOR_CD = TVM.ID_STORE
+		   AND MST.CMP_CD = 'BKR'
+		   AND MST.SALES_ORG_CD = '1000'
+		   AND MST.OPER_TYPE <![CDATA[<>]]> '09'
+		  LEFT OUTER JOIN OMNI.MST_DISTRCT MSTD1
+		    ON MST.DISTRCT_CD_1 = MSTD1.DISTRCT_CD
+		   AND MSTD1.CMP_CD = 'BKR'
+		   AND MSTD1.SALES_ORG_CD = '1000'
+		  LEFT OUTER JOIN OMNI.MST_DISTRCT MSTD2
+		    ON MST.DISTRCT_CD_2 = MSTD2.DISTRCT_CD
+		   AND MSTD2.CMP_CD = 'BKR'
+		   AND MSTD2.SALES_ORG_CD = '1000'  
+		  LEFT OUTER JOIN CRMADMIN.SYS_CODE VRCD
+		    ON TVM.CD_VOC_STATUS = VRCD.CODE
+		   AND VRCD.CODE_CATEGORY_ID = 'CD_VOC_STATUS'
+		 WHERE TVM.FG_DEL = 'N'
+		   AND TVM.CD_VOC_STATUS <![CDATA[<>]]> '03'
+		  	<if test="CD_VOC_CAUSE_2 != null and CD_VOC_CAUSE_2 != ''">
+		  		AND TVM.CD_VOC_CAUSE = #{CD_VOC_CAUSE_2}
+		  	</if>
+		  	<if test="CD_VOC_CAUSE_1 != null and CD_VOC_CAUSE_1 != ''">
+		  		AND TVM.CD_VOC_CAUSE LIKE #{CD_VOC_CAUSE_1}||'%'
+		  	</if>
+			<if test="NM_MEMBER != null and NM_MEMBER != ''">
+				AND TVM.NM_CUST = #{NM_MEMBER}
+			</if>
+			<if test="NO_PHONE != null and NO_PHONE != ''">
+				AND TVM.NO_PHONE = #{NO_PHONE}
+			</if>
+			<if test="DS_EMAIL != null and DS_EMAIL != ''">
+				AND UPPER(TVM.DS_EMAIL) LIKE '%'|| UPPER(#{DS_EMAIL}) ||'%'
+			</if>
+			<if test="DS_TITLE != null and DS_TITLE != ''">
+				AND TVM.DS_TITLE LIKE '%'|| #{DS_TITLE} ||'%'
+			</if>
+			<if test="CD_BIZ_CHNN != null and CD_BIZ_CHNN != ''">
+				<choose>
+					<when test='BIZ_CHNN_SIZE == "1"'>
+						AND TVM.BIZ_CHNN = #{CD_BIZ_CHNN}
+					</when>
+					<otherwise>
+						AND TVM.BIZ_CHNN IN 
+						<foreach collection="CD_BIZ_CHNN" item="CD_CHNN" open="(" close=")" separator=",">
+					   		#{CD_CHNN}
+					   </foreach>
+					</otherwise>
+				</choose>
+			</if>
+			
+			<if test="CD_ACT_CAUSE != null and CD_ACT_CAUSE != ''">
+				AND TVM.CD_ACT_CAUSE = #{CD_ACT_CAUSE}
+			</if>
+			
+			<if test="DT_REG_START != null and DT_REG_START != ''">
+				AND TVM.DT_REG >= TO_DATE(#{DT_REG_START}||' 000000','YYYY-MM-DD HH24MISS')
+			</if>
+			<if test="DT_REG_END != null and DT_REG_END != ''">
+				AND TO_DATE(#{DT_REG_END}||' 235959','YYYY-MM-DD HH24MISS') >= TVM.DT_REG
+			</if>
+			
+			<if test="DT_ACT_START != null and DT_ACT_START != ''">
+				AND TVM.DT_VOC_ACT >= TO_DATE(#{DT_ACT_START}||' 000000','YYYY-MM-DD HH24MISS')
+			</if>
+			<if test="DT_ACT_END != null and DT_ACT_END != ''">
+				AND TO_DATE(#{DT_ACT_END}||' 235959','YYYY-MM-DD HH24MISS') >= TVM.DT_VOC_ACT
+			</if>
+			
+			<if test="CD_VOC_STATUS != null and CD_VOC_STATUS != ''">
+				AND TVM.CD_VOC_STATUS = #{CD_VOC_STATUS}
+			</if>
+			
+			<if test="ID_VOC != null and ID_VOC != ''">
+				AND TVM.ID_VOC LIKE UPPER('%'||#{ID_VOC}||'%')
+			</if>
+			
+			<if test="NM_STORE != null and NM_STORE != ''">
+				AND MST.STOR_NM LIKE '%'||#{NM_STORE}||'%'
+			</if>
+			<if test="ID_STORE != null and ID_STORE != ''">
+				AND TVM.ID_STORE = #{ID_STORE}
+			</if>
+			
+			<if test="NM_USER != null and NM_USER != ''">
+				AND SU.USER_NM LIKE '%'||#{NM_USER}||'%'
+			</if>
+			<if test="ID_USER != null and ID_USER != ''">
+				AND TVM.ID_ACT_EMP = #{ID_USER}
+			</if>
+			ORDER BY TVM.DT_REG DESC
+	</select>
+</mapper>
+ 

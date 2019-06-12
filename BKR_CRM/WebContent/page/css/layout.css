@@ -1,0 +1,114 @@
+@charset "utf-8";
+
+/* - ver2.0 (2017.02) 
+ 	- 배포 시작 : 2017년 3월
+ 	- 레이아웃 용도   	
+ */
+
+body.ub-page {padding:0; color:#444;}
+body.ub-page.popup {padding:0;}
+
+.ub-page.default .ub-frame.body,
+.ub-page.board .ub-frame.body {margin:0 auto; max-width:1220px; min-width:990px; padding-top:15px;}
+.ub-page.full-width .ub-frame.body {margin:0 20px 0 20px; padding-top:15px;}
+
+/* [popup] */
+.ub-page.popup .ub-frame.body {position:relative; padding-bottom:40px;}
+.ub-page.popup .ub-frame.body a.imgBtn.img-popClose {width:12px;height:12px;background:url('../images/common/btn_pop_close.png') no-repeat 0 0; position:absolute;top:10px;right:16px;}
+.ub-page.popup .ub-frame.body h1.ub-control.title {height:36px; margin:0; padding:0 0 0 0; background:url('../images/common/bg_pop_header.gif') repeat-x 0 0;}
+.ub-page.popup .ub-frame.body h1.ub-control.title span {display:inline-block; min-width:156px; height:24px;padding:8px 0 0 21px; color:#fff;font-size:14px;}
+.ub-page.popup .pop-contents {padding:15px 20px 10px;}
+.ub-page.popup .ub-frame.body .pop-tail {position:fixed; left:0; right:0; bottom:0;z-index:4;}
+.ub-page.popup .ub-frame.body .ub-layout.button.top  {position:inherit; margin-bottom:6px; text-align:right;}
+.ub-page.popup .ub-frame.body .pop-tail .ub-layout.button.bottom {margin-top:0;} 
+.ub-page.popup .ub-frame.body .ub-layout.button.bottom {padding:5px 11px; border-top:1px solid #b8b8b8; background:#eee;}
+.ub-page.popup .ub-frame.body .ub-control.table.normal {margin-bottom:20px;}
+.ub-page.popup .ub-layout.search .ub-control.table.normal th label {background:url('../images/common/ico_gray.gif') no-repeat 0 8px;}
+.ub-page.popup .ub-frame.body .ub-layout.search .ub-control.table.normal {width:88%;margin-bottom:0;}
+.ub-page.popup .ub-frame.body .pop-tail .ub-layout.button.bottom .ub-control.button.bottom {height:22px; margin-right:4px; padding-left:24px;  line-height:15px; background:url('../images/common/btn_popbtn_bg.gif') no-repeat 0 0;}
+.ub-page.popup .ub-frame.body .pop-tail .ub-layout.button.bottom .ub-control.button.bottom:hover { background:url('../images/common/btn_popbtn_bg.gif') no-repeat 0 -38px;}
+.ub-page.popup .ub-frame.body .pop-tail .ub-layout.button.bottom .ub-control.button.bottom a {height:20px; padding:2px 24px 0 0; color:#fff; background:url('../images/common/btn_popbtn_bg.gif') no-repeat 100% 0;}
+.ub-page.popup .ub-frame.body .pop-tail .ub-layout.button.bottom .ub-control.button.bottom:hover a {background:url('../images/common/btn_popbtn_bg.gif') no-repeat 100% -38px !important;}
+
+/* [error] */
+.ub-page.error .ub-layout.errorHead {width:350px;margin:56px auto 0;padding:0 0 0 75px; min-height:51px; background:url('../images/common/bg_errorHead.png') no-repeat 0 50%;}
+.ub-page.error .ub-layout.errorHead .comment1 {font-size:14px;color:#666666;font-weight:bold;}
+.ub-page.error .ub-layout.errorHead .comment1 em {color:#d45428;}
+.ub-page.error .ub-layout.errorHead .comment2 {padding-top:5px;color:#666666;}
+.ub-page.error .ub-layout.errorCon {margin:0 20px 10px;padding:20px 18px;background-color:#f5f5f5;color:#6e6e6e;}
+.ub-page.error .ub-layout.errorCon .errorCon-float {padding-bottom:7px;}
+*+ html .ub-page.error .ub-layout.errorCon .errorCon-float {display:inline-block;}
+.ub-page.error .ub-layout.errorCon .errorCon-float:after {content:".";display:block;height:0;clear:both;visibility:hidden;}
+.ub-page.error .ub-layout.errorCon strong {float:left;display:inline-block;padding-left:8px;background:url('../images/common/ico_gray2.gif') no-repeat 0 5px;color:#6e6e6e;}
+.ub-page.error .ub-layout.errorCon pre {float:left;margin:0;padding:0 0 0 7px;line-height:18px;font-size:12px;}
+
+/* [ub-frame] ********************************************************************************* */
+.ub-frame.top {height:88px; border-bottom:1px solid #252830; background-color:#363b47;}
+.ub-frame.top .ub-layout.header {margin:0 auto; max-width:1220px; min-width:990px; position:relative;}
+.ub-frame.top h1 {padding:24px 0 0 30px; display:inline-block;}
+.ub-frame.top .gnb-util {padding:0 30px 0 0; height:24px; color:#a2a2a2;  font-size:11px; position:absolute;top:10px; right:20px;}
+.ub-frame.top .gnb-util .gnb-util-inner {padding:0 0 0 30px; height:24px;}
+.ub-frame.top .gnb-util a {color:#a2a2a2; display:inline-block; font-size:11px; min-height:14px;}
+.ub-frame.top .gnb-util span {display:inline-block; vertical-align:middle;}
+.ub-frame.top .gnb-util .login-user {line-height:17px;}
+.ub-frame.top .gnb-util .login-user em {display:inline-block;margin-right:6px;padding-left:14px; color:#fff;font-weight:bold;font-size:11px;line-height:17px;}
+.ub-frame.top .gnb-util .pw-button,
+.ub-frame.top .gnb-util .logout-button,
+.ub-frame.top .gnb-util .lang-cd {margin:2px 1px 0 5px; padding-left:11px; background:url('../images/common/bg_util.gif') no-repeat 0 2px;} 
+.ub-frame.top .gnb-util .logout-button a {display:block;}
+
+.ub-frame.contents .ui-tabs.ui-corner-all.ui-widget-content.ui-widget {padding:0;border-radius:0;border:none;font-family:'Malgun Gothic', '맑은 고딕';font-size:1em;}
+.ub-frame.contents .ui-tabs .ui-tabs-panel.ui-corner-bottom {padding:0 0 0 0; border-radius:0;}
+.ub-frame.body {position:relative; /* padding-bottom:7px; */}
+.ub-frame.body .ub-layout.location {margin-top:7px; padding:0 0 0 0;text-align:right;font-size:11px;color:#858484;height:12px; display:none;}
+.ub-frame.body .ub-layout.location em {font-weight:bold;}
+.ub-frame.body h1.ub-control.title {margin-top:5px; padding:7px 0 3px 22px; height:23px; line-height:15px; color: #444; font-size:14px; background:url('../images/common/ico_h1.gif') no-repeat 0 8px;}
+/* .ub-frame.body h2.ub-control.title {position:relative; padding-top:7px; padding-bottom:8px; padding-left:15px;background:url('../images/common/ico_h2.gif') no-repeat 3px 10px; font-size:13px; color:#2b5a90;line-height:15px;} */
+.ub-frame.body h2.ub-control.title {position:relative; height:22px; margin-bottom:-1px; padding:5px 0 3px 22px; color:#444; border-top:1px solid #ea9296; border-bottom:1px solid #c3c3c3; font-size:13px; background:#f3f3f3 url('../images/common/ico_h2.gif') no-repeat 10px 10px;}
+.ub-frame.body h2.ub-control.title.hfold {z-index:3;}
+/* .ub-frame.body h3.ub-control.title {position:relative;height:19px;padding-top:3px; padding-bottom:5px; padding-left:19px;background:#ffffff url('../images/common/ico_h3.gif') no-repeat 6px 8px;} */
+.ub-frame.body h3.ub-control.title {position:relative; padding:5px 0 0 18px; height:24px; color:#444; font-size:13px; line-height:15px; background:url('../images/common/ico_h3.gif') no-repeat 6px 9px;}
+.ub-frame.body .in-td h3.ub-control.title {margin-left:0; padding-left:13px; background-position:0 9px;}
+
+.ub-frame.body .ub-layout.details.processingHead {position:relative;height:24px;margin-top:6px;padding-top:12px;padding-left:17px;background:url('../images/common/ico_h3.gif') no-repeat 6px 9px;font-weight:bold;font-size:13px;color:#444;line-height:15px;}
+.ub-frame.body .ub-layout.details.processingHead .ub-control.label b {color:#da3e14 !important;font-weight:normal;}
+
+.ub-frame.contents {min-width:960px;}
+.ub-frame.contents .tabs-bottom .ui-tabs-nav {padding:0 33px 12px;border-radius:0;border:none;background:#eeeeee url('../images/common/bg_grayline.gif') repeat-x top;}
+.ub-frame.contents .tabs-bottom .ui-tabs-nav .ui-state-default {height:24px;margin-top:1px;padding-top:0;padding-right:15px;background:url('../images/common/bg_historyTab_r.gif') no-repeat top right;border-radius:0;border:none;cursor:pointer;}
+.ub-frame.contents .tabs-bottom .ui-tabs-nav .ui-state-default * {vertical-align:top;}
+.ub-frame.contents .tabs-bottom .ui-tabs-nav .ui-state-default a {display:inline-block;height:24px;padding:0 0 0 14px;margin-right:6px;background:url('../images/common/bg_historyTab_l.gif') no-repeat top left;font-family:'Malgun Gothic', '맑은 고딕';font-size:11px;font-weight:bold;color:#7f7f7f;}
+.ub-frame.contents .tabs-bottom .ui-tabs-nav .ui-state-default a label {display:inline-block; margin-top:3px; cursor:pointer;}
+.ub-frame.contents .tabs-bottom .ui-tabs-nav .ui-state-default .ui-icon {display:inline-block;margin-top:5px;}
+.ub-frame.contents .tabs-bottom .ui-tabs-nav .ui-state-default .ui-icon.ui-icon-close {width:12px;height:11px;margin-left:6px;margin-right:-4px;background:url('../images/common/ico_tab_close.gif') no-repeat 0 0px;}
+.ub-frame.contents .tabs-bottom .ui-tabs-nav .ui-state-default .ui-icon.ui-icon-unlocked {width:11px;height:12px;background:url('../images/common/ico_tab_unlock.gif') no-repeat 0 1px;}
+.ub-frame.contents .tabs-bottom .ui-tabs-nav .ui-state-default .ui-icon.ui-icon-locked {width:9px;height:12px;background:url('../images/common/ico_tab_lock.gif') no-repeat 0 1px;}
+.ub-frame.contents .tabs-bottom .ui-tabs-nav .ui-state-default .ui-icon.ui-icon-cancel {width:13px;height:11px;margin-left:6px;margin-right:-4px;background:url('../images/common/ico_tab_ban.gif') no-repeat 0 0;}
+.ub-frame.contents .tabs-bottom .ui-tabs-nav .ui-state-default.ui-tabs-active {height:25px;margin-top:0;padding-top:0;padding-right:20px;background:url('../images/common/bg_historyTab_on_r.gif') no-repeat top right;border-radius:0;border:none;}
+.ub-frame.contents .tabs-bottom .ui-tabs-nav .ui-state-default.ui-tabs-active a {display:inline-block;height:25px;padding:0 0 0 17px;background:url('../images/common/bg_historyTab_on_l.gif') no-repeat top left;font-family:'Malgun Gothic', '맑은 고딕';font-size:12px;font-weight:bold;color:#fff;}
+.ub-frame.contents .tabs-bottom .ui-tabs-nav .ui-state-default.ui-state-active .ui-icon {margin-top:7px;}
+.ub-frame.contents .tabs-bottom .ui-tabs-nav .ui-state-default.ui-state-active .ui-icon.ui-icon-close {margin-left:6px;margin-right:-7px;margin-top:7px;background:url('../images/common/ico_tab_close2.gif') no-repeat 0 0px;}
+.ub-frame.contents .tabs-bottom .ui-tabs-nav .ui-state-default.ui-state-active .ui-icon.ui-icon-unlocked {height:10px; background:url('../images/common/ico_tab_unlock2.gif') no-repeat 0 0;}
+.ub-frame.contents .tabs-bottom .ui-tabs-nav .ui-state-default.ui-state-active .ui-icon.ui-icon-locked {background:url('../images/common/ico_tab_lock2.gif') no-repeat 0 0;}
+.ub-frame.contents .tabs-bottom .ui-tabs-nav .ui-state-default.ui-state-active .ui-icon.ui-icon-cancel {margin-left:6px;margin-right:-7px;margin-top:6px;background:url('../images/common/ico_tab_ban2.gif') no-repeat 0 0;}
+.ub-frame.contents .tabs-bottom .ui-tabs-nav .ui-state-highlight {width:85px;height:25px;border:none;background:url('../images/common/bg_historyTab_none.gif') repeat 0 0;}
+
+/* [body] */
+.floatBox {position:relative;zoom:1;}
+.floatBox:after {content:".";display:block;height:0;clear:both;visibility:hidden;}
+.floatBox .leftBox {float:left;position:relative;}
+.floatBox .rightBox {float:right;position:relative;/*text-align:right;*/}
+
+.wrapOverflow {overflow-x:auto;}
+
+/* footer */
+.ub-frame.bottom {min-width:990px;padding-top:10px;background:url('../images/common/bg_footer_etri.gif') repeat-x 0 0;}
+.ub-frame.bottom .floatBox span {display:inline-block;height:15px;padding-top:2px;color:#ffffff;}
+.ub-frame.bottom .floatBox .leftBox {padding-left:15px;}
+.ub-frame.bottom .floatBox .rightBox {padding-right:10px;}
+.ub-frame.bottom .ico-check {padding-left:22px;margin-right:10px;background:url('../images/common/ico_bluecheck.png') no-repeat 0 0;font-weight:bold;}
+.ub-frame.bottom .ico-folder {padding-left:21px;background:url('../images/common/ico_folder.png') no-repeat 0 2px;}
+.ub-frame.bottom .ico-browser {padding-left:23px;background:url('../images/common/ico_browser.png') no-repeat 0 2px;}
+
+/* 메뉴 */
+.ub-layout.menu nav .ub-control.menu li {background-position:0 12px !important;}

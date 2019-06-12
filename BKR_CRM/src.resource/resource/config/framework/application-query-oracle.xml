@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<!--
+프레임웍 계층에서 사용되나
+프로젝트별로 변경될 여지가 있는 스키마를 참조하는 쿼리들
+ -->
+<properties version="1.0">
+	
+	<entry key="query.application.code">
+		select CODE_CATEGORY_ID   	as categoryId
+             , CODE_TP            	as codeType
+             , UPD_DT             	as lastUpdatedTime
+             , CODE_QUERY_CONTENT 	as queryStatement
+             , nvl(CACHE_YN, 'N') 	as isCache
+             , ENUM_CLASS_NAME    	as enumClassName
+
+             , nvl(MAPPING_YN, 'N') as isMapping
+             , NVL(TABLE_ID, '-')   as mappingTableId
+             , NVL(CODE_COLUMN_ID, '-') as mappingCodeColumnId
+             , NVL(NAME_COLUMN_ID, '-')	as mappingNameColumnId
+          from SYS_CODE_CATEGORY
+         where CODE_CATEGORY_ID = :categoryId
+	</entry>
+	
+	<entry key="query.application.code.list">
+		select CODE        CODE
+		     , CODE_NAME   CODE_NAME
+		     , RES_ID      RES_ID
+		     , PARENT_CODE PARENT_CODE
+		     , STATUS      STATUS
+		  from SYS_CODE
+		 where CODE_CATEGORY_ID = :categoryId
+		 order by SORT_ORDER
+	</entry>
+	
+	<entry key="query.application.code.group">
+		select CODE_GROUP_ID  as CODE_GROUP_ID
+		     , CODE           as CODE
+		  from SYS_CODE_GROUP
+		 where CODE_CATEGORY_ID = :categoryId
+		 order by CODE
+	</entry>
+	
+	<entry key="query.application.code.type">
+		select CODE_CATEGORY_ID   	as categoryId
+             , CODE_TP            	as codeType
+             , UPD_DT             	as lastUpdatedTime
+             , CODE_QUERY_CONTENT 	as queryStatement
+             , nvl(CACHE_YN, 'N') 	as isCache
+             , ENUM_CLASS_NAME    	as enumClassName
+          from SYS_CODE_CATEGORY
+         where CODE_TP = :codeType
+	</entry>
+
+	<!-- CodeMapping Query -->	
+	<entry key="query.application.code.mapping">
+		SELECT TP_FILTER
+ 		     , FILTER_CODE
+		     , CODE_TP
+		     , TABLE_ID
+		     , CODE_COLUMN_ID
+		     , CODE_CATEGORY_ID
+		     , CODE
+		  FROM SYS_CODE_MAPP
+		 WHERE TP_FILTER   = :filterType
+ 		   AND FILTER_CODE = :filterCode
+		   AND CODE_TP     = :codeType
+		   AND TABLE_ID    = :tableName
+		   AND CODE_COLUMN_ID   = :codeColumnId
+		   AND CODE_CATEGORY_ID = :codeCategoryId
+  	</entry>	
+	
+	<entry key="query.application.attach">
+		select ATTACH_ID       id
+		     , FILE_NM         fileName
+		     , FILE_PATH       path
+		     , FILE_SIZE       fileSize
+		     , CONTENT_TYPE    contentType
+		     , ATTACH_TYPE     attachType
+		     , ATTACH_SUB_TYPE attachSubType
+		  from SYS_ATTACH
+		 where ATTACH_ID = :fileId
+	</entry>
+	
+	<entry key="query.application.attach.save">
+		insert into SYS_ATTACH (
+		       ATTACH_ID
+		     , ATTACH_TYPE
+		     , ATTACH_SUB_TYPE
+		     , CONTENT_TYPE
+		     , FILE_NM
+		     , FILE_PATH
+		     , FILE_SIZE
+		     , REG_DT
+		)
+		values (
+		       :id
+		     , :attachType
+		     , :attachSubType
+		     , :contentType
+		     , replace(:fileName, chr(39), '')
+		     , :path
+		     , :fileSize
+		     , CURRENT_TIMESTAMP
+		)
+	</entry>
+
+	<entry key="query.application.attach.load.blob">
+		SELECT FILE_CONTENT content
+		  FROM SYS_ATTACH
+		 WHERE ATTACH_ID = :id  
+	</entry>
+
+	<entry key="query.application.attach.save.blob">
+		UPDATE SYS_ATTACH
+		   SET FILE_CONTENT = :content
+		 WHERE ATTACH_ID = :id  
+	</entry>
+
+	<entry key="query.application.attach.remove">
+		delete SYS_ATTACH
+		 where ATTACH_ID = :id
+	</entry>
+	
+	<entry key="query.application.attach.link">
+		select A.ATTACH_ID       id
+		     , A.FILE_NM         fileName
+		     , A.FILE_PATH       path
+		     , A.FILE_SIZE       fileSize
+		     , A.CONTENT_TYPE    contentType
+		     , A.ATTACH_TYPE     attachType
+		     , A.ATTACH_SUB_TYPE attachSubType
+		  from SYS_ATTACH      A
+		     , SYS_ATTACH_LINK B
+		 where A.ATTACH_ID  = B.ATTACH_ID
+		   and B.BIZ_TP     = :bizType
+		   and B.BIZ_KEY    = :bizKey
+	</entry>
+	
+	<entry key="query.application.attach.link.save">
+		insert into SYS_ATTACH_LINK (
+		       ATTACH_LINK_ID
+		     , ATTACH_ID
+		     , BIZ_TP
+		     , BIZ_KEY
+		)
+		values (
+		       :linkId
+		     , :id
+		     , :bizType
+		     , :bizKey
+		)
+	</entry>
+	
+	<entry key="query.application.attach.link.remove">
+		delete SYS_ATTACH_LINK
+		 where ATTACH_ID = :id
+		   and BIZ_TP  = :bizType
+		   and BIZ_KEY = :bizKey
+	</entry>
+
+	<entry key="query.application.attach.link.count">
+		select ATTACH_LINK_ID
+		  from SYS_ATTACH_LINK
+		 where ATTACH_ID = :id
+	</entry>
+	
+	<entry key="query.application.user">
+		select U.USER_ID     id
+		     , U.USER_NM     name
+			 , L.PASSWD      password
+		     , U.COMPANY_CD  companyCode
+		     , ''            companyName
+		     , U.DEPT_ID     partCode
+		     , D.DEPT_NM     partName
+		     , U.TITLE_CD    classCode
+		     , U.POSITION_CD  positionCode
+		     , U.EMAIL_DS    email
+		     , U.PHONE_NO    phoneNumber
+		     , U.MOBILE_NO   mobilePhoneNumber
+		     , (select dept_id
+		          from sys_department
+		         where level_ds = 1
+		         start with dept_id = D.DEPT_ID
+		         connect by prior dept_id_up = dept_id
+		       )             headquartersCode
+		  from SYS_LOGIN      L
+		     , SYS_USER       U
+			 , SYS_DEPARTMENT D
+		  where L.LOGIN_ID   = :loginId
+		    and L.USER_ID    = U.USER_ID
+		    and U.DEPT_ID    = D.DEPT_ID(+)
+	</entry>
+	
+	<entry key="query.application.user2">
+		select U.USER_ID     id
+		     , U.USER_NM     name
+			 , ''            password
+			 , ''            loginId
+		     , U.COMPANY_CD  companyCode
+		     , ''            companyName
+		     , U.DEPT_ID     partCode
+		     , D.DEPT_NM     partName
+		     , U.TITLE_CD    classCode
+		     , U.POSITION_CD  positionCode
+		     , U.EMAIL_DS    email
+		     , U.PHONE_NO    phoneNumber
+		     , U.MOBILE_NO   mobilePhoneNumber
+		     , (select dept_id
+		          from sys_department
+		         where level_ds = 1
+		         start with dept_id = D.DEPT_ID
+		         connect by prior dept_id_up = dept_id
+		       )             headquartersCode
+		  from SYS_USER       U
+			 , SYS_DEPARTMENT D
+		  where U.USER_ID  = :userId
+		    and U.DEPT_ID  = D.DEPT_ID (+)
+	</entry>
+	
+	<entry key="query.application.user3">
+        select U.USER_ID     id
+             , U.USER_NM     name
+             , ''            password
+             , U.COMPANY_CD  companyCode
+             , ''            companyName
+             , U.DEPT_ID     partCode
+             , D.DEPT_NM     partName
+             , U.TITLE_CD    classCode
+             , U.POSITION_CD  positionCode
+             , U.EMAIL_DS    email
+             , U.PHONE_NO    phoneNumber
+             , U.MOBILE_NO   mobilePhoneNumber
+             , (select dept_id
+                  from sys_department
+                 where level_ds = 1
+                 start with dept_id = D.DEPT_ID
+                 connect by prior dept_id_up = dept_id
+               )             headquartersCode
+          from AP_ROLE_GROUP       R
+             , SYS_USER            U
+             , SYS_DEPARTMENT      D
+         where R.ROLE_ID = :roleId
+           and R.USER_ID = U.USER_ID
+           and U.DEPT_ID  = D.DEPT_ID (+)
+	</entry>
+	
+	<entry key="query.application.user4">
+		select U.USER_ID     id
+		     , U.USER_NM     name
+			 , ''            password
+		     , U.COMPANY_CD  companyCode
+		     , ''            companyName
+		     , U.DEPT_ID     partCode
+		     , D.DEPT_NM     partName
+		     , U.TITLE_CD    classCode
+		     , U.POSITION_CD  positionCode
+		     , U.EMAIL_DS    email
+		     , U.PHONE_NO    phoneNumber
+		     , U.MOBILE_NO   mobilePhoneNumber
+		     , (select dept_id
+		          from sys_department
+		         where level_ds = 1
+		         start with dept_id = D.DEPT_ID
+		         connect by prior dept_id_up = dept_id
+		       )             headquartersCode
+		  from SYS_USER            U
+			 , SYS_DEPARTMENT      D
+			 , ap_role_composition R
+		 where U.DEPT_ID  = D.DEPT_ID
+		   and D.DEPT_ID  = :partCode
+           and (
+                   (R.ROLE_COMPOSITION_TYPE = 'U' and R.ROLE_COMPOSITION_CODE = U.USER_ID)
+                or (R.ROLE_COMPOSITION_TYPE = 'D' and R.ROLE_COMPOSITION_CODE = U.DEPT_ID)
+                or (R.ROLE_COMPOSITION_TYPE = 'C' and R.ROLE_COMPOSITION_CODE = U.TITLE_CD)
+                or (R.ROLE_COMPOSITION_TYPE = 'P' and R.ROLE_COMPOSITION_CODE = U.POSITION_CD)
+               )
+           and ROLE_ID = :roleId
+	</entry>
+	
+	<entry key="query.application.user.role">
+          SELECT R.ROLE_ID ROLE
+               , R.ADMIN_YN       ADMIN_YN
+               , R.EXCEPT_MAP_YN  EXCEPT_MAP_YN
+           FROM AP_ROLE_COMPOSITION C 
+           INNER JOIN AP_ROLE R ON C.ROLE_ID = R.ROLE_ID 
+          WHERE (C.ROLE_COMPOSITION_TYPE = :type_u AND C.ROLE_COMPOSITION_CODE = :userId)
+             OR (C.ROLE_COMPOSITION_TYPE = :type_d AND C.ROLE_COMPOSITION_CODE = :partCode)
+             OR (C.ROLE_COMPOSITION_TYPE = :type_c AND C.ROLE_COMPOSITION_CODE = :classCode)
+             OR (C.ROLE_COMPOSITION_TYPE = :type_p AND C.ROLE_COMPOSITION_CODE = :positionCode)
+	</entry>
+
+	<!-- 사용자 설정정보 조회 쿼리 -->
+	<entry key="query.application.user.config">
+		SELECT ATTR_VALUE
+		  FROM SYS_USER_CONFIG
+		 WHERE USER_ID = :userId
+		   AND ATTR_ID = :attrId
+		 ORDER BY ATTR_ORDER
+	</entry>
+
+	<!-- 사용자 설정정보의 유형 체크 쿼리 -->
+	<entry key="query.application.user.config.type">
+		 SELECT ATTR_ID
+		 	  , SUM(1) CNT
+		  FROM SYS_USER_CONFIG
+		 WHERE USER_ID = :userId
+		 GROUP BY ATTR_ID
+	</entry>
+	
+	<!-- 사용자 상위부서 정보 조회 -->
+	<entry key="query.application.user.dept.info">
+		 SELECT (SELECT DEPT_ID_UP
+		          FROM SYS_DEPARTMENT SD
+		         WHERE 1 = 1
+		           AND SU.DEPT_ID = SD.DEPT_ID) AS DEPT_ID_UP
+		  FROM SYS_USER SU
+		 WHERE 1 = 1
+		   AND USER_ID = :userId
+	</entry>
+				
+	<entry key="query.application.part">
+		select M.DEPT_ID          id
+		     , M.DEPT_NM          name
+			 , M.DEPT_NM_ENG      englishName    
+		     , M.DEPT_ID_UP       parentCode
+		     , M.DEPT_TP          tp
+		     , M.LEVEL_DS         levelNo
+		     , M.PHONE_NO         phoneNumber
+		     , M.FAX_NO           faxNumber
+		     , M.ORDER_DS         orderNo
+		     , M.COMPANY_CD       componyCode
+		     , (select dept_id
+		          from sys_department
+		         where level_ds = 1
+		         start with dept_id = M.DEPT_ID
+		         connect by prior dept_id_up = dept_id
+		       )                  headquartersCode
+		  from SYS_DEPARTMENT M
+		 where M.DEPT_ID = :partCode
+	</entry>
+	
+	<entry key="query.application.login.login">
+		insert into SYS_LOGIN_LOG (
+			  LOG_ID
+			, LOGIN_DT
+			, LOGIN_IP
+			, LOGIN_BROWSER
+			, LOGIN_ID
+			, LOGIN_SESSION_ID
+		)
+		values (
+			  SEQ_SYS_LOGIN_LOG.nextval
+			, SYSDATE
+			, :loginClientIp
+			, :sessionId
+			, :loginId
+			, :loginBrowser
+		)
+	</entry>
+	
+	<entry key="query.application.login.logout">
+		update SYS_LOGIN_LOG
+		   set LOGOUT_DT 		= SYSDATE
+		 where LOGIN_ID         = :loginId
+<!-- 		   and LOGIN_SESSION_ID = :sessionId -->
+	</entry>
+
+	<entry key="query.application.login.logout.reset">
+		update SYS_LOGIN
+		   set SESSION_ID = NULL
+		 where SESSION_ID = :loginToken
+	</entry>
+	
+	<entry key="query.application.menu">
+		select MENU_ID
+		     , to_char(LEVEL) as LVL
+		     , MENU_TYPE
+		     , MENU_NAME
+		     , MENU_NAME_RES_ID
+		     , DESCRIPTION
+		     , CONNECT_URL
+		     , TARGET
+		     , HEIGHT
+		     , WIDTH
+		     , PARENT_MENU_ID
+		     , SORT_ORDER
+		     , DEPTH
+		     , STATUS
+		     , REG_USER_ID
+		     , REG_DATETIME
+		     , UPD_USER_ID
+		     , UPD_DATETIME
+		     , (select decode(count(*), 0 , 'N', 'Y') 
+		          from AP_MENU 
+		         where PARENT_MENU_ID = A.MENU_ID
+		       ) hasChild
+		  from AP_MENU A
+		 where STATUS = 'A'
+		 start with PARENT_MENU_ID is null
+         connect by prior MENU_ID = PARENT_MENU_ID
+		 order by  
+		       LVL
+			 , PARENT_MENU_ID
+			 , SORT_ORDER
+	</entry>
+	
+	<entry key="query.application.menu.maxlevel">
+		select max(LEVEL) as result
+		  from AP_MENU A
+		 where STATUS = 'A'
+		 start with PARENT_MENU_ID is null
+         connect by prior MENU_ID = PARENT_MENU_ID
+	</entry>
+	
+	<entry key="query.application.menu.byrole">
+		select *
+		  from (select MENU_ID
+		             , to_char(LEVEL) as LVL
+		             , MENU_TYPE
+		             , MENU_NAME
+		             , MENU_NAME_RES_ID
+		             , DESCRIPTION
+		             , CONNECT_URL
+		             , TARGET
+		             , HEIGHT
+		             , WIDTH
+		             , PARENT_MENU_ID
+		             , SORT_ORDER
+		             , DEPTH
+		             , STATUS
+		             , REG_USER_ID
+		             , REG_DATETIME
+		             , UPD_USER_ID
+		             , UPD_DATETIME
+                     , (select decode(count(*), 0 , 'N', 'Y') 
+                          from AP_MENU 
+                         where PARENT_MENU_ID = A.MENU_ID
+                       ) hasChild
+		          from AP_MENU A
+		         where STATUS = 'A'
+		         start with PARENT_MENU_ID is null
+                 connect by prior MENU_ID = PARENT_MENU_ID
+		         order by  
+		               LVL
+		        	 , PARENT_MENU_ID
+			         , SORT_ORDER
+			   )
+		 where MENU_ID in (select MENU_ID
+		                     from AP_MENU_AUTH
+		                    where ROLE_ID in (:role)
+		                  )
+		order by LVL
+	           , PARENT_MENU_ID
+		       , SORT_ORDER
+	</entry>
+	
+	<entry key="query.application.menu.byscreen">
+		select MENU_ID          MENU_ID
+		     , to_char(rownum)  LVL 
+		  from (select MENU_ID
+		          from AP_MENU A
+		         where STATUS = 'A'
+		         start with MENU_ID = (select MENU_ID 
+		                                 from AP_MENU_SCREEN
+		                                where SCREEN_ID = :screenId
+		                                  and rownum = 1)
+		       connect by 
+		               prior PARENT_MENU_ID = MENU_ID
+		         order by  
+		               LEVEL desc
+		       )
+	</entry>
+
+	<entry key="query.mask.definition">
+       SELECT ID_MASK         AS maskId
+            , NM_MASK         AS maskName
+            , TP_MASK         AS maskType
+            , DS_INPUT        AS inputRule
+            , DS_OUTPUT       AS outputRule
+            , DS_CLASS        AS customClass
+         FROM SYS_MASK
+        WHERE ID_MASK = :maskId
+	</entry>
+	
+	<entry key="query.mask.auth">
+       SELECT ROLE_ID AS roleId
+         FROM SYS_MASK_AUTH
+        WHERE ID_MASK = :maskId
+	</entry>
+	
+	<!-- 로그인 사용자의 언어코드를 변경할 경우 -->
+	<entry key="query.application.user.changeLangCd">
+		UPDATE SYS_LOGIN
+		   SET LANG_CD  = :langCd
+		 WHERE LOGIN_ID = :loginId
+	</entry>
+
+	<!-- 로그인 세션 유지 설정 - 데이터 등록 -->
+	<entry key="query.application.login.keep.put">
+		INSERT INTO SYS_LOGIN_KEEP(
+			  TOKEN_ID
+			, LOGIN_ID
+			, LOGIN_IP
+			, LOGIN_BROWSER
+			, USE_DT
+			, USE_CNT
+			, REG_DT
+		)VALUES(
+			  :TOKEN_ID
+			, :LOGIN_ID
+			, :LOGIN_IP
+			, :LOGIN_BROWSER
+			, SYSDATE
+			, 0
+			, SYSDATE
+		)
+	</entry>
+
+	<!-- 로그인 세션 유지 설정 - 데이터 조회 -->
+	<entry key="query.application.login.keep.get">
+		SELECT TOKEN_ID
+			 , LOGIN_ID
+			 , LOGIN_IP
+			 , LOGIN_BROWSER
+			 , USE_DT
+			 , USE_CNT
+			 , REG_DT
+		  FROM SYS_LOGIN_KEEP
+		 WHERE TOKEN_ID = :TOKEN_ID
+	</entry>
+
+	<!-- 로그인 세션 유지 - 토큰ID의 데이터 삭제 -->
+	<entry key="query.application.login.keep.update.useCnt">
+		UPDATE SYS_LOGIN_KEEP
+		   SET USE_CNT = NVL(USE_CNT, 0) + 1
+		     , USE_DT  = SYSDATE
+		 WHERE TOKEN_ID = :TOKEN_ID
+	</entry>
+
+	<!-- 로그인 세션 유지 - 토큰ID의 데이터 삭제 -->
+	<entry key="query.application.login.keep.remove.token">
+		DELETE 
+		  FROM SYS_LOGIN_KEEP
+		 WHERE TOKEN_ID = :TOKEN_ID
+	</entry>
+
+	<!-- 로그인 세션 유지 - 로그인ID에 해당하는 모든 세션 삭제 -->
+	<entry key="query.application.login.keep.remove.loginId">
+		DELETE 
+		  FROM SYS_LOGIN_KEEP
+		 WHERE LOGIN_ID = :LOGIN_ID
+	</entry>
+	
+	<!-- 로그인 세션 유지 - 미사용  토큰 삭제 처리 -->
+	<entry key="query.application.login.keep.remove.unused">
+	<![CDATA[
+		DELETE 
+		  FROM SYS_LOGIN_KEEP
+		 WHERE USE_DT < SYSDATE - 90
+	]]>		 
+	</entry>
+</properties>

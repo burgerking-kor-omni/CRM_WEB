@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="ko">
+<head>
+	<meta charset="utf-8" />
+	<title>(주)유비원 스타일 가이드</title>
+	<link type="text/css" rel="stylesheet" href="./css/shCoreDefault.css"/>
+	<link type="text/css" rel="stylesheet" href="./css/style.css"/>
+	<link type="text/css" rel="stylesheet" href="./css/jquery.mCustomScrollbar.css"/>
+	<script type="text/javascript" src="./js/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="./js/html5.js"></script>
+	<script type="text/javascript" src="./js/shCore.js"></script>
+	<script type="text/javascript" src="./js/shBrushJScript.js"></script>
+	<script type="text/javascript" src="./js/shBrushCss.js"></script>
+	<script type="text/javascript" src="./js/shBrushXml.js"></script>
+	<script type="text/javascript" src="./js/jquery.mCustomScrollbar.concat.min.js"></script>
+	<script type="text/javascript">
+		jQuery(function(){
+		   jQuery('a[href^=#]').click(function() {
+			  var speed = 500;  // 스크롤 속도
+			  var href= jQuery(this).attr("href");
+			  var target = jQuery(href == "#" || href == "" ? 'html' : href);
+			  var position = target.offset().top;
+			  jQuery('body,html').animate({scrollTop:position}, speed, 'swing');
+			  return false;
+		   });
+		}); //부드럽게 페이지내 이동위해 사용
+		SyntaxHighlighter.all(); //syntaxhighlighter
+	</script>
+</head>
+
+<body>
+	<!-- S : wrap -->
+	<div id="wrap">
+		<!-- S : header-->
+		<div id="header">
+			<header class="gd-header">
+				<h1>
+					<a href="index.html"><img src="./images/h1_logo.png" alt="ubone" /></a>
+					<strong class="gd-ver">Style Guide
+						<strong class="ver">Ver1.0</strong>
+					</strong>
+				</h1>
+			</header>
+		</div>
+		<!-- E : header-->
+		<div id="container">
+			<!-- S : lnb-->
+			<div id="lnb">
+				<div class="lnb-inner">
+					<div class="tit-rcnt">
+						<h2>CSS Guide</h2>
+						<!-- <span class="rcnt"><a href="#"><img src="./images/btn_all_view.png" alt="전체보기" /></a></span> -->
+					</div>
+					<nav class="gd-nav">
+						<div class="menu">
+							<ul>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="index.html"><strong>공통</strong></a>
+								</li>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="list.html"><strong>목록화면</strong></a></li>
+								<li class="sub-open">
+									<button class="fold">하위메뉴 있음</button>
+									<a href="detail.html"><strong>상세화면</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="detail.html#gd03-1"><strong>상태바</strong></a></li>
+											<li><a href="detail.html#gd03-2"><strong>기본 테이블</strong></a></li>
+											<li><a href="detail.html#gd03-3"><strong>변형 테이블</strong></a></li>
+										</ul>
+									</div>
+								</li>
+								<li class="sub-open">
+									<button class="fold">하위메뉴 있음</button>
+									<a href="etc.html"><strong>기타</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="etc.html#gd04-1"><strong>통계</strong></a></li>
+											<li><a href="etc.html#gd04-2"><strong>탭&amp;파일첨부&amp;페이징</strong></a></li>
+											<li><a href="etc.html#gd04-3"><strong>설명문구</strong></a></li>
+											<li><a href="etc.html#gd04-4"><strong>로딩바</strong></a></li>
+											<li><a href="etc.html#gd04-5"><strong>그래프컬러 가이드</strong></a></li>
+										</ul>
+									</div>
+								</li>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="popup.html"><strong>팝업</strong></a>
+								</li>
+								<li>
+									<button class="fold">하위메뉴 없음</button>
+									<a href="button.html"><strong>버튼</strong></a>
+								</li>
+								<li class="sub-open">
+									<button class="fold">하위메뉴 있음</button>
+									<a href="board.html"><strong>게시판</strong></a>
+									<div class="sub-depth">
+										<ul>
+											<li><a href="board.html#gd07-1"><strong>목록</strong></a></li>
+											<li><a href="board.html#gd07-2"><strong>상세</strong></a></li>
+											<li><a href="board.html#gd07-3"><strong>등록</strong></a></li>
+										</ul>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</nav>
+				</div>
+			</div>
+			<!-- E : lnb -->
+			<!-- S : content -->
+			<div id="content">
+				<!-- S : 게시판 -->
+				<section class="section" id="gd07">
+					<div class="h3-tit">
+						<h3>게시판</h3>
+					</div>
+					<article class="article-cnt" id="gd07-1">
+						<div class="h4-tit">
+							<h4>목록</h4>
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+							<img src="./images/ex/ex_bbs_list.gif" alt="게사판 목록 예시 화면">
+						</div>
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<!-- 공지글 체크, 페이지 당 글 갯수 제어 -->
+								<div class="ub-layout floatBox count-view">
+									<div class="ub-layout rightBox" style="width:69%; text-align:right;">
+										<input id="ckNoticeHide" class="ub-control input-checkbox" type="checkbox"><label>공지글 숨기기</label>
+										<select id="pageSize" name="pageSize" class="ub-control select " style="width:100px;" size="1" defaultvalue="">
+											<option value="10">10개씩 보기</option>
+											<option value="20">20개씩 보기</option>
+											<option value="50">50개씩 보기</option>
+										</select>
+									</div>
+								</div>
+								<!-- //공지글 체크, 페이지 당 글 갯수 제어 -->
+								<!-- 목록 테이블 -->
+								<div id="list" class="list-wrap">
+									<table class="ub-control table bbs-list">
+									<colgroup>
+										<col style="width:5%">
+										<col style="width:55%">
+										<col style="width:15%">
+										<col style="width:10%">
+										<col style="width:5%">
+										<col style="width:5%">
+										<col style="width:5%">
+									</colgroup>
+									<thead>
+										<tr>
+											<th><strong>번호</strong></th>
+											<th><strong>제목</strong></th>
+											<th><strong>작성자</strong></th>
+											<th><strong>작성일</strong></th>
+											<th><strong>조회수</strong></th>
+											<th><strong>추천수</strong></th>
+											<th><strong>반대수</strong></th>
+										</tr>
+									</thead>
+									<tbody><tr class="notice" name="noticeRow">	<td>공지</td>	<td class="t-left"><a href="#none" onclick="javascript:moveDetail(&quot;4&quot;);">513425</a></td>	<td>[본사아래] 관리자</td>	<td>2015-08-17</td>	<td>5</td>	<td>0</td>	<td>1</td></tr><tr>	<td>4</td>	<td class="t-left"><a href="#none" onclick="javascript:moveDetail(&quot;4&quot;);">513425<span class="icon file"><img src="../page/images/board/ico_file.png" alt="파일"></span>	</a></td>	<td>[본사아래] 관리자</td>	<td>2015-08-17</td>	<td>5</td>	<td>0</td>	<td>1</td></tr><tr>	<td>3</td>	<td class="t-left"><a href="#none" onclick="javascript:moveDetail(&quot;3&quot;);">51324514<span class="icon file"><img src="../page/images/board/ico_file.png" alt="파일"></span>	</a></td>	<td>[본사아래] 관리자</td>	<td>2015-08-17</td>	<td>10</td>	<td>0</td>	<td>0</td></tr><tr>	<td>5</td>	<td class="t-left"><a href="#none" onclick="javascript:moveDetail(&quot;5&quot;);">&nbsp;&nbsp;<span class="icon re"><img src="../page/images/board/ico_re.png" alt="댓글"></span>123	</a></td>	<td>[본사아래] 관리자</td>	<td>2015-08-17</td>	<td>4</td>	<td>1</td>	<td>1</td></tr><tr>	<td>1</td>	<td class="t-left"><a href="#none" onclick="javascript:moveDetail(&quot;1&quot;);">1231235555	</a></td>	<td>[본사아래] 관리자</td>	<td>2015-08-17</td>	<td>4</td>	<td>0</td>	<td>0</td></tr></tbody>
+									</table>
+								</div>
+								<!-- //목록 테이블 -->
+								<!-- 페이징 -->
+								<div class="ub-layout pagging">
+									<div class="ub-control temp" style="border:2px solid gray;width:100%;height:30px;text-align:center;">
+										<h3 style="padding-top:3px;">Paging Navigation</h3>
+									</div>
+									<div id="page" name="page" class="ub-control pagging" for="list" formid="defaultForm" function="fnGetListData"><span class="total-count">전체:4</span><em param="1" class="num">1</em> </div>
+								</div>
+								<!-- //페이징 -->
+								<!-- 게시글 검색 -->
+								<div class="ub-layout board-sch">
+									<select id="SEARCH_KEY" name="SEARCH_KEY" class="ub-control select " style="width:80px;" size="1" defaultvalue="">
+										<option value="DS_TITLE">제목</option>
+								<!-- 		<option value="DS_CONTENT">내용</option> -->
+										<option value="REG_USER_NM">작성자</option>
+									</select>
+									<input type="text" class="ub-control input-text " id="SEARCH_VALUE" name="SEARCH_VALUE" style="text-align:left;width:170px;" value="">
+									<span class="ub-control button search" id="btnSearch">
+										<a href="#none" title="Search">검색</a>
+									</span>
+								</div>
+								<!-- //게시글 검색 -->
+							</pre>
+						</div>
+					</article>
+					<article class="article-cnt" id="gd07-2">
+						<div class="h4-tit">
+							<h4>상세</h4>
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+							<img src="./images/ex/ex_bbs_view.gif" alt="게시판 상세 예시 화면">
+						</div>
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+								<!-- 게시글 보기-->
+								<form id="defaultForm" name="defaultForm">
+									<input type="hidden" id="ID_BOARD" name="ID_BOARD" value="DEFAULT">
+									<input type="hidden" id="ID_ARTICLE" name="ID_ARTICLE" value="3">
+									<input type="hidden" id="ID_SUB" name="ID_SUB" value="-">
+								<div class="ub-layout details">
+									<div class="ub-control bbs-view">
+										<div class="bbs-tit">
+											<div class="num" style="width:10%;"><strong class="bar">3</strong></div>
+											<div class="tit" style="width:50%;">
+												<p><strong>51324514</strong></p>
+											</div>
+											<div class="date" style="width:30%;">
+												<strong>2015-08-17  11:53</strong>
+								<!-- 				<span class="ub-control button icon bbs"><a href="#none"><span class="ico-pdf"></span>PDF</a></span> -->
+								<!-- 				<span class="ub-control button icon bbs"><a href="#none"><span class="ico-print"></span>Print</a></span> -->
+											</div>
+										</div>
+										<div class="w-info">
+											<span class="writer">글쓴이 : <a href="#none" id="manLayerOpenBtn">[본사아래] 관리자</a></span>
+											<span class="bar">조회수 : 10</span>
+											<span class="bar agree"><span class="icon"></span>추천 : <a href="#none" id="evaluationGood">0</a></span>
+											<span class="bar disagree"><span class="icon"></span>반대 : <a href="#none" id="evaluationBad">0</a></span>
+										</div>
+										<div class="bbs-cont">
+											<div class="bbs-txt">
+												5132451345
+											</div>
+										</div>
+									</div>
+									<!-- 인력 레이어 -->
+									<div id="manLayer" style="display: none;">
+										<div class="man-layer" style="width:240px; position:absolute; top:0; left:0;">
+											<div class="man-header-wrap">
+												<div class="man-header">
+													<span class="close" id="manLayerCloseBtn">
+														<a href="#none"><span>닫기</span></a>
+													</span>
+												</div>
+											</div>
+											<div class="man-body">
+												<div class="man-info">
+													<img src="../page/images/board/@pic.jpg" class="pic" alt="">
+													<div class="info">
+														<strong class="name">[본사아래] 관리자</strong>
+														<ul>
+															<li><span class="item">부서</span> : </li>
+															<li><span class="item">직책</span> : </li>
+															<li><span class="item">회사</span> : </li>
+														</ul>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<!-- //인력 레이어 -->
+								</div>
+
+								<script type="text/javascript">
+								eventBus.addListener({
+									  id : 'articleBody'
+									, onLoad : function(){
+										$('#evaluationGood').click(function(){
+											fnEvaluationGood();
+										});
+
+										$('#evaluationBad').click(function(){
+											fnEvaluationBad();
+										});
+
+										$('#manLayerCloseBtn').click(function(){
+											$('#manLayer').css('display', 'none');
+										});
+
+										$('#manLayerOpenBtn').click(function(){
+											$('#manLayer').css('display', '');
+										});
+
+										// 해당게시물에 대한 쿠키가 없으면 조회수 증가 + 쿠키생성
+										var visitUserCookie = $.cookie('3');
+										if(visitUserCookie != 'admin'){
+											fnIncreasedHitCount();
+										}
+
+										console.debug('articleBody >> onLoad Complete');
+									}
+									, onSearch : function(){
+
+										console.debug('articleBody >> onSearch Complete');
+									}
+								});
+
+								function fnEvaluationGood(){
+									var url = uxl.getFunctionUrl(_SCREEN_ID,'USERDEFINED4');
+									var option = {
+											data:{CD_EVALUATION:"01", ID_ARTICLE:'3', ID_BOARD:'DEFAULT', ID_SUB:'-'}
+										  , success:function(result) {
+												var resultCount = result.getResultKey();
+												$('#evaluationGood').text(resultCount);
+											}
+										  , async:true
+										  , message : {
+												confirm : uxl.getMessage('@message.common.confirm', '추천'),
+												fail : uxl.getMessage('@message.common.fail', '추천')
+											}
+									};
+									uxl.callFunction(url, option);
+								}
+
+								function fnEvaluationBad(){
+									var url = uxl.getFunctionUrl(_SCREEN_ID,'USERDEFINED4');
+									var option = {
+											data:{CD_EVALUATION:"02", ID_ARTICLE:'3', ID_BOARD:'DEFAULT', ID_SUB:'-'}
+										  , success:function(result) {
+												var resultCount = result.getResultKey();
+												$('#evaluationBad').text(resultCount);
+											}
+										  , async:true
+										  , message : {
+												confirm : uxl.getMessage('@message.common.confirm', '반대'),
+												fail : uxl.getMessage('@message.common.fail', '반대')
+											}
+									};
+									uxl.callFunction(url, option);
+								}
+
+								function fnIncreasedHitCount(){
+									var url = uxl.getFunctionUrl(_SCREEN_ID,'UPDATE');
+									var option = {
+											data:{ID_ARTICLE:'3', ID_BOARD:'DEFAULT', ID_SUB:'-'}
+										  , success:function(result) {
+												$.cookie('3', 'admin', {expires: 1});
+											}
+										  , async:true
+									};
+									uxl.callFunction(url, option);
+								}
+								</script>
+								<div class="ub-layout details">
+									<div class="ub-control stit">
+										<strong class="title">파일첨부</strong>
+									</div>
+									<div class="floatBox file-attach">
+										<div class="ub-layout file-box">
+											<div class="sort-image" id="divFile">
+												<ul>
+								<!-- 					<li> -->
+								<!-- 						<div class="thumb"> -->
+								<!-- 							<div class="layer"> -->
+								<!-- 								<ul> -->
+								<!-- 									<li><a href="#">다운로드</a></li> -->
+								<!-- 									<li><a href="#">미리보기</a></li> -->
+								<!-- 								</ul> -->
+								<!-- 							</div> -->
+								<!-- 							<div class="img"><img src="../page/images/board/@thumb.jpg" alt="" /></div> -->
+								<!-- 							<div class="file-name"><span><img src="../page/images/board/ico_file.png" alt="파일" />pic.jpg</span></div> -->
+								<!-- 							<span class="close"><a href="#" class="blind">삭제</a></span> -->
+								<!-- 						</div>						 -->
+								<!-- 					</li> -->
+								<!-- 					<li> -->
+								<!-- 						<div class="thumb"> -->
+								<!-- 							<div class="img"><img src="../page/images/board/@thumb.jpg" alt="" /></div> -->
+								<!-- 							<div class="file-name"><span><img src="../page/images/board/ico_file.png" alt="파일" />pic.jpg</span></div> -->
+								<!-- 						</div> -->
+								<!-- 					</li> -->
+								<!-- 					<li> -->
+								<!-- 						<div class="thumb"> -->
+								<!-- 							<div class="img"><img src="../page/images/board/thumb_excel.jpg" alt="" /></div> -->
+								<!-- 							<div class="file-name"><span><img src="../page/images/board/ico_file.png" alt="파일" />요거슨엑세루.jpg</span></div> -->
+								<!-- 						</div> -->
+								<!-- 					</li> -->
+												<li fileid="1" title="Desert.jpg"><div class="thumb"><div class="layer"><ul><li><a href="#none" onclick="location.href='/file/download.ub?fileId=1'">다운로드</a></li><li><a href="#none" onclick="dndFile.previewFile('1', 'Desert.jpg')">미리보기</a></li></ul></div><div class="img"><div><img src="/boardfile/thumbnail.ub?imageId=1&amp;wSize=106&amp;hSize=74" alt=""></div></div><div class="ellipsis file-name"><span><img src="../page/images/board/ico_file.png" alt="파일">Desert.jpg</span></div></div><input type="hidden" name="file_info.id" id="file_info.id" value="1"><input type="hidden" name="file_info.delYn" id="file_info.delYn" value="N"></li>
+												</ul>
+											</div>
+										</div>
+									</div>
+									<!-- 파일 미리보기 -->
+								<!-- 	<div style=""> -->
+								<!-- 		<div class="pre-layer" style="width:436px;"> -->
+								<!-- 			<div class="pre-layer-header"> -->
+								<!-- 					<strong class="ellipsis">pic.jpg 미리보기</strong> -->
+								<!-- 				<span class="close"><a href="#"><span>미리보기 닫기</span></a></span> -->
+								<!-- 			</div> -->
+								<!-- 			<div class="pre-layer-body"> -->
+								<!-- 				<div class="inner"> -->
+								<!-- 					<div class="img"><img src="../page/images/board/@preview.jpg" alt="" /></div> -->
+								<!-- 				</div> -->
+								<!-- 				<div class="bottom-btn"> -->
+								<!-- 					<a href="#"><span>다운받기</span></a> -->
+								<!-- 				</div> -->
+								<!-- 			</div> -->
+								<!-- 		</div> -->
+								<!-- 	</div> -->
+									<!-- 파일 미리보기 -->
+								</div>
+								<script type="text/javascript">
+								eventBus.addListener({
+									  id : 'boardFileControl'
+									, onLoad : function(){
+										fnRunFileControl();
+										console.debug('boardFileControl >> onLoad Complete');
+									}
+									, onSearch : function(){
+
+										console.debug('boardFileControl >> onSearch Complete');
+									}
+								});
+								function fnRunFileControl(){
+									var readOnly = true;
+								// 	if(!readOnly){
+										var acceptedType = new Array();
+										var options = {
+											  divId : 'dndFile'
+											, attachType : 'dndFile'
+											, readonly : readOnly
+											, targetId : 'divFile'
+											, formId : 'defaultForm'
+											, acceptedType : acceptedType
+											, maxFileVolume : 'null'
+											, maxFileCount : '0'
+											, listner : null
+										};
+										dndFile.dndAction(options);
+								// 	}
+								// 	fnLoadingFile(readOnly);
+								}
+
+								function fnLoadingFile(readOnly){
+									var url = uxl.getFunctionUrl(_SCREEN_ID,'USERDEFINED7');
+									var option = {
+											data:{ID_BOARD:'DEFAULT', ID_ARTICLE:'3', ID_SUB:'-'}
+										  , success:function(result) {
+												dndFile.loadingFile(result.getDataList('file_info'), "divFile", {readOnly:readOnly});
+										  }
+										  , async:true
+									};
+									uxl.callFunction(url, option);
+								}
+								</script>
+								</form>
+								<!--// 게시글 보기 -->
+								<!-- 버튼 -->
+								<div class="ub-layout button bottom">
+									<div class="ub-layout floatBox">
+										<div class="ub-layout leftBox" style="width:49%; text-align:left;" id="divBottomLeft">
+											<span class="ub-control button bottom left icon" title="PreArticle" onclick="javascript:fnPreArticle();">
+												<a href="#none" title="PreArticle">이전글</a>
+											</span>
+											<span class="ub-control button bottom left icon" title="NextArticle" onclick="javascript:fnNextArticle();">
+												<a href="#none" title="NextArticle">다음글</a>
+											</span>
+										</div>
+										<div class="ub-layout rightBox" style="width:49%" id="divBottomRight">
+											<span class="ub-control button bottom icon" title="RegistAnswer" onclick="javascript:fnRegistAnswer();">
+												<a href="#none" title="RegistAnswer">답글</a>
+											</span>
+											<span class="ub-control button bottom icon" title="Update" onclick="javascript:fnUpdateArticle();">
+												<a href="#none" title="Update">수정</a>
+											</span>
+											<span class="ub-control button bottom icon" title="Delete" onclick="javascript:fnDeleteArticle();">
+												<a href="#none" title="Delete">삭제</a>
+											</span>
+										</div>
+									</div>
+								</div>
+								<!-- //버튼 -->
+								<!-- 추후 댓글관련 부분 업데이트 예정 -->
+							</pre>
+						</div>
+					</article>
+					<article class="article-cnt" id="gd07-3">
+						<div class="h4-tit">
+							<h4>등록</h4>
+						</div>
+						<div class="ex-view">
+							<h5><img src="./images/txt_ex.gif" alt="예시화면"></h5>
+							<img src="./images/ex/ex_bbs_reg.gif" alt="게시판 등록 예시 화면">
+						</div>
+						<div class="source">
+							<h5>HTML Code</h5>
+							<pre class="brush: xml;">
+							<!-- 등록 화면 -->
+							<form id="defaultForm" name="defaultForm">
+								<input type="hidden" id="ID_BOARD" name="ID_BOARD" value="DEFAULT">
+								<input type="hidden" id="ID_SUB" name="ID_SUB" value="-">
+								<input type="hidden" id="FG_NOTICE" name="FG_NOTICE" value="N">
+							<div class="ub-layout details">
+								<div class="ub-control bbs-reg">
+									<div class="bbs-tit">
+										<div class="tit" style="width:10%;"><strong class="bar"><label for="DS_TITLE">제목<span class="required">*</span></label></strong></div>
+										<div class="insert" style="width:80%;">
+											<input type="text" class="ub-control input-text" id="DS_TITLE" name="DS_TITLE" style="width:90%;" metaessential="1" maxlength="100">
+										</div>
+									</div>
+									<div class="notice-chk">
+										<input type="checkbox" class="ub-control input-checkbox" id="chkNotice" name="chkNotice">
+										<label>공지사항으로 등록하기</label>
+									</div>
+									<div class="editor">
+										<textarea class="ub-control textarea " id="DS_CONTENT" name="DS_CONTENT" style="width:99%;" rows="10"></textarea>
+										<input type="hidden" id="CONTENT_EDITOR" name="CONTENT_EDITOR" value="N">
+									</div>
+								</div>
+							</div>
+
+							<script type="text/javascript">
+							eventBus.addListener({
+								  id : 'registerBody'
+								, onLoad : function(){
+									$('#chkNotice').click(function(){
+										fnCheckNotice(this);
+									});
+									console.debug('registerBody >> onLoad Complete');
+								}
+								, onRegist : function(){
+									var content = $('#DS_CONTENT');
+									if(content.val() == null || content.val() == ''){
+										uxl.showMessage('내용을 입력해주세요.');
+										content.focus();
+										return false;
+									}
+									console.debug('registerBody >> onRegist Complete');
+								}
+							});
+							function fnCheckNotice(chkNotice){
+								if(chkNotice.checked){
+									$('#FG_NOTICE').val('Y');
+								}else{
+									$('#FG_NOTICE').val('N');
+								}
+							}
+							</script>
+
+							<div class="ub-layout details">
+								<div class="ub-control stit">
+									<strong class="title">파일첨부</strong>
+								</div>
+								<div class="floatBox file-attach">
+									<div class="ub-layout file-box">
+										<div class="sort-image" id="divFile">
+											<ul>
+							<!-- 					<li> -->
+							<!-- 						<div class="thumb"> -->
+							<!-- 							<div class="layer"> -->
+							<!-- 								<ul> -->
+							<!-- 									<li><a href="#">다운로드</a></li> -->
+							<!-- 									<li><a href="#">미리보기</a></li> -->
+							<!-- 								</ul> -->
+							<!-- 							</div> -->
+							<!-- 							<div class="img"><img src="../page/images/board/@thumb.jpg" alt="" /></div> -->
+							<!-- 							<div class="file-name"><span><img src="../page/images/board/ico_file.png" alt="파일" />pic.jpg</span></div> -->
+							<!-- 							<span class="close"><a href="#" class="blind">삭제</a></span> -->
+							<!-- 						</div>						 -->
+							<!-- 					</li> -->
+							<!-- 					<li> -->
+							<!-- 						<div class="thumb"> -->
+							<!-- 							<div class="img"><img src="../page/images/board/@thumb.jpg" alt="" /></div> -->
+							<!-- 							<div class="file-name"><span><img src="../page/images/board/ico_file.png" alt="파일" />pic.jpg</span></div> -->
+							<!-- 						</div> -->
+							<!-- 					</li> -->
+							<!-- 					<li> -->
+							<!-- 						<div class="thumb"> -->
+							<!-- 							<div class="img"><img src="../page/images/board/thumb_excel.jpg" alt="" /></div> -->
+							<!-- 							<div class="file-name"><span><img src="../page/images/board/ico_file.png" alt="파일" />요거슨엑세루.jpg</span></div> -->
+							<!-- 						</div> -->
+							<!-- 					</li> -->
+											</ul>
+										</div>
+									</div>
+									<div id="divFileUp" name="divFileUp" class="div-dropBox">
+										<article id="dndFile" name="dndFile" class="ub-dnd-image">
+											<div class="holder"><strong>Click</strong><strong> &amp; </strong><strong>Drop</strong><strong> File Here</strong><div class="upload"><a href="#none"><img src="../page/images/board/btn_upload.png" alt="upload"></a></div></div>
+											<p class="upload hidden"><input type="file" multiple=""></p>
+										</article>
+									</div>
+									<progress id="uploadprogress" min="0" max="100" value="0" style="width:100%; display:none;"></progress>
+								</div>
+
+								<!-- 파일 미리보기 -->
+							<!-- 	<div style=""> -->
+							<!-- 		<div class="pre-layer" style="width:436px;"> -->
+							<!-- 			<div class="pre-layer-header"> -->
+							<!-- 					<strong class="ellipsis">pic.jpg 미리보기</strong> -->
+							<!-- 				<span class="close"><a href="#"><span>미리보기 닫기</span></a></span> -->
+							<!-- 			</div> -->
+							<!-- 			<div class="pre-layer-body"> -->
+							<!-- 				<div class="inner"> -->
+							<!-- 					<div class="img"><img src="../page/images/board/@preview.jpg" alt="" /></div> -->
+							<!-- 				</div> -->
+							<!-- 				<div class="bottom-btn"> -->
+							<!-- 					<a href="#"><span>다운받기</span></a> -->
+							<!-- 				</div> -->
+							<!-- 			</div> -->
+							<!-- 		</div> -->
+							<!-- 	</div> -->
+								<!-- 파일 미리보기 -->
+							</div>
+							<script type="text/javascript">
+							eventBus.addListener({
+								  id : 'boardFileControl'
+								, onLoad : function(){
+									fnRunFileControl();
+									console.debug('boardFileControl >> onLoad Complete');
+								}
+								, onSearch : function(){
+
+									console.debug('boardFileControl >> onSearch Complete');
+								}
+							});
+							function fnRunFileControl(){
+								var readOnly = false;
+							// 	if(!readOnly){
+									var acceptedType = new Array();
+									var options = {
+										  divId : 'dndFile'
+										, attachType : 'dndFile'
+										, readonly : readOnly
+										, targetId : 'divFile'
+										, formId : 'defaultForm'
+										, acceptedType : acceptedType
+										, maxFileVolume : 'null'
+										, maxFileCount : '0'
+										, listner : null
+									};
+									dndFile.dndAction(options);
+							// 	}
+							// 	fnLoadingFile(readOnly);
+							}
+
+							function fnLoadingFile(readOnly){
+								var url = uxl.getFunctionUrl(_SCREEN_ID,'USERDEFINED7');
+								var option = {
+										data:{ID_BOARD:'', ID_ARTICLE:'', ID_SUB:''}
+									  , success:function(result) {
+											dndFile.loadingFile(result.getDataList('file_info'), "divFile", {readOnly:readOnly});
+									  }
+									  , async:true
+								};
+								uxl.callFunction(url, option);
+							}
+							</script>
+							</form>
+							<!-- //등록 화면 -->
+							</pre>
+						</div>
+					</article>
+				</section>
+				<!-- E : 게시판 -->
+
+
+			</div>
+			<!-- E : content -->
+		</div><!-- E : container -->
+	</div><!-- E : wrap -->
+</body>
+</html>

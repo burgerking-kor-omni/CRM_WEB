@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="APM0005" screenType="list" screenLayoutType="Default" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>APMD /  서비스관리 목록</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0005</fileName>
+  <functions>
+    <function id="FNCAPM0018" isStartFunction="false" functionName="서비스 목록 조회 호출" serviceId="SVCAPM0009" alias="INQUIRY"/>
+    <function id="FNCAPM0019" isStartFunction="false" functionName="서비스 목록 조회 (자동완성) 호출" serviceId="SVCAPM0010" alias="USERDEFINED1"/>
+    <function id="FNCAPM0020" isStartFunction="true" functionName="서비스관리 기본정보 조회(dummy) 호출" serviceId="SVCAPM0017" alias=""/>
+    <function id="FNCAPM0078" isStartFunction="false" functionName="서비스관리 화면 캐쉬 모두 삭제 호출" serviceId="SVCAPM0078" alias="USERDEFINED2"/>
+    <function id="FNCAPM0087" isStartFunction="false" functionName="서비스관리 / 서비스 XML 파일다운로드 호출" serviceId="SVCAPM0087" alias="EXPORT"/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

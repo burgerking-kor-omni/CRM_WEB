@@ -1,0 +1,75 @@
+@charset "utf-8";
+
+.ub-layout.menu.simple {position:absolute; top:50px; right:30px;}
+nav .ub-control.menu:after {content:".";display:block;height:0;clear:both;visibility:hidden;}
+nav .ub-control.menu {zoom:1;}
+nav .ub-control.menu li {text-align:center;}
+nav .ub-control.menu li a {display:inline-block;padding:4px 10px 3px 10px; font-weight:bold;font-size:14px;color:#a2a2a2;cursor:pointer;}
+nav .ub-control.menu li.menu-item {float:left; padding:0 20px; position:relative; background:url('../../../page/images/common/bar_nav.gif') no-repeat 0 9px;}
+nav .ub-control.menu li.menu-item:first-child {background-image:none;}
+nav .ub-control.menu li.menu-item:hover {}
+nav .ub-control.menu li.menu-item a {padding-bottom:7px;}
+nav .ub-control.menu .menu-sub-box {display:none; position:absolute;top:33px;left:47%; margin-left:-90px; z-index: 2002;}
+/* nav .ub-control.menu li.menu-item.last .menu-sub-box {right:0; margin-left:-115px;} */
+nav .ub-control.menu li.menu-item.last .menu-sub-box .menu-sub-box {margin-left:0; margin-bottom:0px;}
+nav .ub-control.menu .menu-sub-box ul {margin-top:6px;padding:6px 7px 6px; width:170px; border:1px solid #c1c1c1;border-top:0 none;background-color:#fff;}
+nav .ub-control.menu .menu-sub-box ul:after {content:".";display:block;height:0;clear:both;visibility:hidden;}
+nav .ub-control.menu .menu-sub-box ul li.menu-sub-item {position:relative; padding-top:1px; background:url(../../../page/images/common/bg_line_dotted.gif) repeat-x 0 0;line-height:15px; text-align:left;}
+nav .ub-control.menu .menu-sub-box ul li.menu-sub-item:first-child {background:none;}
+nav .ub-control.menu .menu-sub-box ul li.menu-sub-item a {display:block;margin:1px 0 0;padding:5px 16px 5px 13px;background-image:url(../../../page/images/common/ico_submenu.gif) no-repeat 10px 110px;font-size:1em;color:#444;}
+nav .ub-control.menu .menu-sub-box ul li.menu-sub-item:hover a, nav .ub-control.menu .menu-sub-box ul li.menu-sub-item a:hover {background-color:#5180ca;background-image:url(../../../page/images/common/ico_submenu_on.gif) no-repeat 0 100%; color:#fff;}
+nav .ub-control.menu li.menu-item:hover a {color:#fff;}
+/* nav .ub-control.menu li.menu-item:hover .menu-sub-box ul li a {color:#2b93c2;} */
+nav .ub-control.menu li.menu-item:hover .menu-sub-box ul li:hover a, nav .ub-control.menu li.menu-item:hover .menu-sub-box ul li a:hover {color:#fff;}
+nav .ub-control.menu .menu-sub-box .menu-sub-box {position:relative;top:0;left:0%;width:170px;margin-left:0;margin-bottom:0;}
+nav .ub-control.menu .menu-sub-box .menu-sub-box ul {margin-top:0px;padding:5px 0 3px;border:none;border-radius:0;background-color:#f4f4f4;}
+nav .ub-control.menu .menu-sub-box .menu-sub-box li.menu-sub-item {background:none; padding-left:15px; padding-right:5px;}
+nav .ub-control.menu .menu-sub-box .menu-sub-box li.menu-sub-item a {margin:0;padding:0px 0px 5px 6px;background-image:url(../../../page/images/common/ico_gray2.gif);background-repeat:no-repeat;background-position:0px 6px;font-size:12px;color:#666;font-weight:normal;}
+nav .ub-control.menu .menu-sub-box .menu-sub-box li.menu-sub-item a:hover {background-color:transparent; color:#746253;text-decoration:underline;}
+nav .ub-control.menu li.menu-item:hover .menu-sub-box .menu-sub-box li.menu-sub-item a {color:#666666;}
+nav .ub-control.menu li.menu-item:hover .menu-sub-box .menu-sub-box li.menu-sub-item a:hover {color:#746253;}
+nav .ub-control.menu li.menu-sub-item:hover li.menu-sub-item a {background-color:transparent; background-position:0 6px;}
+
+nav .ub-control.menu .menu-sub-box ul li.menu-sub-item .menu-sub-arrow {position:absolute;top:10px;right:7px;display:inline-block;width:9px;height:7px;background:url(../../../page/images/common/ico_menu_sub_arrow.gif) no-repeat 0 0;}
+nav .ub-control.menu .menu-sub-box ul li.menu-sub-item:hover .menu-sub-arrow {background:url(../../../page/images/common/ico_menu_sub_arrow.gif) no-repeat 0 -83px;}
+
+nav .ub-control.menu li .menu-sub-box .subbox-arrow {margin-left:-5px; display:inline-block; width:11px; height:7px; vertical-align: middle; position:absolute; left:50%; top:0px;background:url('../../../page/images/common/ico_subbox-arrow.gif') no-repeat 0 0;}
+
+/* TopMenu */
+#menu-navi {
+	clear: both;
+}
+#navtabs {
+	position: relative;
+	z-index: 2001;
+}
+
+/* simplemenu + 아이콘 추가 (메뉴 활성화 케이스 포함) */
+.icon {margin-right:5px; display:inline-block; vertical-align:top;}
+.icon.type01 {width:16px; height:18px; background:url('../../../page/images/menu_icon/ico_type01.png') no-repeat 0 2px;}
+a:hover .icon.type01,
+.active .icon.type01 {background:url('../../../page/images/menu_icon/ico_type01_over.png') no-repeat 0 2px;}
+.icon.type02 {width:19px; height:17px; background:url('../../../page/images/menu_icon/ico_type02.png') no-repeat 0 2px;}
+a:hover .icon.type02,
+.active .icon.type02 {background:url('../../../page/images/menu_icon/ico_type02_over.png') no-repeat 0 2px;}
+.icon.type03 {width:16px; height:18px; background:url('../../../page/images/menu_icon/ico_type03.png') no-repeat 0 2px;}
+a:hover .icon.type03,
+.active .icon.type03 {background:url('../../../page/images/menu_icon/ico_type03_over.png') no-repeat 0 2px;}
+.icon.type04 {width:16px; height:20px; background:url('../../../page/images/menu_icon/ico_type04.png') no-repeat 0 0;}
+a:hover .icon.type04,
+.active .icon.type04 {background:url('../../../page/images/menu_icon/ico_type04_over.png') no-repeat 0 0;}
+.icon.type05 {width:19px; height:18px; background:url('../../../page/images/menu_icon/ico_type05.png') no-repeat 0 2px;}
+a:hover .icon.type05,
+.active .icon.type05 {background:url('../../../page/images/menu_icon/ico_type05_over.png') no-repeat 0 2px;}
+.icon.type06 {width:24px; height:18px; background:url('../../../page/images/menu_icon/ico_type06.png') no-repeat 0 1px;}
+a:hover .icon.type06,
+.active .icon.type06 {background:url('../../../page/images/menu_icon/ico_type06_over.png') no-repeat 0 1px;}
+.icon.type07 {width:19px; height:19px; background:url('../../../page/images/menu_icon/ico_type07.png') no-repeat 0 0;}
+a:hover .icon.type07,
+.active .icon.type07 {background:url('../../../page/images/menu_icon/ico_type07_over.png') no-repeat 0 0;}
+.icon.type08 {width:17px; height:18px; background:url('../../../page/images/menu_icon/ico_type08.png') no-repeat 0 1px;}
+a:hover .icon.type08,
+.active .icon.type08 {background:url('../../../page/images/menu_icon/ico_type08_over.png') no-repeat 0 1px;}
+.icon.type09 {width:17px; height:19px; background:url('../../../page/images/menu_icon/ico_type09.png') no-repeat 0 3px;}
+a:hover .icon.type09,
+.active .icon.type09 {background:url('../../../page/images/menu_icon/ico_type09_over.png') no-repeat 0 3px;}

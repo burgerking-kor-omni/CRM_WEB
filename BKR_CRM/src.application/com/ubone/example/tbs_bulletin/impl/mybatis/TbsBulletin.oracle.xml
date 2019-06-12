@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="EUC-KR"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+	<mapper namespace="TbsBulletin">
+	
+	<!-- FAQ 신규 등록 -->
+	<insert id="insertFaq" parameterType="map">
+	
+	<selectKey keyProperty="SEQ_TBS_BULLETIN" resultType="String" order="BEFORE">
+		SELECT SEQ_TBS_BULLETIN.NEXTVAL FROM DUAL 
+	</selectKey>
+		INSERT INTO TBS_BULLETIN
+		(
+		    ID_BULLETIN    		/* 게시판ID	*/
+		  , TP_SYSTEM    		/* 시스템구분 */
+		  , TP_BULLETIN    		/* 게시판구분(01:FAQ, 02:자료실)	*/
+		  , TP_CATEGORY    		/* 카테고리	*/
+		  , ID_SEQ    				/* 게시판구분별순번 */
+	  	  , DS_TITLE    			/* 제목 */
+	  	  , DS_CONTENT    		/* 상세내용 */
+		  , DS_CONT_DTL    		/* 상세내용2 */
+		  , ID_PARENT    			/* 상위ID */
+		  , FG_ANS    				/* 답변글여부 */
+		  , FG_ANS_LEVEL    		/* 답변레벨 */
+		  , FG_ATTACH    			/* 파일첨부여부	 */
+		  , FG_OPEN    			/* 공개여부	*/
+		  , ID_VOC    				/* 관련VOC번호 */
+		  , FG_DEL    				/* 삭제여부 */
+		  , DT_REG    				/* 최초등록일시 */
+		  , ID_REG_DEPT    		/* 최초등록부서 */
+		  , ID_REG_EMP    		/* 최초등록자 */
+		  , DT_UPT    				/* 최근수정일시	 */
+		  , ID_UPT_DEPT    		/* 최근수정부서	 */
+		  , ID_UPT_EMP    		/* 최근수정자 */
+		    )
+		VALUES (
+		    #{SEQ_TBS_BULLETIN}		/* 게시판ID	*/
+		  , #{TP_SYSTEM}   		/* 시스템구분 */
+		  , '01'		    				/* 게시판구분(01:FAQ, 02:자료실)	*/
+		  , #{CD_CATEGORY_1}  		/* 카테고리	*/
+		  , #{ID_SEQ}    				/* 게시판구분별순번 */
+		  , #{DS_TITLE}    			/* 제목 */
+		  , #{DS_CONTENT}   		/* 상세내용 */
+		  , #{DS_CONT_DTL}  		/* 상세내용2 */
+		  , #{ID_PARENT}    			/* 상위ID */
+		  , #{FG_ANS}    				/* 답변글여부 */
+		  , #{FG_ANS_LEVEL} 		/* 답변레벨	*/
+		  , #{FG_ATTACH}    		/* 파일첨부여부	 */
+		  , #{FG_OPEN}    			/* 공개여부 */
+		  , #{ID_VOC}    				/* 관련VOC번호 */
+		  , 'N'		    					/* 삭제여부 */
+		  , CURRENT_TIMESTAMP	/* 최초등록일시	 */
+		  , #{user.partCode}  		/* 최초등록부서 */
+		  , #{user.id}   				/* 최초등록자 */
+		  , CURRENT_TIMESTAMP	/* 최근수정일시 */
+		  , #{user.partCode}  		/* 최근수정부서 */
+		  , #{user.id}   				/* 최근수정자 */
+		)
+            
+	</insert>
+	
+	<!-- FAQ 수정	-->
+	<update id="updateFaq" parameterType="map">
+
+		UPDATE TBS_BULLETIN
+		     SET ID_BULLETIN	=	#{ID_BULLETIN}    		/* 게시판ID */
+		 	     , TP_BULLETIN	=	'01'   							/* 게시판구분(01:FAQ, 02:자료실) */
+		 	     , TP_CATEGORY	=	#{TP_CATEGORY}   		/* 카테고리	*/
+			     , DS_TITLE			=	#{DS_TITLE}    			/* 제목 */
+			     , DS_CONTENT	=	#{DS_CONTENT}    		/* 상세내용  */
+			     , DT_UPT			=	CURRENT_TIMESTAMP	/* 최근수정일시	 */
+			     , ID_UPT_DEPT	=	#{user.partCode}   		/* 최근수정부서 */
+			     , ID_UPT_EMP		=	#{user.id}		   			/* 최근수정자  */
+		 WHERE ID_BULLETIN	=	#{ID_BULLETIN}    		/* 게시판ID */
+   
+	</update>
+	
+	<!-- FAQ 삭제 -->
+	<delete id="deleteFaq" parameterType="map">
+		UPDATE TBS_BULLETIN
+  			   SET FG_DEL = 'Y'
+		     WHERE ID_BULLETIN = #{ID_BULLETIN}    /* 게시판ID */
+		
+	</delete>
+	
+	<!-- 자료실 신규 등록 -->
+	<insert id="insertRef" parameterType="map">
+	
+		<selectKey keyProperty="SEQ_VOC_REFER" resultType="String" order="BEFORE">
+			SELECT SEQ_TBS_BULLETIN.NEXTVAL FROM DUAL
+		</selectKey>
+		    INSERT INTO TBS_BULLETIN(
+				 	  ID_BULLETIN      	/* 게시판ID	 */
+					, TP_SYSTEM    	   	/* 시스템구분 */
+					, TP_BULLETIN      	/* 게시판구분(01:FAQ, 02:자료실) */
+					, TP_CATEGORY      	/* 카테고리 */
+					, ID_SEQ    	   			/* 게시판구분별순번	 */
+					, DS_TITLE    	  		/* 제목 */
+					, DS_CONTENT       	/* 상세내용 */
+					, DS_CONT_DTL      	/* 상세내용2 */
+					, ID_PARENT    	   	/* 상위ID */
+					, FG_ANS    	   		/* 답변글여부 */
+					, FG_ANS_LEVEL     	/* 답변레벨 */
+					, CNT_INQUIRY      	/* 조회수 */
+					, CNT_RECOMMEND  	/* 추천수 */
+					, FG_ATTACH    	   	/* 파일첨부여부  */
+					, FG_OPEN    	  		/* 공개여부 */
+					, ID_VOC    	   		/* 관련VOC번호 */
+					, FG_DEL    	   			/* 삭제여부 */
+					, DT_REG    	   		/* 최초등록일시 */
+					, ID_REG_DEPT      	/* 최초등록부서 */
+					, ID_REG_EMP       	/* 최초등록바  */
+					, DT_UPT    	   		/* 최근수정일시  */
+					, ID_UPT_DEPT      	/* 최근수정부서 */
+					, ID_UPT_EMP       	/* 최근수정자 */
+			   ) VALUES (
+				  	#{SEQ_VOC_REFER} 	/* 게시판ID	 */
+					, #{TP_SYSTEM}     	/* 시스템구분 */
+					, '02'		       				/* 게시판구분(01:FAQ, 02:자료실)	*/
+					, #{TP_CATEGORY_2} 	/* 카테고리  */
+					, #{ID_SEQ}    	   		/* 게시판구분별순번	 */
+					, #{DS_TITLE}      		/* 제목	 */
+					, #{DS_CONTENT}    	/* 상세내용 */
+					, #{DS_CONT_DTL}   	/* 상세내용2 */
+					, #{ID_PARENT}     		/* 상위ID */
+					, #{FG_ANS}    	   		/* 답변글여부 */
+					, #{FG_ANS_LEVEL}  	/* 답변레벨 */
+					, #{CNT_INQUIRY}   	/* 조회수  */
+					, #{CNT_RECOMMEND} /* 추천수	 */
+					, #{FG_ATTACH}     	/* 파일첨부여부	 */
+					, #{FG_OPEN}       		/* 공개여부  */
+					, #{ID_VOC}    	   		/* 관련VOC번호 */
+					, 'N'		       				/* 삭제여부 */
+					, CURRENT_TIMESTAMP/* 최초등록일시 */
+					, #{user.partCode} 		/* 최초등록부서 */
+					, #{user.id}   	   			/* 최초등록자 */
+					, CURRENT_TIMESTAMP	/* 최근수정일시	*/
+					, #{user.partCode} 		/* 최근수정부서 */
+					, #{user.id}   	   			/* 최근수정자 */
+			   	)
+            
+	</insert>
+	
+	<!-- 자료실 수정	-->
+	<update id="updateRef" parameterType="map">
+	
+		 	UPDATE TBS_BULLETIN
+			  SET
+				   ID_BULLETIN  		=	#{ID_BULLETIN}    		/* 게시판ID */
+				 , TP_SYSTEM			=	#{TP_SYSTEM}      		/* 시스템구분 */
+				 , TP_BULLETIN		=	'02'   			  				/* 게시판구분(01:FAQ, 02:자료실)*/
+				 , TP_CATEGORY		=	#{TP_CATEGORY_2}  	/* 카테고리  */
+				 , ID_SEQ				=	#{ID_SEQ}    	  			/* 게시판구분별순번*/
+				 , DS_TITLE				=	#{DS_TITLE}    	  		/* 제목*/
+				 , DS_CONTENT		=	#{DS_CONTENT}     	/* 상세내용*/
+				 , DS_CONT_DTL		=	#{DS_CONT_DTL}    	/* 상세내용*/
+				 , ID_PARENT			=	#{ID_PARENT}      		/* 상위ID*/
+				 , FG_ANS				=	#{FG_ANS}    	  			/* 답변글여부*/
+				 , FG_ANS_LEVEL		=	#{FG_ANS_LEVEL}   	/* 답변레벨*/
+				 , CNT_INQUIRY		=	#{CNT_INQUIRY}    		/* 조회수*/
+				 , CNT_RECOMMEND	=	#{CNT_RECOMMEND} 	/* 추천수 */
+				 , FG_ATTACH			=	#{FG_ATTACH}      		/* 파일첨부여부*/
+				 , FG_OPEN				=	#{FG_OPEN}        		/* 공개여부	*/
+				 , ID_VOC				=	#{ID_VOC}         		/* 관련VOC번호*/
+				 , FG_DEL				=	'N'    	  		  				/* 삭제여부*/
+				 , DT_UPT				=	CURRENT_TIMESTAMP 	/* 최근수정일시 */
+				 , ID_UPT_DEPT		=	#{user.partCode}  		/* 최근수정부서*/
+				 , ID_UPT_EMP			=	#{user.id}     	  			/* 최근수정자*/
+		 WHERE ID_BULLETIN 		=	#{ID_BULLETIN}    		
+   
+	</update>
+	
+	<!-- 자료실 삭제 -->
+	
+	<delete id="deleteRef" parameterType="map">
+		 	UPDATE TBS_BULLETIN
+  			   	 SET FG_DEL = 'Y'
+		     WHERE ID_BULLETIN = #{ID_BULLETIN}   
+	</delete>
+	
+</mapper>

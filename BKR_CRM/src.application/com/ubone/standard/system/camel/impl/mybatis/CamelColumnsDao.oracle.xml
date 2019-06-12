@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.samsung.nahq.b2e.portal.camel.dao.CamelColumnsDao">
+	
+	<select id="listColumns" parameterType="String" resultType="hmap">
+		SELECT A.TABLE_NAME
+			 , B.COLUMN_NAME
+		     , B.DATA_TYPE
+		     , B.DATA_LENGTH
+		  FROM USER_TABLES A
+		     , USER_TAB_COLUMNS B 
+		 WHERE A.TABLE_NAME = B.TABLE_NAME 
+       	   AND A.TABLE_NAME LIKE #{tableName}
+	</select>
+	
+	<select id="listAutocompleate" resultType="lmap" parameterType="String">
+		SELECT TABLE_NAME AS LABEL
+			 , TABLE_NAME AS VALUE
+	      FROM USER_TABLES
+	     WHERE UPPER(TABLE_NAME) LIKE UPPER('%'||#{tableName}||'%')
+	</select>
+</mapper>

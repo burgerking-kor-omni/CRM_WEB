@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ApiAddress">
+	
+	<!--
+		QueryId     : ApiUser.getAddress
+		Description : 회원 주소 정보 조회
+	 -->
+	<select id="getAddress" parameterType="map" resultType="lmap">
+		SELECT NO_ADDRESS AS "no_address"                       /* 주소 일련번호 */
+			 , ID_MEMBER AS "id_member"                         /* 회원PK */
+			 , ID_STORE AS "id_store"                           /* 매장PK */
+			 , BRANCH_IDX AS "branch_idx"                       /* 매장 소구역 코드 */
+			 , DELIVERY_TIME AS "delivery_time"                 /* 배달 예상시간 */
+			 , NIGHT_STORE_PK AS "night_store_pk"               /* 야간 매장PK */
+			 , NIGHT_BRANCH_IDX AS "night_branch_idx"           /* 야간 매장 소구역 코드 */
+			 , NIGHT_DELIVERY_TIME AS "night_delivery_time"     /* 야간 배당 예상시간 */
+			 , NM_ADDR AS "nm_addr"                             /* 주소제목 */
+			 , YN_ADDR_BASE AS "yn_addr_base"                   /* 기본주소여부 */
+			 , ZIP_CODE AS "zip_code"                           /* 우편번호 */
+			 , DS_ADDR_STREET AS "ds_addr_street"               /* 도로명주소 */
+			 , DS_ADDR_STREET_DTL  AS "ds_addr_street_dtl"      /* 도로명주소상세 */
+			 , DS_ADDR AS "ds_addr"                             /* 지번주소 */
+			 , DS_ADDR_DTL AS "ds_addr_dtl"                     /* 지번주소상세 */
+			 , CUST_DONG_SI AS "cust_dong_si"                   /* 주문시 사용 - 지번주소 시 */
+			 , CUST_DONG_GU AS "cust_dong_gu"                   /* 주문시 사용 - 지번주소 구 */
+			 , CUST_DONG_DONG AS "cust_dong_dong"               /* 주문시 사용 - 지번주소 동 */
+			 , CUST_DONG_APPEND AS "cust_dong_append"           /* 주문시 사용 - 지번주소 번지 */
+			 , CUST_GIL_SI AS "cust_gil_si"                     /* 주문시 사용 - 도로명 시 */
+			 , CUST_GIL_GU AS "cust_gil_gu"                     /* 주문시 사용 - 도로명 구 */
+			 , CUST_GIL_GIL AS "cust_gil_gil"                   /* 주문시 사용 - 도로명 길 */
+			 , CUST_GIL_APPEND AS "cust_gil_append"             /* 주문시 사용 - 도로명 건물번호 */
+			 , CUST_GIL_DONG_DESC AS "cust_gil_dong_desc"       /* 주문시 사용 - 주소 추가 상세 주소 */
+			 , X_COORDINATES AS "x_coordinates"                 /* 주문시 사용 - 회원좌표X */
+			 , Y_COORDINATES AS "y_coordinates"                 /* 주문시 사용 - 회원좌표Y */
+			 , CD_SEARCH_CHNN
+		  FROM CRMADMIN.TBS_MEMBER_ADDRESS
+		 WHERE 1 = 1
+		   AND ID_MEMBER = #{ID_MEMBER}
+		<if test="NO_ADDRESS != null and NO_ADDRESS != ''">
+		   AND NO_ADDRESS = #{NO_ADDRESS}
+		</if>
+
+	</select>
+	
+	<!--
+		QueryId     : ApiUser.getOmniStorInfo
+		Description : 매장정보조회
+	 -->
+	<select id="getOmniStorInfo" parameterType="map" resultType="lmap">
+		SELECT OS.STOR_CD
+		     , OS.STOR_NM
+		     , OS.TEL_NO
+		     , OS.DELIVERY_TEL_NO
+		  FROM OMNI.OMNI_STOR_APP OS
+		 WHERE OS.DLVYN = '1'
+	       AND OS.STOR_CD = #{STOR_CD}
+
+	</select>
+
+	<!-- ************************************************************** -->
+	<!-- ************************************************************** -->
+	<!-- ************************************************************** -->
+	
+	<!--
+		QueryId     : ApiAddress.insertAddress
+		Description : 회원가입
+	 -->
+	<insert id="insertAddress" parameterType="map">
+		<selectKey keyProperty="SEQ_TBS_MEMBER_ADDRESS" resultType="String" order="BEFORE">
+			SELECT CRMADMIN.SEQ_TBS_MEMBER_ADDRESS.NEXTVAL FROM DUAL 
+		</selectKey>
+					
+		INSERT INTO CRMADMIN.TBS_MEMBER_ADDRESS
+		(
+			   NO_ADDRESS               /* 주소 일련번호 */
+			 , ID_MEMBER                /* 회원PK */
+			 , ID_STORE                 /* 매장PK */
+			 , BRANCH_IDX               /* 매장 소구역 코드 */
+			 , DELIVERY_TIME            /* 배달 예상시간 */
+			 , NIGHT_STORE_PK           /* 야간 매장PK */
+			 , NIGHT_BRANCH_IDX         /* 야간 매장 소구역 코드 */
+			 , NIGHT_DELIVERY_TIME      /* 야간 배당 예상시간 */
+			 , NM_ADDR                  /* 주소제목 */
+			 , YN_ADDR_BASE             /* 기본주소여부 */
+			 , ZIP_CODE                 /* 우편번호 */
+			 , DS_ADDR_STREET           /* 도로명주소 */
+			 , DS_ADDR_STREET_DTL       /* 도로명주소상세 */
+			 , DS_ADDR                  /* 지번주소 */
+			 , DS_ADDR_DTL              /* 지번주소상세 */
+			 , CUST_DONG_SI             /* 주문시 사용 - 지번주소 시 */
+			 , CUST_DONG_GU             /* 주문시 사용 - 지번주소 구 */
+			 , CUST_DONG_DONG           /* 주문시 사용 - 지번주소 동 */
+			 , CUST_DONG_APPEND         /* 주문시 사용 - 지번주소 번지 */
+			 , CUST_GIL_SI              /* 주문시 사용 - 도로명 시 */
+			 , CUST_GIL_GU              /* 주문시 사용 - 도로명 구 */
+			 , CUST_GIL_GIL             /* 주문시 사용 - 도로명 길 */
+			 , CUST_GIL_APPEND          /* 주문시 사용 - 도로명 건물번호 */
+			 , CUST_GIL_DONG_DESC       /* 주문시 사용 - 주소 추가 상세 주소 */
+			 , X_COORDINATES            /* 주문시 사용 - 회원좌표X */
+			 , Y_COORDINATES            /* 주문시 사용 - 회원좌표Y */
+			 , DT_REG                   /* 최초등록일시 */
+			 , DT_UPT                   /* 최근수정일시 */
+			 , CD_SEARCH_CHNN           /* 조회채널구분 */
+		) VALUES (
+		       #{SEQ_TBS_MEMBER_ADDRESS}
+			 , #{ID_MEMBER}
+			 , #{ID_STORE}
+			 , #{BRANCH_IDX}
+			 , #{DELIVERY_TIME}
+			 , #{NIGHT_STORE_PK}
+			 , #{NIGHT_BRANCH_IDX}
+			 , #{NIGHT_DELIVERY_TIME}
+			 , #{NM_ADDR}
+			 , NVL(#{YN_ADDR_BASE}, 'N')
+			 , #{ZIP_CODE}
+			 , #{DS_ADDR_STREET}
+			 , #{DS_ADDR_STREET_DTL}
+			 , #{DS_ADDR}
+			 , #{DS_ADDR_DTL}
+			 , #{CUST_DONG_SI}
+			 , #{CUST_DONG_GU}
+			 , #{CUST_DONG_DONG}
+			 , #{CUST_DONG_APPEND}
+			 , #{CUST_GIL_SI}
+			 , #{CUST_GIL_GU}
+			 , #{CUST_GIL_GIL}
+			 , #{CUST_GIL_APPEND}
+			 , #{CUST_GIL_DONG_DESC}
+			 , #{X_COORDINATES}
+			 , #{Y_COORDINATES}
+			 , SYSDATE
+		     , SYSDATE
+		     , #{CD_SEARCH_CHNN}
+		)
+		    
+	</insert>
+	
+	<!--
+		QueryId     : ApiAddress.deleteAddress
+		Description : 주소삭제 
+	 -->
+	<delete id="deleteAddress" parameterType="map">
+		DELETE CRMADMIN.TBS_MEMBER_ADDRESS
+		 WHERE NO_ADDRESS = #{NO_ADDRESS}
+
+	</delete>
+	
+	<!--
+		QueryId     : ApiUser.updateAddress
+		Description : 주소수정
+	 -->
+	<update id="updateAddress" parameterType="map">
+		UPDATE CRMADMIN.TBS_MEMBER_ADDRESS
+		   SET DT_UPT               = SYSDATE                   /* 최근수정일시 */
+			 , ID_UPT_USER          = #{ID_MEMBER}              /* 최근수정자 */
+		<if test="ID_STORE != null and ID_STORE != ''">
+			 , ID_STORE             = #{ID_STORE}               /* 매장PK */
+		</if>
+		<if test="BRANCH_IDX != null and BRANCH_IDX != ''">
+			 , BRANCH_IDX           = #{BRANCH_IDX}             /* 매장 소구역 코드 */			 
+		</if>
+		<if test="DELIVERY_TIME != null and DELIVERY_TIME != ''">
+			 , DELIVERY_TIME        = #{DELIVERY_TIME}          /* 배달 예상시간 */			 
+		</if>
+		<if test="NIGHT_STORE_PK != null and NIGHT_STORE_PK != ''">
+			 , NIGHT_STORE_PK       = #{NIGHT_STORE_PK}         /* 야간 매장PK */			 
+		</if>
+		<if test="NIGHT_BRANCH_IDX != null and NIGHT_BRANCH_IDX != ''">
+			 , NIGHT_BRANCH_IDX     = #{NIGHT_BRANCH_IDX}       /* 야간 매장 소구역 코드 */			 
+		</if>
+		<if test="NIGHT_DELIVERY_TIME != null and NIGHT_DELIVERY_TIME != ''">
+			 , NIGHT_DELIVERY_TIME  = #{NIGHT_DELIVERY_TIME}    /* 야간 배당 예상시간 */			 
+		</if>
+		<if test="NM_ADDR != null and NM_ADDR != ''">
+			 , NM_ADDR              = #{NM_ADDR}                /* 주소제목 */			 
+		</if>
+		<if test="YN_ADDR_BASE != null and YN_ADDR_BASE != ''">
+			 , YN_ADDR_BASE         = #{YN_ADDR_BASE}           /* 기본주소여부 */			 
+		</if>
+		<if test="ZIP_CODE != null and ZIP_CODE != ''">
+			 , ZIP_CODE             = #{ZIP_CODE}               /* 우편번호 */			 
+		</if>
+		<if test="DS_ADDR_STREET != null and DS_ADDR_STREET != ''">
+			 , DS_ADDR_STREET       = #{DS_ADDR_STREET}         /* 도로명주소 */
+		</if>
+		<if test="DS_ADDR_STREET_DTL != null and DS_ADDR_STREET_DTL != ''">
+			 , DS_ADDR_STREET_DTL   = #{DS_ADDR_STREET_DTL}     /* 도로명주소상세 */
+		</if>
+		<if test="DS_ADDR != null and DS_ADDR != ''">
+			 , DS_ADDR              = #{DS_ADDR}                /* 지번주소 */
+		</if>
+		<if test="DS_ADDR_DTL != null and DS_ADDR_DTL != ''">
+			 , DS_ADDR_DTL          = #{DS_ADDR_DTL}            /* 지번주소상세 */
+		</if>
+		<if test="CUST_DONG_SI != null and CUST_DONG_SI != ''">
+			 , CUST_DONG_SI         = #{CUST_DONG_SI}           /* 주문시 사용 - 지번주소 시 */
+		</if>
+		<if test="CUST_DONG_GU != null and CUST_DONG_GU != ''">
+			 , CUST_DONG_GU         = #{CUST_DONG_GU}           /* 주문시 사용 - 지번주소 구 */
+		</if>
+		<if test="CUST_DONG_DONG != null and CUST_DONG_DONG != ''">
+			 , CUST_DONG_DONG       = #{CUST_DONG_DONG}         /* 주문시 사용 - 지번주소 동 */
+		</if>
+		<if test="CUST_DONG_APPEND != null and CUST_DONG_APPEND != ''">
+			 , CUST_DONG_APPEND     = #{CUST_DONG_APPEND}       /* 주문시 사용 - 지번주소 번지 */
+		</if>
+		<if test="CUST_GIL_SI != null and CUST_GIL_SI != ''">
+			 , CUST_GIL_SI          = #{CUST_GIL_SI}            /* 주문시 사용 - 도로명 시 */
+		</if>
+		<if test="CUST_GIL_GU != null and CUST_GIL_GU != ''">
+			 , CUST_GIL_GU          = #{CUST_GIL_GU}            /* 주문시 사용 - 도로명 구 */
+		</if>
+		<if test="CUST_GIL_GIL != null and CUST_GIL_GIL != ''">
+			 , CUST_GIL_GIL         = #{CUST_GIL_GIL}           /* 주문시 사용 - 도로명 길 */
+		</if>
+		<if test="CUST_GIL_APPEND != null and CUST_GIL_APPEND != ''">
+			 , CUST_GIL_APPEND      = #{CUST_GIL_APPEND}        /* 주문시 사용 - 도로명 건물번호 */
+		</if>
+		<if test="CUST_GIL_DONG_DESC != null and CUST_GIL_DONG_DESC != ''">
+			 , CUST_GIL_DONG_DESC   = #{CUST_GIL_DONG_DESC}     /* 주문시 사용 - 주소 추가 상세 주소 */
+		</if>
+		<if test="X_COORDINATES != null and X_COORDINATES != ''">
+			 , X_COORDINATES        = #{X_COORDINATES}          /* 주문시 사용 - 회원좌표X */
+		</if>
+		<if test="Y_COORDINATES != null and Y_COORDINATES != ''">
+			 , Y_COORDINATES        = #{Y_COORDINATES}          /* 주문시 사용 - 회원좌표Y */
+		</if>
+		 WHERE NO_ADDRESS = #{NO_ADDRESS}
+
+	</update>
+	
+	<!--
+		QueryId     : ApiUser.updateAddressBase
+		Description : 주소수정 - 기본주소여부
+	 -->
+	<update id="updateAddressBase" parameterType="map">
+		UPDATE CRMADMIN.TBS_MEMBER_ADDRESS
+		   SET DT_UPT               = SYSDATE                   /* 최근수정일시 */
+			 , ID_UPT_USER          = #{ID_MEMBER}              /* 최근수정자 */
+			 , YN_ADDR_BASE         = 'N'                       /* 기본주소여부 */
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+		   AND NO_ADDRESS <![CDATA[<>]]> #{NO_ADDRESS}
+
+	</update>
+
+</mapper>
+ 

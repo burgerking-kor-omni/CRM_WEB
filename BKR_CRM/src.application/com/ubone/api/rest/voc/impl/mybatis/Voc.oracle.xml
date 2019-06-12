@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ApiVoc">
+
+	<!--
+		QueryId     : ApiVoc.getMailSendCause
+		Description : 메일전송용 정보조회
+	 -->
+	<select id="getMailSendCause" parameterType="map" resultType="lmap">
+		SELECT CASE WHEN LENGTH(#{CD_VOC_CAUSE}) = 2 THEN CAUSE1.CODE_NAME
+		            ELSE CAUSE1.CODE_NAME || ' > ' || CAUSE2.CODE_NAME
+		        END NM_VOC_CAUSE
+		  FROM (SELECT #{CD_VOC_CAUSE} AS PARAM_CAUSE
+		          FROM DUAL
+		        ) A
+		   LEFT OUTER JOIN CRMADMIN.SYS_CODE CAUSE1
+		    ON CAUSE1.CODE = SUBSTR(A.PARAM_CAUSE,0,2)
+		   AND CAUSE1.CODE_CATEGORY_ID = 'CD_VOC_CAUSE_1'
+		  LEFT OUTER JOIN CRMADMIN.SYS_CODE CAUSE2
+		    ON CAUSE2.CODE = A.PARAM_CAUSE
+		   AND CAUSE2.CODE_CATEGORY_ID = 'CD_VOC_CAUSE_2'
+	</select>
+	
+	<!--
+		QueryId     : ApiVoc.getMailData
+		Description : 메일 템플릿 데이터 조회
+	 -->
+	<select id="getMailData" parameterType="map" resultType="lmap">
+		SELECT TVM.ID_VOC
+             , TVM.CD_VOC_CAUSE
+             , TVM.NM_CUST
+             , TVM.NO_PHONE
+             , TVM.DS_EMAIL
+             , TO_CHAR(TVM.DT_REG, 'YYYY-MM-DD HH24:MI:SS') AS DT_REG
+             , TVM.ID_STORE
+             , TVM.DS_TITLE
+             , TVM.DS_CONT
+             , NVL(MST.STOR_NM, '선택안됨') AS NM_STORE
+             , DECODE(TVM.YN_PRIVACY_AGREE, 'Y', 'O', 'X') AS YN_PRIVACY_AGREE
+		     , DECODE(TVM.YN_SENSITIVE_AGREE, 'Y', 'O', 'X') AS YN_SENSITIVE_AGREE
+		     , DECODE(TVM.YN_PRIVACY_ORDER_AGREE, 'Y', 'O', 'X') AS YN_PRIVACY_ORDER_AGREE
+		     , DECODE(TVM.YN_SENSITIVE_ORDER_AGREE, 'Y', 'O', 'X') AS YN_SENSITIVE_ORDER_AGREE
+		  FROM CRMADMIN.TBS_VOC_MASTER  TVM
+          LEFT OUTER JOIN OMNI.OMNI_STOR_APP MST
+            ON MST.STOR_CD = TVM.ID_STORE
+           AND MST.CMP_CD = 'BKR'
+           AND MST.SALES_ORG_CD = '1000'
+           AND MST.STOR_STATUS = '1'
+           AND SUBSTR(MST.STOR_CD, 4, 1) != 9
+           AND TO_CHAR(SYSDATE, 'YYYYMMDD') >= MST.SALES_START_DATE 
+		 WHERE ID_VOC = #{ID_VOC}
+	</select>
+	
+	<!--
+		QueryId     : ApiVoc.getMailDataFile
+		Description : 메일 템플릿 파일 데이터 조회
+	 -->
+	<select id="getMailDataFile" parameterType="map" resultType="lmap">
+		SELECT ID_VOC
+		     , FILE_KEY
+		     , FILE_NM
+		  FROM CRMADMIN.TBS_VOC_ATTACH
+		 WHERE ID_VOC = #{ID_VOC}
+	</select>
+
+	<!-- ************************************************************** -->
+	<!-- ************************************************************** -->
+	<!-- ************************************************************** -->
+	
+	<!--
+		QueryId     : ApiVoc.insertVoc
+		Description : 문의/클레임 등록
+	 -->
+	<insert id="insertVoc" parameterType="map">
+		INSERT INTO CRMADMIN.TBS_VOC_MASTER
+		(
+			   ID_VOC                    /* VOC ID */
+			 , BIZ_CHNN                  /* 접수채널 */
+			 , ID_BIZ_KEY                /* 업무별ID */
+			 , ORDER_NO                  /* 주문번호 */
+			 , ID_STORE                  /* 매장ID */
+			 , FG_MEMBER                 /* 회원여부 */
+			 , ID_MEMBER                 /* 회원PK */
+			 , NM_CUST                   /* 이름 */
+			 , NO_PHONE                  /* 연락처 */
+			 , DS_EMAIL                  /* 이메일 */
+			 , YN_PRIVACY_AGREE          /* 개인정보수집동의여부 */
+			 , YN_SENSITIVE_AGREE        /* 민감정보수집동의여부 */
+			 , YN_PRIVACY_ORDER_AGREE    /* 개인정보제3자제공동의여부 */
+			 , YN_SENSITIVE_ORDER_AGREE  /* 민감정보제3자제공동의여부 */
+			 , CD_VOC_STATUS             /* VOC상태 */
+			 , CD_ACT_CAUSE              /* 처리결과유형 */
+			 , DS_ACT_CONT               /* 처리내용 */
+			 , DT_VOC_ACT                /* 처일일시 */
+			 , ID_ACT_EMP                /* 처리자 */
+			 , ID_ACT_DEPT               /* 처리부서 */
+			 , CD_VOC_CAUSE              /* VOC접수유형 */
+			 , DS_TITLE                  /* 제목 */
+			 , DS_CONT                   /* 내용 */
+			 , DS_DISPATCH_CONT          /* 통보내용 */
+			 , FG_DEL                    /* 삭제여부 */
+			 , DT_REG                    /* 최초등록일시 */
+			 , ID_REG_USER               /* 최초등록자 */
+			 , DT_UPT                    /* 최근수정일시 */
+			 , ID_UPT_USER               /* 최근수정자 */
+			 , DT_VOC_REG                /* VOC 발생일 */
+			 , MENU_CD                   /* 메뉴 코드 */
+			 , PAYMENT_TYPE              /* 결제 방법 */
+			 , PAYMENT_PRC               /* 결제 금액 */
+			 , DT_ORDER                  /* 주문일자 */
+			 , MENU_NM                   /* 메뉴명 */
+			 , CD_STATUS                 /* 회원상태 */
+			 , POS_ORDER_NO              /* POS 주문번호 */
+			 , OMNI_ORDER_NO             /* OMNI 주문번호 */
+			 , CALL_ORDER_NO             /* CALL 주문번호 */
+			 , FG_SEND
+		) VALUES (
+		       #{ID_VOC}                                                      
+			 , #{BIZ_CHNN}
+			 , #{ID_BIZ_KEY}
+			 , #{ORDER_NO}
+			 , #{ID_STORE}
+			 , #{FG_MEMBER}
+			 , #{ID_MEMBER}
+			 , #{NM_CUST}
+			 , #{NO_PHONE}
+			 , #{DS_EMAIL}
+			 , #{YN_PRIVACY_AGREE}
+			 , #{YN_SENSITIVE_AGREE}
+			 , #{YN_PRIVACY_ORDER_AGREE}
+			 , #{YN_SENSITIVE_ORDER_AGREE}
+			 , #{CD_VOC_STATUS}
+			 , #{CD_ACT_CAUSE}
+			 , #{DS_ACT_CONT}
+			 , DECODE(#{CD_VOC_STATUS}, '02', SYSDATE, NULL)
+			 , DECODE(#{CD_VOC_STATUS}, '02', #{ID_REG_USER}, NULL)
+			 , #{ID_ACT_DEPT}
+			 , #{CD_VOC_CAUSE}
+			 , #{DS_TITLE}
+			 , #{DS_CONT}
+			 , #{DS_DISPATCH_CONT}
+			 , 'N'
+			 , SYSDATE
+			 , #{ID_REG_USER}
+			 , SYSDATE
+			 , #{ID_UPD_USER}
+			 , TO_DATE(#{DT_VOC_REG}, 'YYYY-MM-DD')
+			 , NULL
+			 , #{PAYMENT_TYPE}
+			 , #{PAYMENT_PRC}
+			 , TO_DATE(#{DT_ORDER}, 'YYYY-MM-DD HH24:MI:SS')
+			 , #{MENU_NM}
+			 , #{CD_STATUS}
+			 , #{POS_ORDER_NO}
+			 , #{OMNI_ORDER_NO}
+			 , #{CALL_ORDER_NO}
+			 , 'N'
+		)
+		    
+	</insert>
+	
+	<!--
+		QueryId     : ApiVoc.insertVocFile
+		Description : 문의/클레임 파일 등록
+	 -->
+	<insert id="insertVocFile" parameterType="map">
+		INSERT INTO CRMADMIN.TBS_VOC_ATTACH
+		(
+			   ID_VOC                  /* VOC ID */
+			 , FILE_NM                 /* 파일명 */
+			 , FILE_KEY                /* 파일키 */
+		) VALUES (
+		       #{ID_VOC}                                                      
+			 , #{FILE_NM}
+			 , 'images/voc/' || #{FILE_KEY}
+		)
+		    
+	</insert>
+	
+	<!--
+		QueryId     : ApiVoc.updateVoc
+		Description : 문의/클레임 수정
+	 -->
+	<update id="updateVoc" parameterType="map">
+		UPDATE CRMADMIN.TBS_VOC_MASTER
+		   SET DT_UPT = SYSDATE
+		     , ID_UPT_USER = #{ID_UPD_USER}
+		<if test="CD_ACT_CAUSE != null and CD_ACT_CAUSE != ''">
+		     , CD_ACT_CAUSE = #{CD_ACT_CAUSE}
+		</if>
+		<if test="DS_ACT_CONT != null and DS_ACT_CONT != ''">
+		     , DS_ACT_CONT = #{DS_ACT_CONT}
+		</if>
+		<if test="CD_VOC_CAUSE != null and CD_VOC_CAUSE != ''">
+		     , CD_VOC_CAUSE = #{CD_VOC_CAUSE}
+		</if>
+		<if test="CD_VOC_STATUS != null and CD_VOC_STATUS != ''">
+		     , DT_VOC_ACT = DECODE(#{CD_VOC_STATUS}, '02', SYSDATE, NULL)
+		     , ID_ACT_EMP = DECODE(#{CD_VOC_STATUS}, '02', #{ID_UPD_USER}, NULL)
+			 , CD_VOC_STATUS = #{CD_VOC_STATUS}
+		</if>
+		 WHERE ID_VOC = #{ID_VOC}
+
+	</update>
+	
+	<!--
+		QueryId     : ApiUser.deleteVoc
+		Description : 문의/클레임 삭제 
+	 -->
+	<delete id="deleteVoc" parameterType="map">
+		UPDATE CRMADMIN.TBS_VOC_MASTER
+		   SET FG_DEL = 'Y'
+		     , DT_UPT = SYSDATE
+		 WHERE ID_VOC = #{ID_VOC}
+
+	</delete>
+	
+</mapper>
+ 

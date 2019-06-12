@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+	<!--
+	================================================================================
+	 익명사용자와 시스템사용자 객체 설정
+	 - 해당객체는 로그인 객체의 클래스를 정의한다.
+	================================================================================
+	-->
+	<bean id="anonymouseUser" class="com.ubone.standard.login.domain.VocUser">
+		<property name="id" 			value="Anonymouse" />
+		<property name="name"			value="익명유저" />
+		<property name="languageCode"	value="ko" />
+		<property name="roles">
+			<list>
+				<value>7</value>
+				<value>8</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="systemUser"     class="com.ubone.standard.login.domain.VocUser">
+		<property name="id" 			value="System.user" />
+		<property name="name"			value="시스템유저" />
+		<property name="languageCode"	value="ko" />
+		<property name="roles">
+			<list>
+			</list>
+		</property>
+	</bean>
+</beans>

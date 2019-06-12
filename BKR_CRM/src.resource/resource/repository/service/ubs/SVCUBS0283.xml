@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<serviceBuilder id="SVCSYS0283" isProtectedResource="false" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <serviceName>게시판관리 / 게시판 상세 정보 조회</serviceName>
+  <serviceType type="Read">
+    <paging isPaging="false" pagingCount="-1"/>
+    <isFindConditionSave>false</isFindConditionSave>
+  </serviceType>
+  <serviceComponentType type="Custom">
+    <className>com.ubone.standard.ubboard.system.service.BoardManageSO</className>
+    <methodName>getDetail</methodName>
+    <linkedFile>false</linkedFile>
+    <inducedEvent>false</inducedEvent>
+    <linkedWorkCategory></linkedWorkCategory>
+    <linkedActivity></linkedActivity>
+  </serviceComponentType>
+  <serviceCodes version="1.0">
+    <serviceCode id="BOARD_PARTITION_TYPE" includeSleep="false" alias="BOARD_PARTITION_TYPE"/>
+    <serviceCode id="STATUS" includeSleep="false" alias="STATUS"/>
+  </serviceCodes>
+  <serviceMasks version="1.0"/>
+</serviceBuilder>

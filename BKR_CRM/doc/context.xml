@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>    
+    <WatchedResource>WEB-INF/web.xml</WatchedResource>
+
+ 	<Resource name="jdbc/meta" auth="Container" type="javax.sql.DataSource"
+		driverClassName="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:hsql://localhost:9606/ubmeta"
+		username="sa" password="" maxActive="20" maxIdle="10" maxWait="-1" validationQuery="SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS"/>
+  	
+	<!-- CRM oracle -->
+	<Resource name="jdbc/application" auth="Container" type="javax.sql.DataSource"
+		driverClassName="core.log.jdbc.driver.OracleDriver" url="jdbc:oracle:thin:@an2-bkr-dev-omni-oracle.cqnvymkdmidm.ap-northeast-2.rds.amazonaws.com:1521:OMNIDB"
+		username="crmadmin" password="crmadmin" maxActive="20" maxIdle="10" maxWait="-1" validationQuery="SELECT 1 FROM DUAL"/>
+<!-- 	<Resource name="jdbc/application" auth="Container" type="javax.sql.DataSource" -->
+<!-- 		driverClassName="core.log.jdbc.driver.OracleDriver" url="jdbc:oracle:thin:@an2-bkr-prd-omni-oracle.cqnvymkdmidm.ap-northeast-2.rds.amazonaws.com:1521:OMNIDB" -->
+<!-- 		username="crmadmin" password="crmadmin" maxActive="20" maxIdle="10" maxWait="-1" validationQuery="SELECT 1 FROM DUAL"/> -->
+
+	<!-- RIMS oracle -->
+	<Resource name="jdbc/rims" auth="Container" type="javax.sql.DataSource"
+		driverClassName="core.log.jdbc.driver.OracleDriver" 
+		url="jdbc:oracle:thin:@an2-bkr-dev-pos-oracle.cqnvymkdmidm.ap-northeast-2.rds.amazonaws.com:1521:POSDB"
+		username="omni" password="omni!@" maxActive="20" maxIdle="10" maxWait="-1" validationQuery="SELECT 1 FROM DUAL"/>
+
+<!-- 		username="rims" password="rims" maxActive="20" maxIdle="10" maxWait="-1" validationQuery="SELECT 1 FROM DUAL"/> -->
+<!-- 		url="jdbc:oracle:thin:@an2-bkr-tmp-pos-oracle.cqnvymkdmidm.ap-northeast-2.rds.amazonaws.com:1521:posdb" -->
+</Context>
+ 

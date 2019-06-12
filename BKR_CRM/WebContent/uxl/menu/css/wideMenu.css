@@ -1,0 +1,70 @@
+@charset "utf-8";
+
+.ub-layout.menu.wide-menu {position:absolute; top:50px; right:30px;}
+.ub-layout.menu nav .ub-control.menu {display:inline-block;}
+.ub-layout.menu nav .ub-control.menu:after {clear:both; display:block; content:' ';}
+.ub-layout.menu nav .ub-control.menu li {float:left; position:relative; z-index:1; background: url('../../../page/images/common/bar_nav.gif') no-repeat 0 9px;}
+.ub-layout.menu nav .ub-control.menu li:first-child {background-image:none;}
+.ub-layout.menu nav .ub-control.menu li a {padding:0 26px; height:38px; line-height:35px; display:inline-block; font-size:16px; color:#a2a2a2; border:1px solid transparent; border-bottom:0;}
+.ub-layout.menu nav .ub-control.menu li a:hover,
+.ub-layout.menu nav .ub-control.menu li.on a:hover {color:#3557af; border:1px solid #252830; border-bottom:0; background:#fff;}
+.ub-layout.menu nav .ub-control.menu li.on a {color:#fff; background:url('../../../page/images/common/bg_current.gif') repeat-x 0 34px;}
+.ub-layout.menu nav .ub-control.menu li:hover a {color:#3557af; border:1px solid #252830; border-bottom:0; background:#fff;}
+/* .ub-layout.menu nav .ub-control.menu li.on a {height:35px; line-height:30px; color:#fff; border-bottom:3px solid #99cb3a;} */
+
+
+/* sub-depth control */
+.ub-layout.menu nav .ub-control.menu .sub-depth-box {display:none; min-width:180px; position:absolute; top:39px; left:50%; border:1px solid #7c7f87; border-top:0; box-shadow:2px 2px 0px #d9d9d9; webkit-box-shadow:2px 2px 0px #d9d9d9; background:#fff;}
+.ub-layout.menu nav .ub-control.menu .start-line {left:0; margin-left:0 !important;}
+.ub-layout.menu nav .ub-control.menu .end-line {left:auto; right:0;}
+.ub-layout.menu nav .ub-control.menu .sub-depth {margin:10px 0; overflow:hidden; background:url('../../../page/images/common/bg_column.gif') repeat 0 0;}
+.ub-layout.menu nav .ub-control.menu .sub-depth:after {clear:both; display:block; content:' ';}
+.ub-layout.menu nav .ub-control.menu .column {float:left; margin:0 0 0 10px; padding-left:10px; width:180px; min-height:64px; max-height:470px; }
+.ub-layout.menu nav .ub-control.menu .column:first-child {padding-left:0;}
+.ub-layout.menu nav .ub-control.menu .grid01 {width:200px; margin-left:-100px;}
+.ub-layout.menu nav .ub-control.menu .grid02 {width:401px; margin-left:-201px;}
+.ub-layout.menu nav .ub-control.menu .grid03 {width:602px; margin-left:-302px;}
+.ub-layout.menu nav .ub-control.menu .grid04 {width:803px; margin-left:-403px;}
+.ub-layout.menu nav .ub-control.menu .active .sub-depth-box {display:block;}
+
+/* 2depth control */
+.ub-layout.menu nav .ub-control.menu .depth02 li:first-child {margin-top:0;}
+.ub-layout.menu nav .ub-control.menu .depth02 li {float:none; margin-top:1px; display:block; background-image:none;}
+.ub-layout.menu nav .ub-control.menu .depth02 li a {padding:2px 0 5px 18px; display:block; height:auto; line-height:18px; font-size:13px; color:#444; border:0; background:url('../../../page/images/common/bul_dep03_basic.gif') no-repeat 9px 10px;}
+.ub-layout.menu nav .ub-control.menu .depth02 li a:hover {color:#fff; border:0; background:#5180ca url('../../../page/images/common/bul_dep03_over.gif') no-repeat 9px 10px;}
+.ub-layout.menu nav .ub-control.menu .depth02 li.depth-end a {background:url('../../../page/images/common/bul_dep02_basic.gif') no-repeat 9px 10px;}
+.ub-layout.menu nav .ub-control.menu .depth02 li.depth-end a:hover {color:#fff; background:#5180ca url('../../../page/images/common/bul_dep02_over.gif') no-repeat 9px 10px;}
+
+/* 3depth control */
+.ub-layout.menu nav .ub-control.menu .depth03 li:first-child {margin-top:0;}
+.ub-layout.menu nav .ub-control.menu .depth03 li {float:none; margin-top:1px; display:block; background-image:none;}
+.ub-layout.menu nav .ub-control.menu .depth03 li a {padding:2px 0 5px 25px; display:block; height:auto; line-height:16px; font-size:12px; color:#444; border:0; background:url('../../../page/images/common/bul_lastdep_basic.gif') no-repeat 15px 10px;}
+.ub-layout.menu nav .ub-control.menu .depth03 li a:hover {color:#fff; border:0; background:#a8a8a8 url('../../../page/images/common/bul_lastdep_over.gif') no-repeat 15px 10px;}
+.ub-layout.menu nav .ub-control.menu .depth03 li a strong {font-weight:normal;}
+
+
+/* 스크롤 컨트롤 */
+.mCSB_outside + .mCS-minimal.mCSB_scrollTools_vertical,
+.mCSB_outside + .mCS-minimal-dark.mCSB_scrollTools_vertical{
+	right: -10px !important;
+	margin: 5px 0 !important;
+}
+
+/* simplemenu에 아이콘 추가 */
+.icon {margin-right:5px; display:inline-block; vertical-align:top;}
+.icon.type01 {width:16px; height:26px; background:url('../../../page/images/menu_icon/ico_type01.png') no-repeat 0 10px;}
+a:hover .icon.type01 {background:url('../../../page/images/menu_icon/ico_type01_over.png') no-repeat 0 10px;}
+.icon.type02 {width:19px; height:25px; background:url('../../../page/images/menu_icon/ico_type02.png') no-repeat 0 10px;}
+a:hover .icon.type02 {background:url('../../../page/images/menu_icon/ico_type02_over.png') no-repeat 0 10px;}
+.icon.type03 {width:16px; height:26px; background:url('../../../page/images/menu_icon/ico_type03.png') no-repeat 0 10px;}
+a:hover .icon.type03 {background:url('../../../page/images/menu_icon/ico_type03_over.png') no-repeat 0 10px;}
+.icon.type04 {width:16px; height:28px; background:url('../../../page/images/menu_icon/ico_type04.png') no-repeat 0 8px;}
+a:hover .icon.type04 {background:url('../../../page/images/menu_icon/ico_type04_over.png') no-repeat 0 8px;}
+.icon.type05 {width:19px; height:26px; background:url('../../../page/images/menu_icon/ico_type05.png') no-repeat 0 10px;}
+a:hover .icon.type05 {background:url('../../../page/images/menu_icon/ico_type05_over.png') no-repeat 0 10px;}
+.icon.type06 {width:24px; height:27px; background:url('../../../page/images/menu_icon/ico_type06.png') no-repeat 0 10px;}
+a:hover .icon.type06 {background:url('../../../page/images/menu_icon/ico_type06_over.png') no-repeat 0 10px;}
+.icon.type07 {width:19px; height:28px; background:url('../../../page/images/menu_icon/ico_type07.png') no-repeat 0 9px;}
+a:hover .icon.type07 {background:url('../../../page/images/menu_icon/ico_type07_over.png') no-repeat 0 9px;}
+.icon.type08 {width:17px; height:27px; background:url('../../../page/images/menu_icon/ico_type08.png') no-repeat 0 10px;}
+a:hover .icon.type08 {background:url('../../../page/images/menu_icon/ico_type08_over.png') no-repeat 0 10px;}

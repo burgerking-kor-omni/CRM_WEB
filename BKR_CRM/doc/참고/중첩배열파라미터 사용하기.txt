@@ -1,0 +1,40 @@
+고객의 여러건의 주문정보를 처리하는 경우와 같이 다건의 배열 데이타를 처리해야 하는 경우가 있다.
+이럴 경우, 파라미터에 배열 형태로 포함된 내부 파라미터를 추출하여 파라미터의 List 로 반환해주는
+유틸성 메소드(com.ubone.framework.data.DataUtil.extractInnerParameter)가 있다. 
+예를 들어 클라이언트로 부터 전달받은 다음과 같은 JSON 형태의 데이타가 있다.
+(표현 편의상 JSON 형태로 작성했다. form post 형태로 데이타 전달시에도 동일하다.)
+	data = {
+		id:123,
+		name:'test',
+		addr:'seoul',
+		Oder.id:[1, 2, 3],
+		Oder.name:['order1', 'oder2', 'oder3']
+	}
+
+서비스의 메소드에서 해당 데이타를 사용할 경우
+아래와 같이 필요한 데이타를 파라미터로 부터 개별적으로 추출한 다음 파라미터객체를 재설정하여 사용하거나
+	String id = parameter.getParameter("id");
+	String name = parameter.getParameter("name");
+	String addr = parameter.getParameter("addr");
+	String[] oderIds = parameter.getParameter("Oder.id");
+	String[] oderNames = parameter.getParameter("Oder.name");
+	for(int i=0; i<oderIds.length; i++){
+		parameter.setParameter("ODER_ID", oderIds[i]);
+		parameter.setParameter("ODER_NAME", oderNames[i]);
+		
+		// DB 저장 처리
+		dao.doSomething(parameter);
+	}
+
+
+아래와 같이 extractInnerParameter 메소드를 사용하여 반복되는 코드를 줄여 사용할 수 있다.
+	List innerParameterList = DataUtil.extractInnerParameter(parameter, "Oder", true);
+	for(Parameter parameter : innerParameterList) {
+		// DB 저장 처리
+		dao.doSomething(parameter);
+	}
+
+단 extractInnerParameter 메소드를 사용할 경우
+중첩된 배열 파라미터 이름은 반듯이 "Oder.id" 과 같이 지정된 Prefix 명 + "."으로 시작하도록 명명되어야 한다.
+
+해당 메소드의 자세한 내용은 javadoc 주석을 참조할것!

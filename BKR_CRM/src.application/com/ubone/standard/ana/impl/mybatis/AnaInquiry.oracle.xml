@@ -1,0 +1,2038 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="AnaInquiry">
+
+	<!--
+		QueryId     : AnaInquiry.getYearlyAna
+		Description : 연도별 회원현황 목록  조회 
+	 -->
+	<select id="getYearlyAna" parameterType="map" resultType="lmap">
+	
+			SELECT YMD.YYYY||'년' AS AA
+			 , NVL(AAMP.BB,0) AS BB
+			 , NVL(AMP.DD,0) AS DD
+			 , NVL(AMP.FF,0) AS FF
+			 , NVL(AMP.HH,0) AS HH
+			 , NVL(AMP.JJ,0) AS JJ
+			 , NVL(AMP.LL,0) AS LL
+			 , NVL(AMP.NN,0) AS NN
+			 , NVL(AMP.PP,0) AS PP
+			 , NVL(AMP.RR,0) AS RR
+			 , NVL(AMP.TT,0) AS TT
+			 , NVL(AMP.VV,0) AS VV
+			 , NVL(AMP.XX,0) AS XX
+			 , NVL(AMP.ZZ,0) AS ZZ
+			 , NVL(AAMP.BB,0)-NVL(AAMP2.BB,0) AS CC
+             , NVL(AMP.DD,0)-NVL(AMP2.DD,0) AS EE
+             , NVL(AMP.FF,0)-NVL(AMP2.FF,0) AS GG
+             , NVL(AMP.HH,0)-NVL(AMP2.HH,0) AS II
+             , NVL(AMP.JJ,0)-NVL(AMP2.JJ,0) AS KK
+             , NVL(AMP.LL,0)-NVL(AMP2.LL,0) AS MM
+             , NVL(AMP.NN,0)-NVL(AMP2.NN,0) AS OO
+             , NVL(AMP.PP,0)-NVL(AMP2.PP,0) AS QQ
+             , NVL(AMP.RR,0)-NVL(AMP2.RR,0) AS SS
+             , NVL(AMP.TT,0)-NVL(AMP2.TT,0) AS UU
+             , NVL(AMP.VV,0)-NVL(AMP2.VV,0) AS WW
+             , NVL(AMP.XX,0)-NVL(AMP2.XX,0) AS YY
+             , NVL(AMP.ZZ,0)-NVL(AMP2.ZZ,0) AS AAA
+		 FROM
+		 <![CDATA[
+			 (SELECT YYYY FROM
+					 (SELECT TO_CHAR(TO_DATE(#{DT_START_Y}-2||'0101', 'YYYYMMDD') + NUM-1, 'YYYY') AS YYYY
+					    FROM (
+					 SELECT ROWNUM NUM 
+					   FROM DICTIONARY
+					  WHERE ROWNUM <= TO_DATE(#{DT_START_Y}||'1231', 'YYYYMMDD') - TO_DATE(#{DT_START_Y}-2||'0101', 'YYYYMMDD')  + 1)
+					 )
+				GROUP BY YYYY 
+			 ) YMD
+		 ]]>
+		 LEFT OUTER JOIN (SELECT YYYY,
+		                         SUM(A.CNT_MEMBER) AS BB
+		                    FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD A
+                           WHERE DD = (SELECT MAX(DD) 
+                            			 FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD B 
+                            			WHERE A.YYYY = B.YYYY 
+                            			  AND A.MM = B.MM)
+                             AND MM = (SELECT MAX(MM) 
+                                         FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD B 
+                                        WHERE A.YYYY = B.YYYY)
+					        	<if test="CD_GENDER != '' and CD_GENDER != null">
+					        		AND CD_GENDER = #{CD_GENDER}
+					        	</if>
+					        	<if test="CD_AGE != '' and CD_AGE != null">
+					        		AND CD_AGE = #{CD_AGE}
+					        	</if>
+					        	<if test="CD_GRADE != '' and CD_GRADE != null">
+					        		AND CD_GRADE = #{CD_GRADE}
+					        	</if>
+		                    GROUP BY YYYY
+		                    ) AAMP
+		   ON YMD.YYYY = AAMP.YYYY
+		 LEFT OUTER JOIN (SELECT YYYY,
+		                         SUM(A.CNT_MEMBER) AS BB
+		                    FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD A
+                           WHERE DD = (SELECT MAX(DD) 
+                            			 FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD B 
+                            			WHERE A.YYYY = B.YYYY 
+                            			  AND A.MM = B.MM)
+                             AND MM = (SELECT MAX(MM) 
+                                         FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD B 
+                                        WHERE A.YYYY = B.YYYY)
+					        	<if test="CD_GENDER != '' and CD_GENDER != null">
+					        		AND CD_GENDER = #{CD_GENDER}
+					        	</if>
+					        	<if test="CD_AGE != '' and CD_AGE != null">
+					        		AND CD_AGE = #{CD_AGE}
+					        	</if>
+					        	<if test="CD_GRADE != '' and CD_GRADE != null">
+					        		AND CD_GRADE = #{CD_GRADE}
+					        	</if>
+		                    GROUP BY YYYY
+		                    ) AAMP2
+		   ON YMD.YYYY-1 = AAMP2.YYYY
+		 LEFT OUTER JOIN (SELECT YYYY,
+		                        SUM(AMP.CNT_JOIN)            AS DD,
+			                    SUM(AMP.CNT_DORMANCY)        AS FF,
+			                    SUM(AMP.CNT_DEL)             AS HH,
+			                    SUM(AMP.CNT_LOGIN)           AS JJ,
+			                    SUM(AMP.CNT_BUY)             AS LL,
+			                    SUM(AMP.CNT_COUPON)          AS NN,
+			                    SUM(AMP.CNT_REWARD)          AS PP,
+			                    SUM(AMP.CNT_REWARD_COUPON)   AS RR,
+			                    SUM(AMP.CNT_CHNN_BKR)        AS TT,
+			                    SUM(AMP.CNT_CHNN_NAVER)      AS VV,
+			                    SUM(AMP.CNT_CHNN_KAKAO)      AS XX,
+			                    SUM(AMP.CNT_CHNN_SAMSUNG)    AS ZZ
+			               FROM CRMADMIN.ANA_MEMBER_PERIOD AMP
+			               <where>
+					        	<if test="CD_GENDER != '' and CD_GENDER != null">
+					        		CD_GENDER = #{CD_GENDER}
+					        	</if>
+					        	<if test="CD_AGE != '' and CD_AGE != null">
+					        		AND CD_AGE = #{CD_AGE}
+					        	</if>
+					        	<if test="CD_GRADE != '' and CD_GRADE != null">
+					        		AND CD_GRADE = #{CD_GRADE}
+					        	</if>
+		                     </where>
+			           GROUP BY YYYY) AMP
+		   ON YMD.YYYY = AMP.YYYY
+		 LEFT OUTER JOIN (SELECT YYYY,
+		                        SUM(AMP.CNT_JOIN)            AS DD,
+			                    SUM(AMP.CNT_DORMANCY)        AS FF,
+			                    SUM(AMP.CNT_DEL)             AS HH,
+			                    SUM(AMP.CNT_LOGIN)           AS JJ,
+			                    SUM(AMP.CNT_BUY)             AS LL,
+			                    SUM(AMP.CNT_COUPON)          AS NN,
+			                    SUM(AMP.CNT_REWARD)          AS PP,
+			                    SUM(AMP.CNT_REWARD_COUPON)   AS RR,
+			                    SUM(AMP.CNT_CHNN_BKR)        AS TT,
+			                    SUM(AMP.CNT_CHNN_NAVER)      AS VV,
+			                    SUM(AMP.CNT_CHNN_KAKAO)      AS XX,
+			                    SUM(AMP.CNT_CHNN_SAMSUNG)    AS ZZ
+			               FROM CRMADMIN.ANA_MEMBER_PERIOD AMP
+			               <where>
+					        	<if test="CD_GENDER != '' and CD_GENDER != null">
+					        		CD_GENDER = #{CD_GENDER}
+					        	</if>
+					        	<if test="CD_AGE != '' and CD_AGE != null">
+					        		AND CD_AGE = #{CD_AGE}
+					        	</if>
+					        	<if test="CD_GRADE != '' and CD_GRADE != null">
+					        		AND CD_GRADE = #{CD_GRADE}
+					        	</if>
+		                     </where>
+			           GROUP BY YYYY) AMP2
+		   ON YMD.YYYY-1 = AMP2.YYYY
+     ORDER BY YMD.YYYY DESC
+	     
+	</select>
+
+	<!--
+		QueryId     : AnaInquiry.getMonthAna
+		Description : 월별 회원현황 목록  조회 
+	 -->
+	<select id="getMonthAna" parameterType="map" resultType="lmap">
+		SELECT YMD.YYYY||'년 '||YMD.MMMM||'월' AS AA
+                 , NVL(AAMP.BB,0) AS BB
+                 , NVL(AMP.DD,0) AS DD
+                 , NVL(AMP.FF,0) AS FF
+                 , NVL(AMP.HH,0) AS HH
+                 , NVL(AMP.JJ,0) AS JJ
+                 , NVL(AMP.LL,0) AS LL
+                 , NVL(AMP.NN,0) AS NN
+                 , NVL(AMP.PP,0) AS PP
+                 , NVL(AMP.RR,0) AS RR
+                 , NVL(AMP.TT,0) AS TT
+                 , NVL(AMP.VV,0) AS VV
+                 , NVL(AMP.XX,0) AS XX
+                 , NVL(AMP.ZZ,0) AS ZZ
+                 , NVL(AAMP.BB,0)-NVL(AAMP2.BB,0) AS CC
+                 , NVL(AMP.DD,0)-NVL(AMP2.DD,0) AS EE
+                 , NVL(AMP.FF,0)-NVL(AMP2.FF,0) AS GG
+                 , NVL(AMP.HH,0)-NVL(AMP2.HH,0) AS II
+                 , NVL(AMP.JJ,0)-NVL(AMP2.JJ,0) AS KK
+                 , NVL(AMP.LL,0)-NVL(AMP2.LL,0) AS MM
+                 , NVL(AMP.NN,0)-NVL(AMP2.NN,0) AS OO
+                 , NVL(AMP.PP,0)-NVL(AMP2.PP,0) AS QQ
+                 , NVL(AMP.RR,0)-NVL(AMP2.RR,0) AS SS
+                 , NVL(AMP.TT,0)-NVL(AMP2.TT,0) AS UU
+                 , NVL(AMP.VV,0)-NVL(AMP2.VV,0) AS WW
+                 , NVL(AMP.XX,0)-NVL(AMP2.XX,0) AS YY
+                 , NVL(AMP.ZZ,0)-NVL(AMP2.ZZ,0) AS AAA
+                 , YMD.YYYY
+                 , YMD.MMMM
+              FROM (
+              		SELECT TO_CHAR(YYMMDD,'YYYY') AS YYYY
+              			 , TO_CHAR(YYMMDD,'MM') AS MMMM
+              		  FROM (
+              		  		 SELECT ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M}, 'YYYYMM'),- (LEVEL-1)) AS YYMMDD
+              		  		   FROM DUAL
+              		  	 CONNECT BY ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M}, 'YYYYMM'),- (LEVEL-1)) >= ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M}, 'YYYYMM'),-11)
+                 			)
+             ) YMD
+         LEFT OUTER JOIN (SELECT YYYY,
+                                 MM,
+                                  SUM(A.CNT_MEMBER) AS BB
+                             FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD A
+                            WHERE DD = (SELECT MAX(DD) 
+                            			  FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD B 
+                            			 WHERE A.YYYY = B.YYYY 
+                            			   AND A.MM = B.MM)
+					        	<if test="CD_GENDER != '' and CD_GENDER != null">
+					        		AND CD_GENDER = #{CD_GENDER}
+					        	</if>
+					        	<if test="CD_AGE != '' and CD_AGE != null">
+					        		AND CD_AGE = #{CD_AGE}
+					        	</if>
+					        	<if test="CD_GRADE != '' and CD_GRADE != null">
+					        		AND CD_GRADE = #{CD_GRADE}
+					        	</if>
+                            GROUP BY YYYY,MM
+                            ) AAMP
+           ON YMD.YYYY = AAMP.YYYY
+          AND YMD.MMMM = AAMP.MM
+          LEFT OUTER JOIN (SELECT YYYY,
+                                 MM,
+                                  SUM(A.CNT_MEMBER) AS BB
+                             FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD A
+                            WHERE DD = (SELECT MAX(DD) 
+                            			  FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD B 
+                            			 WHERE A.YYYY = B.YYYY 
+                            			   AND A.MM = B.MM)
+					        	<if test="CD_GENDER != '' and CD_GENDER != null">
+					        		AND CD_GENDER = #{CD_GENDER}
+					        	</if>
+					        	<if test="CD_AGE != '' and CD_AGE != null">
+					        		AND CD_AGE = #{CD_AGE}
+					        	</if>
+					        	<if test="CD_GRADE != '' and CD_GRADE != null">
+					        		AND CD_GRADE = #{CD_GRADE}
+					        	</if>
+                            GROUP BY YYYY,MM
+                            ) AAMP2
+           ON TO_DATE(AAMP2.YYYY||AAMP2.MM,'YYYYMM') = ADD_MONTHS(TO_DATE(YMD.YYYY||YMD.MMMM,'YYYYMM'),-1)
+          LEFT OUTER JOIN (SELECT YYYY,MM,
+                                SUM(AMP.CNT_JOIN)            AS DD,
+                                SUM(AMP.CNT_DORMANCY)        AS FF,
+                                SUM(AMP.CNT_DEL)             AS HH,
+                                SUM(AMP.CNT_LOGIN)           AS JJ,
+                                SUM(AMP.CNT_BUY)             AS LL,
+                                SUM(AMP.CNT_COUPON)          AS NN,
+                                SUM(AMP.CNT_REWARD)          AS PP,
+                                SUM(AMP.CNT_REWARD_COUPON)   AS RR,
+                                SUM(AMP.CNT_CHNN_BKR)        AS TT,
+                                SUM(AMP.CNT_CHNN_NAVER)      AS VV,
+                                SUM(AMP.CNT_CHNN_KAKAO)      AS XX,
+                                SUM(AMP.CNT_CHNN_SAMSUNG)    AS ZZ
+                           FROM CRMADMIN.ANA_MEMBER_PERIOD AMP
+                           <where>
+					        	<if test="CD_GENDER != '' and CD_GENDER != null">
+					        		CD_GENDER = #{CD_GENDER}
+					        	</if>
+					        	<if test="CD_AGE != '' and CD_AGE != null">
+					        		AND CD_AGE = #{CD_AGE}
+					        	</if>
+					        	<if test="CD_GRADE != '' and CD_GRADE != null">
+					        		AND CD_GRADE = #{CD_GRADE}
+					        	</if>
+		                     </where>
+                       GROUP BY YYYY,MM) AMP
+           ON YMD.YYYY = AMP.YYYY
+          AND YMD.MMMM = AMP.MM
+          LEFT OUTER JOIN (SELECT YYYY,MM,
+                                SUM(AMP.CNT_JOIN)            AS DD,
+                                SUM(AMP.CNT_DORMANCY)        AS FF,
+                                SUM(AMP.CNT_DEL)             AS HH,
+                                SUM(AMP.CNT_LOGIN)           AS JJ,
+                                SUM(AMP.CNT_BUY)             AS LL,
+                                SUM(AMP.CNT_COUPON)          AS NN,
+                                SUM(AMP.CNT_REWARD)          AS PP,
+                                SUM(AMP.CNT_REWARD_COUPON)   AS RR,
+                                SUM(AMP.CNT_CHNN_BKR)        AS TT,
+                                SUM(AMP.CNT_CHNN_NAVER)      AS VV,
+                                SUM(AMP.CNT_CHNN_KAKAO)      AS XX,
+                                SUM(AMP.CNT_CHNN_SAMSUNG)    AS ZZ
+                           FROM CRMADMIN.ANA_MEMBER_PERIOD AMP
+                           <where>
+					        	<if test="CD_GENDER != '' and CD_GENDER != null">
+					        		CD_GENDER = #{CD_GENDER}
+					        	</if>
+					        	<if test="CD_AGE != '' and CD_AGE != null">
+					        		AND CD_AGE = #{CD_AGE}
+					        	</if>
+					        	<if test="CD_GRADE != '' and CD_GRADE != null">
+					        		AND CD_GRADE = #{CD_GRADE}
+					        	</if>
+		                     </where>
+                       GROUP BY YYYY,MM) AMP2
+           ON ADD_MONTHS(TO_DATE(YMD.YYYY||YMD.MMMM,'YYYYMM'),-1) = TO_DATE(AMP2.YYYY||AMP2.MM,'YYYYMM')
+     ORDER BY YMD.YYYY DESC,YMD.MMMM DESC
+	</select>
+	
+	<!--
+		QueryId     : AnaInquiry.getDateAna
+		Description : 일별 회원현황 목록  조회 
+	 -->
+	<select id="getDateAna" parameterType="map" resultType="lmap">
+		SELECT   YMD.YYYY||'년 '||YMD.MMMM||'월 '||YMD.DDDD||'일' AS AA
+                 , NVL(AAMP.BB,0) AS BB
+                 , NVL(AMP.DD,0) AS DD
+                 , NVL(AMP.FF,0) AS FF
+                 , NVL(AMP.HH,0) AS HH
+                 , NVL(AMP.JJ,0) AS JJ
+                 , NVL(AMP.LL,0) AS LL
+                 , NVL(AMP.NN,0) AS NN
+                 , NVL(AMP.PP,0) AS PP
+                 , NVL(AMP.RR,0) AS RR
+                 , NVL(AMP.TT,0) AS TT
+                 , NVL(AMP.VV,0) AS VV
+                 , NVL(AMP.XX,0) AS XX
+                 , NVL(AMP.ZZ,0) AS ZZ
+                 , NVL(AAMP.BB,0)-NVL(AAMP2.BB,0) AS CC
+                 , NVL(AMP.DD,0)-NVL(AMP2.DD,0) AS EE
+                 , NVL(AMP.FF,0)-NVL(AMP2.FF,0) AS GG
+                 , NVL(AMP.HH,0)-NVL(AMP2.HH,0) AS II
+                 , NVL(AMP.JJ,0)-NVL(AMP2.JJ,0) AS KK
+                 , NVL(AMP.LL,0)-NVL(AMP2.LL,0) AS MM
+                 , NVL(AMP.NN,0)-NVL(AMP2.NN,0) AS OO
+                 , NVL(AMP.PP,0)-NVL(AMP2.PP,0) AS QQ
+                 , NVL(AMP.RR,0)-NVL(AMP2.RR,0) AS SS
+                 , NVL(AMP.TT,0)-NVL(AMP2.TT,0) AS UU
+                 , NVL(AMP.VV,0)-NVL(AMP2.VV,0) AS WW
+                 , NVL(AMP.XX,0)-NVL(AMP2.XX,0) AS YY
+                 , NVL(AMP.ZZ,0)-NVL(AMP2.ZZ,0) AS AAA
+	             , YMD.YYYY
+	             , YMD.MMMM
+	             , YMD.DDDD
+          FROM (
+              		SELECT TO_CHAR(YYMMDD,'YYYY') AS YYYY
+              			 , TO_CHAR(YYMMDD,'MM') AS MMMM
+              			 , TO_CHAR(YYMMDD,'DD') AS DDDD
+              		  FROM (
+              		  		 SELECT TO_DATE(TO_DATE(#{DT_START_Y}||#{DT_START_M}||#{DT_START_D},'YYYYMMDD') - (LEVEL-1)) YYMMDD
+              		  		   FROM DUAL 
+              		     CONNECT BY (TO_DATE(#{DT_START_Y}||#{DT_START_M}||#{DT_START_D},'YYYYMMDD') - ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M}||#{DT_START_D},'YYYYMMDD'),-1)) >= LEVEL 
+                 )
+             ) YMD
+         LEFT OUTER JOIN (SELECT YYYY,
+                                 MM,
+                                 DD AS DD1,
+                                  SUM(A.CNT_MEMBER) AS BB
+                             FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD A
+                             <where>
+					        	<if test="CD_GENDER != '' and CD_GENDER != null">
+					        		CD_GENDER = #{CD_GENDER}
+					        	</if>
+					        	<if test="CD_AGE != '' and CD_AGE != null">
+					        		AND CD_AGE = #{CD_AGE}
+					        	</if>
+					        	<if test="CD_GRADE != '' and CD_GRADE != null">
+					        		AND CD_GRADE = #{CD_GRADE}
+					        	</if>
+					         </where>
+                            GROUP BY YYYY,MM,DD
+                            ) AAMP
+           ON YMD.YYYY = AAMP.YYYY
+          AND YMD.MMMM = AAMP.MM
+          AND YMD.DDDD = AAMP.DD1
+          LEFT OUTER JOIN (SELECT YYYY,
+                                 MM,
+                                 DD AS DD1,
+                                  SUM(A.CNT_MEMBER) AS BB
+                             FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD A
+                             <where>
+					        	<if test="CD_GENDER != '' and CD_GENDER != null">
+					        		CD_GENDER = #{CD_GENDER}
+					        	</if>
+					        	<if test="CD_AGE != '' and CD_AGE != null">
+					        		AND CD_AGE = #{CD_AGE}
+					        	</if>
+					        	<if test="CD_GRADE != '' and CD_GRADE != null">
+					        		AND CD_GRADE = #{CD_GRADE}
+					        	</if>
+		                     </where>
+                            GROUP BY YYYY,MM,DD
+                            ) AAMP2
+           ON TO_DATE(YMD.YYYY||YMD.MMMM||YMD.DDDD,'YYYYMMDD')-1 = TO_DATE(AAMP2.YYYY||AAMP2.MM||AAMP2.DD1,'YYYYMMDD')
+          LEFT OUTER JOIN (SELECT YYYY,MM,DD AS DD1,
+                                SUM(AMP.CNT_JOIN)            AS DD,
+                                SUM(AMP.CNT_DORMANCY)        AS FF,
+                                SUM(AMP.CNT_DEL)             AS HH,
+                                SUM(AMP.CNT_LOGIN)           AS JJ,
+                                SUM(AMP.CNT_BUY)             AS LL,
+                                SUM(AMP.CNT_COUPON)          AS NN,
+                                SUM(AMP.CNT_REWARD)          AS PP,
+                                SUM(AMP.CNT_REWARD_COUPON)   AS RR,
+                                SUM(AMP.CNT_CHNN_BKR)        AS TT,
+                                SUM(AMP.CNT_CHNN_NAVER)      AS VV,
+                                SUM(AMP.CNT_CHNN_KAKAO)      AS XX,
+                                SUM(AMP.CNT_CHNN_SAMSUNG)    AS ZZ
+                           FROM CRMADMIN.ANA_MEMBER_PERIOD AMP
+                           <where>
+					        	<if test="CD_GENDER != '' and CD_GENDER != null">
+					        		CD_GENDER = #{CD_GENDER}
+					        	</if>
+					        	<if test="CD_AGE != '' and CD_AGE != null">
+					        		AND CD_AGE = #{CD_AGE}
+					        	</if>
+					        	<if test="CD_GRADE != '' and CD_GRADE != null">
+					        		AND CD_GRADE = #{CD_GRADE}
+					        	</if>
+		                     </where>
+                       GROUP BY YYYY,MM,DD) AMP
+           ON YMD.YYYY = AMP.YYYY
+          AND YMD.MMMM = AMP.MM
+          AND YMD.DDDD = AMP.DD1
+          LEFT OUTER JOIN (SELECT YYYY,MM,DD AS DD1,
+                                SUM(AMP.CNT_JOIN)            AS DD,
+                                SUM(AMP.CNT_DORMANCY)        AS FF,
+                                SUM(AMP.CNT_DEL)             AS HH,
+                                SUM(AMP.CNT_LOGIN)           AS JJ,
+                                SUM(AMP.CNT_BUY)             AS LL,
+                                SUM(AMP.CNT_COUPON)          AS NN,
+                                SUM(AMP.CNT_REWARD)          AS PP,
+                                SUM(AMP.CNT_REWARD_COUPON)   AS RR,
+                                SUM(AMP.CNT_CHNN_BKR)        AS TT,
+                                SUM(AMP.CNT_CHNN_NAVER)      AS VV,
+                                SUM(AMP.CNT_CHNN_KAKAO)      AS XX,
+                                SUM(AMP.CNT_CHNN_SAMSUNG)    AS ZZ
+                           FROM CRMADMIN.ANA_MEMBER_PERIOD AMP
+                           <where>
+					        	<if test="CD_GENDER != '' and CD_GENDER != null">
+					        		CD_GENDER = #{CD_GENDER}
+					        	</if>
+					        	<if test="CD_AGE != '' and CD_AGE != null">
+					        		AND CD_AGE = #{CD_AGE}
+					        	</if>
+					        	<if test="CD_GRADE != '' and CD_GRADE != null">
+					        		AND CD_GRADE = #{CD_GRADE}
+					        	</if>
+		                     </where>
+                       GROUP BY YYYY,MM,DD) AMP2
+           ON TO_DATE(YMD.YYYY||YMD.MMMM||YMD.DDDD,'YYYYMMDD')-1 = TO_DATE(AMP2.YYYY||AMP2.MM||AMP2.DD1,'YYYYMMDD')
+      ORDER BY YMD.YYYY DESC,YMD.MMMM DESC,YMD.DDDD DESC
+	</select>
+	
+	<!--
+		QueryId     : AnaInquiry.getGradeAna
+		Description : 멤버십별 회원현황 목록  조회 
+	 -->
+	<select id="getGradeAna" parameterType="map" resultType="lmap">
+		SELECT TG.CD_GRADE AS AA,
+			   AAMP.CNT_MEMBER	AS BB,
+			   AMP.CNT_JOIN	AS CC,
+			   AMP.CNT_DORMANCY	AS DD,
+			   AMP.CNT_DEL	AS EE,
+			   AMP.CNT_LOGIN	AS FF,
+			   AMP.CNT_BUY	AS GG,
+			   AMP.CNT_COUPON	AS HH,
+			   AMP.CNT_REWARD	AS II,
+			   AMP.CNT_REWARD_COUPON AS JJ,
+			   AMP.CNT_CHNN_BKR AS KK,
+			   AMP.CNT_CHNN_NAVER AS LL,
+			   AMP.CNT_CHNN_KAKAO AS MM,
+			   AMP.CNT_CHNN_SAMSUNG AS NN
+		  FROM CRMADMIN.TBS_GRADE TG
+		  LEFT OUTER JOIN(
+		  					SELECT CD_GRADE,
+		  						   SUM(CNT_JOIN)			AS CNT_JOIN,
+		  						   SUM(CNT_DORMANCY)		AS CNT_DORMANCY,
+		  						   SUM(CNT_DEL)				AS CNT_DEL,
+		  						   SUM(CNT_LOGIN)			AS CNT_LOGIN,
+		  						   SUM(CNT_BUY)				AS CNT_BUY,
+		  						   SUM(CNT_COUPON)			AS CNT_COUPON,
+		  						   SUM(CNT_REWARD)			AS CNT_REWARD,
+		  						   SUM(CNT_REWARD_COUPON)	AS CNT_REWARD_COUPON,
+		  						   SUM(CNT_CHNN_BKR)		AS CNT_CHNN_BKR,
+		  						   SUM(CNT_CHNN_NAVER)		AS CNT_CHNN_NAVER,
+		  						   SUM(CNT_CHNN_KAKAO)		AS CNT_CHNN_KAKAO,
+		  						   SUM(CNT_CHNN_SAMSUNG)    AS CNT_CHNN_SAMSUNG
+		    				 FROM  CRMADMIN.ANA_MEMBER_PERIOD
+		    				WHERE TO_DATE(YYYY||MM,'YYYYMM') >= TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM')
+		    				  AND TO_DATE(#{DT_END_Y}||#{DT_END_M},'YYYYMM') >= TO_DATE(YYYY||MM,'YYYYMM')
+					        <if test="CD_GENDER != '' and CD_GENDER != null">
+					          AND CD_GENDER = #{CD_GENDER}
+					        </if>
+					        <if test="CD_AGE != '' and CD_AGE != null">
+					          AND CD_AGE = #{CD_AGE}
+					        </if>
+					        GROUP BY CD_GRADE
+		    			) AMP
+		    ON TG.CD_GRADE = AMP.CD_GRADE
+		  LEFT OUTER JOIN (
+		  				 SELECT B.CD_GRADE
+		  						, SUM(B.CNT_MEMBER) AS CNT_MEMBER
+		                     FROM (
+								SELECT A.CD_GRADE
+								     , A.CNT_MEMBER
+								     , RANK() OVER(ORDER BY YYYY||MM||DD DESC) AS RANK
+						          FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD A
+						    <where>
+			                    <if test="CD_GENDER != '' and CD_GENDER != null">
+						          A.CD_GENDER = #{CD_GENDER}
+						        </if>
+						        <if test="CD_AGE != '' and CD_AGE != null">
+						          AND A.CD_AGE = #{CD_AGE}
+						        </if>
+					        </where>
+					        )B
+					        WHERE B.RANK = 1
+					     GROUP BY B.CD_GRADE
+		  ) AAMP
+		    ON AAMP.CD_GRADE = TG.CD_GRADE
+		  WHERE TG.FG_DEL = 'N'
+		ORDER BY TG.CD_GRADE ASC
+	</select>
+	
+	<!--
+		QueryId     : AnaInquiry.getGenderAna
+		Description : 성별 회원현황 목록  조회 
+	 -->
+	<select id="getGenderAna" parameterType="map" resultType="lmap">
+		SELECT CDGEN.CODE               AS AA,
+	               AAMP.CNT_MEMBER    AS BB,
+	               AMP.CNT_JOIN    AS CC,
+	               AMP.CNT_DORMANCY    AS DD,
+	               AMP.CNT_DEL    AS EE,
+	               AMP.CNT_LOGIN    AS FF,
+	               AMP.CNT_BUY    AS GG,
+	               AMP.CNT_COUPON    AS HH,
+	               AMP.CNT_REWARD    AS II,
+	               AMP.CNT_REWARD_COUPON AS JJ,
+	               AMP.CNT_CHNN_BKR AS KK,
+	               AMP.CNT_CHNN_NAVER AS LL,
+	               AMP.CNT_CHNN_KAKAO AS MM,
+	               AMP.CNT_CHNN_SAMSUNG AS NN
+	          FROM (SELECT CODE
+					  FROM CRMADMIN.SYS_CODE
+					 WHERE CODE_CATEGORY_ID = 'CD_GENDER') CDGEN
+	          LEFT OUTER JOIN(
+	                              SELECT CD_GENDER,
+	                                     SUM(CNT_JOIN)			AS CNT_JOIN,
+	                                     SUM(CNT_DORMANCY)		AS CNT_DORMANCY,
+	                                     SUM(CNT_DEL)			AS CNT_DEL,
+	                                     SUM(CNT_LOGIN)			AS CNT_LOGIN,
+	                                     SUM(CNT_BUY)			AS CNT_BUY,
+	                                     SUM(CNT_COUPON)		AS CNT_COUPON,
+	                                     SUM(CNT_REWARD)		AS CNT_REWARD,
+	                                     SUM(CNT_REWARD_COUPON)	AS CNT_REWARD_COUPON,
+	                                     SUM(CNT_CHNN_BKR)		AS CNT_CHNN_BKR,
+	                                     SUM(CNT_CHNN_NAVER)	AS CNT_CHNN_NAVER,
+	                                     SUM(CNT_CHNN_KAKAO)	AS CNT_CHNN_KAKAO,
+	                                     SUM(CNT_CHNN_SAMSUNG)  AS CNT_CHNN_SAMSUNG
+	                             FROM  CRMADMIN.ANA_MEMBER_PERIOD
+	                            WHERE TO_DATE(YYYY||MM,'YYYYMM') >= TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM')
+	                              AND TO_DATE(#{DT_END_Y}||#{DT_END_M},'YYYYMM') >= TO_DATE(YYYY||MM,'YYYYMM')
+	                            <if test="CD_GRADE != '' and CD_GRADE != null">
+	                              AND CD_GRADE = #{CD_GRADE}
+	                            </if>
+	                            <if test="CD_AGE != '' and CD_AGE != null">
+	                              AND CD_AGE = #{CD_AGE}
+	                            </if>
+	                            GROUP BY CD_GENDER
+	                        ) AMP
+	            ON CDGEN.CODE = AMP.CD_GENDER
+	          LEFT OUTER JOIN (SELECT B.CD_GENDER
+		  						, SUM(B.CNT_MEMBER) AS CNT_MEMBER
+		                     FROM (
+								SELECT A.CD_GENDER
+								     , A.CNT_MEMBER
+								     , RANK() OVER(ORDER BY YYYY||MM||DD DESC) AS RANK
+						          FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD A
+						         <where>
+				                    <if test="CD_GRADE != '' and CD_GRADE != null">
+							          A.CD_GRADE = #{CD_GRADE}
+							        </if>
+							        <if test="CD_AGE != '' and CD_AGE != null">
+							          AND A.CD_AGE = #{CD_AGE}
+							        </if>
+							     </where>
+					        )B
+					        WHERE B.RANK = 1
+					     GROUP BY B.CD_GENDER
+	          ) AAMP
+	            ON AAMP.CD_GENDER = CDGEN.CODE
+	        ORDER BY CDGEN.CODE DESC
+	</select>
+	
+	<!--
+		QueryId     : AnaInquiry.getAgeAna
+		Description : 연령대별 회원현황 목록  조회 
+	 -->
+	<select id="getAgeAna" parameterType="map" resultType="lmap">
+		SELECT CDAGE.CODE AS AA,
+                   AAMP.CNT_MEMBER    AS BB,
+                   AMP.CNT_JOIN    	  AS CC,
+                   AMP.CNT_DORMANCY   AS DD,
+                   AMP.CNT_DEL    	  AS EE,
+                   AMP.CNT_LOGIN      AS FF,
+                   AMP.CNT_BUY    	  AS GG,
+                   AMP.CNT_COUPON     AS HH,
+                   AMP.CNT_REWARD     AS II,
+                   AMP.CNT_REWARD_COUPON AS JJ,
+                   AMP.CNT_CHNN_BKR   	AS KK,
+                   AMP.CNT_CHNN_NAVER AS LL,
+                   AMP.CNT_CHNN_KAKAO AS MM,
+                   AMP.CNT_CHNN_SAMSUNG  AS NN
+              FROM (SELECT CODE
+                      FROM CRMADMIN.SYS_CODE
+                     WHERE CODE_CATEGORY_ID = 'CD_AGE') CDAGE
+              LEFT OUTER JOIN(
+                                  SELECT CD_AGE,
+                                         SUM(CNT_JOIN)          AS CNT_JOIN,
+                                         SUM(CNT_DORMANCY)      AS CNT_DORMANCY,
+                                         SUM(CNT_DEL)           AS CNT_DEL,
+                                         SUM(CNT_LOGIN)         AS CNT_LOGIN,
+                                         SUM(CNT_BUY)           AS CNT_BUY,
+                                         SUM(CNT_COUPON)        AS CNT_COUPON,
+                                         SUM(CNT_REWARD)        AS CNT_REWARD,
+                                         SUM(CNT_REWARD_COUPON) AS CNT_REWARD_COUPON,
+                                         SUM(CNT_CHNN_BKR)      AS CNT_CHNN_BKR,
+                                         SUM(CNT_CHNN_NAVER)    AS CNT_CHNN_NAVER,
+                                         SUM(CNT_CHNN_KAKAO)    AS CNT_CHNN_KAKAO,
+                                         SUM(CNT_CHNN_SAMSUNG)   AS CNT_CHNN_SAMSUNG
+                                 FROM  CRMADMIN.ANA_MEMBER_PERIOD
+                                WHERE TO_DATE(YYYY||MM,'YYYYMM') >= TO_DATE( #{DT_START_Y}||#{DT_START_M},'YYYYMM')
+                                  AND TO_DATE( #{DT_END_Y}||#{DT_END_M},'YYYYMM') >= TO_DATE(YYYY||MM,'YYYYMM')
+                                <if test="CD_GRADE != '' and CD_GRADE != null">
+	                              AND CD_GRADE = #{CD_GRADE}
+	                            </if>
+	                            <if test="CD_GENDER != '' and CD_GENDER != null">
+	                              AND CD_GENDER = #{CD_GENDER}
+	                            </if>
+	                            GROUP BY CD_AGE
+                            ) AMP
+                ON CDAGE.CODE = AMP.CD_AGE
+              LEFT OUTER JOIN (SELECT B.CD_AGE
+		  							, SUM(B.CNT_MEMBER) AS CNT_MEMBER
+			                     FROM (
+									SELECT A.CD_AGE
+									     , A.CNT_MEMBER
+									     , RANK() OVER(ORDER BY YYYY||MM||DD DESC) AS RANK
+							          FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD A
+							          <where>
+					                    <if test="CD_GRADE != '' and CD_GRADE != null">
+								          AND A.CD_GRADE = #{CD_GRADE}
+								        </if>
+								        <if test="CD_GENDER != '' and CD_GENDER != null">
+								          AND A.CD_GENDER = #{CD_GENDER}
+								        </if>
+								      </where>
+						        )B
+						        WHERE B.RANK = 1
+						     GROUP BY B.CD_AGE
+              ) AAMP
+                ON AAMP.CD_AGE = CDAGE.CODE
+            ORDER BY CDAGE.CODE ASC
+	</select>
+	
+	<!--
+		QueryId     : AnaInquiry.getMonthStamp
+		Description : 월별 스탬프 적립현황 목록  조회 
+	 -->
+	<select id="getMonthStamp" parameterType="map" resultType="lmap">
+		SELECT YMD.YYYY||'년 '||YMD.MMMM||'월' AS AA
+		     , AAMP.CNT_MEMBER      AS BB
+		     , CNT_ONE	 AS 	DD
+		     , CNT_TWO	 AS 	EE
+		     , CNT_THREE	 AS 	FF
+		     , CNT_FOUR	 AS 	GG
+		     , CNT_FIVE	 AS 	HH
+		     , CNT_SIX	 AS 	II
+		     , CNT_SEVEN	 AS 	JJ
+		     , CNT_EIGHT	 AS 	KK
+		     , CNT_NINE	 AS 	LL
+		     , CNT_TEN	 AS 	MM
+		     , CNT_REWARD_FIVE	 AS 	NN
+		     , CNT_REWARD_TEN	 AS 	OO
+		  FROM (SELECT TO_CHAR(YYMMDD,'YYYY') AS YYYY
+		                           , TO_CHAR(YYMMDD,'MM') AS MMMM
+		                        FROM (
+		                                 SELECT ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M}, 'YYYYMM'),- (LEVEL-1)) AS YYMMDD
+		                                   FROM DUAL
+		                             CONNECT BY ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M}, 'YYYYMM'),- (LEVEL-1)) >= ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M}, 'YYYYMM'),-11))
+		       ) YMD
+		  LEFT OUTER JOIN (SELECT YYYY
+		  						, MM
+		  						, SUM(CNT_ONE) AS 	CNT_ONE
+								, SUM(CNT_TWO) AS 	CNT_TWO
+								, SUM(CNT_THREE) AS 	CNT_THREE
+								, SUM(CNT_FOUR) AS 	CNT_FOUR
+								, SUM(CNT_FIVE) AS 	CNT_FIVE
+								, SUM(CNT_SIX) AS 	CNT_SIX
+								, SUM(CNT_SEVEN) AS 	CNT_SEVEN
+								, SUM(CNT_EIGHT) AS 	CNT_EIGHT
+								, SUM(CNT_NINE) AS 	CNT_NINE
+								, SUM(CNT_TEN) AS 	CNT_TEN
+								, SUM(CNT_ELEVEN_MORE) AS 	CNT_ELEVEN_MORE
+								, SUM(CNT_REWARD_FIVE) AS 	CNT_REWARD_FIVE
+								, SUM(CNT_REWARD_TEN) AS 	CNT_REWARD_TEN
+								, SUM(CNT_REWARD_USE_FIVE) AS 	CNT_REWARD_USE_FIVE
+								, SUM(CNT_REWARD_USE_TEN) AS 	CNT_REWARD_USE_TEN
+		  					 FROM CRMADMIN.ANA_STAMP_PERIOD
+		  				 <where>
+		  				 	<if test="CD_GENDER != '' and CD_GENDER != null">
+					          CD_GENDER = #{CD_GENDER}
+					        </if>
+					        <if test="CD_AGE != '' and CD_AGE != null">
+					          AND CD_AGE = #{CD_AGE}
+					        </if>
+		  				 </where>
+		  				 GROUP BY YYYY,MM )ASP
+		    ON ASP.YYYY = YMD.YYYY
+		   AND ASP.MM = YMD.MMMM
+		  LEFT OUTER JOIN (SELECT YYYY
+		  						, MM
+		  						, SUM(CNT_MEMBER) AS CNT_MEMBER
+		  					 FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD A
+                            WHERE DD = (SELECT MAX(DD) 
+                            			  FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD B 
+                            			 WHERE A.YYYY = B.YYYY 
+                            			   AND A.MM = B.MM)
+		  				 	<if test="CD_GENDER != '' and CD_GENDER != null">
+					          AND CD_GENDER = #{CD_GENDER}
+					        </if>
+					        <if test="CD_AGE != '' and CD_AGE != null">
+					          AND CD_AGE = #{CD_AGE}
+					        </if>
+		  				 GROUP BY YYYY,MM) AAMP
+		    ON YMD.YYYY = AAMP.YYYY
+		   AND YMD.MMMM = AAMP.MM
+	  ORDER BY AA DESC
+	</select>
+	
+	<!--
+		QueryId     : AnaInquiry.getDateStamp
+		Description : 일별 스탬프 적립현황 목록  조회 
+	 -->
+	<select id="getDateStamp" parameterType="map" resultType="lmap">
+		SELECT YMD.YYYY||'년 '||YMD.MMMM||'월 '||YMD.DDDD||'일' AS AA
+		     , AAMP.CNT_MEMBER  AS BB
+		     , CNT_ONE	 		AS DD
+		     , CNT_TWO	 		AS EE
+		     , CNT_THREE	 	AS FF
+		     , CNT_FOUR	 		AS GG
+		     , CNT_FIVE	 		AS HH
+		     , CNT_SIX	 		AS II
+		     , CNT_SEVEN	 	AS JJ
+		     , CNT_EIGHT	 	AS KK
+		     , CNT_NINE	 		AS LL
+		     , CNT_TEN	 		AS MM
+		     , CNT_REWARD_FIVE	AS NN
+		     , CNT_REWARD_TEN	AS OO
+		  FROM (
+		  		SELECT TO_CHAR(YYMMDD,'YYYY') AS YYYY
+                     , TO_CHAR(YYMMDD,'MM') AS MMMM
+                     , TO_CHAR(YYMMDD,'DD') AS DDDD
+                  FROM (
+                           SELECT TO_DATE(TO_DATE(#{DT_START_Y}||#{DT_START_M}||#{DT_START_D},'YYYYMMDD') - (LEVEL-1)) YYMMDD
+                             FROM DUAL 
+                     CONNECT BY (TO_DATE(#{DT_START_Y}||#{DT_START_M}||#{DT_START_D},'YYYYMMDD') - ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M}||#{DT_START_D},'YYYYMMDD'),-1)) >= LEVEL 
+                    	)
+		       ) YMD
+		  LEFT OUTER JOIN (SELECT YYYY
+		  						, MM
+		  						, DD
+		  						, SUM(CNT_ONE) AS 	CNT_ONE
+								, SUM(CNT_TWO) AS 	CNT_TWO
+								, SUM(CNT_THREE) AS 	CNT_THREE
+								, SUM(CNT_FOUR) AS 	CNT_FOUR
+								, SUM(CNT_FIVE) AS 	CNT_FIVE
+								, SUM(CNT_SIX) AS 	CNT_SIX
+								, SUM(CNT_SEVEN) AS 	CNT_SEVEN
+								, SUM(CNT_EIGHT) AS 	CNT_EIGHT
+								, SUM(CNT_NINE) AS 	CNT_NINE
+								, SUM(CNT_TEN) AS 	CNT_TEN
+								, SUM(CNT_ELEVEN_MORE) AS 	CNT_ELEVEN_MORE
+								, SUM(CNT_REWARD_FIVE) AS 	CNT_REWARD_FIVE
+								, SUM(CNT_REWARD_TEN) AS 	CNT_REWARD_TEN
+								, SUM(CNT_REWARD_USE_FIVE) AS 	CNT_REWARD_USE_FIVE
+								, SUM(CNT_REWARD_USE_TEN) AS 	CNT_REWARD_USE_TEN
+		  					 FROM CRMADMIN.ANA_STAMP_PERIOD
+		  				 <where>
+		  				 	<if test="CD_GENDER != '' and CD_GENDER != null">
+					          CD_GENDER = #{CD_GENDER}
+					        </if>
+					        <if test="CD_AGE != '' and CD_AGE != null">
+					          AND CD_AGE = #{CD_AGE}
+					        </if>
+		  				 </where>
+		  				 GROUP BY YYYY,MM,DD )ASP
+		    ON ASP.YYYY = YMD.YYYY
+		   AND ASP.MM = YMD.MMMM
+		   AND ASP.DD = YMD.DDDD
+		  LEFT OUTER JOIN (SELECT YYYY
+		  						, MM
+		  						, DD
+		  						, SUM(CNT_MEMBER) AS CNT_MEMBER
+		  					 FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD
+		  				 <where>
+		  				 	<if test="CD_GENDER != '' and CD_GENDER != null">
+					          CD_GENDER = #{CD_GENDER}
+					        </if>
+					        <if test="CD_AGE != '' and CD_AGE != null">
+					          AND CD_AGE = #{CD_AGE}
+					        </if>
+		  				 </where>
+		  				 GROUP BY YYYY,MM,DD) AAMP
+		    ON YMD.YYYY = AAMP.YYYY
+		   AND YMD.MMMM = AAMP.MM
+		   AND YMD.DDDD = AAMP.DD
+	  ORDER BY AA DESC
+	</select>
+	
+	<!--
+		QueryId     : AnaInquiry.getMonGradeStamp
+		Description : 월별/멤버십별 스탬프 적립현황 목록  조회 
+	 -->
+	<select id="getMonGradeStamp" parameterType="map" resultType="lmap">
+		SELECT YMD.YYYY||'년 '||YMD.MMMM||'월' AS AA
+			 , ALLM.MCNT AS BB
+			 , ALLSM.CNT  AS CC
+			 , GDM.CNT01   AS DD
+			 , GD1.CNT    AS EE
+			 , GDM.CNT02   AS FF
+ 			 , GD2.CNT    AS GG
+			 , GDM.CNT03   AS HH
+			 , GD3.CNT    AS II
+		  FROM (
+		  		SELECT TO_CHAR(YYMMDD,'YYYY') AS YYYY
+                     , TO_CHAR(YYMMDD,'MM') AS MMMM
+		        FROM (
+		        		SELECT ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M}, 'YYYYMM'),- (LEVEL-1)) AS YYMMDD
+		                  FROM DUAL
+                    CONNECT BY ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M}, 'YYYYMM'),- (LEVEL-1)) >= ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M}, 'YYYYMM'),-11) 
+                     )
+		       ) YMD
+		  LEFT OUTER JOIN ( 
+		  					SELECT AMSP.YYYY,AMSP.MM
+		  						 , SUM(CNT_SAVE_STAMP) AS CNT
+						      FROM CRMADMIN.ANA_MSHIP_STAMP_PERIOD AMSP
+						  GROUP BY AMSP.YYYY,AMSP.MM
+	  					  ) ALLSM
+	  		ON ALLSM.YYYY = YMD.YYYY
+	  	   AND ALLSM.MM = YMD.MMMM
+	  	  LEFT OUTER JOIN (
+			                    SELECT YYYY
+			                    	 , MM
+			                    	 , SUM(CNT_MEMBER) AS MCNT
+			                      FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD A
+			                     WHERE DD = (SELECT MAX(DD)
+			                     			   FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD B 
+			                     			  WHERE A.YYYY = B.YYYY
+			                     			    AND A.MM = B.MM)
+			                  GROUP BY YYYY, MM
+                		  ) ALLM
+            ON ALLM.YYYY= YMD.YYYY
+           AND ALLM.MM = YMD.MMMM
+	  	  LEFT OUTER JOIN (
+	  	  					SELECT AMSP.YYYY
+	  	  						 , AMSP.MM
+	  	  						 , AMSP.CD_GRADE
+	  	  						 , SUM(CNT_SAVE_STAMP ) AS CNT
+                              FROM CRMADMIN.ANA_MSHIP_STAMP_PERIOD AMSP
+  	  					  GROUP BY AMSP.YYYY,AMSP.MM,AMSP.CD_GRADE
+  	  					 	HAVING AMSP.CD_GRADE = '01'
+  	  					  ) GD1
+  	  		ON GD1.YYYY = YMD.YYYY
+	  	   AND GD1.MM = YMD.MMMM 
+  	  	  LEFT OUTER JOIN (
+  	  	  					SELECT AMSP.YYYY
+  	  	  						 , AMSP.MM
+  	  	  						 , AMSP.CD_GRADE
+  	  	  						 , SUM(CNT_SAVE_STAMP ) AS CNT
+                              FROM CRMADMIN.ANA_MSHIP_STAMP_PERIOD AMSP
+	  	  				  GROUP BY AMSP.YYYY,AMSP.MM,AMSP.CD_GRADE
+	  	  				  	HAVING AMSP.CD_GRADE = '02'
+	  	  				   ) GD2
+	  	  	ON GD2.YYYY = YMD.YYYY
+	  	   AND GD2.MM = YMD.MMMM
+	  	  LEFT OUTER JOIN (
+  	  	  					SELECT AMSP.YYYY
+  	  	  						 , AMSP.MM
+  	  	  						 , AMSP.CD_GRADE
+  	  	  						 , SUM(CNT_SAVE_STAMP ) AS CNT
+                              FROM CRMADMIN.ANA_MSHIP_STAMP_PERIOD AMSP
+	  	  				  GROUP BY AMSP.YYYY,AMSP.MM,AMSP.CD_GRADE
+	  	  				  	HAVING AMSP.CD_GRADE = '03'
+	  	  				   ) GD3
+	  	  	ON GD3.YYYY = YMD.YYYY
+	  	   AND GD3.MM = YMD.MMMM 
+	  	  LEFT OUTER JOIN (SELECT YYYY
+							     , MM
+							     , SUM(GRD01) AS CNT01
+							     , SUM(GRD02) AS CNT02
+							     , SUM(GRD03) AS CNT03
+							  FROM (
+							  SELECT YYYY
+							       , MM
+							       , CASE WHEN CD_GRADE = '01' THEN CNT_MEMBER
+							              ELSE 0 END AS GRD01
+							       , CASE WHEN CD_GRADE = '02' THEN CNT_MEMBER
+							              ELSE 0 END AS GRD02
+							       , CASE WHEN CD_GRADE = '03' THEN CNT_MEMBER
+							              ELSE 0 END AS GRD03
+							    FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD A
+							   WHERE DD = (SELECT MAX(DD) 
+							   				 FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD B 
+							   				WHERE A.YYYY=B.YYYY AND A.MM=B.MM)
+							   )
+							  GROUP BY YYYY, MM) GDM
+			 ON GDM.YYYY = YMD.YYYY
+			AND GDM.MM = YMD.MMMM
+	   ORDER BY AA DESC
+	</select>
+	
+	
+	<!--
+		QueryId     : AnaInquiry.getStoreStamp
+		Description : 매장별 스탬프 적립현황 목록  조회 
+	 -->
+	<select id="getStoreStamp" parameterType="map" resultType="lmap">
+		SELECT STOR_NM              AS AA
+		     , SUM(CNT_ALL_MEMBER)  AS BB
+		     , SUM(CNT_ALL_STAMP)   AS CC
+		     , SUM(CNT_J_MEMBER)    AS DD
+		     , SUM(CNT_J_STAMP)     AS EE
+		     , SUM(CNT_W_MEMBER)    AS FF
+		     , SUM(CNT_W_STAMP)     AS GG
+		     , SUM(CNT_K_MEMBER)    AS HH
+		     , SUM(CNT_K_STAMP)     AS II
+		  FROM CRMADMIN.ANA_STOR_STAMP_PERIOD ASSP
+		  LEFT OUTER JOIN OMNI.OMNI_STOR_APP MS
+		    ON MS.STOR_CD = ASSP.STOR_CD
+		   AND MS.CMP_CD = 'BKR'
+		   AND MS.SALES_ORG_CD = '1000'
+		   AND MS.STOR_STATUS = '1'
+		   AND SUBSTR(MS.STOR_CD, 4, 1) != '9'
+		   AND TO_CHAR(SYSDATE, 'YYYYMMDD') >= MS.SALES_START_DATE
+		 WHERE TO_DATE(ASSP.YYYY||ASSP.MM,'YYYYMM') >= ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M}, 'YYYYMM'),-11)
+		   AND ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M}, 'YYYYMM'),1) > TO_DATE(ASSP.YYYY||ASSP.MM,'YYYYMM')
+	  GROUP BY ASSP.STOR_CD,MS.STOR_NM
+	  ORDER BY MS.STOR_NM ASC
+	</select>
+	
+	<!--
+		QueryId     : AnaInquiry.getChangeAna
+		Description : 월별 멤버십 변동현황 목록  조회 
+	 -->
+	<select id="getChangeAna" parameterType="map" resultType="lmap">
+		SELECT YMD.YYYY||'년 '||YMD.MMMM||'월' AS AA
+			 , AAMP.CNT     AS BB
+			 , GD1.CNT      AS CC
+			 , CNT_J_DOWN	AS DD
+			 , GD2.CNT      AS EE
+			 , CNT_W_UP     AS FF
+			 , CNT_W_DOWN   AS GG
+			 , GD3.CNT      AS HH
+			 , CNT_K_UP     AS II
+		  FROM (
+		                  SELECT TO_CHAR(YYMMDD,'YYYY') AS YYYY
+		                     , TO_CHAR(YYMMDD,'MM') AS MMMM
+		                FROM (
+		                        SELECT ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M}, 'YYYYMM'),- (LEVEL-1)) AS YYMMDD
+		                          FROM DUAL
+		                    CONNECT BY ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M}, 'YYYYMM'),- (LEVEL-1)) >= ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M}, 'YYYYMM'),-11) 
+		                     )
+		               ) YMD
+		  LEFT OUTER JOIN (SELECT YYYY
+		  						, MM
+		  						, SUM(CNT_MEMBER) AS CNT
+		                     FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD A
+                            WHERE DD = (SELECT MAX(DD) 
+                            			  FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD B 
+                            			 WHERE A.YYYY = B.YYYY 
+                            			   AND A.MM = B.MM)
+		                 GROUP BY YYYY,MM) AAMP
+		    ON YMD.YYYY = AAMP.YYYY
+		   AND YMD.MMMM = AAMP.MM
+		  LEFT OUTER JOIN (SELECT YYYY,MM,SUM(CNT_MEMBER) AS CNT
+		                     FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD A
+		                    WHERE DD = (SELECT MAX(DD) 
+                            			  FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD B 
+                            			 WHERE A.YYYY = B.YYYY 
+                            			   AND A.MM = B.MM)
+		                 GROUP BY YYYY,MM,CD_GRADE
+		                 HAVING CD_GRADE = '01' ) GD1
+		    ON YMD.YYYY = GD1.YYYY
+		   AND YMD.MMMM = GD1.MM
+		  LEFT OUTER JOIN (SELECT YYYY,MM,SUM(CNT_MEMBER) AS CNT
+		                     FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD A
+		                    WHERE DD = (SELECT MAX(DD) 
+                            			  FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD B 
+                            			 WHERE A.YYYY = B.YYYY 
+                            			   AND A.MM = B.MM)
+                              AND MM = (SELECT MAX(MM) 
+                                         FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD B 
+                                        WHERE A.YYYY = B.YYYY)
+		                 GROUP BY YYYY,MM,CD_GRADE
+		                 HAVING CD_GRADE = '02' ) GD2
+		    ON YMD.YYYY = GD2.YYYY
+		   AND YMD.MMMM = GD2.MM
+		  LEFT OUTER JOIN (SELECT YYYY,MM,SUM(CNT_MEMBER) AS CNT
+		                     FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD A
+		                    WHERE DD = (SELECT MAX(DD) 
+                            			  FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD B 
+                            			 WHERE A.YYYY = B.YYYY 
+                            			   AND A.MM = B.MM)
+                              AND MM = (SELECT MAX(MM) 
+                                          FROM CRMADMIN.ANA_ALL_MEMBER_PERIOD B 
+                                         WHERE A.YYYY = B.YYYY)
+		                 GROUP BY YYYY,MM,CD_GRADE
+		                 HAVING CD_GRADE = '03' ) GD3
+		    ON YMD.YYYY = GD3.YYYY
+		   AND YMD.MMMM = GD3.MM
+		  LEFT OUTER JOIN CRMADMIN.ANA_MSHIP_CHANGE_PERIOD AMCP
+		    ON YMD.YYYY = AMCP.YYYY
+		   AND YMD.MMMM = AMCP.MM
+	  ORDER BY AA DESC
+	</select>
+	
+	<!--
+		QueryId     : AnaInquiry.getCauseVocAna
+		Description : 유형-월별 VOC현황 목록  조회 
+	 -->
+	<select id="getCauseVocAna" parameterType="map" resultType="lmap">
+		SELECT SC.CODE
+		     , NVL(AAA.DATA1 ,0) AS DATA1 
+		     , NVL(AAA.DATA2 ,0) AS DATA2 
+		     , NVL(AAA.DATA3 ,0) AS DATA3 
+		     , NVL(AAA.DATA4 ,0) AS DATA4 
+		     , NVL(AAA.DATA5 ,0) AS DATA5 
+		     , NVL(AAA.DATA6 ,0) AS DATA6 
+		     , NVL(AAA.DATA7 ,0) AS DATA7 
+		     , NVL(AAA.DATA8 ,0) AS DATA8 
+		     , NVL(AAA.DATA9 ,0) AS DATA9 
+		     , NVL(AAA.DATA10,0) AS DATA10
+		     , NVL(AAA.DATA11,0) AS DATA11
+		     , NVL(AAA.DATA12,0) AS DATA12
+		     , NVL(AAA.DATA1 ,0)+ NVL(AAA.DATA2 ,0)+ NVL(AAA.DATA3 ,0)+ NVL(AAA.DATA4 ,0)+
+               NVL(AAA.DATA5 ,0)+ NVL(AAA.DATA6 ,0)+ NVL(AAA.DATA7 ,0)+ NVL(AAA.DATA8 ,0)+
+               NVL(AAA.DATA9 ,0)+ NVL(AAA.DATA10,0)+ NVL(AAA.DATA11,0)+ NVL(AAA.DATA12,0) AS ROWSUM
+		 FROM CRMADMIN.SYS_CODE SC
+		 LEFT OUTER JOIN (SELECT AA.CD_VOC_CAUSE
+		                     , SUM(AA.DATA1) AS DATA1
+		                     , SUM(AA.DATA2) AS DATA2
+		                     , SUM(AA.DATA3) AS DATA3
+		                     , SUM(AA.DATA4) AS DATA4
+		                     , SUM(AA.DATA5) AS DATA5
+		                     , SUM(AA.DATA6) AS DATA6
+		                     , SUM(AA.DATA7) AS DATA7
+		                     , SUM(AA.DATA8) AS DATA8
+		                     , SUM(AA.DATA9) AS DATA9
+		                     , SUM(AA.DATA10) AS DATA10
+		                     , SUM(AA.DATA11) AS DATA11
+		                     , SUM(AA.DATA12) AS DATA12
+		                  FROM (SELECT CASE WHEN A.YYYYMM = #{DT_START_Y}||#{DT_START_M} THEN 1
+		                                    ELSE 0
+		                                END DATA1
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-1),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA2
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-2),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA3
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-3),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA4
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-4),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA5
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-5),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA6
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-6),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA7
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-7),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA8
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-8),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA9
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-9),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA10
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-10),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA11
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-11),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA12
+		                             , A.CD_VOC_CAUSE
+		                          FROM (SELECT TO_CHAR(TVM.DT_REG, 'YYYYMM') AS YYYYMM
+		                                     , CD_VOC_CAUSE
+		                                  FROM CRMADMIN.TBS_VOC_MASTER TVM
+		                            	  LEFT OUTER JOIN CRMADMIN.TBS_MEMBER TM
+                                     		ON TVM.ID_MEMBER = TM.ID_MEMBER
+                                    	  LEFT OUTER JOIN OMNI.OMNI_STOR_APP MS
+                                    	    ON TVM.ID_STORE = MS.STOR_CD
+                                    	   AND MS.CMP_CD = 'BKR'
+                                    	   AND MS.SALES_ORG_CD = '1000'
+                                    	   AND MS.STOR_STATUS = '1'
+                                    	   AND SUBSTR(MS.STOR_CD, 4, 1) != '9'
+                                    	   AND TO_CHAR(SYSDATE, 'YYYYMMDD') >= MS.SALES_START_DATE
+                                    	 WHERE TVM.FG_DEL = 'N'
+                                    	   AND TVM.DT_REG >= ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-11)
+                                    	   AND ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),1) > TVM.DT_REG
+		                                  	<if test="FG_MEMBER != '' and FG_MEMBER != null">
+		                                  		AND FG_MEMBER = #{FG_MEMBER}
+		                                  	</if>
+		                                  	<if test="CD_GENDER != '' and CD_GENDER != null">
+		                                  		AND CD_GENDER = #{CD_GENDER}
+		                                  	</if>
+		                                  	<if test="CD_AGE != '' and CD_AGE != null">
+		                                  		AND CD_AGE = #{CD_AGE}
+		                                  	</if>
+		                                  	<if test="CD_GRADE != '' and CD_GRADE != null">
+		                                  		AND CD_GRADE = #{CD_GRADE}
+		                                  	</if>
+		                                  	<if test="CD_STORE != '' and CD_STORE != null">
+		                                  		AND DRT_FRCS_TYPE = #{CD_STORE}
+		                                  	</if>
+		                                  	<if test="YN_FLAG != '' and YN_FLAG != null">
+		                                  		AND DIRVE_TH = #{YN_FLAG}
+		                                  	</if>
+		                                  	<if test="CD_BIZ_CHNN != null and CD_BIZ_CHNN != ''">
+		                                  	    <choose>
+		                                  	        <when test='BIZ_CHNN_SIZE == "1"'>
+		                                  	        	AND TVM.BIZ_CHNN = #{CD_BIZ_CHNN}
+		                                  	        </when>
+		                                  	        <otherwise>
+		                                  	        	AND TVM.BIZ_CHNN IN 
+		                                  	            <foreach collection="CD_BIZ_CHNN" item="CD_CHNN" open="(" close=")" separator=",">
+		                                  	            	#{CD_CHNN}
+		                                  	            </foreach>
+		                                  	        </otherwise>
+		                                  	    </choose>
+		                                  	</if>
+		                                ) A
+		                        ) AA
+		                 GROUP BY AA.CD_VOC_CAUSE
+		                ) AAA
+		              ON AAA.CD_VOC_CAUSE = SC.CODE
+		WHERE SC.CODE_CATEGORY_ID = 'CD_VOC_CAUSE_2'
+		ORDER BY SC.CODE
+	</select>
+
+
+	<!--
+		QueryId     : AnaInquiry.getStoreVocAna
+		Description : 매장-월별 VOC현황 목록  조회 
+	 -->
+	<select id="getStoreVocAna" parameterType="map" resultType="lmap">
+		SELECT AAA.ID_STORE
+		     , DECODE(AAA.ID_STORE, '99999999', '매장없음', MS.STOR_NM) AS STOR_NM
+		     , NVL(AAA.DATA1 ,0) AS DATA1 
+			 , NVL(AAA.DATA2 ,0) AS DATA2 
+			 , NVL(AAA.DATA3 ,0) AS DATA3 
+			 , NVL(AAA.DATA4 ,0) AS DATA4 
+			 , NVL(AAA.DATA5 ,0) AS DATA5 
+			 , NVL(AAA.DATA6 ,0) AS DATA6 
+			 , NVL(AAA.DATA7 ,0) AS DATA7 
+			 , NVL(AAA.DATA8 ,0) AS DATA8 
+			 , NVL(AAA.DATA9 ,0) AS DATA9 
+			 , NVL(AAA.DATA10,0) AS DATA10
+			 , NVL(AAA.DATA11,0) AS DATA11
+			 , NVL(AAA.DATA12,0) AS DATA12
+		 FROM  (SELECT AA.ID_STORE
+		                     , SUM(AA.DATA1) AS DATA1
+		                     , SUM(AA.DATA2) AS DATA2
+		                     , SUM(AA.DATA3) AS DATA3
+		                     , SUM(AA.DATA4) AS DATA4
+		                     , SUM(AA.DATA5) AS DATA5
+		                     , SUM(AA.DATA6) AS DATA6
+		                     , SUM(AA.DATA7) AS DATA7
+		                     , SUM(AA.DATA8) AS DATA8
+		                     , SUM(AA.DATA9) AS DATA9
+		                     , SUM(AA.DATA10) AS DATA10
+		                     , SUM(AA.DATA11) AS DATA11
+		                     , SUM(AA.DATA12) AS DATA12
+		                  FROM (SELECT CASE WHEN A.YYYYMM = #{DT_START_Y}||#{DT_START_M} THEN 1
+		                                    ELSE 0
+		                                END DATA1
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-1),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA2
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-2),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA3
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-3),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA4
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-4),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA5
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-5),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA6
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-6),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA7
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-7),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA8
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-8),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA9
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-9),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA10
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-10),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA11
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-11),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA12
+		                             , A.ID_STORE
+		                          FROM (SELECT TO_CHAR(TVM.DT_REG, 'YYYYMM') AS YYYYMM
+		                                     , NVL(TVM.ID_STORE, '99999999') AS ID_STORE
+		                                  FROM CRMADMIN.TBS_VOC_MASTER TVM
+		                                  LEFT OUTER JOIN OMNI.OMNI_STOR_APP OSA
+                                            ON TVM.ID_STORE = OSA.STOR_CD
+                                    	   AND OSA.CMP_CD = 'BKR'
+                                    	   AND OSA.SALES_ORG_CD = '1000'
+                                    	   AND OSA.STOR_STATUS = '1'
+                                    	   AND SUBSTR(OSA.STOR_CD, 4, 1) != '9'
+                                    	   AND TO_CHAR(SYSDATE, 'YYYYMMDD') >= OSA.SALES_START_DATE
+                                          LEFT OUTER JOIN CRMADMIN.TBS_MEMBER TM
+                                            ON TVM.ID_MEMBER = TM.ID_MEMBER
+		                                 WHERE TVM.FG_DEL = 'N'
+		                                   AND TVM.DT_REG >= ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-11)
+                                    	   AND ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M}, 'YYYYMM'),1) > TVM.DT_REG
+		                                 <if test="FG_MEMBER != '' and FG_MEMBER != null">
+	                                  		AND FG_MEMBER = #{FG_MEMBER}
+	                                  	</if>
+	                                  	<if test="CD_GENDER != '' and CD_GENDER != null">
+	                                  		AND CD_GENDER = #{CD_GENDER}
+	                                  	</if>
+	                                  	<if test="CD_AGE != '' and CD_AGE != null">
+	                                  		AND CD_AGE = #{CD_AGE}
+	                                  	</if>
+	                                  	<if test="CD_GRADE != '' and CD_GRADE != null">
+	                                  		AND CD_GRADE = #{CD_GRADE}
+	                                  	</if>
+	                                  	<if test="CD_STORE != '' and CD_STORE != null">
+	                                  		AND DRT_FRCS_TYPE = #{CD_STORE}
+	                                  	</if>
+	                                  	<if test="YN_FLAG != '' and YN_FLAG != null">
+	                                  		AND DIRVE_TH = #{YN_FLAG}
+	                                  	</if>
+                                        <if test="CD_BIZ_CHNN != null and CD_BIZ_CHNN != ''">
+                                         <choose>
+                                          <when test='BIZ_CHNN_SIZE == "1"'>
+                                          	AND TVM.BIZ_CHNN = #{CD_BIZ_CHNN}
+                                          </when>
+                                          <otherwise>
+                                          	AND TVM.BIZ_CHNN IN 
+                                           <foreach collection="CD_BIZ_CHNN" item="CD_CHNN" open="(" close=")" separator=",">
+                                           	#{CD_CHNN}
+                                           </foreach>
+                                          </otherwise>
+                                         </choose>
+                                        </if>
+		                                ) A
+		                        ) AA
+		                 GROUP BY AA.ID_STORE
+		                ) AAA
+		       LEFT OUTER JOIN OMNI.OMNI_STOR_APP MS
+		         ON MS.STOR_CD = AAA.ID_STORE
+		        AND MS.CMP_CD = 'BKR'
+		        AND MS.SALES_ORG_CD = '1000'
+		      ORDER BY MS.STOR_NM
+	</select>
+	
+	
+	<!--
+		QueryId     : AnaInquiry.getCustAttrVocAna
+		Description : 고객속성별 VOC현황 목록  조회 
+	 -->
+	<select id="getCustAttrVocAna" parameterType="map" resultType="lmap">
+		SELECT SC.CODE
+             , NVL(AAA.DATA1 ,0) AS DATA1 
+             , NVL(AAA.DATA2 ,0) AS DATA2 
+             , NVL(AAA.DATA3 ,0) AS DATA3 
+             , NVL(AAA.DATA4 ,0) AS DATA4 
+             , NVL(AAA.DATA5 ,0) AS DATA5 
+             , NVL(AAA.DATA6 ,0) AS DATA6 
+             , NVL(AAA.DATA7 ,0) AS DATA7 
+             , NVL(AAA.DATA8 ,0) AS DATA8 
+             , NVL(AAA.DATA9 ,0) AS DATA9 
+             , NVL(AAA.DATA10,0) AS DATA10
+             , NVL(AAA.DATA11,0) AS DATA11
+         FROM CRMADMIN.SYS_CODE SC
+         LEFT OUTER JOIN (SELECT AA.CD_VOC_CAUSE
+                             , SUM(AA.DATA1) AS DATA1
+                             , SUM(AA.DATA2) AS DATA2
+                             , SUM(AA.DATA3) AS DATA3
+                             , SUM(AA.DATA4) AS DATA4
+                             , SUM(AA.DATA5) AS DATA5
+                             , SUM(AA.DATA6) AS DATA6
+                             , SUM(AA.DATA7) AS DATA7
+                             , SUM(AA.DATA8) AS DATA8
+                             , SUM(AA.DATA9) AS DATA9
+                             , SUM(AA.DATA10) AS DATA10
+                             , SUM(AA.DATA11) AS DATA11
+                          FROM (SELECT CASE WHEN A.CD_GRADE = '01' THEN 1
+                                            ELSE 0
+                                        END DATA1
+                                     , CASE WHEN A.CD_GRADE = '02' THEN 1
+                                            ELSE 0
+                                        END DATA2
+                                     , CASE WHEN A.CD_GRADE = '03' THEN 1
+                                            ELSE 0
+                                        END DATA3
+                                     , CASE WHEN A.CD_GENDER = 'M' THEN 1
+                                            ELSE 0
+                                        END DATA4
+                                     , CASE WHEN A.CD_GENDER = 'F' THEN 1
+                                            ELSE 0
+                                        END DATA5
+                                     , CASE WHEN A.CD_AGE = '10' THEN 1
+                                            ELSE 0
+                                        END DATA6
+                                     , CASE WHEN A.CD_AGE = '20' THEN 1
+                                            ELSE 0
+                                        END DATA7
+                                     , CASE WHEN A.CD_AGE = '30' THEN 1
+                                            ELSE 0
+                                        END DATA8
+                                     , CASE WHEN A.CD_AGE = '40' THEN 1
+                                            ELSE 0
+                                        END DATA9
+                                     , CASE WHEN A.CD_AGE = '50' THEN 1
+                                            ELSE 0
+                                        END DATA10
+                                     , CASE WHEN A.CD_AGE = '60' THEN 1
+                                            ELSE 0
+                                        END DATA11
+                                     , A.CD_VOC_CAUSE
+                                  FROM (SELECT CD_VOC_CAUSE
+                                             , TM.CD_GRADE
+                                             , TM.CD_GENDER
+                                             , TM.CD_AGE
+                                          FROM CRMADMIN.TBS_VOC_MASTER TVM
+                                          LEFT OUTER JOIN CRMADMIN.TBS_MEMBER TM
+                                             ON TVM.ID_MEMBER = TM.ID_MEMBER
+                                         WHERE TVM.DT_REG >= TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM')
+                                           AND LAST_DAY(TO_DATE(#{DT_END_Y}||#{DT_END_M}||' 23:59:59','YYYYMM HH24:MI:SS')) >= TVM.DT_REG
+                                           AND TVM.FG_DEL = 'N'
+                                           <if test="CD_BIZ_CHNN != null and CD_BIZ_CHNN != ''">
+	                                           <choose>
+		                                           <when test='BIZ_CHNN_SIZE == "1"'>
+		                                           	AND TVM.BIZ_CHNN = #{CD_BIZ_CHNN}
+		                                           </when>
+		                                           <otherwise>
+		                                           	AND TVM.BIZ_CHNN IN 
+			                                           <foreach collection="CD_BIZ_CHNN" item="CD_CHNN" open="(" close=")" separator=",">
+			                                           	#{CD_CHNN}
+			                                           </foreach>
+		                                           </otherwise>
+	                                           </choose>
+                                           </if>
+                                        ) A
+                                ) AA
+                         GROUP BY AA.CD_VOC_CAUSE
+                        ) AAA
+                      ON AAA.CD_VOC_CAUSE = SC.CODE
+        WHERE SC.CODE_CATEGORY_ID = 'CD_VOC_CAUSE_2'
+        ORDER BY SC.CODE
+	</select>
+	
+	
+	<!--
+		QueryId     : AnaInquiry.getDivVocAna
+		Description : 지역별 VOC현황 목록  조회 
+	 -->
+	<select id="getDivVocAna" parameterType="map" resultType="lmap">
+		SELECT AA.DISTRCT_CD_1
+		     , NVL((SELECT DISTRCT_NM FROM OMNI.MST_DISTRCT SUB
+		             WHERE SUB.DISTRCT_CD = AA.DISTRCT_CD_1
+		               AND SUB.CMP_CD = 'BKR'
+		               AND SUB.SALES_ORG_CD = '1000'), 'ALLSUM') AS DISTRCT_NM_1
+		     , AA.DISTRCT_CD_2
+		     , NVL((SELECT DISTRCT_NM FROM OMNI.MST_DISTRCT SUB
+		             WHERE SUB.DISTRCT_CD = AA.DISTRCT_CD_2
+		               AND SUB.CMP_CD = 'BKR'
+		               AND SUB.SALES_ORG_CD = '1000'), '지역명없음') AS DISTRCT_NM_2
+		     , SUM(DATA1)  AS DATA1
+		     , SUM(DATA2)  AS DATA2
+		     , SUM(DATA3)  AS DATA3
+		     , SUM(DATA4)  AS DATA4
+		     , SUM(DATA5)  AS DATA5
+		     , SUM(DATA6)  AS DATA6
+		     , SUM(DATA7)  AS DATA7
+		     , SUM(DATA8)  AS DATA8
+		     , SUM(DATA9)  AS DATA9
+		     , SUM(DATA10) AS DATA10
+		     , SUM(DATA11) AS DATA11
+		     , SUM(DATA12) AS DATA12
+		     , SUM(DATA13) AS DATA13
+		     , SUM(DATA14) AS DATA14
+		     , SUM(DATA15) AS DATA15
+		     , SUM(DATA16) AS DATA16
+		     , SUM(DATA17) AS DATA17
+		     , SUM(DATA18) AS DATA18
+		     , SUM(DATA19) AS DATA19
+		     , SUM(DATA20) AS DATA20
+		     , SUM(DATA21) AS DATA21
+		  FROM (SELECT A.DISTRCT_CD_1
+		             , A.DISTRCT_CD_2
+		             , A.CD_VOC_CAUSE
+		             , A.DRT_FRCS_TYPE
+		             , CASE WHEN A.CD_VOC_CAUSE = '02001' AND A.DRT_FRCS_TYPE = 1 THEN 1
+		                    ELSE 0 END AS DATA1 
+		             , CASE WHEN A.CD_VOC_CAUSE = '02001'AND A.DRT_FRCS_TYPE = 2 THEN 1
+		                    ELSE 0 END AS DATA2
+		             , CASE WHEN A.CD_VOC_CAUSE = '02002' AND A.DRT_FRCS_TYPE = 1 THEN 1
+		                    ELSE 0 END AS DATA3
+		             , CASE WHEN A.CD_VOC_CAUSE = '02002'AND A.DRT_FRCS_TYPE = 2 THEN 1
+		                    ELSE 0 END AS DATA4
+		             , CASE WHEN A.CD_VOC_CAUSE = '02003' AND A.DRT_FRCS_TYPE = 1 THEN 1
+		                    ELSE 0 END AS DATA5
+		             , CASE WHEN A.CD_VOC_CAUSE = '02003'AND A.DRT_FRCS_TYPE = 2 THEN 1
+		                    ELSE 0 END AS DATA6
+		             , CASE WHEN (A.CD_VOC_CAUSE = '02004' OR A.CD_VOC_CAUSE = '02010') AND A.DRT_FRCS_TYPE = 1 THEN 1
+		                    ELSE 0 END AS DATA7
+		             , CASE WHEN (A.CD_VOC_CAUSE = '02004' OR A.CD_VOC_CAUSE = '02010') AND A.DRT_FRCS_TYPE = 2 THEN 1
+		                    ELSE 0 END AS DATA8
+		             , CASE WHEN A.CD_VOC_CAUSE = '02005' AND A.DRT_FRCS_TYPE = 1 THEN 1
+		                    ELSE 0 END AS DATA9
+		             , CASE WHEN A.CD_VOC_CAUSE = '02005'AND A.DRT_FRCS_TYPE = 2 THEN 1
+		                    ELSE 0 END AS DATA10
+		             , CASE WHEN (A.CD_VOC_CAUSE = '02006' OR A.CD_VOC_CAUSE = '02009') AND A.DRT_FRCS_TYPE = 1 THEN 1
+		                    ELSE 0 END AS DATA11
+		             , CASE WHEN (A.CD_VOC_CAUSE = '02006' OR A.CD_VOC_CAUSE = '02009') AND A.DRT_FRCS_TYPE = 2 THEN 1
+		                    ELSE 0 END AS DATA12
+		             , CASE WHEN A.CD_VOC_CAUSE = '02007' AND A.DRT_FRCS_TYPE = 1 THEN 1
+		                    ELSE 0 END AS DATA13
+		             , CASE WHEN A.CD_VOC_CAUSE = '02007'AND A.DRT_FRCS_TYPE = 2 THEN 1
+		                    ELSE 0 END AS DATA14
+		             , CASE WHEN A.CD_VOC_CAUSE = '02008' AND A.DRT_FRCS_TYPE = 1 THEN 1
+		                    ELSE 0 END AS DATA15
+		             , CASE WHEN A.CD_VOC_CAUSE = '02008'AND A.DRT_FRCS_TYPE = 2 THEN 1
+		                    ELSE 0 END AS DATA16
+		             , CASE WHEN ( A.CD_VOC_CAUSE = '02011' OR A.CD_VOC_CAUSE NOT LIKE '02%' ) AND A.DRT_FRCS_TYPE = 1 THEN 1
+		                    ELSE 0 END AS DATA17
+		             , CASE WHEN ( A.CD_VOC_CAUSE = '02011' OR A.CD_VOC_CAUSE NOT LIKE '02%' )AND A.DRT_FRCS_TYPE = 2 THEN 1
+		                    ELSE 0 END AS DATA18
+		             , CASE WHEN A.CD_VOC_CAUSE IS NOT NULL AND A.DRT_FRCS_TYPE = 1 THEN 1
+		                    ELSE 0 END DATA19
+		             , CASE WHEN A.CD_VOC_CAUSE IS NOT NULL AND A.DRT_FRCS_TYPE = 2 THEN 1
+		                    ELSE 0 END DATA20
+		             , CASE WHEN A.CD_VOC_CAUSE IS NOT NULL THEN 1
+		                    ELSE 0 END DATA21
+		          FROM (SELECT NVL(MS.DISTRCT_CD_1, MS2.DISTRCT_CD_1) AS DISTRCT_CD_1
+                             , NVL(MS.DISTRCT_CD_2, MS2.DISTRCT_CD_2) AS DISTRCT_CD_2
+		                     , MS.DRT_FRCS_TYPE
+		                     , VM.CD_VOC_CAUSE
+		                  FROM OMNI.MST_STOR MS
+		                  LEFT OUTER JOIN OMNI.MST_STOR MS2
+                            ON MS2.STOR_CD_24 = MS.STOR_CD
+                           AND MS2.OPER_24_YN = '1'
+                           AND MS2.DLVYN = '1'
+		                  LEFT OUTER JOIN CRMADMIN.TBS_VOC_MASTER VM
+		                    ON VM.ID_STORE = MS.STOR_CD
+		                   AND VM.FG_DEL = 'N'
+							<if test="DT_START != '' and DT_START != null">
+								AND VM.DT_REG >= TO_DATE(#{DT_START},'YYYY-MM-DD')
+							</if>
+							<if test="DT_END != '' and DT_END != null">
+								AND VM.DT_REG <![CDATA[<=]]> TO_DATE(#{DT_END}||' 235959', 'YYYY-MM-DD HH24MISS') 
+							</if>
+							<if test="CD_BIZ_CHNN != null and CD_BIZ_CHNN != ''">
+							<choose>
+								<when test='BIZ_CHNN_SIZE == "1"'>
+									AND VM.BIZ_CHNN = #{CD_BIZ_CHNN}
+								</when>
+								<otherwise>
+									AND VM.BIZ_CHNN IN 
+									<foreach collection="CD_BIZ_CHNN" item="CD_CHNN" open="(" close=")" separator=",">
+										#{CD_CHNN}
+									</foreach>
+								</otherwise>
+							</choose>
+							</if>
+							<!-- 분류 조건  -->
+							<if test="CD_DIV_STR != null and CD_DIV_STR != ''">
+								AND ( VM.CD_VOC_CAUSE IN 
+										<foreach collection="CD_DIV_STR" item="CD_DIV" open="(" close=")" separator=",">
+									   		#{CD_DIV}
+									   	</foreach>
+									<if test='FLAG_ETC == "00"'>
+								 		OR VM.CD_VOC_CAUSE NOT LIKE '02%' 
+								 	</if>
+								 	)
+							</if>
+		                 WHERE MS.CMP_CD = 'BKR'
+		                   AND MS.SALES_ORG_CD = '1000'
+		                ) A
+		        ) AA
+         WHERE AA.DISTRCT_CD_1 IS NOT NULL
+		 GROUP BY ROLLUP(AA.DISTRCT_CD_1, AA.DISTRCT_CD_2)
+		 ORDER BY AA.DISTRCT_CD_1, AA.DISTRCT_CD_2
+		
+	</select>
+	
+	<!--
+		QueryId     : AnaInquiry.getAnaListToExcel
+		Description : 지역별 VOC 불만 현황 엑셀  조회 
+	 -->
+	<select id="getAnaListToExcel" parameterType="map" resultType="lmap">
+		SELECT NVL((SELECT DISTRCT_NM FROM OMNI.MST_DISTRCT SUB
+		             WHERE SUB.DISTRCT_CD = AA.DISTRCT_CD_1
+		               AND SUB.CMP_CD = 'BKR'
+		               AND SUB.SALES_ORG_CD = '1000'), 'ALLSUM') AS DISTRCT_NM_1
+		     , NVL((SELECT DISTRCT_NM FROM OMNI.MST_DISTRCT SUB
+		             WHERE SUB.DISTRCT_CD = AA.DISTRCT_CD_2
+		               AND SUB.CMP_CD = 'BKR'
+		               AND SUB.SALES_ORG_CD = '1000'), 'SUM') AS DISTRCT_NM_2
+		     , SUM(DATA1)  AS DATA1
+		     , SUM(DATA2)  AS DATA2
+		     , SUM(DATA3)  AS DATA3
+		     , SUM(DATA4)  AS DATA4
+		     , SUM(DATA5)  AS DATA5
+		     , SUM(DATA6)  AS DATA6
+		     , SUM(DATA7)  AS DATA7
+		     , SUM(DATA8)  AS DATA8
+		     , SUM(DATA9)  AS DATA9
+		     , SUM(DATA10) AS DATA10
+		     , SUM(DATA11) AS DATA11
+		     , SUM(DATA12) AS DATA12
+		     , SUM(DATA13) AS DATA13
+		     , SUM(DATA14) AS DATA14
+		     , SUM(DATA15) AS DATA15
+		     , SUM(DATA16) AS DATA16
+		     , SUM(DATA17) AS DATA17
+		     , SUM(DATA18) AS DATA18
+		     , SUM(DATA19) AS DATA19
+		     , SUM(DATA20) AS DATA20
+		     , SUM(DATA21) AS DATA21
+		  FROM (SELECT A.DISTRCT_CD_1
+		             , A.DISTRCT_CD_2
+		             , A.CD_VOC_CAUSE
+		             , A.DRT_FRCS_TYPE
+		             , CASE WHEN A.CD_VOC_CAUSE = '02001' AND A.DRT_FRCS_TYPE = 1 THEN 1
+		                    ELSE 0 END AS DATA1 
+		             , CASE WHEN A.CD_VOC_CAUSE = '02001'AND A.DRT_FRCS_TYPE = 2 THEN 1
+		                    ELSE 0 END AS DATA2
+		             , CASE WHEN A.CD_VOC_CAUSE = '02002' AND A.DRT_FRCS_TYPE = 1 THEN 1
+		                    ELSE 0 END AS DATA3
+		             , CASE WHEN A.CD_VOC_CAUSE = '02002'AND A.DRT_FRCS_TYPE = 2 THEN 1
+		                    ELSE 0 END AS DATA4
+		             , CASE WHEN A.CD_VOC_CAUSE = '02003' AND A.DRT_FRCS_TYPE = 1 THEN 1
+		                    ELSE 0 END AS DATA5
+		             , CASE WHEN A.CD_VOC_CAUSE = '02003'AND A.DRT_FRCS_TYPE = 2 THEN 1
+		                    ELSE 0 END AS DATA6
+		             , CASE WHEN (A.CD_VOC_CAUSE = '02004' OR A.CD_VOC_CAUSE = '02010') AND A.DRT_FRCS_TYPE = 1 THEN 1
+		                    ELSE 0 END AS DATA7
+		             , CASE WHEN (A.CD_VOC_CAUSE = '02004' OR A.CD_VOC_CAUSE = '02010') AND A.DRT_FRCS_TYPE = 2 THEN 1
+		                    ELSE 0 END AS DATA8
+		             , CASE WHEN A.CD_VOC_CAUSE = '02005' AND A.DRT_FRCS_TYPE = 1 THEN 1
+		                    ELSE 0 END AS DATA9
+		             , CASE WHEN A.CD_VOC_CAUSE = '02005'AND A.DRT_FRCS_TYPE = 2 THEN 1
+		                    ELSE 0 END AS DATA10
+		             , CASE WHEN (A.CD_VOC_CAUSE = '02006' OR A.CD_VOC_CAUSE = '02009') AND A.DRT_FRCS_TYPE = 1 THEN 1
+		                    ELSE 0 END AS DATA11
+		             , CASE WHEN (A.CD_VOC_CAUSE = '02006' OR A.CD_VOC_CAUSE = '02009') AND A.DRT_FRCS_TYPE = 2 THEN 1
+		                    ELSE 0 END AS DATA12
+		             , CASE WHEN A.CD_VOC_CAUSE = '02007' AND A.DRT_FRCS_TYPE = 1 THEN 1
+		                    ELSE 0 END AS DATA13
+		             , CASE WHEN A.CD_VOC_CAUSE = '02007'AND A.DRT_FRCS_TYPE = 2 THEN 1
+		                    ELSE 0 END AS DATA14
+		             , CASE WHEN A.CD_VOC_CAUSE = '02008' AND A.DRT_FRCS_TYPE = 1 THEN 1
+		                    ELSE 0 END AS DATA15
+		             , CASE WHEN A.CD_VOC_CAUSE = '02008'AND A.DRT_FRCS_TYPE = 2 THEN 1
+		                    ELSE 0 END AS DATA16
+		             , CASE WHEN ( A.CD_VOC_CAUSE = '02011' OR A.CD_VOC_CAUSE NOT LIKE '02%' ) AND A.DRT_FRCS_TYPE = 1 THEN 1
+		                    ELSE 0 END AS DATA17
+		             , CASE WHEN ( A.CD_VOC_CAUSE = '02011' OR A.CD_VOC_CAUSE NOT LIKE '02%' )AND A.DRT_FRCS_TYPE = 2 THEN 1
+		                    ELSE 0 END AS DATA18
+		             , CASE WHEN A.CD_VOC_CAUSE IS NOT NULL AND A.DRT_FRCS_TYPE = 1 THEN 1
+		                    ELSE 0 END DATA19
+		             , CASE WHEN A.CD_VOC_CAUSE IS NOT NULL AND A.DRT_FRCS_TYPE = 2 THEN 1
+		                    ELSE 0 END DATA20
+		             , CASE WHEN A.CD_VOC_CAUSE IS NOT NULL THEN 1
+		                    ELSE 0 END DATA21
+		          FROM (SELECT NVL(MS.DISTRCT_CD_1, MS2.DISTRCT_CD_1) AS DISTRCT_CD_1
+                             , NVL(MS.DISTRCT_CD_2, MS2.DISTRCT_CD_2) AS DISTRCT_CD_2
+		                     , MS.DRT_FRCS_TYPE
+		                     , VM.CD_VOC_CAUSE
+		                  FROM OMNI.MST_STOR MS
+		                  LEFT OUTER JOIN OMNI.MST_STOR MS2
+                            ON MS2.STOR_CD_24 = MS.STOR_CD
+                           AND MS2.OPER_24_YN = '1'
+                           AND MS2.DLVYN = '1'
+		                  LEFT OUTER JOIN CRMADMIN.TBS_VOC_MASTER VM
+		                    ON VM.ID_STORE = MS.STOR_CD
+		                   AND VM.FG_DEL = 'N'
+		                   <if test="DT_START != '' and DT_START != null">
+		                   	AND VM.DT_REG >= TO_DATE(#{DT_START},'YYYY-MM-DD')
+		                   </if>
+		                   <if test="DT_END != '' and DT_END != null">
+		                   	AND VM.DT_REG <![CDATA[<=]]> TO_DATE(#{DT_END}||' 235959', 'YYYY-MM-DD HH24MISS') 
+		                   </if>
+		                   <if test="CD_BIZ_CHNN != null and CD_BIZ_CHNN != ''">
+		                   	<choose>
+		                   		<when test='BIZ_CHNN_SIZE == "1"'>
+		                   			AND VM.BIZ_CHNN = #{CD_BIZ_CHNN}
+		                   		</when>
+		                   		<otherwise>
+		                   			AND VM.BIZ_CHNN IN 
+		                   			<foreach collection="CD_BIZ_CHNN" item="CD_CHNN" open="(" close=")" separator=",">
+		                   				#{CD_CHNN}
+		                   			</foreach>
+		                   		</otherwise>
+		                   	</choose>
+		                   </if>
+		                   <!-- 분류 조건  -->
+							<if test="CD_DIV_STR != null and CD_DIV_STR != ''">
+								AND ( VM.CD_VOC_CAUSE IN 
+										<foreach collection="CD_DIV_STR" item="CD_DIV" open="(" close=")" separator=",">
+									   		#{CD_DIV}
+									   	</foreach>
+									<if test='FLAG_ETC == "00"'>
+								 		OR VM.CD_VOC_CAUSE NOT LIKE '02%' 
+								 	</if>
+								 	)
+							</if>
+		                 WHERE MS.CMP_CD = 'BKR'
+		                   AND MS.SALES_ORG_CD = '1000'
+		                ) A
+		        ) AA
+		 WHERE AA.DISTRCT_CD_1 IS NOT NULL
+		 GROUP BY ROLLUP(AA.DISTRCT_CD_1, AA.DISTRCT_CD_2)
+		 ORDER BY AA.DISTRCT_CD_1, AA.DISTRCT_CD_2
+	</select>
+	
+	<!--
+		QueryId     : AnaInquiry.getDivVocEtc
+		Description : 지역별 VOC 불만 현황 기타 조회 
+	 -->
+	<select id="getDivVocEtc" parameterType="map" resultType="lmap">
+		SELECT COUNT(DECODE(CD_VOC_CAUSE, '02001',1)) AS DATA1
+		     , COUNT(DECODE(CD_VOC_CAUSE, '02002',1)) AS DATA2
+		     , COUNT(DECODE(CD_VOC_CAUSE, '02003',1)) AS DATA3
+		     , COUNT(CASE WHEN CD_VOC_CAUSE ='02004' OR CD_VOC_CAUSE ='02010' THEN 1 END) AS DATA4
+		     , COUNT(DECODE(CD_VOC_CAUSE, '02005',1)) AS DATA5
+		     , COUNT(CASE WHEN CD_VOC_CAUSE = '02006' OR CD_VOC_CAUSE = '02009' THEN 1 END ) AS DATA6
+		     , COUNT(DECODE(CD_VOC_CAUSE, '02007',1)) AS DATA7
+		     , COUNT(DECODE(CD_VOC_CAUSE, '02008',1)) AS DATA8
+		     , COUNT(CASE WHEN CD_VOC_CAUSE = '02011' OR CD_VOC_CAUSE NOT LIKE '02%' THEN 1 END) AS DATA9
+		     , COUNT(CASE WHEN CD_VOC_CAUSE IS NOT NULL THEN 1 END) AS DATA10
+		  FROM CRMADMIN.TBS_VOC_MASTER VM
+		 WHERE VM.FG_DEL = 'N'
+		   AND ID_STORE IS NULL
+		   <if test="DT_START != '' and DT_START != null">
+		   	AND VM.DT_REG >= TO_DATE(#{DT_START},'YYYY-MM-DD')
+		   </if>
+		   <if test="DT_END != '' and DT_END != null">
+		   	AND VM.DT_REG <![CDATA[<=]]> TO_DATE(#{DT_END}||' 235959', 'YYYY-MM-DD HH24MISS') 
+		   </if>
+		   <if test="CD_BIZ_CHNN != null and CD_BIZ_CHNN != ''">
+		   	<choose>
+		    	<when test='BIZ_CHNN_SIZE == "1"'>
+		        	AND VM.BIZ_CHNN = #{CD_BIZ_CHNN}
+		        </when>
+		        <otherwise>
+		        	AND VM.BIZ_CHNN IN 
+		        	<foreach collection="CD_BIZ_CHNN" item="CD_CHNN" open="(" close=")" separator=",">
+		            	#{CD_CHNN}
+		            </foreach>
+		        </otherwise>
+		    </choose>
+		   </if>
+           <!-- 분류 조건  -->
+		   <if test="CD_DIV_STR != null and CD_DIV_STR != ''">
+		   	AND ( VM.CD_VOC_CAUSE IN 
+					<foreach collection="CD_DIV_STR" item="CD_DIV" open="(" close=")" separator=",">
+				   		#{CD_DIV}
+				   	</foreach>
+				    <if test='FLAG_ETC == "00"'>
+				   		OR VM.CD_VOC_CAUSE NOT LIKE '02%' 
+				    </if>
+				 )
+		   </if>
+	</select>
+	
+	
+	<!--
+		QueryId     : AnaInquiry.getCauseVocExcelDown
+		Description : 유형별-기간별 VOC 통계 엑셀 다운로드
+	 -->
+	<select id="getCauseVocExcelDown" parameterType="map" resultType="lmap">
+		SELECT NVL((SELECT CODE_NAME FROM CRMADMIN.SYS_CODE WHERE CODE = SC.PARENT_CODE AND CODE_CATEGORY_ID = 'CD_VOC_CAUSE_1'), '전체') AS "구분"
+             , CASE WHEN SC.PARENT_CODE IS NULL THEN '전체'  
+                    WHEN SC.CODE IS NULL THEN '소계' 
+                    ELSE (SELECT CODE_NAME FROM CRMADMIN.SYS_CODE WHERE CODE = SC.CODE AND CODE_CATEGORY_ID = 'CD_VOC_CAUSE_2') END AS "유형"
+             , NVL(SUM(AA.DATA1)+SUM(AA.DATA2)+SUM(AA.DATA3)
+                 +SUM(AA.DATA4)+SUM(AA.DATA5)+SUM(AA.DATA6)
+                 +SUM(AA.DATA7)+SUM(AA.DATA8)+SUM(AA.DATA9)
+                 +SUM(AA.DATA10)+SUM(AA.DATA11)+SUM(AA.DATA12) ,0) AS "전체"
+             , NVL(SUM(AA.DATA1) ,0) AS DATA1
+             , NVL(SUM(AA.DATA2) ,0) AS DATA2
+             , NVL(SUM(AA.DATA3) ,0) AS DATA3
+             , NVL(SUM(AA.DATA4) ,0) AS DATA4
+             , NVL(SUM(AA.DATA5) ,0) AS DATA5
+             , NVL(SUM(AA.DATA6) ,0) AS DATA6
+             , NVL(SUM(AA.DATA7) ,0) AS DATA7
+             , NVL(SUM(AA.DATA8) ,0) AS DATA8
+             , NVL(SUM(AA.DATA9) ,0) AS DATA9
+             , NVL(SUM(AA.DATA10) ,0) AS DATA10
+             , NVL(SUM(AA.DATA11) ,0) AS DATA11
+             , NVL(SUM(AA.DATA12) ,0) AS DATA12
+          FROM CRMADMIN.SYS_CODE SC
+          LEFT OUTER JOIN (SELECT CASE WHEN A.YYYYMM =  #{DT_START_Y}||#{DT_START_M} THEN 1
+                            ELSE 0
+                        END DATA1
+                     , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE( #{DT_START_Y}||#{DT_START_M},'YYYYMM'),-1),'YYYYMM') THEN 1
+                            ELSE 0
+                        END DATA2
+                     , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE( #{DT_START_Y}||#{DT_START_M},'YYYYMM'),-2),'YYYYMM') THEN 1
+                            ELSE 0
+                        END DATA3
+                     , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE( #{DT_START_Y}||#{DT_START_M},'YYYYMM'),-3),'YYYYMM') THEN 1
+                            ELSE 0
+                        END DATA4
+                     , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE( #{DT_START_Y}||#{DT_START_M},'YYYYMM'),-4),'YYYYMM') THEN 1
+                            ELSE 0
+                        END DATA5
+                     , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE( #{DT_START_Y}||#{DT_START_M},'YYYYMM'),-5),'YYYYMM') THEN 1
+                            ELSE 0
+                        END DATA6
+                     , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE( #{DT_START_Y}||#{DT_START_M},'YYYYMM'),-6),'YYYYMM') THEN 1
+                            ELSE 0
+                        END DATA7
+                     , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE( #{DT_START_Y}||#{DT_START_M},'YYYYMM'),-7),'YYYYMM') THEN 1
+                            ELSE 0
+                        END DATA8
+                     , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE( #{DT_START_Y}||#{DT_START_M},'YYYYMM'),-8),'YYYYMM') THEN 1
+                            ELSE 0
+                        END DATA9
+                     , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE( #{DT_START_Y}||#{DT_START_M},'YYYYMM'),-9),'YYYYMM') THEN 1
+                            ELSE 0
+                        END DATA10
+                     , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE( #{DT_START_Y}||#{DT_START_M},'YYYYMM'),-10),'YYYYMM') THEN 1
+                            ELSE 0
+                        END DATA11
+                     , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE( #{DT_START_Y}||#{DT_START_M},'YYYYMM'),-11),'YYYYMM') THEN 1
+                            ELSE 0
+                        END DATA12
+                     , A.CD_VOC_CAUSE
+                  FROM (SELECT TO_CHAR(TVM.DT_REG, 'YYYYMM') AS YYYYMM
+                             , CD_VOC_CAUSE
+                          FROM CRMADMIN.TBS_VOC_MASTER TVM
+                          LEFT OUTER JOIN CRMADMIN.TBS_MEMBER TM
+                             ON TVM.ID_MEMBER = TM.ID_MEMBER
+                          LEFT OUTER JOIN OMNI.OMNI_STOR_APP MS
+                            ON TVM.ID_STORE = MS.STOR_CD
+                           AND MS.CMP_CD = 'BKR'
+                           AND MS.SALES_ORG_CD = '1000'
+                           AND MS.STOR_STATUS = '1'
+                           AND SUBSTR(MS.STOR_CD, 4, 1) != '9'
+                           AND TO_CHAR(SYSDATE, 'YYYYMMDD') >= MS.SALES_START_DATE
+                         WHERE TVM.FG_DEL = 'N'
+                           AND TVM.DT_REG >= ADD_MONTHS(TO_DATE( #{DT_START_Y}||#{DT_START_M},'YYYYMM'),-11)
+                           AND ADD_MONTHS(TO_DATE( #{DT_START_Y}||#{DT_START_M},'YYYYMM'),1) > TVM.DT_REG
+                           <if test="FG_MEMBER != '' and FG_MEMBER != null">
+                           	AND FG_MEMBER = #{FG_MEMBER}
+                           </if>
+                           <if test="CD_GENDER != '' and CD_GENDER != null">
+                           	AND CD_GENDER = #{CD_GENDER}
+                           </if>
+                           <if test="CD_AGE != '' and CD_AGE != null">
+                           	AND CD_AGE = #{CD_AGE}
+                           </if>
+                           <if test="CD_GRADE != '' and CD_GRADE != null">
+                           	AND CD_GRADE = #{CD_GRADE}
+                           </if>
+                           <if test="CD_STORE != '' and CD_STORE != null">
+                           	AND DRT_FRCS_TYPE = #{CD_STORE}
+                           </if>
+                           <if test="YN_FLAG != '' and YN_FLAG != null">
+                           	AND DIRVE_TH = #{YN_FLAG}
+                           </if>
+                           <if test="CD_BIZ_CHNN != null and CD_BIZ_CHNN != ''">
+	                         <choose>
+	                          <when test='BIZ_CHNN_SIZE == "1"'>
+	                          	AND TVM.BIZ_CHNN = #{CD_BIZ_CHNN}
+	                          </when>
+	                          <otherwise>
+	                          	AND TVM.BIZ_CHNN IN 
+	                           <foreach collection="CD_BIZ_CHNN" item="CD_CHNN" open="(" close=")" separator=",">
+	                           	#{CD_CHNN}
+	                           </foreach>
+	                          </otherwise>
+	                         </choose>
+	                        </if>
+                        ) A
+                ) AA
+            ON AA.CD_VOC_CAUSE = SC.CODE
+         WHERE SC.CODE_CATEGORY_ID = 'CD_VOC_CAUSE_2'
+         GROUP BY ROLLUP( SC.PARENT_CODE , SC.CODE)
+	</select>
+	
+	<!--
+		QueryId     : AnaInquiry.getMonthHeader
+		Description : 월별 헤더 조회
+	 -->
+	<select id="getMonthHeader" parameterType="map" resultType="lmap">
+		SELECT #{DT_START_Y}||#{DT_START_M}	AS DATA1
+			 , TO_CHAR(ADD_MONTHS(TO_DATE( #{DT_START_Y}||#{DT_START_M},'YYYYMM'),-1),'YYYYMM')	 	AS DATA2
+			 , TO_CHAR(ADD_MONTHS(TO_DATE( #{DT_START_Y}||#{DT_START_M},'YYYYMM'),-2),'YYYYMM')  	AS DATA3
+			 , TO_CHAR(ADD_MONTHS(TO_DATE( #{DT_START_Y}||#{DT_START_M},'YYYYMM'),-3),'YYYYMM')  	AS DATA4
+			 , TO_CHAR(ADD_MONTHS(TO_DATE( #{DT_START_Y}||#{DT_START_M},'YYYYMM'),-4),'YYYYMM')  	AS DATA5
+			 , TO_CHAR(ADD_MONTHS(TO_DATE( #{DT_START_Y}||#{DT_START_M},'YYYYMM'),-5),'YYYYMM')  	AS DATA6
+			 , TO_CHAR(ADD_MONTHS(TO_DATE( #{DT_START_Y}||#{DT_START_M},'YYYYMM'),-6),'YYYYMM')  	AS DATA7
+			 , TO_CHAR(ADD_MONTHS(TO_DATE( #{DT_START_Y}||#{DT_START_M},'YYYYMM'),-7),'YYYYMM')  	AS DATA8
+			 , TO_CHAR(ADD_MONTHS(TO_DATE( #{DT_START_Y}||#{DT_START_M},'YYYYMM'),-8),'YYYYMM')  	AS DATA9
+			 , TO_CHAR(ADD_MONTHS(TO_DATE( #{DT_START_Y}||#{DT_START_M},'YYYYMM'),-9),'YYYYMM')  	AS DATA10
+			 , TO_CHAR(ADD_MONTHS(TO_DATE( #{DT_START_Y}||#{DT_START_M},'YYYYMM'),-10),'YYYYMM') 	AS DATA11
+			 , TO_CHAR(ADD_MONTHS(TO_DATE( #{DT_START_Y}||#{DT_START_M},'YYYYMM'),-11),'YYYYMM') 	AS DATA12
+		  FROM DUAL
+	</select>
+	
+	
+	<!--
+		QueryId     : AnaInquiry.getStoreVocAnaExcel
+		Description : 매장-월별 VOC현황 엑셀 다운로드
+	 -->
+	<select id="getStoreVocAnaExcel" parameterType="map" resultType="lmap">
+		SELECT DECODE(AAA.ID_STORE
+                , '99999999', '매장없음'
+                , NULL , 'SUM'
+                , MS.STOR_NM) AS "매장명"
+             , AAA.DATA1    + AAA.DATA2    + AAA.DATA3
+	             + AAA.DATA4    + AAA.DATA5    + AAA.DATA6
+	             + AAA.DATA7    + AAA.DATA8    + AAA.DATA9
+	             + AAA.DATA10    + AAA.DATA11    + AAA.DATA12 AS "전체"
+		     , NVL(AAA.DATA1 ,0) AS DATA1 
+			 , NVL(AAA.DATA2 ,0) AS DATA2 
+			 , NVL(AAA.DATA3 ,0) AS DATA3 
+			 , NVL(AAA.DATA4 ,0) AS DATA4 
+			 , NVL(AAA.DATA5 ,0) AS DATA5 
+			 , NVL(AAA.DATA6 ,0) AS DATA6 
+			 , NVL(AAA.DATA7 ,0) AS DATA7 
+			 , NVL(AAA.DATA8 ,0) AS DATA8 
+			 , NVL(AAA.DATA9 ,0) AS DATA9 
+			 , NVL(AAA.DATA10,0) AS DATA10
+			 , NVL(AAA.DATA11,0) AS DATA11
+			 , NVL(AAA.DATA12,0) AS DATA12
+		 FROM  (SELECT AA.ID_STORE
+		                     , SUM(AA.DATA1) AS DATA1
+		                     , SUM(AA.DATA2) AS DATA2
+		                     , SUM(AA.DATA3) AS DATA3
+		                     , SUM(AA.DATA4) AS DATA4
+		                     , SUM(AA.DATA5) AS DATA5
+		                     , SUM(AA.DATA6) AS DATA6
+		                     , SUM(AA.DATA7) AS DATA7
+		                     , SUM(AA.DATA8) AS DATA8
+		                     , SUM(AA.DATA9) AS DATA9
+		                     , SUM(AA.DATA10) AS DATA10
+		                     , SUM(AA.DATA11) AS DATA11
+		                     , SUM(AA.DATA12) AS DATA12
+		                  FROM (SELECT CASE WHEN A.YYYYMM = #{DT_START_Y}||#{DT_START_M} THEN 1
+		                                    ELSE 0
+		                                END DATA1
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-1),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA2
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-2),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA3
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-3),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA4
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-4),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA5
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-5),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA6
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-6),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA7
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-7),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA8
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-8),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA9
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-9),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA10
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-10),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA11
+		                             , CASE WHEN A.YYYYMM = TO_CHAR(ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-11),'YYYYMM') THEN 1
+		                                    ELSE 0
+		                                END DATA12
+		                             , A.ID_STORE
+		                          FROM (SELECT TO_CHAR(TVM.DT_REG, 'YYYYMM') AS YYYYMM
+		                                     , NVL(TVM.ID_STORE, '99999999') AS ID_STORE
+		                                  FROM CRMADMIN.TBS_VOC_MASTER TVM
+		                                  LEFT OUTER JOIN OMNI.OMNI_STOR_APP OSA
+                                            ON TVM.ID_STORE = OSA.STOR_CD
+                                    	   AND OSA.CMP_CD = 'BKR'
+                                    	   AND OSA.SALES_ORG_CD = '1000'
+                                    	   AND OSA.STOR_STATUS = '1'
+                                    	   AND SUBSTR(OSA.STOR_CD, 4, 1) != '9'
+                                    	   AND TO_CHAR(SYSDATE, 'YYYYMMDD') >= OSA.SALES_START_DATE
+                                          LEFT OUTER JOIN CRMADMIN.TBS_MEMBER TM
+                                            ON TVM.ID_MEMBER = TM.ID_MEMBER
+		                                 WHERE TVM.FG_DEL = 'N'
+		                                   AND TVM.DT_REG >= ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM'),-11)
+                                    	   AND ADD_MONTHS(TO_DATE(#{DT_START_Y}||#{DT_START_M}, 'YYYYMM'),1) > TVM.DT_REG
+		                                 <if test="FG_MEMBER != '' and FG_MEMBER != null">
+	                                  		AND FG_MEMBER = #{FG_MEMBER}
+	                                  	</if>
+	                                  	<if test="CD_GENDER != '' and CD_GENDER != null">
+	                                  		AND CD_GENDER = #{CD_GENDER}
+	                                  	</if>
+	                                  	<if test="CD_AGE != '' and CD_AGE != null">
+	                                  		AND CD_AGE = #{CD_AGE}
+	                                  	</if>
+	                                  	<if test="CD_GRADE != '' and CD_GRADE != null">
+	                                  		AND CD_GRADE = #{CD_GRADE}
+	                                  	</if>
+	                                  	<if test="CD_STORE != '' and CD_STORE != null">
+	                                  		AND DRT_FRCS_TYPE = #{CD_STORE}
+	                                  	</if>
+	                                  	<if test="YN_FLAG != '' and YN_FLAG != null">
+	                                  		AND DIRVE_TH = #{YN_FLAG}
+	                                  	</if>
+                                        <if test="CD_BIZ_CHNN != null and CD_BIZ_CHNN != ''">
+                                         <choose>
+                                          <when test='BIZ_CHNN_SIZE == "1"'>
+                                          	AND TVM.BIZ_CHNN = #{CD_BIZ_CHNN}
+                                          </when>
+                                          <otherwise>
+                                          	AND TVM.BIZ_CHNN IN 
+                                           <foreach collection="CD_BIZ_CHNN" item="CD_CHNN" open="(" close=")" separator=",">
+                                           	#{CD_CHNN}
+                                           </foreach>
+                                          </otherwise>
+                                         </choose>
+                                        </if>
+		                                ) A
+		                        ) AA
+		                 GROUP BY ROLLUP (AA.ID_STORE)
+		                ) AAA
+		       LEFT OUTER JOIN OMNI.OMNI_STOR_APP MS
+		         ON MS.STOR_CD = AAA.ID_STORE
+		        AND MS.CMP_CD = 'BKR'
+		        AND MS.SALES_ORG_CD = '1000'
+		      ORDER BY "매장명"
+	</select>
+	
+
+	<!--
+		QueryId     : AnaInquiry.getCustAttrVocExcel
+		Description : 고객속성별 VOC 통계 엑셀 다운로드
+	 -->
+	<select id="getCustAttrVocExcel" parameterType="map" resultType="lmap">
+		SELECT NVL((SELECT CODE_NAME FROM CRMADMIN.SYS_CODE WHERE CODE = SC.PARENT_CODE AND CODE_CATEGORY_ID = 'CD_VOC_CAUSE_1'), '전체') AS "구분"
+		     , NVL((SELECT CODE_NAME FROM CRMADMIN.SYS_CODE WHERE CODE = SC.CODE AND CODE_CATEGORY_ID = 'CD_VOC_CAUSE_2'),'소계') AS "유형"
+		     , NVL(SUM(AA.DATA1)+SUM(AA.DATA2)+SUM(AA.DATA3)
+		        +SUM(AA.DATA4)+SUM(AA.DATA5)+SUM(AA.DATA6)
+		        +SUM(AA.DATA7)+SUM(AA.DATA8)+SUM(AA.DATA9)
+		        +SUM(AA.DATA10)+SUM(AA.DATA11),0) AS "전체"
+             , NVL(SUM(AA.DATA1),0) AS "주니어"
+             , NVL(SUM(AA.DATA2),0) AS "와퍼"
+             , NVL(SUM(AA.DATA3),0) AS "킹"
+             , NVL(SUM(AA.DATA4),0) AS "남자"
+             , NVL(SUM(AA.DATA5),0) AS "여자"
+             , NVL(SUM(AA.DATA6),0) AS "10대"
+             , NVL(SUM(AA.DATA7),0) AS "20대"
+             , NVL(SUM(AA.DATA8),0) AS "30대"
+             , NVL(SUM(AA.DATA9),0) AS "40대"
+             , NVL(SUM(AA.DATA10),0) AS "50대"
+             , NVL(SUM(AA.DATA11),0) AS "60대 이상"
+          FROM CRMADMIN.SYS_CODE SC
+          LEFT OUTER JOIN (SELECT CASE WHEN A.CD_GRADE = '01' THEN 1
+                            ELSE 0
+                        END DATA1
+                     , CASE WHEN A.CD_GRADE = '02' THEN 1
+                            ELSE 0
+                        END DATA2
+                     , CASE WHEN A.CD_GRADE = '03' THEN 1
+                            ELSE 0
+                        END DATA3
+                     , CASE WHEN A.CD_GENDER = 'M' THEN 1
+                            ELSE 0
+                        END DATA4
+                     , CASE WHEN A.CD_GENDER = 'F' THEN 1
+                            ELSE 0
+                        END DATA5
+                     , CASE WHEN A.CD_AGE = '10' THEN 1
+                            ELSE 0
+                        END DATA6
+                     , CASE WHEN A.CD_AGE = '20' THEN 1
+                            ELSE 0
+                        END DATA7
+                     , CASE WHEN A.CD_AGE = '30' THEN 1
+                            ELSE 0
+                        END DATA8
+                     , CASE WHEN A.CD_AGE = '40' THEN 1
+                            ELSE 0
+                        END DATA9
+                     , CASE WHEN A.CD_AGE = '50' THEN 1
+                            ELSE 0
+                        END DATA10
+                     , CASE WHEN A.CD_AGE = '60' THEN 1
+                            ELSE 0
+                        END DATA11
+                     , A.CD_VOC_CAUSE
+                  FROM (SELECT CD_VOC_CAUSE
+                             , TM.CD_GRADE
+                             , TM.CD_GENDER
+                             , TM.CD_AGE
+                          FROM CRMADMIN.TBS_VOC_MASTER TVM
+                          LEFT OUTER JOIN CRMADMIN.TBS_MEMBER TM
+                             ON TVM.ID_MEMBER = TM.ID_MEMBER
+                         WHERE TVM.DT_REG >= TO_DATE(#{DT_START_Y}||#{DT_START_M},'YYYYMM')
+                           AND LAST_DAY(TO_DATE(#{DT_END_Y}||#{DT_END_M}||' 23:59:59','YYYYMM HH24:MI:SS')) >= TVM.DT_REG
+                           AND TVM.FG_DEL = 'N'
+                           <if test="CD_BIZ_CHNN != null and CD_BIZ_CHNN != ''">
+							<choose>
+								<when test='BIZ_CHNN_SIZE == "1"'>
+									AND TVM.BIZ_CHNN = #{CD_BIZ_CHNN}
+								</when>
+								<otherwise>
+									AND TVM.BIZ_CHNN IN 
+									<foreach collection="CD_BIZ_CHNN" item="CD_CHNN" open="(" close=")" separator=",">
+										#{CD_CHNN}
+									</foreach>
+								</otherwise>
+							</choose>
+							</if>
+                        ) A
+                ) AA
+                ON AA.CD_VOC_CAUSE = SC.CODE
+         WHERE SC.CODE_CATEGORY_ID = 'CD_VOC_CAUSE_2'
+         GROUP BY ROLLUP (SC.PARENT_CODE, SC.CODE)
+	</select> 
+</mapper>
