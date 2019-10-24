@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ApiError">
+
+	<!--
+		QueryId     : ApiUser.insertApiError
+		Description : API Error log 저장
+	 -->
+	<insert id="insertApiError" parameterType="map">
+		<selectKey keyProperty="SEQ_TBS_API_ERROR_LOG" resultType="String" order="BEFORE">
+			SELECT CRMADMIN.SEQ_TBS_API_ERROR_LOG.NEXTVAL FROM DUAL 
+		</selectKey>
+		
+		INSERT INTO CRMADMIN.TBS_API_ERROR_LOG
+		(
+			   NO_API_ERROR_LOG          /* API에러로그일련번호 */
+			 , ID_API                    /* API ID */
+			 , CD_CALL_CHNN              /* 호출채널 */
+			 , DT_ERROR                  /* 에러일시 */
+			 , ERROR_MESSAGE             /* 에러메시지 */
+			 , STACK_TRACE               /* 호출메소드 */
+		) VALUES (
+		       #{SEQ_TBS_API_ERROR_LOG}
+		     , #{ID_API}
+		     , #{CD_CALL_CHNN}
+		     , SYSDATE
+		     , #{ERROR_MESSAGE}
+		     , #{STACK_TRACE}
+		)
+		    
+	</insert>
+
+</mapper>
+ 

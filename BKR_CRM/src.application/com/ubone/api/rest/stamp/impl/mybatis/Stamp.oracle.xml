@@ -260,7 +260,6 @@
 	<update id="updateMemberStampPlus" parameterType="map">
 		UPDATE CRMADMIN.TBS_MEMBER
 		   SET CNT_STAMP = CNT_STAMP + TO_NUMBER(#{CNT_STAMP})
-		     , DT_CHNG_GRADE = SYSDATE
 		 WHERE ID_MEMBER = #{ID_MEMBER}
 
 	</update>

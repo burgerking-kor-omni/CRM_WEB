@@ -230,4 +230,23 @@ public class CustManageDAOImpl extends UbSqlSessionDaoSupport implements CustMan
 		return queryForDataList(this.prefix+"getCountReward", param);
 	}
 	
+	@Override
+	public int updateMemberName(Parameter param) {
+		return update(this.prefix+"updateMemberName", param);
+	}
+	
+	@Override
+	public int checkEmail(Parameter param) {
+		return queryForObject(this.prefix+"checkEmail", param);
+	}
+	
+	@Override
+	public void updateEmail(Parameter param) {
+		update(this.prefix+"updateEmail", param);
+	}
+	
+	@Override
+	public void insertChangeRecord(Parameter param) {
+		insert(this.prefix+"insertChangeRecord", param);
+	}
 }

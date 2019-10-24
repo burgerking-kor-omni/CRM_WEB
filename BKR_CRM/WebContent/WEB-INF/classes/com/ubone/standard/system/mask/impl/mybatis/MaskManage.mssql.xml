@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="MaskManage">
+	
+	<!--
+		QueryId     : MaskManage.getMaskList
+		Description : Mask 관리 목록 조회
+	 -->
+	<sql id="getMaskList_base">
+<!-- 페이징 공통 관련 쿼리 -->		  
+	   SELECT 
+	    <if test="ORDER_COLUMN == null or ORDER_COLUMN == ''">
+			  ROW_NUMBER() OVER( order by DT_REG DESC ) AS ROWNUM /* ROWNUM */
+		</if>
+		<if test="ORDER_COLUMN != null and ORDER_COLUMN != ''">
+			  ROW_NUMBER() OVER( order by ${ORDER_COLUMN} ${ORDER_ASC} ) AS ROWNUM /* ROWNUM */
+		</if>
+		    , SUB.*
+		 FROM (
+<!-- 업무 관련 쿼리 :: Begin -->	    
+			SELECT 
+				  ID_MASK
+				, NM_MASK
+				, (SELECT CODE_NAME
+                 		FROM SYS_CODE WITH( NOLOCK )
+                  		WHERE CODE_CATEGORY_ID='TP_MASK' AND CODE=TP_MASK ) AS TP_MASK
+				, DS_INPUT
+				, DS_OUTPUT
+				, DS_CLASS
+				, DT_REG
+			FROM SYS_MASK WITH( NOLOCK )
+			WHERE 1=1
+			<if test="NM_MASK != null and NM_MASK != ''" >
+		   		AND NM_MASK LIKE '%' + #{NM_MASK} + '%' 
+			</if>
+			<if test="TP_MASK != null and TP_MASK != ''" >
+		   		AND TP_MASK LIKE '%' + #{TP_MASK} + '%' 
+			</if>
+			<if test="DS_CLASS != null and DS_CLASS != ''" >
+		   		AND DS_CLASS LIKE '%' + #{DS_CLASS} + '%' 
+			</if>
+<!-- 업무 관련 쿼리 :: End -->		  
+			) SUB			
+	</sql>
+	
+	<!-- 마스크관리 목록 조회 -->
+	<select id="getMaskList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getMaskList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- 마스크관리 목록 조회 - count -->
+	<select id="getMaskList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getMaskList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- 마스크관리 목록 조회 - paging -->
+	<select id="getMaskList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getMaskList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!--
+		QueryId     : MaskManage.getMaskDetail
+		Description : Mask 관리 상세조회 호출
+	 -->
+	<select id="getMaskDetail" parameterType="map" resultType="lmap">
+		SELECT 
+				  ID_MASK
+				, NM_MASK
+				, TP_MASK
+				, DS_INPUT
+				, DS_OUTPUT
+				, DS_CLASS
+			FROM SYS_MASK WITH( NOLOCK )
+			WHERE ID_MASK = #{ID_MASK}
+	</select>
+	
+	<!--
+		QueryId     : MaskManage.updateMask
+		Description : Mask 관리 정보 수정
+	 -->
+	<update id="updateMask" parameterType="map">
+		UPDATE SYS_MASK SET
+				  NM_MASK = #{NM_MASK}
+				, TP_MASK = #{TP_MASK}
+				, DS_INPUT = #{DS_INPUT}
+				, DS_OUTPUT = #{DS_OUTPUT}
+				, DS_CLASS = #{DS_CLASS}
+				, DT_UPT = GETDATE()
+				, ID_UPT_DEPT = #{user.partCode}
+				, ID_UPT_EMP = #{user.id}
+			WHERE ID_MASK = #{ID_MASK}
+	</update>
+	
+	<!--
+		QueryId     : MaskManage.deleteMask
+		Description : Mask 관리 정보 삭제
+	 -->
+	<delete id="deleteMask" parameterType="map">
+		DELETE FROM SYS_MASK
+			WHERE ID_MASK = #{ID_MASK}
+	</delete>
+	
+	<!--
+		QueryId     : MaskManage.getAuthByMaskId
+		Description : Mask 관리 마스크 권한 조회
+	 -->
+	<select id="getAuthByMaskId" parameterType="map" resultType="lmap">
+		SELECT 
+				 A.ROLE_ID AS ROLE_ID
+		       , A.ROLE_NAME AS ROLE_NAME
+		       , CASE WHEN B.ROLE_ID = A.ROLE_ID THEN 'Y'
+		       		  ELSE 'N'
+		       	  END AS CHECKED
+    		FROM AP_ROLE A WITH( NOLOCK )
+    		LEFT OUTER JOIN SYS_MASK_AUTH B
+    		  ON A.ROLE_ID = B.ROLE_ID AND #{ID_MASK} = B.ID_MASK
+    		WHERE 1=1 
+    		ORDER BY ROLE_ID ASC  
+	</select>
+	
+	<!--
+		QueryId     : MaskManage.insertAuthByMaskId
+		Description : Mask 관리 마스크 권한 등록
+	 -->
+	<insert id="insertAuthByMaskId" parameterType="map">
+		INSERT INTO SYS_MASK_AUTH(
+				  ID_MASK
+				, ROLE_ID
+				, DT_REG 
+				, ID_REG_DEPT
+				, ID_REG_EMP
+			)VALUES(
+				  #{ID_MASK}
+				, #{ROLE_ID}
+				, GETDATE()
+				, #{user.partCode}
+				, #{user.id}
+			)
+	</insert>
+	
+	<!--
+		QueryId     : MaskManage.deleteAuthByMaskId
+		Description : Mask 관리 마스크 권한 삭제
+	 -->
+	<delete id="deleteAuthByMaskId" parameterType="map">
+		DELETE FROM SYS_MASK_AUTH
+			WHERE ID_MASK = #{ID_MASK}
+				AND ROLE_ID=#{ROLE_ID}
+	</delete>
+	
+	<!--
+		QueryId     : MaskManage.getServiceListByMask
+		Description : Mask 관리 마스크에 연결된 서비스 목록
+	 -->
+	<select id="getServiceListByMask" parameterType="map" resultType="lmap">
+		SELECT
+                  A.SERVICE_ID
+                , A.SERVICE_NAME
+                , (SELECT CODE_NAME
+                 		FROM SYS_CODE WITH( NOLOCK )
+                  		WHERE CODE_CATEGORY_ID='SERVICE_TYPE' AND CODE=A.SERVICE_TYPE ) AS SERVICE_TYPE
+                , (SELECT CODE_NAME
+                 		FROM SYS_CODE WITH( NOLOCK )
+                  		WHERE CODE_CATEGORY_ID='CALL_TYPE' AND CODE=A.CALL_TYPE ) AS CALL_TYPE
+            FROM AP_SERVICE A WITH( NOLOCK )
+            JOIN AP_SERVICE_MASK B WITH( NOLOCK ) ON A.SERVICE_ID = B.SERVICE_ID
+            WHERE B.MASK_ID = #{ID_MASK}
+	</select>
+
+	<!--
+		QueryId     : MaskManage.insertMask
+		Description : Mask 관리 마스크 등록
+	 -->
+	<insert id="insertMask" parameterType="map">
+		<selectKey keyProperty="ID_MASK" resultType="String" order="BEFORE">
+            SELECT 'MASK' +
+						CASE WHEN MAX(maxKey) > 999 THEN '' + CAST(MAX(maxKey) AS VARCHAR)
+				             WHEN MAX(maxKey) > 99  THEN '0' + CAST(MAX(maxKey) AS VARCHAR)            
+				             WHEN MAX(maxKey) > 9   THEN '00' + CAST(MAX(maxKey) AS VARCHAR)
+				             ELSE '000' + CAST(MAX(maxKey) AS VARCHAR)
+				         END
+			   FROM (
+			    SELECT CAST(REPLACE(ID_MASK, 'MASK', '') AS INT)+1 AS maxKey
+			      FROM SYS_MASK WITH( NOLOCK )
+			     UNION
+			    SELECT 0 AS maxKey
+			  ) A
+		</selectKey>
+		INSERT INTO SYS_MASK(
+				  ID_MASK
+				, NM_MASK
+				, TP_MASK
+				, DS_INPUT
+				, DS_OUTPUT
+				, DS_CLASS
+				, DT_REG
+				, ID_REG_DEPT
+				, ID_REG_EMP
+				, DT_UPT
+				, ID_UPT_DEPT
+				, ID_UPT_EMP
+			)VALUES(
+				  #{ID_MASK}
+				, #{NM_MASK}
+				, #{TP_MASK}
+				, #{DS_INPUT}
+				, #{DS_OUTPUT}
+				, #{DS_CLASS}
+				, GETDATE()
+				, #{user.partCode}
+				, #{user.id}
+				, GETDATE()
+				, #{user.partCode}
+				, #{user.id}
+			)
+	</insert>
+	
+</mapper>

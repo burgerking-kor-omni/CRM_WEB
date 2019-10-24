@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<screenBuilder id="APM0050" screenType="detail" screenLayoutType="Default" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>시스템관리 / 메뉴 관리 (다국어용)</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0050</fileName>
+  <functions>
+    <function id="FNCSYS0024" isStartFunction="false" functionName="메뉴 관리 조회 (다국어용) 호출" serviceId="SVCAPM0093" alias="INQUIRY"/>
+    <function id="FNCSYS0027" isStartFunction="true" functionName="메뉴 관리 동기 (다국어용) 호출" serviceId="SVCAPM0094" alias="USERDEFINED1"/>
+    <function id="FNCSYS0028" isStartFunction="false" functionName="메뉴 수정 (다국어용) 호출" serviceId="SVCAPM0095" alias="MODIFY"/>
+    <function id="FNCSYS0029" isStartFunction="false" functionName="메뉴 관리 상위 목록 조회 (다국어용) 호출" serviceId="SVCAPM0096" alias="USERDEFINED2"/>
+    <function id="FNCSYS0030" isStartFunction="false" functionName="메뉴 등록 (다국어용) 호출" serviceId="SVCAPM0097" alias="REGIST"/>
+    <function id="FNCSYS0034" isStartFunction="false" functionName="메뉴 상세 조회 (다국어용) 호출" serviceId="SVCAPM0098" alias="USERDEFINED3"/>
+    <function id="FNCSYS0037" isStartFunction="false" functionName="메뉴 삭제 (다국어용) 호출" serviceId="SVCAPM0099" alias="REMOVE"/>
+    <function id="FNCSYS0047" isStartFunction="false" functionName="메뉴 트리 조회( Lazy ) (다국어용) 호출" serviceId="SVCAPM0100" alias="USERDEFINED4"/>
+    <function id="FNCSYS0068" isStartFunction="false" functionName="프로그램 권한 관리 - 메뉴 화면 링크 등록 (다국어용) 호출" serviceId="SVCAPM0101" alias="USERDEFINED5"/>
+    <function id="FNCSYS0069" isStartFunction="false" functionName="프로그램 권한 관리 - Screen 목록 조회 (다국어용) 호출" serviceId="SVCAPM0102" alias="USERDEFINED6"/>
+    <function id="FNCSYS0291" isStartFunction="false" functionName="프로그램 권한 관리 - Screen 목록 조회 (XML용) (다국어용) 호출" serviceId="SVCAPM0103" alias="USERDEFINED7"/>
+    <function id="FNCSYS0064" isStartFunction="false" functionName="프로그램 권한 관리 - 메뉴 화면 링크 삭제 (다국어용) 호출" serviceId="SVCAPM0104" alias="USERDEFINED8"/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

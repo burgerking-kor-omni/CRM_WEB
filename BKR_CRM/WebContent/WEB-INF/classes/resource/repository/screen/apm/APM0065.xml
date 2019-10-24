@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<screenBuilder id="APM0065" screenType="detail" screenLayoutType="Popup" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>시스템관리 / Dynamic 코드 조회(다국어용)</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0065</fileName>
+  <functions>
+    <function id="FNCAPM0125" isStartFunction="false" functionName="Dynamic 코드 조회 호출" serviceId="SVCAPM0125" alias="INQUIRY"/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

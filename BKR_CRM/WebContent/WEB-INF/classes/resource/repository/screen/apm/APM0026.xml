@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="APM0026" screenType="register" screenLayoutType="Popup" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>APMD /  서비스 마스킹 추가</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0026</fileName>
+  <functions>
+    <function id="FNCAPM0050" isStartFunction="false" functionName="서비스관리 마스킹컬럼 중복여부 체크 호출" serviceId="SVCAPM0047" alias="INQUIRY"/>
+    <function id="FNCAPM0051" isStartFunction="false" functionName="서비스관리 마스킹 컬럼 등록 호출" serviceId="SVCAPM0046" alias="REGIST"/>
+    <function id="FNCAPM0052" isStartFunction="false" functionName="서비스관리 마스크 조회 (AutoComplate) 호출" serviceId="SVCAPM0057" alias="USERDEFINED1"/>
+    <function id="FNCAPM0053" isStartFunction="true" functionName="서비스관리 마스킹 기본정보 조회 (dummy) 호출" serviceId="SVCAPM0045" alias=""/>
+    <function id="FNCAPM0064" isStartFunction="false" functionName="적용위치 코드 조회 호출" serviceId="SVCAPM0060" alias="USERDEFINED2"/>
+    <function id="FNCAPM0065" isStartFunction="false" functionName="마스크 콤보 목록 조회 호출" serviceId="SVCAPM0061" alias="USERDEFINED3"/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

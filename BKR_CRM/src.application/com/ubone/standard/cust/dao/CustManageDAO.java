@@ -263,4 +263,30 @@ public interface CustManageDAO {
 	 */
 	public DataList getCountReward (Parameter param);
 	
+	/**
+	 * 회원명 변경
+	 * @param param 회원명
+	 * @return 변경여부
+	 */
+	public int updateMemberName(Parameter param);
+	
+	/**
+	 * email 중복확인
+	 * @param param email주소
+	 * @return 중복여부
+	 */
+	public int checkEmail(Parameter param);
+	
+	/**
+	 * 회원 이메일 변경
+	 * @param param email, id_member
+	 */
+	public void updateEmail(Parameter param);
+	
+	/**
+	 * 변경이력 추가
+	 * @param param
+	 */
+	public void insertChangeRecord(Parameter param);
+	
 }

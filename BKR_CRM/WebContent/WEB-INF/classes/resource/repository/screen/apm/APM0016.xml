@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="APM0016" screenType="list" screenLayoutType="Default" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>APMD /  Function Alias 목록</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0016</fileName>
+  <functions>
+    <function id="FNCAPM0038" isStartFunction="false" functionName="Function Alias 목록 조회 호출" serviceId="SVCAPM0024" alias="INQUIRY"/>
+    <function id="FNCAPM0039" isStartFunction="false" functionName="Function Alias 삭제 호출" serviceId="SVCAPM0028" alias="REMOVE"/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="APM0008" screenType="detail" screenLayoutType="TabContent" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>APMD /  서비스 상세</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0008</fileName>
+  <functions>
+    <function id="FNCAPM0022" isStartFunction="false" functionName="서비스 스크린 목록 조회 호출" serviceId="SVCAPM0015" alias="INQUIRY"/>
+    <function id="FNCAPM0023" isStartFunction="false" functionName="서비스관리 서비스 수정 호출" serviceId="SVCAPM0042" alias="MODIFY"/>
+    <function id="FNCAPM0024" isStartFunction="false" functionName="서비스관리 서비스 삭제 호출" serviceId="SVCAPM0041" alias="REMOVE"/>
+    <function id="FNCAPM0025" isStartFunction="true" functionName="서비스 상세 조회 호출" serviceId="SVCAPM0012" alias=""/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

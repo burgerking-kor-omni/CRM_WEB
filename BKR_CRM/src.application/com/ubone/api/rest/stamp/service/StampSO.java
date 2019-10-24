@@ -356,7 +356,7 @@ public class StampSO {
 			resultData.put("cd_increment", dtRecord.getString(0, "CD_INCREMENT"));			/* 증가/차감코드 */
 			resultData.put("cnt_stamp_incre", dtRecord.getString(0, "CNT_STAMP_INCRE"));	/* 증/차감스템프개수 */
 			resultData.put("cnt_stamp_stack", dtRecord.getString(0, "CNT_STAMP_STACK"));	/* 누적스탬프갯수 */
-			resultData.put("cnt_stamp", dtRecord.getString(0, "ID_MEMBER"));				/* 스템프개수 */
+			resultData.put("cnt_stamp", dtRecord.getString(0, "CNT_STAMP"));				/* 스템프개수 */
 		}
 
 		DataList dtResultData = DataUtil.makeDataList("resultData", resultData);
@@ -552,6 +552,19 @@ public class StampSO {
 					resultInfo.put("result_code", ApiConstantHolder.STAMP_CANCEL);
 					resultInfo.put("result_message", "이미 취소된 주문입니다.");
 					result.addDataList(DataUtil.makeDataList("resultInfo", resultInfo));
+					
+					// 스템프정보 조회
+					DataList dtErrorRecord = stampDAO.getStampRecord(parameter);
+					
+					// return 설정
+					if (0 < dtErrorRecord.getRowCount()) {
+						resultData.put("id_member", dtErrorRecord.getString(0, "ID_MEMBER"));				/* 회원PK */	
+						resultData.put("cd_increment", dtErrorRecord.getString(0, "CD_INCREMENT"));			/* 증가/차감코드 */
+						resultData.put("cnt_stamp_incre", dtErrorRecord.getString(0, "CNT_STAMP_INCRE"));	/* 증/차감스템프개수 */
+						resultData.put("cnt_stamp_stack", dtErrorRecord.getString(0, "CNT_STAMP_STACK"));	/* 누적스탬프갯수 */
+						resultData.put("cnt_stamp", dtErrorRecord.getString(0, "CNT_STAMP"));				/* 스템프개수 */
+					}
+
 					result.addDataList(DataUtil.makeDataList("resultData", resultData));
 					return result;
 				}
@@ -674,6 +687,19 @@ public class StampSO {
 				resultInfo.put("result_code", ApiConstantHolder.STAMP_CANCEL);
 				resultInfo.put("result_message", "리워드 쿠폰을 사용했습니다.");
 				result.addDataList(DataUtil.makeDataList("resultInfo", resultInfo));
+
+				// 스템프정보 조회
+				DataList dtErrorRecord = stampDAO.getStampRecord(parameter);
+				
+				// return 설정
+				if (0 < dtErrorRecord.getRowCount()) {
+					resultData.put("id_member", dtErrorRecord.getString(0, "ID_MEMBER"));				/* 회원PK */	
+					resultData.put("cd_increment", dtErrorRecord.getString(0, "CD_INCREMENT"));			/* 증가/차감코드 */
+					resultData.put("cnt_stamp_incre", dtErrorRecord.getString(0, "CNT_STAMP_INCRE"));	/* 증/차감스템프개수 */
+					resultData.put("cnt_stamp_stack", dtErrorRecord.getString(0, "CNT_STAMP_STACK"));	/* 누적스탬프갯수 */
+					resultData.put("cnt_stamp", dtErrorRecord.getString(0, "CNT_STAMP"));				/* 스템프개수 */
+				}
+
 				result.addDataList(DataUtil.makeDataList("resultData", resultData));
 				return result;
 			}
@@ -681,6 +707,19 @@ public class StampSO {
 			resultInfo.put("result_code", ApiConstantHolder.STAMP_CANCEL);
 			resultInfo.put("result_message", "적립된 스템프가 존재하지 않습니다.");
 			result.addDataList(DataUtil.makeDataList("resultInfo", resultInfo));
+			
+			// 스템프정보 조회
+			DataList dtErrorRecord = stampDAO.getStampRecord(parameter);
+			
+			// return 설정
+			if (0 < dtErrorRecord.getRowCount()) {
+				resultData.put("id_member", dtErrorRecord.getString(0, "ID_MEMBER"));				/* 회원PK */	
+				resultData.put("cd_increment", dtErrorRecord.getString(0, "CD_INCREMENT"));			/* 증가/차감코드 */
+				resultData.put("cnt_stamp_incre", dtErrorRecord.getString(0, "CNT_STAMP_INCRE"));	/* 증/차감스템프개수 */
+				resultData.put("cnt_stamp_stack", dtErrorRecord.getString(0, "CNT_STAMP_STACK"));	/* 누적스탬프갯수 */
+				resultData.put("cnt_stamp", dtErrorRecord.getString(0, "CNT_STAMP"));				/* 스템프개수 */
+			}
+
 			result.addDataList(DataUtil.makeDataList("resultData", resultData));
 			return result;
 		}
@@ -690,10 +729,10 @@ public class StampSO {
 		resultInfo.put("result_message", "정상적으로 처리되었습니다.");
 		result.addDataList(DataUtil.makeDataList("resultInfo", resultInfo));
 		
-		// 4. 스템프정보 조회
+		// 7. 스템프정보 조회
 		DataList dtRetuenRecord = stampDAO.getStampRecord(parameter);
 		
-		// 7. return 설정
+		// 8. return 설정
 		if (0 < dtRetuenRecord.getRowCount()) {
 			resultData.put("id_member", dtRetuenRecord.getString(0, "ID_MEMBER"));				/* 회원PK */	
 			resultData.put("cd_increment", dtRetuenRecord.getString(0, "CD_INCREMENT"));			/* 증가/차감코드 */

@@ -243,8 +243,7 @@
            AND MST.CMP_CD = 'BKR'
            AND MST.SALES_ORG_CD = '1000'
            AND MST.STOR_STATUS = '1'
-           AND SUBSTR(MST.STOR_CD, 4, 1) != 9
-           AND TO_CHAR(SYSDATE, 'YYYYMMDD') >= MST.SALES_START_DATE
+           AND SUBSTR(MST.STOR_CD, 4, 1) != '9'
           LEFT OUTER JOIN CRMADMIN.TBS_COUPON TC
             ON TC.CD_COUPON = OM.COUPON_PIN_CD
 		 where
@@ -581,7 +580,7 @@
            AND MST.CMP_CD = 'BKR'
            AND MST.SALES_ORG_CD = '1000'
            AND MST.STOR_STATUS = '1'
-           AND SUBSTR(MST.STOR_CD, 4, 1) != 9
+           AND SUBSTR(MST.STOR_CD, 4, 1) != '9'
            AND TO_CHAR(SYSDATE, 'YYYYMMDD') >= MST.SALES_START_DATE 
           LEFT OUTER JOIN CRMADMIN.TBS_COUPON TC
             ON TC.CD_COUPON = OM.COUPON_PIN_CD
@@ -813,16 +812,14 @@
 			 , TMR.VAL_ITEM_BR
 			 , TMR.VAL_ITEM_AF
 			 , TO_CHAR(TMR.DT_REG, 'YYYY-MM-DD') AS DT_REG
-			 , NVL( TM.NM_MEMBER, '(관리자)'||SU.USER_NM ) AS NM_REG_USER
+			 , SU.USER_NM AS NM_REG_USER
 			 , TMR.DT_UPT
 			 , TMR.ID_UPT_USER
 		  FROM CRMADMIN.TBS_MEMBER_RECORD TMR
 		  LEFT OUTER JOIN CRMADMIN.SYS_USER SU
 		    ON SU.USER_ID = TMR.ID_REG_USER
-		  LEFT OUTER JOIN CRMADMIN.TBS_MEMBER TM
-		    ON TM.ID_MEMBER = TMR.ID_MEMBER
 		 WHERE TMR.ID_MEMBER = #{ID_MEMBER}
-		 ORDER BY TMR.DT_REG
+		 ORDER BY TMR.DT_REG DESC
 	</sql>
 	<!-- 변경이력 목록 조회 -->
 	<select id="getCustLog_change" parameterType="map" resultType="lmap">
@@ -1356,6 +1353,70 @@
 		)
 		    
 	</insert>
+
+	<!--
+		QueryId     : CustManageDAO.updateMemberName
+		Description : 회원 스템프 리워드 저장
+	 -->
+	<update id="updateMemberName" parameterType="map">
+		UPDATE CRMADMIN.TBS_MEMBER
+		   SET NM_MEMBER = #{NM_MEMBER}
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+	</update>
 	
+	
+	<!--
+		QueryId     : CustManageDAO.checkEmail
+		Description : 회원 이메일 중복여부 조회
+	 -->
+	 <select id="checkEmail" parameterType="map" resultType="int">
+	 	SELECT COUNT(ID_MEMBER)
+	 	  FROM CRMADMIN.TBS_MEMBER
+	 	 WHERE DS_EMAIL = #{DS_EMAIL}
+	 </select>
+	
+	<!--
+		QueryId     : CustManageDAO.updateMemberName
+		Description : 회원 스템프 리워드 저장
+	 -->
+	<update id="updateEmail" parameterType="map">
+		UPDATE CRMADMIN.TBS_MEMBER
+		   SET DS_EMAIL = #{DS_EMAIL}
+		 WHERE ID_MEMBER = #{ID_MEMBER}
+	</update>
+
+
+	<!--
+		QueryId     : CustManageDAO.insertChangeRecord
+		Description : 회원 정보 변경 이력 저장
+	 -->
+	<insert id="insertChangeRecord" parameterType="map">
+		<selectKey keyProperty="SEQ_TBS_MEMBER_RECORD" resultType="String" order="BEFORE">
+			SELECT CRMADMIN.SEQ_TBS_MEMBER_RECORD.NEXTVAL FROM DUAL 
+		</selectKey>
+		
+		INSERT INTO CRMADMIN.TBS_MEMBER_RECORD
+		(
+			   NO_ITEM_RECD                 /* 회원정보변경일련번호 */
+			 , ID_MEMBER                    /* 회원PK */
+			 , CD_CHNG_ITEM                 /* 변경항목 */
+			 , VAL_ITEM_BR                  /* 변경전_VAL */
+			 , VAL_ITEM_AF                  /* 변경후_VAL */
+			 , DT_REG                       /* 최초등록일시 */
+			 , ID_REG_USER                  /* 최초등록자 */
+			 , DT_UPT                       /* 최근수정일시 */
+			 , ID_UPT_USER                  /* 최근수정자 */
+		) VALUES (
+		       #{SEQ_TBS_MEMBER_RECORD}
+		     , #{ID_MEMBER}
+		     , #{CD_CHNG_ITEM}
+		     , #{VAL_ITEM_BR}
+		     , #{VAL_ITEM_AF}
+		     , SYSDATE
+		     , #{user.id}
+		     , SYSDATE
+		     , #{user.id}
+		)		
+	</insert>
 </mapper>
  

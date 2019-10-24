@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="UBS0002" screenType="detail" screenLayoutType="Popup" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>게시판관리 / 게시판 복제 팝업</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/ubs/</filePath>
+  <fileName>UBS0002</fileName>
+  <functions>
+    <function id="FNCUBS0296" isStartFunction="false" functionName="게시판관리 / 게시판 복제 호출" serviceId="SVCUBS0280" alias="REGIST"/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+  </authorities>
+</screenBuilder>

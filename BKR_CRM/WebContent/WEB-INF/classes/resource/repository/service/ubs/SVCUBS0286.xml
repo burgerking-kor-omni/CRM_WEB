@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<serviceBuilder id="SVCSYS0286" isProtectedResource="false" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <serviceName>게시판상세 관리자설정 기본 정보로드 (Dummy)</serviceName>
+  <serviceType type="Read">
+    <paging isPaging="false" pagingCount="-1"/>
+    <isFindConditionSave>false</isFindConditionSave>
+  </serviceType>
+  <serviceComponentType type="Dummy">
+    <linkedFile>false</linkedFile>
+    <inducedEvent>false</inducedEvent>
+    <linkedWorkCategory></linkedWorkCategory>
+    <linkedActivity></linkedActivity>
+  </serviceComponentType>
+  <serviceCodes version="1.0">
+    <serviceCode id="BOARD_ADMIN_TYPE" includeSleep="false" alias="BOARD_ADMIN_TYPE"/>
+    <serviceCode id="CD_ROLE" includeSleep="false" alias="CD_ROLE"/>
+  </serviceCodes>
+  <serviceMasks version="1.0"/>
+</serviceBuilder>

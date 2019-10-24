@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Batch">
+	
+	<!--
+		Query id    : Batch.selectBatchList
+		Description : 배치 목록 조회
+	-->
+	<sql id="selectBatchList_base">
+<!-- 페이징 공통 관련 쿼리 -->		  
+	   SELECT 
+	    <if test="ORDER_COLUMN == null or ORDER_COLUMN == ''">
+			  ROW_NUMBER() OVER( order by REG_DT DESC ) AS ROWNUM /* ROWNUM */
+		</if>
+		<if test="ORDER_COLUMN != null and ORDER_COLUMN != ''">
+			  ROW_NUMBER() OVER( order by ${ORDER_COLUMN} ${ORDER_ASC} ) AS ROWNUM /* ROWNUM */
+		</if>
+		    , SUB.*
+		 FROM (
+<!-- 업무 관련 쿼리 :: Begin -->	
+		SELECT 	  BATCH_ID    /* 배치ID*/
+				, BATCH_NAME    /* 배치명*/
+				, CASE WHEN BATCH_TYPE = 'R' THEN'반복실행' WHEN BATCH_TYPE = 'O' THEN '한번실행' END 
+				  AS BATCH_TYPE    /* 배치유형*/
+				, BATCH_DESC    /* 배치설명*/
+				, EXEC_PROGRAM    /* 실행프로그램*/
+				, EXEC_COND_MIN    /* 실행조건-분*/
+				, EXEC_COND_HOUR    /* 실행조건-시*/
+				, EXEC_COND_DAY    /* 실행조건-일*/
+				, EXEC_COND_MONTH    /* 실행조건-월*/
+				, EXEC_COND_WEEK    /* 실행조건-주*/
+				, USE_YN    /* 사용여부*/
+				, LAST_BATCH_LOG_ID    /* 최종배치로그ID*/
+				, REG_DT    /* 최초등록일시*/
+				, USER_ID_REG    /* 최초등록자아이디*/
+				, UPD_DT    /* 최종수정일시*/
+				, USER_ID_UPD    /* 최종수정자아이디*/
+				, LAST_RUN_DATETIME    /* 최종실행일시*/
+				, LAST_SUCC_DATETIME    /* 최종성공일시*/
+				, LAST_FAIL_DATETIME    /* 최종실패일시*/
+				, CASE WHEN STATUS ='00' THEN '준비' WHEN STATUS = '01' THEN '강제실행' WHEN STATUS = '10' THEN '실행중' WHEN STATUS = '99' THEN '성공' WHEN STATUS = '-1' THEN '오류' END 
+				  AS STATUS /* 상태 (00:준비, 01:강제실행, 10:실행중, 99:성공, -1:오류) */
+			FROM SYS_BATCH WITH (nolock)
+			WHERE 1=1
+ 			<if test="BATCH_ID != null and BATCH_ID != ''">
+				AND BATCH_ID LIKE '%' ||#{BATCH_ID}|| '%'    /* 배치ID*/
+			</if>
+	        <if test="BATCH_NAME != null and BATCH_NAME != ''">
+				AND BATCH_NAME LIKE '%' ||#{BATCH_NAME}|| '%' /* 배치명*/
+			</if>  
+			<if test="USE_YN != null and USE_YN != ''">
+				AND USE_YN=#{USE_YN}	    /* 사용여부*/
+			</if>
+			<if test="STATUS != null and STATUS != ''">
+				AND STATUS=#{STATUS}   /* 상태 (00:준비, 01:강제실행, 10:실행중, 99:성공, -1:오류)*/
+			</if>
+<!-- 업무 관련 쿼리 :: End -->		  
+			) SUB			
+	</sql>
+	
+	<!-- 배치 목록 조회 -->
+	<select id="selectBatchList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="selectBatchList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- 배치 목록 조회 - count -->
+	<select id="selectBatchList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="selectBatchList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- 배치 목록 조회 - paging -->
+	<select id="selectBatchList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="selectBatchList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	
+	<!--
+		Query id    : Batch.getListForAutocomplete
+		Description : 배치 목록 조회 자동완성
+	-->
+	<select id="getListForAutocomplete" parameterType="map" resultType="lmap">
+		SELECT 	  BATCH_ID    /* 배치ID*/
+				, BATCH_NAME    /* 배치명*/
+				, CASE WHEN BATCH_TYPE = 'R' THEN'반복실행' WHEN BATCH_TYPE = 'O' THEN '한번실행' END 
+				  AS BATCH_TYPE    /* 배치유형*/
+				, BATCH_DESC    /* 배치설명*/
+				, EXEC_PROGRAM    /* 실행프로그램*/
+				, EXEC_COND_MIN    /* 실행조건-분*/
+				, EXEC_COND_HOUR    /* 실행조건-시*/
+				, EXEC_COND_DAY    /* 실행조건-일*/
+				, EXEC_COND_MONTH    /* 실행조건-월*/
+				, EXEC_COND_WEEK    /* 실행조건-주*/
+				, USE_YN    /* 사용여부*/
+				, LAST_BATCH_LOG_ID    /* 최종배치로그ID*/
+				, REG_DT    /* 최초등록일시*/
+				, USER_ID_REG    /* 최초등록자아이디*/
+				, UPD_DT    /* 최종수정일시*/
+				, USER_ID_UPD    /* 최종수정자아이디*/
+				, LAST_RUN_DATETIME    /* 최종실행일시*/
+				, LAST_SUCC_DATETIME    /* 최종성공일시*/
+				, LAST_FAIL_DATETIME    /* 최종실패일시*/
+				, CASE WHEN STATUS ='00' THEN '준비' WHEN STATUS = '01' THEN '강제실행' WHEN STATUS = '10' THEN '실행중' WHEN STATUS = '99' THEN '성공' WHEN STATUS = '-1' THEN '오류' END 
+				  AS STATUS /* 상태 (00:준비, 01:강제실행, 10:실행중, 99:성공, -1:오류) */
+			FROM SYS_BATCH WITH (nolock)
+			WHERE 1=1
+	        <if test="BATCH_NAME != null and BATCH_NAME != ''">
+				AND BATCH_NAME LIKE '%' ||#{BATCH_NAME}|| '%' /* 배치명*/
+				ORDER BY BATCH_NAME ASC
+			</if>  
+	</select>
+	
+	
+	<!--
+		Query id    : Batch.insertBatch
+		Description : 배치 등록
+	-->
+	<insert id="insertBatch" parameterType="map">
+		INSERT INTO SYS_BATCH(
+			  BATCH_ID    /* 배치ID*/
+			, BATCH_NAME    /* 배치명*/
+			, BATCH_TYPE    /* 배치유형*/
+			, BATCH_DESC    /* 배치설명*/
+			, EXEC_PROGRAM    /* 실행프로그램*/
+			, EXEC_ARGUMENT   /* 프로그램 인수*/
+			, EXEC_COND_MIN    /* 실행조건-분*/
+			, EXEC_COND_HOUR    /* 실행조건-시*/
+			, EXEC_COND_DAY    /* 실행조건-일*/
+			, EXEC_COND_MONTH    /* 실행조건-월*/
+			, EXEC_COND_WEEK    /* 실행조건-주*/
+			, LAST_BATCH_LOG_ID    /* 최종배치로그ID*/
+			, USE_YN    /* 사용여부*/
+			, STATUS    /* 상태*/
+			
+		)
+		VALUES (
+     		  #{BATCH_ID}    /* 배치ID*/
+			, #{BATCH_NAME}    /* 배치명*/
+			, #{BATCH_TYPE}    /* 배치유형*/
+			, #{BATCH_DESC}    /* 배치설명*/
+			, #{EXEC_PROGRAM}    /* 실행프로그램*/
+			, #{EXEC_ARGUMENT}    /* 프로그램 인수*/
+			, #{EXEC_COND_MIN}    /* 실행조건-분*/
+			, #{EXEC_COND_HOUR}    /* 실행조건-시*/
+			, #{EXEC_COND_DAY}    /* 실행조건-일*/
+			, #{EXEC_COND_MONTH}    /* 실행조건-월*/
+			, #{EXEC_COND_WEEK}    /* 실행조건-주*/
+			, #{LAST_BATCH_LOG_ID}    /* 최종배치로그ID*/
+			, #{USE_YN}    /* 사용여부*/
+			, #{STATUS}    /* 상태*/
+		    )
+	</insert>
+	
+	<!--
+		Query id    : Batch.updateBatchStatus
+		Description : 배치 상태 수정
+	-->
+	<update id="updateBatchStatus" parameterType="map">
+		UPDATE SYS_BATCH 
+		SET STATUS=#{BATCH_STATUS}
+		WHERE BATCH_ID=#{ID}
+	</update>
+	
+	<!--
+		Query id    : Batch.updateBatchStatusRe
+		Description : 배치 상태 및 사용여부 수정
+	-->
+	<update id="updateBatchStatusRe" parameterType="map">
+		UPDATE SYS_BATCH 
+		   SET STATUS = #{BATCH_STATUS}
+			 , USE_YN = #{USE_YN}
+		 WHERE 1 = 1
+		   AND BATCH_TYPE = 'R'
+		   AND BATCH_ID = #{ID}
+	</update>
+	
+	<!--
+		Query id    : Batch.selectBatch
+		Description : 배치 조회
+	-->
+	<select id="selectBatch" parameterType="map" resultType="lmap">
+		SELECT  SB.BATCH_ID    /* 배치ID*/
+                , BATCH_NAME    /* 배치명*/
+                , BATCH_TYPE    /* 배치유형*/
+                , BATCH_DESC    /* 배치설명*/
+                , EXEC_PROGRAM    /* 실행프로그램*/
+                , EXEC_COND_MIN    /* 실행조건-분*/
+                , EXEC_COND_HOUR    /* 실행조건-시*/
+                , EXEC_COND_DAY    /* 실행조건-일*/
+                , EXEC_COND_MONTH    /* 실행조건-월*/
+                , EXEC_COND_WEEK    /* 실행조건-주*/
+                , USE_YN    /* 사용여부*/
+                , LAST_BATCH_LOG_ID    /* 최종배치로그ID*/
+                , LAST_RUN_DATETIME    /* 최종실행일시*/
+                , LAST_SUCC_DATETIME    /* 최종성공일시*/
+                , LAST_FAIL_DATETIME    /* 최종실패일시*/
+                , CASE WHEN SB.STATUS = '00' THEN '준비' WHEN SB.STATUS = '01' THEN'강제실행' WHEN SB.STATUS= '10' THEN '실행중' WHEN SB.STATUS = '99' THEN '성공' WHEN SB.STATUS = '-1' THEN '오류' END 
+                  AS STATUS /* 상태 (00:준비, 01:강제실행, 10:실행중, 99:성공, -1:오류) */
+                , CASE WHEN SBL.STATUS = 'S' THEN '성공' WHEN SBL.STATUS = 'F' THEN '실패' ELSE '' END  
+                  AS LOG_STATUS        /* 기록 상태 */
+                , SBL.RESULT_COUNT         /* 결과갯수 */
+                , SBL.ERROR_MESSAGE        /* 오류내용 */
+		FROM SYS_BATCH SB WITH (NOLOCK)
+    	LEFT OUTER JOIN (
+                    SELECT 
+                        ROW_NUMBER() OVER (PARTITION BY BATCH_ID ORDER BY BATCH_LOG_ID DESC) RN,
+                        T.*
+                    FROM SYS_BATCH_LOG T WITH (NOLOCK)) SBL
+        ON SB.BATCH_ID = SBL.BATCH_ID 
+        AND SBL.RN = 1
+		WHERE 1=1
+		<if test="BATCH_ID != null and BATCH_ID != ''">
+			AND SB.BATCH_ID=#{BATCH_ID}    /* 배치ID*/
+		</if>
+	</select>
+	
+	<!--
+		Query id    : Batch.updateBatch
+		Description : 배치 수정
+	-->
+	<update id="updateBatch" parameterType="map">
+		UPDATE SYS_BATCH
+		SET
+		  BATCH_ID	=	#{BATCH_ID}    /*배치ID*/
+		, BATCH_NAME	=	#{BATCH_NAME}    /*배치명*/
+		, BATCH_TYPE	=	#{BATCH_TYPE}    /*배치유형*/
+		, BATCH_DESC	=	#{BATCH_DESC}    /*배치설명*/
+		, EXEC_PROGRAM	=	#{EXEC_PROGRAM}    /*실행프로그램*/
+		, EXEC_COND_MIN	=	#{EXEC_COND_MIN}    /*실행조건-분*/
+		, EXEC_COND_HOUR	=	#{EXEC_COND_HOUR}    /*실행조건-시*/
+		, EXEC_COND_DAY	=	#{EXEC_COND_DAY}    /*실행조건-일*/
+		, EXEC_COND_MONTH	=	#{EXEC_COND_MONTH}    /*실행조건-월*/
+		, EXEC_COND_WEEK	=	#{EXEC_COND_WEEK}    /*실행조건-주*/
+		, USE_YN	=	CASE WHEN #{USE_YN} IS NULL THEN 'Y' ELSE #{USE_YN} END    /*사용여부*/
+		WHERE 1=1
+  	    <if test="BATCH_ID != null and BATCH_ID != ''">
+		   AND BATCH_ID=#{BATCH_ID}	/*배치ID*/
+		</if>
+	</update>
+	
+	<!--
+		Query id    : Batch.deleteBatch
+		Description : 배치 삭제
+	-->
+	<delete id="deleteBatch" parameterType="map">
+		DELETE FROM SYS_BATCH
+		WHERE BATCH_ID=#{BATCH_ID}    /*배치ID*/
+	</delete>
+	
+	<!--
+		Query id    : Batch.selectBatchLogList
+		Description : 배치 기록 목록 조회
+	-->
+	<sql id="selectBatchLogList_base">
+		SELECT BATCH_LOG_ID     /* 배치로그ID*/
+			 , BATCH_ID    		/* 배치ID*/
+			 , START_DATETIME   /* 시작시간*/
+			 , FINISH_DATETIME  /* 종료시간*/
+			 , CASE WHEN STATUS='S' THEN '성공' WHEN STATUS='F' THEN '실패' ELSE '' END AS STATUS /* 상태*/
+			 , RESULT_COUNT    	/* 건수*/
+			 , ERROR_MESSAGE    /* 오류내용*/
+			 , REG_DT    		/* 최초등록일시*/
+		FROM SYS_BATCH_LOG WITH (NOLOCK)
+		WHERE 1=1
+			<if test="BATCH_JOB != null and BATCH_JOB != ''">
+			   AND BATCH_ID=#{BATCH_JOB}  
+			</if>
+			<if test="START_DATETIME != null and START_DATETIME != ''">
+			   AND START_DATETIME <![CDATA[ >= ]]> #{START_DATETIME} 
+			</if>
+			<if test="FINISH_DATETIME != null and FINISH_DATETIME != ''">
+			   AND FINISH_DATETIME <![CDATA[ <= ]]> #{FINISH_DATETIME}
+			</if>
+			<if test="BATCH_LOG_STATUS != null and BATCH_LOG_STATUS != ''">
+			   AND STATUS=#{BATCH_LOG_STATUS} 	
+			</if>   
+	</sql>
+	
+	<!-- 배치 기록 목록 조회 -->
+	<select id="selectBatchLogList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="selectBatchLogList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- 배치 기록 목록 조회 - count -->
+	<select id="selectBatchLogList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="selectBatchLogList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- 배치 기록 목록 조회 - paging -->
+	<select id="selectBatchLogList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="selectBatchLogList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+</mapper>

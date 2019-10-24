@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties version="1.0">
+	<!-- 특별한 경우가 아닐경우 프레임웍을 사용한 모든 Application 에서 동일한 값의 상수로 사용될 값. -->
+	
+	<!--
+	================================================
+	공통/기본 상수들
+	================================================
+	-->	
+	<!-- 서비스 결과 키 -->
+	<entry key="framework.key.result">result</entry>
+	<!-- 파라미터 키 -->
+	<entry key="framework.key.parameter">parameter</entry>
+	<!-- 화면 정보 키 -->
+	<entry key="framework.key.screen">screen</entry>
+	<!-- 메뉴 정보 키 -->
+	<entry key="framework.key.menu">menu</entry>
+	<!-- EnumCode 정보 키 -->
+	<entry key="framework.key.enum_code">enumCode</entry>
+	<!-- 세션에 저장된 사용자 정보 키 -->
+	<entry key="framework.key.user">user</entry>
+	<!-- File Info 정보 키 -->
+	<entry key="framework.key.fileinfo">file_info</entry>
+	<!-- File path 파라미터 키 -->
+	<entry key="framework.key.filepath">file_path</entry>
+	<!-- primary key -->
+	<entry key="framework.key.primarykey">primary_key</entry>
+	<!-- 테마 key -->
+	<entry key="framework.key.theme">theme</entry>
+	<!-- 화면 요청 경로명 -->
+	<entry key="framework.key.request.screen">screen</entry>
+	<!-- 서비스 요청 경로명 -->
+	<entry key="framework.key.request.service">service</entry>
+	<!-- 코드 요청 경로명 -->
+	<entry key="framework.key.request.code">code</entry>
+	<!-- 메세지 요청 경로명 -->
+	<entry key="framework.key.request.message">message</entry>
+	<!-- layout 파라미터 명 -->
+	<entry key="framework.key.parameter.layout">call_layout</entry>
+	
+	<!--
+	================================================
+	권한/보안/인증 관련 상수들
+	================================================
+	-->	
+	<!-- 비인증(익명) 사용자 ID -->
+	<entry key="framework.auth.anonymous">anonymous</entry>
+	<!-- 인증 사용자명 파라미터 키 -->
+	<entry key="framework.auth.key.username">a_username</entry>
+	<!-- 인증 패스워드 파라미터 키 -->
+	<entry key="framework.auth.key.password">a_password</entry>
+	<!-- 인증 서비스명 파라미터 키 -->
+	<entry key="framework.auth.key.authtype">a_authtype</entry>
+	<!-- 인증 성공시 요청 경로 파라미터 키 -->
+	<entry key="framework.auth.key.entrypoint">a_entrypoint</entry>
+	<!-- 서비스 토큰 칼럼 키 -->
+	<entry key="framework.auth.key.token">a_token</entry>
+	<!-- 데이타 소유자 칼럼 키 -->
+	<entry key="framework.auth.key.owner">a_owner</entry>	
+	<!-- 데이타 소유부서 칼럼 키 -->
+	<entry key="framework.auth.key.ownerpart">a_ownerpart</entry>	
+	<!-- 데이타 공개여부 칼럼 키 -->
+	<entry key="framework.auth.key.open">a_open</entry>	
+
+	<!--
+	================================================
+	검색 이력 관련 상수
+	================================================
+	-->	
+	<!-- 검색 이력 저장및 복구를 위한 커맨드 키 -->
+	<entry key="framework.key.search.command">searchRecoveryCommand</entry>	
+	<!-- 검색 이력 저장 커맨드 -->
+	<entry key="framework.search.command.save"></entry>	
+	<!-- 검색 이력 복구 커맨드 -->
+	<entry key="framework.search.command.recovery">recovery</entry>	
+	<!-- 검색 이력 초기화 커맨드 -->
+	<entry key="framework.search.command.clear">clear</entry>
+
+	<!--
+	================================================
+	Paging 관련 상수
+	================================================
+	-->	
+	<!-- 페이지 사이즈 파라미터 키 -->
+	<entry key="framework.paging.key.size">pageSize</entry>	
+	<!-- 페이지 번호 파라미터 키 -->
+	<entry key="framework.paging.key.number">pageNumber</entry>	
+	<!-- 블럭 파라미터 키 -->
+	<entry key="framework.paging.key.block">pageBlock</entry>	
+	<!-- 카운트 쿼리 접미어 -->
+	<entry key="framework.paging.query.count.suffix">_count</entry>	
+	<!-- 페이징 쿼리 접미어 -->
+	<entry key="framework.paging.query.paging.suffix">_paging</entry>
+
+	<!--
+	================================================
+	권한 관련 상수
+	================================================
+	-->
+	<entry key="auth.code.constant">authConstant</entry>
+</properties>

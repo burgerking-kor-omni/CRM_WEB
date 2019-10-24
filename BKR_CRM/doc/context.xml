@@ -3,7 +3,7 @@
     <WatchedResource>WEB-INF/web.xml</WatchedResource>
 
  	<Resource name="jdbc/meta" auth="Container" type="javax.sql.DataSource"
-		driverClassName="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:hsql://localhost:9606/ubmeta"
+		driverClassName="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:hsql://10.10.1.107:9606/ubmeta"
 		username="sa" password="" maxActive="20" maxIdle="10" maxWait="-1" validationQuery="SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS"/>
   	
 	<!-- CRM oracle -->

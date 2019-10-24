@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="APM0031" screenType="detail" screenLayoutType="Popup" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>APMD /  화면관리 상세(팝업)</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0031</fileName>
+  <functions>
+    <function id="FNCAPM0004" isStartFunction="false" functionName="스크린 기능 조회 호출" serviceId="SVCAPM0004" alias="INQUIRY"/>
+    <function id="FNCAPM0005" isStartFunction="false" functionName="스크린 기능 등록 호출" serviceId="SVCAPM0035" alias="REGIST"/>
+    <function id="FNCAPM0006" isStartFunction="false" functionName="스크린 수정 호출" serviceId="SVCAPM0007" alias="MODIFY"/>
+    <function id="FNCAPM0007" isStartFunction="false" functionName="스크린 삭제 호출" serviceId="SVCAPM0006" alias="REMOVE"/>
+    <function id="FNCAPM0008" isStartFunction="false" functionName="스크린 파라미터 조회 호출" serviceId="SVCAPM0005" alias="USERDEFINED1"/>
+    <function id="FNCAPM0009" isStartFunction="false" functionName="기능관리 목록 조회(Auto Complete) 호출" serviceId="SVCAPM0021" alias="USERDEFINED2"/>
+    <function id="FNCAPM0010" isStartFunction="false" functionName="스크린 기능 삭제 호출" serviceId="SVCAPM0036" alias="USERDEFINED3"/>
+    <function id="FNCAPM0011" isStartFunction="false" functionName="스크린 기능 등록 (멀티) 호출" serviceId="SVCAPM0034" alias="USERDEFINED4"/>
+    <function id="FNCAPM0012" isStartFunction="false" functionName="스크린 파라미터 등록 호출" serviceId="SVCAPM0038" alias="USERDEFINED6"/>
+    <function id="FNCAPM0013" isStartFunction="false" functionName="스크린 파라미터 수정 호출" serviceId="SVCAPM0059" alias="USERDEFINED7"/>
+    <function id="FNCAPM0014" isStartFunction="false" functionName="스크린 파라미터 삭제 호출" serviceId="SVCAPM0039" alias="USERDEFINED8"/>
+    <function id="FNCAPM0015" isStartFunction="false" functionName="스크린 기능 수정 호출" serviceId="SVCAPM0037" alias="USERDEFINED9"/>
+    <function id="FNCAPM0016" isStartFunction="true" functionName="스크린 상세 조회 호출" serviceId="SVCAPM0003" alias=""/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

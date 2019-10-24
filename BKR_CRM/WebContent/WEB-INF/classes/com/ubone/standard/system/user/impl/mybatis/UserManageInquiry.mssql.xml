@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="UserManageInquiry">
+
+	<!-- 사용자 목록 조회 -->
+	<sql id="getUserList_base">
+<!-- 페이징 공통 관련 쿼리 -->		  
+	   SELECT 
+	    <if test="ORDER_COLUMN == null or ORDER_COLUMN == ''">
+			  ROW_NUMBER() OVER( order by USER_NM ASC ) AS ROWNUM /* ROWNUM */
+		</if>
+		<if test="ORDER_COLUMN != null and ORDER_COLUMN != ''">
+			  ROW_NUMBER() OVER( order by ${ORDER_COLUMN} ${ORDER_ASC} ) AS ROWNUM /* ROWNUM */
+		</if>
+		    , SUB.*
+		 FROM (
+<!-- 업무 관련 쿼리 :: Begin -->
+		  SELECT A.USER_ID
+		       , A.LOGIN_ID
+		       , A.USER_NM
+		       , A.DUTY_CD
+		       , A.EMP_NO
+		       , A.DEPT_ID
+		       , A.DEPT_NM
+		       , A.MOBILE_NO
+		       , A.EMAIL_DS
+		       , A.INCUMBENT_CD
+		       , A.FG_RECV
+		    FROM (
+					SELECT 
+							 SU.USER_ID
+							,SL.LOGIN_ID
+							<!-- , CASE WHEN SR.APPR_STATUS = 'REQ' THEN SR.USER_NM
+				                   ELSE SU.USER_NM
+				               END USER_NM -->
+				            ,SU.USER_NM
+							,SU.DUTY_CD
+							,SU.EMP_NO
+							,SU.DEPT_ID
+							,CASE WHEN SD.LEVEL_DS = 2 THEN SD.DEPT_NM
+								  ELSE NULL
+							  END AS DEPT_NM
+							,SU.MOBILE_NO
+							,SU.EMAIL_DS						
+							,SU.INCUMBENT_CD
+							,SU.FG_RECV
+					FROM SYS_USER SU
+					LEFT OUTER JOIN SYS_DEPARTMENT SD
+						ON SU.DEPT_ID=SD.DEPT_ID
+					LEFT OUTER JOIN SYS_LOGIN SL
+			      		ON SU.USER_ID = SL.USER_ID
+			      	<!-- LEFT OUTER JOIN (SELECT * FROM 
+	                                  		(SELECT A.*, MAX(REQ_NO) OVER(ORDER BY LOGIN_ID) MAX_NO 
+	                                 			FROM SYS_ACCOUNT_REQ A WHERE APPR_STATUS = 'REQ' ) T
+	                                 			WHERE T.MAX_NO = T.REQ_NO 
+	                                 	 ) SR
+			            ON SU.EMP_NO = SR.LOGIN_ID -->
+			        ) A
+				WHERE 1=1
+			<if test="USER_NM != null and USER_NM != ''">
+				AND USER_NM LIKE '%' + #{USER_NM} + '%'
+			</if>
+			<if test="LOGIN_ID != null and LOGIN_ID != ''">
+				AND LOGIN_ID LIKE '%' + #{LOGIN_ID} + '%'
+			</if>
+			<if test="INCUMBENT_CD != null and INCUMBENT_CD != ''">
+				AND INCUMBENT_CD = #{INCUMBENT_CD}
+			</if>		
+			<if test="EMP_NO != null and EMP_NO != ''">
+				AND EMP_NO LIKE '%' + #{EMP_NO} + '%'
+			</if>
+<!-- 업무 관련 쿼리 :: End -->		  
+			) SUB		
+		
+	
+	</sql>
+	
+	<!-- 사용자 목록 조회 -->
+	<select id="getUserList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getUserList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- 사용자 목록 조회 - count -->
+	<select id="getUserList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getUserList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- 사용자 목록 상세조회 - paging -->
+	<select id="getUserList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getUserList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<sql id="getUserDetail_base">
+<!-- 페이징 공통 관련 쿼리 -->		  
+	   SELECT 
+	    <if test="ORDER_COLUMN == null or ORDER_COLUMN == ''">
+			  ROW_NUMBER() OVER( order by USER_NM ASC ) AS ROWNUM /* ROWNUM */
+		</if>
+		<if test="ORDER_COLUMN != null and ORDER_COLUMN != ''">
+			  ROW_NUMBER() OVER( order by ${ORDER_COLUMN} ${ORDER_ASC} ) AS ROWNUM /* ROWNUM */
+		</if>
+		    , SUB.*
+		 FROM (
+<!-- 업무 관련 쿼리 :: Begin -->
+			SELECT 
+					 SU.USER_ID
+					,SU.USER_NM
+					,SL.LOGIN_ID AS LOGIN_ID
+					,DUTY_CD
+					,SL.PASSWD
+					,ARC.ROLE_ID
+					,DEPT_ID
+					,(SELECT DEPT_NM FROM SYS_DEPARTMENT WHERE DEPT_ID = SU.DEPT_ID) DEPT_NM
+					,MOBILE_NO
+					,EMAIL_DS
+					,INCUMBENT_CD
+					,FG_RECV
+			FROM SYS_USER SU
+				LEFT OUTER JOIN SYS_LOGIN SL
+					ON SU.USER_ID = SL.USER_ID
+				LEFT OUTER JOIN AP_ROLE_COMPOSITION ARC
+					ON SU.USER_ID = ARC.ROLE_COMPOSITION_CODE
+				WHERE 1=1
+				<if test="USER_ID != null and USER_ID != ''">
+					AND SU.USER_ID = #{USER_ID}
+				</if>
+<!-- 업무 관련 쿼리 :: End -->		  
+			) SUB	
+	</sql>
+	
+	<!-- 사용자 목록 상세조회 -->
+	<select id="getUserDetail" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getUserDetail_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- 사용자 목록 상세조회 - count -->
+	<select id="getUserDetail_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getUserDetail_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- 사용자 목록 상세조회 - paging -->
+	<select id="getUserDetail_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getUserDetail_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!-- 포탈 사용자 상세조회  -->
+	<select id="getUserPortalDetail" parameterType="map" resultType="lmap">
+		SELECT 
+               USR.USER_ID
+        FROM SYS_USER USR
+        INNER JOIN SYS_DEPARTMENT SRT
+            ON USR.DEPT_ID = SRT.DEPT_ID
+        WHERE 1=1
+        AND PORTAL_ID = #{PORTAL_ID}	
+	</select>
+	
+	<!-- 비밀번호 확인 조회-->
+	<select id="getUserPasswdInfo" parameterType="map" resultType="lmap">
+		SELECT 
+               LOGIN_ID				/* 로그인ID		 	 */
+             , PASSWD				/* 비밀번호 	 	 */
+          FROM SYS_LOGIN
+       WHERE 1=1 
+       	 AND LOGIN_ID = #{LOGIN_ID}
+         AND PASSWD   =	#{PASSWD}  
+	</select>
+	
+	<!-- 비밀번호 변경처리-->
+	<update id="updateUserPasswdInfo" parameterType="map" >
+		UPDATE SYS_LOGIN 
+		   SET PASSWD = #{CHANGE_PASSWD}
+		     , CHNG_DT_PASSWD = CURRENT_TIMESTAMP
+		 WHERE 
+			LOGIN_ID = #{LOGIN_ID}
+	</update>
+	
+	<!-- 비밀번호 초기화 -->
+	<update id="updateUserPasswdReset" parameterType="map">
+		UPDATE SYS_LOGIN
+		   SET PASSWD = #{RESET_PASSWD}
+		     , CHNG_DT_PASSWD = CURRENT_TIMESTAMP
+		 WHERE 
+		    LOGIN_ID = #{LOGIN_ID}
+	</update>
+	
+	
+	<!-- 영업사원(SV) 정보조회[통보용] - 미사용-->
+	<select id="findByUserSalesEmp" parameterType="map" resultType="lmap">
+        select U.USER_ID        id
+             , U.USER_NM        name
+             , ''               password
+             , U.COMPANY_CD     companyCode
+             , ''               companyName
+             , U.DEPT_ID        partCode
+             , ''               partName
+             , U.TITLE_CD       classCode
+             , U.POSITION_CD    positionCode
+             , U.EMAIL_DS       email
+             , U.PHONE_NO       phoneNumber
+             , U.MOBILE_NO      mobilePhoneNumber 
+             , ''               headquartersCode
+             , ''               languageCode
+          from TBS_CORPORATION C, SYS_USER U
+         WHERE C.ID_SALE_EMP = SUBSTR(U.USER_ID,INSTR(U.USER_ID,'.')+1,LENGTH(U.USER_ID))  
+           AND C.ID_CORP = #{idCorp}
+	</select>	
+	
+	<!-- 발생점포(점주) 정보조회[통보용] - 미사용 -->
+	<select id="findByUserStoreOwner" parameterType="map" resultType="lmap">
+        select NM_PRESIDENT			id
+             , NM_PRESIDENT     	name
+             , ''            		password
+             , ''			 		companyCode
+             , ''            		companyName
+             , ''     				partCode
+             , ''     				partName
+             , ''    				classCode
+             , ''  					positionCode
+             , DS_EMAIL_PRESIDENT	email
+             , ''    				phoneNumber
+             , ID_PHONE_PRESIDENT   mobilePhoneNumber
+             , '' 					headquartersCode
+             , '' 					languageCode
+          from TBS_CORPORATION
+         where ID_CORP = #{idCorp}
+	</select>	
+	
+	<!--
+		Query id    : UserManageInquiry.insertUser
+		Description : 사용자정보 등록
+	-->
+	<insert id="insertUser" parameterType="map">
+		<selectKey resultType="String" keyProperty="PKEY" order="BEFORE">
+			SELECT (REPLICATE('0', 9 - LEN(A.maxKey)) + CAST(A.maxKey AS VARCHAR))+1
+			  FROM (
+			        SELECT CAST(MAX(A.USER_ID) AS NUMERIC) AS maxKey 
+			          FROM SYS_USER A 
+			         WHERE ISNUMERIC(A.USER_ID) = 1
+			       ) A
+		</selectKey>
+			INSERT INTO SYS_USER (USER_ID,
+		                    USER_NM,
+		                    EMP_NO,
+		                    DUTY_CD,
+		                    DEPT_ID,
+		                    DEPT_ID_REAL,
+		                    EMAIL_DS,
+		                    MOBILE_NO,
+		                    INCUMBENT_CD,
+		                    REG_DT,
+		                    DEPT_ID_REG,
+		                    USER_ID_REG,
+		                    UPD_DT,
+		                    DEPT_ID_UPD,
+		                    USER_ID_UPD,
+		                    FG_RECV)
+		     VALUES (
+		     	     #{PKEY},
+		             #{USER_NM},
+		             #{LOGIN_ID},
+		             #{CD_DUTY},
+		             #{DEPT_ID},
+		             #{DEPT_ID},
+		             #{EMAIL_DS},
+		             #{MOBILE_NO},
+		             #{INCUMBENT_CD},
+		             GETDATE(),
+		             #{user.partCode},
+		             #{user.id},
+		             GETDATE(),
+		             #{user.partCode},
+		             #{user.id},
+		             #{FG_RECV})	
+	</insert>
+	
+	<update id="updateUser" parameterType="map" >
+		UPDATE SYS_USER
+		SET  USER_NM         = #{USER_NM},
+		       USER_NM_ENG     = #{USER_NM_ENG},
+		       DEPT_ID 			= #{DEPT_ID},
+		       DEPT_ID_REAL    = #{DEPT_ID_REAL},
+		       COMPANY_CD      = #{COMPANY_CD},
+		       DUTY_CD         = #{CD_DUTY},
+		       POSITION_CD     = #{POSITION_CD},
+		       TITLE_CD        = #{TITLE_CD},
+		       EMAIL_DS        = #{EMAIL_DS},
+		       PHONE_NO        = #{PHONE_NO},
+		       MOBILE_NO       = #{MOBILE_NO},
+		       FAX_NO          = #{FAX_NO},
+		       OFFICE_PHONE_NO = #{OFFICE_PHONE_NO},
+		       INCUMBENT_CD    = #{INCUMBENT_CD},
+		       JOIN_DT         = #{JOIN_DT},
+		       RETIRE_DT       = #{RETIRE_DT},
+		       CHRG_CD         = #{CHRG_CD},
+		       UPD_DT          = GETDATE(),
+		       DEPT_ID_UPD     = #{user.partCode},
+		       USER_ID_UPD     = #{user.id},
+		       PORTAL_ID       = #{PORTAL_ID},
+		       FG_RECV			= #{FG_RECV}
+		WHERE  USER_ID         = #{USER_ID}
+	</update>
+	
+	<select id="getSysUserDetail" parameterType="map" resultType="lmap">
+		SELECT 
+				  USER_ID
+				, EMP_TP
+				, EMP_NO
+				, USER_NM
+				, USER_NM_ENG
+				, DEPT_ID
+				, DEPT_ID_REAL
+				, COMPANY_CD
+				, DUTY_CD
+				, POSITION_CD
+				, TITLE_CD
+				, EMAIL_DS
+				, PHONE_NO
+				, MOBILE_NO
+				, FAX_NO
+				, OFFICE_PHONE_NO
+				, INCUMBENT_CD
+				, JOIN_DT
+				, RETIRE_DT
+				, CHRG_CD
+				, IF_DT
+				, PORTAL_ID
+				, FG_RECV
+				, FG_LOCK_ACCOUNT
+			FROM SYS_USER
+			WHERE EMP_NO = #{loginId}
+	</select>
+</mapper>	
+	

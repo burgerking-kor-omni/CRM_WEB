@@ -86,7 +86,7 @@ public class IwtCrypt {
 	// 암호화 테스트 메서드
 	public static void main(String[] args) {
 		String test = "01023022271";
-		String test2 = "12d9e643248304c476916eb7e636fb50";
+		String test2 = "23be0e003538e8b48536a89bf5ae2836";
 		String encrypt = "";
 		String decrypt = "";
 		try {

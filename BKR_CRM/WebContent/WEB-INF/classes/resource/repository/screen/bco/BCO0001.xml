@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<screenBuilder id="BCO0001" screenType="detail" screenLayoutType="Login" isLoginCheck="false" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>로그인</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/bco/</filePath>
+  <fileName>BCO0001</fileName>
+  <functions/>
+  <defaultParameters/>
+  <authorities/>
+</screenBuilder>

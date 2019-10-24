@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<serviceBuilder id="SVCSYS0292" isProtectedResource="false" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <serviceName>게시판상세 관리자 설정 정보 삭제</serviceName>
+  <serviceType type="Delete"/>
+  <serviceComponentType type="Custom">
+    <className>com.ubone.standard.ubboard.system.service.BoardManageSO</className>
+    <methodName>removeAdmin</methodName>
+    <linkedFile>false</linkedFile>
+    <inducedEvent>false</inducedEvent>
+    <linkedWorkCategory></linkedWorkCategory>
+    <linkedActivity></linkedActivity>
+  </serviceComponentType>
+  <serviceCodes version="1.0"/>
+  <serviceMasks version="1.0"/>
+</serviceBuilder>

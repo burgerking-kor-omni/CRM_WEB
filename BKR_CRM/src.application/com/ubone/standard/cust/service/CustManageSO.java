@@ -4,9 +4,13 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.ubone.api.rest.common.constant.ApiConstantHolder;
 import com.ubone.framework.data.DataList;
 import com.ubone.framework.data.DataUtil;
 import com.ubone.framework.data.Parameter;
+import com.ubone.framework.data.Result;
+import com.ubone.framework.data.ServiceMessage;
+import com.ubone.framework.type.ResultStatus;
 import com.ubone.framework.util.sequence.BizSeqRepository;
 import com.ubone.standard.common.encrypto.IwtCrypt;
 import com.ubone.standard.common.encrypto.Passwdcrypt;
@@ -232,9 +236,10 @@ public class CustManageSO {
 		DataList result = custDAO.getCustLogChange(param);
 		int cnt = result.getRowCount();
 		for(int i = 0; i < cnt; i++){
-			if(!result.get(i, "NM_REG_USER").toString().contains("관리자")){
-				result.set(i, "NM_REG_USER", IwtCrypt.aesDecryptHex(result.getString(i, "NM_REG_USER").toString()) );
-			};
+			if(result.get(i,"CD_CHNG_ITEM").equals("05")||result.get(i,"CD_CHNG_ITEM").equals("01")){
+				result.set(i, "VAL_ITEM_BR",IwtCrypt.aesDecryptHex(result.get(i,"VAL_ITEM_BR").toString()) );
+				result.set(i, "VAL_ITEM_AF",IwtCrypt.aesDecryptHex(result.get(i,"VAL_ITEM_AF").toString()) );
+			}
 		}
 		return result;
 	}
@@ -522,5 +527,53 @@ public class CustManageSO {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * 회원명 변경
+	 * @param param 회원명
+	 */
+	public void updateMemberName(Parameter param) throws Exception{
+		
+		// 변경이력 저장
+		Parameter param2 = DataUtil.makeUserAddedParameter();
+		param2.set("ID_MEMBER"    , param.get("ID_MEMBER"));
+	    param2.set("CD_CHNG_ITEM" , ApiConstantHolder.CD_CHNG_ITEM_NAME);
+	    param2.set("VAL_ITEM_BR"  , IwtCrypt.aesEncryptHex(param.get("NM_MEMBER_BR")));
+	    param2.set("VAL_ITEM_AF"  , IwtCrypt.aesEncryptHex(param.get("NM_MEMBER")));
+	    custDAO.insertChangeRecord(param2);
+		
+		param.set("NM_MEMBER", IwtCrypt.aesEncryptHex(param.get("NM_MEMBER")));
+		custDAO.updateMemberName(param);
+	}
+	
+	
+	/**
+	 * 회원 이메일 변경
+	 * @param param email, id_member
+	 * @return 성공여부
+	 */
+	public Result updateEmail(Parameter param){
+		Result result = DataUtil.makeResult();
+		
+		int flag = custDAO.checkEmail(param);
+		if(flag == 1){
+			result.setServiceMessage(new ServiceMessage("이미 등록된 이메일 주소입니다."));
+			result.setExtendAttribute("resultStatus", false);
+		}else{
+			custDAO.updateEmail(param);
+			
+			// 변경이력 저장
+			Parameter param2 = DataUtil.makeUserAddedParameter();
+			param2.set("ID_MEMBER"    , param.get("ID_MEMBER"));
+		    param2.set("CD_CHNG_ITEM" , "06");
+		    param2.set("VAL_ITEM_BR"  , param.get("DS_EMAIL_BR"));
+		    param2.set("VAL_ITEM_AF"  , param.get("DS_EMAIL"));
+		    custDAO.insertChangeRecord(param2);
+			
+			result.setServiceMessage(new ServiceMessage().setResultStatus(ResultStatus.Success));
+			result.setExtendAttribute("resultStatus", true);
+		}
+		return result;
 	}
 }

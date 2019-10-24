@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="APM0033" screenType="detail" screenLayoutType="Popup" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>APMD /  서비스쿼리 상세</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0033</fileName>
+  <functions>
+    <function id="FNCAPM0070" isStartFunction="false" functionName="서비스 쿼리 수정 호출" serviceId="SVCAPM0064" alias="MODIFY"/>
+    <function id="FNCAPM0071" isStartFunction="true" functionName="서비스쿼리 상세조회 호출" serviceId="SVCAPM0068" alias=""/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

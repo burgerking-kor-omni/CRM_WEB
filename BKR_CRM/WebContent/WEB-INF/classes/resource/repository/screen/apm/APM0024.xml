@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="APM0024" screenType="list" screenLayoutType="TabContent" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>APMD /  서비스 마스킹 목록</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0024</fileName>
+  <functions>
+    <function id="FNCAPM0048" isStartFunction="false" functionName="서비스관리 마스킹 목록 조회 호출" serviceId="SVCAPM0044" alias="INQUIRY"/>
+    <function id="FNCAPM0049" isStartFunction="false" functionName="서비스관리 마스킹 컬럼 삭제 호출" serviceId="SVCAPM0058" alias="REMOVE"/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

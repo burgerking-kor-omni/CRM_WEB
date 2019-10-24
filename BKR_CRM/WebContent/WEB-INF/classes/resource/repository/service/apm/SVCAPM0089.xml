@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<serviceBuilder id="SVCAPM0089" isProtectedResource="false" isLoginCheck="false" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <serviceName>다국어 리소스 상세 조회</serviceName>
+  <serviceType type="Read">
+    <paging isPaging="false" pagingCount="-1"/>
+    <isFindConditionSave>false</isFindConditionSave>
+  </serviceType>
+  <serviceComponentType type="Custom">
+    <className>com.ubone.standard.system.lang.service.LanguageResourceSO</className>
+    <methodName>getLanguageResourceDetail</methodName>
+    <linkedFile>false</linkedFile>
+    <inducedEvent>false</inducedEvent>
+    <linkedWorkCategory></linkedWorkCategory>
+    <linkedActivity></linkedActivity>
+  </serviceComponentType>
+  <serviceCodes version="1.0"/>
+  <serviceMasks version="1.0"/>
+</serviceBuilder>

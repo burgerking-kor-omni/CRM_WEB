@@ -548,6 +548,7 @@
 		     , TVM.DS_CONT	AS "내용"
 		     , TVM.DS_ACT_CONT AS "처리내용"
 		     , VRCD.CODE_NAME AS "처리상태"
+		     , TVM.DS_DISPATCH_CONT AS "통보내용"
 		     , '' AS "비고"
 		  FROM CRMADMIN.TBS_VOC_MASTER TVM
 		 INNER JOIN CRMADMIN.SYS_CODE CAUSE2

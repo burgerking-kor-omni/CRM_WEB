@@ -53,6 +53,7 @@
 		     , OS.STOR_NM
 		     , OS.TEL_NO
 		     , OS.DELIVERY_TEL_NO
+		     , DECODE(SUBSTR(OS.STOR_CD, 0, 4), '0009', 'Y', 'N') FG_YN
 		  FROM OMNI.OMNI_STOR_APP OS
 		 WHERE OS.DLVYN = '1'
 	       AND OS.STOR_CD = #{STOR_CD}

@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+	<!--
+	================================================================================
+	보안 필터 Proxy 설정
+	================================================================================
+	-->
+	<!-- 웹 보안 필터 Proxy -->
+	<!--
+		 filters - 보안에 사용될 필터들을 실행될 순서대로 설정(가장 먼저 선언된 필터가 최상위 계층에 존재)
+		 matchedUrlPatterns - 필터가 적용될 경로명
+		 excludedUrlPatterns - 예외적으로 보안필터가 적용안될 경로명
+	 -->
+	<bean id="webSecurityFilterProxy" class="com.ubone.framework.security.WebSecurityFilterProxy">
+		<property name="filters">
+			<list>
+				<ref bean="securityExceptionHandlerFilter" />
+<!-- 				<ref bean="loginTokenFilter" /> -->
+				<ref bean="sessionUserIntegratorFilter" />
+				<ref bean="headerRefererCheckFilter" />
+				<ref bean="loginCheckFilter" />
+			</list>
+		</property>
+		<property name="matchedUrlPatterns">
+			<list>
+				<value>/**/*.do</value>
+				<value>/**/*.ub</value>
+				<value>/**/*.jsp</value>
+			</list>
+		</property>
+		<property name="excludedUrlPatterns">
+			<list>
+				<value>/**/error/*.jsp</value>			<!-- 오류 페이지 : 삭제시 일부 필터에서 무한반복 될 수 있음. -->
+				<value>/**/login/ssoLogout.jsp</value>	<!-- 예외 패턴추가 : 삭제시 로그아웃후 무한반복됨. -->
+				<value>/**/login/logout.jsp</value>		<!-- 예외 패턴추가 : 삭제시 로그아웃후 무한반복됨. -->
+				<value>/**/login.ub</value>				<!-- Login 진입점 -->
+				<value>/**/mlogin.ub</value>			<!-- 모바일 Login 진입점 -->
+				<value>/**/ssoLogin.ub</value>			<!-- SsoLogin 진입점 -->
+				<value>/**/sso.ub</value>				<!-- SSO 진입점 -->
+				<value>/**/sso.jsp</value>				<!-- SSO 처리 JSP -->
+				<value>/**/file/*.ub</value>			<!-- SFUpload Flash 모듈의 세션 제한으로 인한 추가 -->
+				<value>/**/index.jsp</value>			<!-- Index 페이지 -->
+				<value>/**/alimyLogin.ub</value>		<!-- 알리미 로그인 처리 -->
+				<value>/**/messageDebug.ub</value>		<!-- 메세지 디버거 설정 -->
+				
+				<value>/**/api/*</value>				<!-- rest api 호출 -->
+				<value>/**/CUS0001.jsp</value>			<!-- API테스트 설정 -->
+			</list>
+		</property>
+	</bean>
+
+	<!--
+	================================================================================
+	 웹 보안 필터 설정
+	================================================================================
+	-->
+	<!-- 1. 보안 필터 설정 : 보안 예외 처리 필터 -->
+	<!--
+		 authenticationFailUrl - 인증실패 예외 발생시 redirect 될 URL 설정(별도 설정값이 없는 경우 /index.jsp)
+		 loginRequireUrl -  접근거부 예외 발생시 비인증 사용자를 redirect 할 URL 설정(별도 설정값이 없는 경우 /index.jsp)
+		 accessDeniedUrl - 접근거부 예외 발생시 인증 사용자를 redirect 할 URL 설정(별도 설정값이 없는 경우 /index.jsp)
+		 badRequestUrl - 비정상적인 Reqeust 요청에 대한 오류 페이지 설정
+	 -->
+	<bean id="securityExceptionHandlerFilter" class="com.ubone.framework.security.SecurityExceptionHandlerFilter">
+		<property name="authenticationFailUrl" value="/screen/BCO0001.ub?login_flag=fail" />
+		<property name="loginRequireUrl" value="/screen/BCO0001.ub?login_flag=require" />
+		<property name="accessDeniedUrl" value="/jsp/error/accessDenied.jsp" />
+		<property name="badRequestUrl" value="/jsp/error/badRequest.jsp" />
+	</bean>
+	
+	<!-- 1.1 보안 필터 설정 : 로그인 토큰 필터 -->
+	<bean id="loginTokenFilter" class="com.ubone.framework.security.LoginTokenFilter">
+		<property name="loginTokenHandler">
+			<bean class="com.ubone.standard.login.token.TokenHandler" />
+		</property>
+	</bean>
+
+	<!-- 1.2 보안 필터 설정 : XSS 관련 필터 -->
+	<bean id="XSSSecurityFilter" class="com.ubone.framework.security.XSSSecurityFilter">
+		<property name="parameterFilters" value="classpath:/resource/config/XSSSecurityFilters.properties" />
+	</bean>
+
+	<!-- 1.3 보안 필터 설정 : Header Referer 체크 관련 필터 -->
+	<bean id="headerRefererCheckFilter" class="com.ubone.framework.security.HeaderRefererCheckSecurityFilter">
+		<!-- 타 도메인에서 호출시 허용할 도메인 패턴 -->
+		<property name="refererUrlPatterns">
+			<list>
+				<!-- <value>**/*</value> --><!-- 모든 접속 경로 허용 -->
+				<value>*//127.0.0.1*/**/*</value><!-- Mobile Page 호출시 사용 -->
+				<value>*//13.125.114.27*/**/*</value><!-- RIMS Page 호출시 사용 -->
+			</list>
+		</property>
+	</bean>
+
+	<!-- 2. 보안 필터 설정 : 로그인 체크 필터 -->
+	<!--
+		 정상적인 로그인이 된 상태에서의 실행되는 필터로 화면요청 및 서비스 호출시 체크된다.
+		 로그인 체크여부는 Screen 정보와 Service 정보에서 로그인 체크여부가 Y로 설정시 하위 필터가 체크되고,
+		 N으로 설정시 로그인 페이지로 이동한다.
+		 
+		 filters - 보안에 사용될 필터들을 실행될 순서대로 설정(가장 먼저 선언된 필터가 최상위 계층에 존재)
+	 -->
+	<bean id="loginCheckFilter" class="com.ubone.framework.security.LoginCheckFilter">
+		<property name="filters">
+			<list>
+				<ref bean="logoutFilter" />
+				<ref bean="anonymousProcessingFilter" />
+				<ref bean="anonymousAclFilter" />
+			</list>
+		</property>
+	</bean>
+	
+	<!--
+	================================================================================
+	 웹 보안 필터 설정 - 정상로그인시 체크
+	================================================================================
+	-->
+	<!-- 1. 보안 필터 설정 : 세션 통합 필터 -->
+	<!--
+		 logoutHandler - 동시성 제어등으로 인한 사용자 정보가 파기된 경우 로그아웃 처리를 실행할...(별도 설정값이 없는 경우 BasicLogoutHandler)
+	 -->
+	<bean id="sessionUserIntegratorFilter" class="com.ubone.framework.security.SessionUserIntegratorFilter">
+		<property name="logoutHandler" ref="logoutHandler" />
+	</bean>
+
+	<!-- 2. 보안 필터 설정 : 로그아웃 처리 필터 -->
+	<!--
+		 logoutRequestPath - 로그아웃 요청으로 사용될 경로명 설정(별도 설정값이 없는 경우 /logout.ub)
+		 logoutHandler - 로그아웃 처리를 실행할...(별도 설정값이 없는 경우 BasicLogoutHandler)
+	 -->
+	<bean id="logoutFilter" class="com.ubone.framework.security.LogoutFilter">
+		<property name="logoutRequestPath" value="/logout.ub" />
+		<property name="logoutHandler" ref="logoutHandler" />
+	</bean>
+
+	<!-- 5. 보안 필터 설정 : 익명 사용자 지원 필터 -->
+	<bean id="anonymousProcessingFilter"
+		class="com.ubone.framework.security.auth.AnonymousProcessingFilter" />
+
+	<!-- 6. 보안 필터 설정 : 익명 사용자 접근 제어 필터 -->
+	<!--
+		 anonymousAccessibleResources - 익명 사용자에게도 접근을 허용할 리소스 설정
+	 -->
+	<bean id="anonymousAclFilter" class="com.ubone.framework.security.acl.AnonymousAclFilter">
+		<property name="sessionTimeoutUrl" value="/login/logout.jsp?flag=timeout" />
+		<property name="anonymousAccessibleResources">
+			<list>
+			</list>
+		</property>
+	</bean>
+
+
+	<!--
+	================================================================================
+	필터 관련 Bean  설정
+	================================================================================
+	-->
+	<!-- 로그아웃 처리기 설정 -->
+	<!--
+		 logoutUrl - 로그아웃 처리 후 redirect 될 URL 설정(별도 설정값이 없는 경우 /index.jsp)
+		 logoutUrlByAdmin  - 관리자에 의한 강제 종료시 로그아웃 처리후 redirect 될 URL 설정 
+		 logoutUrlBySystem - 시스템에 의한 강제 종료시 로그아웃 처리후 redirect 될 URL 설정 
+	 -->
+	<bean id="logoutHandler"
+		class="com.ubone.framework.security.BasicLogoutHandler">
+		<property name="logoutUrl" value="/login/logout.jsp" />
+	</bean>
+	
+	<!-- 기본 인증 서비스 -->
+	<!--
+		 userRepository - 사용자 정보 저장소 설정(UserRepository 인터페이스 구현체)
+		 passwordEncoder - 입력된 사용자의 비밀번호를 암호화에 사용할 encoder 설정(PasswordEncoder 인터페이스 구현체)
+		 tokens - 서비스 명 파라미터값과 매칭될 token 값 설정 
+	 -->
+	<bean id="basicAuthenticateService"
+		class="com.ubone.framework.security.auth.BasicAuthenticateService">
+		<property name="userRepository" ref="userRepository" />
+		<property name="passwordEncoder">
+			<bean class="com.ubone.framework.security.util.DummyPasswordEncoder" />
+		</property>
+		<property name="tokens">
+			<list>
+				<value></value>
+				<value>form</value>
+				<value>basic</value>
+				<value>default</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 사용자 저장소 설정 -->
+	<!--
+		 userExtensionInfoCollectors - 사이트에 특화된 추가 사용자 속성 정보 추출기 설정(UserExtensionInfoCollector 인터페이스 구현체)
+	 -->
+	<bean id="userRepository" 
+		class="com.ubone.framework.security.user.JdbcUserRepository" 
+		parent="frameworkAppRepository">
+		<property name="userExtensionInfoCollectors">
+			<list>
+				<ref bean="userConfigCollector" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- 사용자설정 수집기 -->
+	<bean id="userConfigCollector" class="com.ubone.framework.security.user.UserConfigCollector" parent="frameworkAppRepository"/>
+
+	<!-- 부서 저장소 설정 -->
+	<bean id="departmentRepository" 
+		class="com.ubone.framework.security.user.JdbcDepartmentRepository" 
+		parent="frameworkAppRepository" />
+	
+	<!-- 세션관리 : WAS가 세션클러스터링을 지원하는 경우 -->
+	<!--
+	    useCleanSession - true 일 경우 이전세션 정보를 삭제한다.
+		canOneUserForOneId - true 일 경우 한개의 ID 당 오직 한 명의 사용자만 로그인 가능하다.
+		canOneClientForOneId - true 일 경우 한개의 ID 당 오직 한 개의 클라이언트IP에서만 로그인 가능하다.
+		                       canOneUserForOneId 값이 false 일 경우에만 설정값이 의미가 있다.
+		loginUserRegistry - 로그인 사용자 관리기 설정(설정 필수! LoginUserRegistry 인터페이스 구현체)
+	 -->
+	<bean id="sessionManager" class="com.ubone.framework.security.session.ConcurrentSessionManager">
+		<property name="useCleanSession" value="true" />
+		<property name="canOneUserForOneId" value="false" />
+		<property name="canOneClientForOneId" value="false" />
+		<property name="loginUserRegistry" ref="loginUserRegistry" />
+	</bean>
+	
+	<!-- 세션관리 : WAS가 세션클러스터링을 지원하지 않는 경우 -->
+	<!--
+	    useCleanSession - true 일 경우 이전세션 정보를 삭제한다.
+		canOneUserForOneId - true 일 경우 한개의 ID 당 오직 한 명의 사용자만 로그인 가능하다.
+		canOneClientForOneId - true 일 경우 한개의 ID 당 오직 한 개의 클라이언트IP에서만 로그인 가능하다.
+		                       canOneUserForOneId 값이 false 일 경우에만 설정값이 의미가 있다.
+		loginUserRegistry - 로그인 사용자 관리기 설정(설정 필수! LoginUserRegistry 인터페이스 구현체)
+		
+		** 필수 : 해당 기능을 활성화 할 경우 webSecurityFilterProxy의 loginTokenFilter를 활성화 시켜야 한다.
+	 -->
+<!-- 	<bean id="sessionManager" class="com.ubone.framework.security.session.NonClusteringSessionManager"> -->
+<!-- 		<property name="useCleanSession" value="true" /> -->
+<!-- 		<property name="canOneUserForOneId" value="false" /> -->
+<!-- 		<property name="canOneClientForOneId" value="false" /> -->
+<!-- 		<property name="loginUserRegistry" ref="loginUserRegistry" /> -->
+<!-- 	</bean> -->
+	
+	<!-- 로그인 사용자 registry 설정 -->
+	<!--
+		loginUserLogger - 별도 물리 저장소에 사용자 로그인/로그아웃 이력을 저장할 logger 설정
+	 -->
+	<bean id="loginUserRegistry" class="com.ubone.framework.security.user.MemoryLoginUserRegistry">
+		<property name="loginUserLogger" ref="loginUserLogger" />
+	</bean>
+	
+	<!-- 로그인 사용자 logger 설정 -->
+	<bean id="loginUserLogger" class="com.ubone.framework.security.user.JdbcLoginUserLogRepository"
+		parent="frameworkAppRepository">
+	</bean>
+	
+	<!--
+	================================================================================
+	화면 및 서비스 호출 및 실행에 관한 상세 설정
+	================================================================================
+	-->
+	<!-- 서비스 접근 제어기 - ServiceSecurity aspect 에서 참조 -->
+	<bean id="serviceAccessDicisionManager" class="com.ubone.framework.security.acl.BasicServiceAccessDicisionManager" />
+	
+	<!-- 서비스 토큰 Center - 서비스 호출을 위한 토큰을 발급
+	                        - ServiceSecurity, ScreenFunctionSecurity aspect 에서 참조 -->
+	<!--
+		 serverSecret - 서버 보안값(문자열)
+		 serverInteger - 서버 보안값(int)
+	 -->
+	<bean id="serviceTokenCenter" class="com.ubone.framework.security.token.EncriptedServiceTokenCenter">
+		<property name="serverSecret" value="_ub_secret" />
+		<property name="serverInteger" value="1240" />
+	</bean>
+	
+	<!-- 화면 접근 제어기 - ScreenSecurity aspect 에서 참조 -->
+	<bean id="screenAccessDesisionManager" class="com.ubone.framework.security.acl.RoleBaseScreenAccessDesisionManager">
+		<property name="anonymousAccessibleResources">
+			<list>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 데이타 소유자 Finder - 상세 데이타 정보로 부터 해당 데이타의 소유자 정보를 추출 : ScreenFunctionSecurity aspect 에서 참조 -->
+	<bean id="dataOwnerFinder" class="com.ubone.framework.security.acl.BasicDataOwnerFinder" />
+	
+	<!-- 키정보 추출기 - 파라미터로부터 [ID_] 시작하거나 [_ID]로 끝나는 속성명을 키로 인식하고 해당 속성명과 값을 키 정보로 추출 
+	                   - ScreenFunctionSecurity aspect 에서 참조 -->
+	<!--
+	     
+		 patterns - 기본 설정만으로 키 정보가 정상적으로 추출되지 않을 경우 추가적으로 키로 인식할 키 패턴값(정규식)을 배열로 설정
+		 ignorePatterns - 키가 아닌 값이 키로 추출될 경우 제외시킬 키 패턴값(정규식)을 배열로 설정
+	 -->
+	<bean id="keyInterceptor" class="com.ubone.framework.data.BasicKeyInterceptor">
+		<property name="patterns">
+			<list>
+				<value>patternExample</value>
+			</list>
+		</property>
+		<property name="ignorePatterns">
+			<list>
+				<value>ignorePatternsExample</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 접근 범위 제한자 Factory - DataAccessQualifier aspect 에서 참조 -->
+	<!--
+		 headquartersQueryStatement - 본부 하위 부서 목록 조회 쿼리
+		                              사용자의 본부와 동일한 본부를 가져오기 위해 사용한다.
+		                              사용자의 본부 코드값이 대입될 부분은 :headquarters 변수설정한다.
+	 -->
+	<bean id="qualifierFactory" class="com.ubone.framework.security.acl.BasicQualifierFactory">
+		<property name="headquartersQueryStatement" value="
+			select dept_id 
+			  from CRMADMIN.SYS_department 
+			 start with dept_id = :headquarters 
+			 connect by prior dept_id = dept_id_up
+		" />
+	</bean>
+	
+	<!-- 기본 role 적용 전략(?) - 어플리케이션 기본 role 적용 -->
+	<!--
+		 appendTo - All : 모든 사용자에게 기본 role 을 할당한다.
+		            Novice : 어떤 role 도 할당받지 않은 사용자에게 기본 role 을 할당한다.
+		            그 외 모든값 : 적용 안함  
+		 basicRoleId - 적용할 기본 role 의 ID를 설정한다. 
+	 -->
+	<bean id="basicRoleAppendStrategy" class="com.ubone.framework.security.user.BasicRoleAppendStrategy">
+		<property name="appendTo" value="Novice" />
+		<property name="basicRoleId" value="999" />
+	</bean>
+	
+	<!-- 추가 role 적용 전략 -->
+	<!--
+		 query - 사용자별로 추가 role 을 부여할지를 결정하기 위한 조회쿼리
+		         결과값이 0이 아닌 모든 경우에 추가 role 을 사용자에게 부여하고
+		         0일경우에 추가하지 않는다.
+		 extendRoleId - 추가할 role 의 ID를 설정한다. 
+	 -->
+	<bean id="extendRoleAppendStrategy" class="com.ubone.framework.security.user.QueryBaseRoleAppendStrategy">
+		<property name="dataSource" ref="applicationDataSource"/>
+		<property name="query" value="select 0" />
+		<property name="extendRoleId" value="" />
+	</bean>
+
+</beans>

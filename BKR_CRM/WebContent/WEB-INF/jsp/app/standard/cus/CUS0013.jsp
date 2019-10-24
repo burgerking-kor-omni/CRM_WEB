@@ -90,10 +90,11 @@ function fnSearch(){
 	$("#list").clearGridData();
 	
 	var data = {
-			ID_MEMBER : parent.$('#ID_MEMBER').val()
+			ID_MEMBER : parent.$('#ID_MEMBER').val(),
+			ORDER_STATUS : '01'
 		};
 	//필수정보 체크
-	var url = uxl.getFunctionUrl(_SCREEN_ID,'INQUIRY');
+	var url = uxl.getFunctionUrl('CUS0012','INQUIRY');
 	var option = {
 			  data: $.extend(data, uxl.grid.getParam('list'))
 			, success:function(result){

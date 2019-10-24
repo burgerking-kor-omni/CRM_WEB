@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<serviceBuilder id="SVCUBD0011" isProtectedResource="false" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <serviceName>게시판 답글 등록</serviceName>
+  <serviceType type="Create"/>
+  <serviceComponentType type="Custom">
+    <className>com.ubone.standard.ubboard.board.base.service.BoardSO</className>
+    <methodName>insertAnswer</methodName>
+    <linkedFile>true</linkedFile>
+    <inducedEvent>false</inducedEvent>
+    <linkedWorkCategory>BOARD</linkedWorkCategory>
+    <linkedActivity></linkedActivity>
+  </serviceComponentType>
+  <serviceCodes/>
+  <serviceMasks>
+  </serviceMasks>
+</serviceBuilder>

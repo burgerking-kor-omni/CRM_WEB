@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<screenBuilder id="APM0063" screenType="detail" screenLayoutType="Popup" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>시스템관리 / 코드 등록(다국어용)</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId>APM0063R00</metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0063</fileName>
+  <functions>
+    <function id="FNCAPM0122" isStartFunction="false" functionName="코드 등록 호출" serviceId="SVCAPM0122" alias="REGIST"/>
+    <function id="FNCAPM0123" isStartFunction="true" functionName="코드 등록 더미 호출" serviceId="SVCAPM0123" alias=""/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<serviceBuilder id="SVCUBD0025" isProtectedResource="false" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <serviceName>UB-Board 사원정보 조회</serviceName>
+  <serviceType type="Read"/>
+  <serviceComponentType type="Custom">
+    <className>com.ubone.standard.ubboard.board.common.service.BoardCommonSO</className>
+    <methodName>getBoardUserInfo</methodName>
+    <linkedFile>true</linkedFile>
+    <inducedEvent>false</inducedEvent>
+    <linkedWorkCategory>USER</linkedWorkCategory>
+    <linkedActivity></linkedActivity>
+  </serviceComponentType>
+  <serviceCodes/>
+  <serviceMasks/>
+</serviceBuilder>

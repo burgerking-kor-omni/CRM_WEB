@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+	<!-- file policy declaration -->
+	<bean id="filePolicyRepository"  class="com.ubone.framework.util.file.FilePolicyRepository">
+		<!-- 
+			전역 Black 리스트
+			파일이름 중간에 "abc.jsp%00.jpg" 형태의 파일명을 가진 파일로 제외하기 위하여,
+			기본확장자 및 파일명중간에 포함되는 확장자 또한 같이 대상에 포함됨
+		 -->
+		<property name="blackList" value="jsp;java;cgi;exe;php;asp;aspx" />
+
+		<!-- 기본 첨부파일 정책 -->
+ 		<property name="defaultFilePolicy">
+ 				<bean class="com.ubone.framework.util.file.FilePolicy">
+ 					<!-- 파일 저장 위치 : config.xml의 framework.upload.path에 설정된 정보설정  -->
+ 					<property name="baseDir" value="${framework.upload.path}/default"/>
+ 					<!-- 파일 중간 경로 생성 규칙 -->
+ 					<!-- 0-None(중간경로 없음), 1-YYYY, 2-YYYY/MM, 3-YYYY/MM/DD, 4-YYYYMM, 5-YYYYMMDD -->
+ 					<property name="pathRule" value="0"/>
+ 					<!-- 파일명 생성 규칙(디스크에 저장되는 파일명 형식) -->
+ 					<!-- 0-랜덤파일명.확장자, 1-랜덤파일명, 2-파일명.확장자, 3-파일명 -->
+ 					<property name="nameRule" value="0"/>
+					<!-- 
+						업로드 확장자 제한 유형 (default : WHITE) 
+					    * BLACK - Black List : 명기된 확장자만 업로드 할 수 없는 방식
+					    * WHITE - White List : 명기된 확장자만 업로드 할 수 있는 방식
+					    
+					    config.xml의 framework.upload.ext.limit.type에 설정된 값을 셋팅함.
+					 -->
+					<property name="secureType" value="${framework.upload.ext.limit.type}" />
+					<!-- 업로드 파일확장자 제한 리스트(대소문자 구분 없음) -->
+					<property name="limitFileExts">
+						<list>
+							<value>${framework.upload.ext.limit.list}</value>
+						</list>
+					</property>
+ 				</bean>
+ 		</property>
+ 		
+		<!-- AttachType별 첨부파일 정책 -->
+ 		<property name="extendFilePolicies">
+ 			<list>
+ 				<!-- 썸네일용 파일 정책 -->
+ 				<bean class="com.ubone.framework.util.file.FilePolicy">
+ 					<!-- 적용될 AttachType리스트 -->
+ 					<property name="attachTypes">
+ 						<list>
+ 							<value>thumbnail</value>
+ 						</list>
+ 					</property>
+ 					<!-- 파일 저장 위치 -->
+ 					<property name="baseDir" value="${framework.upload.path}/thumbnail"/>
+ 				</bean>
+ 				
+ 				<!-- file2 정책 -->
+ 				<bean class="com.ubone.framework.util.file.FilePolicy">
+ 					<!-- 적용될 AttachType리스트 -->
+ 					<property name="attachTypes">
+ 						<list>
+ 							<value>file2</value>
+ 						</list>
+ 					</property>
+ 					<!-- 파일 저장 위치 -->
+ 					<property name="baseDir" value="${framework.upload.path}/file2"/>
+ 					<!-- 파일 중간 경로 생성 규칙 -->
+ 					<!-- 0-None(중간경로 없음), 1-YYYY, 2-YYYY/MM, 3-YYYY/MM/DD, 4-YYYYMM, 5-YYYYMMDD -->
+ 					<property name="pathRule" value="5"/>
+ 					<!-- 파일명 생성 규칙(디스크에 저장되는 파일명 형식) -->
+ 					<!-- 0-랜덤파일명.확장자, 1-랜덤파일명, 2-파일명.확장자, 3-파일명 -->
+ 					<property name="nameRule" value="0"/>
+
+					<!-- 
+						업로드 확장자 제한 유형 (default : WHITE)
+					    * BLACK - Black List : 명기된 확장자만 업로드 할 수 없는 방식
+					    * WHITE - White List : 명기된 확장자만 업로드 할 수 있는 방식
+					 -->
+ 					<property name="secureType" value="WHITE" />
+ 					<!-- 업로드 파일확장자 제한 리스트(대소문자 구분 없음) -->
+ 					<property name="limitFileExts">
+ 						<list>
+ 							<!-- Hangul File List -->
+ 							<value>hwp</value>
+ 							<!-- MS-Office File List -->
+ 							<value>doc;docx;xls;xlsx;ppt;pptx</value>
+ 							<!-- Image File List -->
+ 							<value>bmp;png;gif;jpg;jpeg</value>
+ 							<!-- Document File List -->
+ 							<value>txt;pdf</value>
+ 						</list>
+ 					</property>
+ 				</bean>
+ 				
+ 				<!-- 사용자 이미지 정책 -->
+ 				<bean class="com.ubone.framework.util.file.FilePolicy">
+ 					<!-- 적용될 AttachType리스트 -->
+ 					<property name="attachTypes">
+ 						<list>
+ 							<value>userImage</value>
+ 						</list>
+ 					</property>
+ 					<!-- 파일 저장 위치 -->
+ 					<property name="baseDir" value="${framework.upload.path}/userImage"/>
+ 					<!-- 파일 중간 경로 생성 규칙 -->
+ 					<!-- 0-None(중간경로 없음), 1-YYYY, 2-YYYY/MM, 3-YYYY/MM/DD, 4-YYYYMM, 5-YYYYMMDD -->
+ 					<property name="pathRule" value="5"/>
+ 					<!-- 파일명 생성 규칙(디스크에 저장되는 파일명 형식) -->
+ 					<!-- 0-랜덤파일명.확장자, 1-랜덤파일명, 2-파일명.확장자, 3-파일명 -->
+ 					<property name="nameRule" value="2"/>
+
+					<!-- 
+						업로드 확장자 제한 유형 (default : WHITE)
+					    * BLACK - Black List : 명기된 확장자만 업로드 할 수 없는 방식
+					    * WHITE - White List : 명기된 확장자만 업로드 할 수 있는 방식
+					 -->
+ 					<property name="secureType" value="WHITE" />
+ 					<!-- 업로드 파일확장자 제한 리스트(대소문자 구분 없음) -->
+ 					<property name="limitFileExts">
+ 						<list>
+ 							<!-- Hangul File List -->
+<!--  							<value>hwp</value> -->
+ 							<!-- MS-Office File List -->
+<!--  							<value>doc;docx;xls;xlsx;ppt;pptx</value> -->
+ 							<!-- Image File List -->
+ 							<value>bmp;png;gif;jpg;jpeg</value>
+ 							<!-- Document File List -->
+<!--  							<value>txt;pdf</value> -->
+ 						</list>
+ 					</property>
+ 				</bean>
+ 			</list>
+        </property>
+	</bean>
+</beans>

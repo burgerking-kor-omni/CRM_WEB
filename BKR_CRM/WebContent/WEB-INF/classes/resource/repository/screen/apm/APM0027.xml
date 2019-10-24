@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="APM0027" screenType="list" screenLayoutType="Default" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>APMD /  마스크 관리 / 마스크 목록</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0027</fileName>
+  <functions>
+    <function id="FNCAPM0054" isStartFunction="false" functionName="마스크관리 마스크 목록 조회 호출" serviceId="SVCAPM0048" alias="INQUIRY"/>
+    <function id="FNCAPM0055" isStartFunction="true" functionName="마스크관리 기본정보 조회 (dummy) 호출" serviceId="SVCAPM0050" alias=""/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

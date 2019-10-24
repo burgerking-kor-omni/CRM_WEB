@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "HTTP://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<settings>
+		<setting name="jdbcTypeForNull" 		value="VARCHAR" /><!-- 필수 : Null인 파라미터의 타입지정 -->
+		<setting name="callSettersOnNulls"		value="true"    /><!-- 필수 : true로 설정 (true : Null값 컬럼도 포함, false : 포함하지 않음) -->
+		<setting name="useGeneratedKeys"     	value="false"   /><!-- 필수 : 자동증가 컬럼이 있는 DBMS는 true, 없는것은 false, 즉 Oracle : false, MSSQL : true -->
+		<setting name="defaultExecutorType"  	value="REUSE" />
+	</settings>
+	
+	<typeAliases>
+		<typeAlias alias="hmap" type="java.util.HashMap"/>
+		<typeAlias alias="lmap" type="java.util.LinkedHashMap"/>
+	</typeAliases>
+	
+	<typeHandlers>
+		<typeHandler javaType="oracle.sql.CLOB" 		handler="org.apache.ibatis.type.ClobTypeHandler" />
+		<typeHandler javaType="oracle.jdbc.OracleClob" 	handler="org.apache.ibatis.type.ClobTypeHandler" />
+
+		<typeHandler javaType="oracle.sql.BLOB" 		handler="org.apache.ibatis.type.BlobTypeHandler" />
+		<typeHandler javaType="oracle.jdbc.OracleBlob" 	handler="org.apache.ibatis.type.BlobTypeHandler" />
+		
+		<typeHandler javaType="java.sql.Timestamp"  
+		             handler="com.ubone.framework.dao.typehandler.TimestampTypeHandler" />
+		<typeHandler javaType="java.sql.Date"  		
+		             handler="com.ubone.framework.dao.typehandler.TimestampTypeHandler" />
+		
+		<typeHandler javaType="oracle.sql.TIMESTAMP" 
+					 jdbcType="TIMESTAMP" 
+					 handler="com.ubone.framework.dao.typehandler.TimestampTypeHandler" />
+		
+		<typeHandler javaType="BigDecimal" 			
+		             handler="com.ubone.framework.dao.typehandler.NumericTypeHandler" />
+	</typeHandlers>
+
+	<mappers>
+		<mapper resource="resource/config/mybatis/mybatis-common-oracle.xml" />
+	</mappers>
+</configuration>

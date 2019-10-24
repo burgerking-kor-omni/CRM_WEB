@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="EUC-KR"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+	<mapper namespace="TbsNotice">
+	
+		<!-- 공지사항 신규 등록 -->
+		<insert id="insertNotice" parameterType="map">
+		
+			<selectKey keyProperty="SEQ_VOC_NOTICE" resultType="String" order="BEFORE">
+				SELECT SEQ_TBS_NOTICE.NEXTVAL FROM DUAL 
+			</selectKey>
+						
+			INSERT INTO TBS_NOTICE
+			(
+				  ID_NOTICE    		/* 공지사항ID	*/
+				, DS_TITLE    		/* 제목 		*/
+				, DS_NOTICE    		/* 공지내용		*/
+				, DT_START    		/* 시작일시		*/
+				, DT_END    		/* 종료일시		*/
+				, FG_OPEN_PORTAL	/* 포탈게시여부 */
+				, FG_ATTACH    		/* 파일첨부여부	*/
+				, CD_COMP    		/* 회사코드		*/
+				, FG_DEL    		/* 삭제여부		*/
+				, DT_REG    		/* 최초등록일시	*/
+				, ID_REG_DEPT    	/* 최초등록부서	*/
+				, ID_REG_EMP    	/* 최초등록자	*/
+				, DT_UPT    		/* 최근수정일시	*/
+				, ID_UPT_DEPT    	/* 최근수정부서	*/
+				, ID_UPT_EMP    	/* 최근수정자	*/
+			) VALUES (
+			      #{SEQ_VOC_NOTICE}	/* 공지사항ID	*/
+				, #{DS_TITLE}    	/* 제목			*/
+				, #{DS_NOTICE}    	/* 공지내용		*/
+				, TO_DATE(#{DT_START},'YYYY-MM-DD')    	/* 시작일시		*/
+				, TO_DATE(#{DT_END},'YYYY-MM-DD')    		/* 종료일시		*/
+				, #{FG_OPEN_PORTAL} /* 포탈게시여부	*/
+				, #{FG_ATTACH}    	/* 파일첨부여부	*/
+				, #{CD_COMP}    	/* 회사코드		*/
+				, 'N'	    		/* 삭제여부		*/
+				, CURRENT_TIMESTAMP	/* 최초등록일시	*/
+				, #{user.partCode}  /* 최초등록부서	*/
+				, #{user.id}    	/* 최초등록자	*/
+				, CURRENT_TIMESTAMP	/* 최근수정일시	*/
+				, #{user.partCode}  /* 최근수정부서	*/
+				, #{user.id}    	/* 최근수정자	*/
+			)
+			    
+		</insert>
+		
+		<!-- 공지사항 수정.	-->
+		<update id="updateNotice" parameterType="map">
+
+			UPDATE TBS_NOTICE
+			   SET DS_TITLE			=	#{DS_TITLE}    		/* 제목 		*/
+				 , DS_NOTICE		=	#{DS_NOTICE}    	/* 공지내용 	*/
+				 , DT_START			=	TO_DATE(#{DT_START},'YYYY-MM-DD')    		/* 시작일시		*/
+				 , DT_END			=	TO_DATE(#{DT_END},'YYYY-MM-DD')    		/* 종료일시		*/
+				 , FG_OPEN_PORTAL	=	#{FG_OPEN_PORTAL}   /* 포탈게시여부 */
+				 , FG_ATTACH		=	#{FG_ATTACH}    	/* 파일첨부여부 */
+				 , CD_COMP			=	#{CD_COMP}    		/* 회사코드		*/
+				 , DT_UPT			=	CURRENT_TIMESTAMP  	/* 최근수정일시	*/
+				 , ID_UPT_DEPT		=	#{user.partCode}   	/* 최근수정부서	*/
+				 , ID_UPT_EMP		=	#{user.id}    		/* 최근수정자	*/
+			WHERE
+			       ID_NOTICE		=	#{ID_NOTICE}   		/* 공지사항id	*/
+
+		</update>
+		
+		<!-- 공지사항 삭제.	-->
+		<delete id="deleteNotice" parameterType="map">
+			
+			UPDATE TBS_NOTICE
+			   SET FG_DEL = 'Y'
+ 		     WHERE ID_NOTICE = #{ID_NOTICE}    /* 공지사항ID */
+		</delete>
+		
+	</mapper>

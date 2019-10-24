@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="SqlManager">
+
+	<!-- SQL관리자 쿼리 실행 -->
+	<sql id="selectQuery_base">
+	<![CDATA[
+	SELECT TOP 1000 SUB.*
+	  FROM (
+			${queryString}	  
+		) SUB
+	]]>		
+	</sql>
+
+	<!-- SQL관리자 쿼리 실행 -->
+	<select id="selectQuery" parameterType="map" resultType="lmap" useCache="false">
+		<include refid="common.order-top" />
+		<include refid="selectQuery_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- SQL관리자 쿼리 실행 - count -->
+	<select id="selectQuery_count" parameterType="map" resultType="Integer" useCache="false">
+		<include refid="common.count-top" />
+		<include refid="selectQuery_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- SQL관리자 쿼리 실행 - paging -->
+	<select id="selectQuery_paging" parameterType="map" resultType="lmap" useCache="false">
+		<include refid="common.paging-top" />
+		<include refid="selectQuery_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<!-- Update 실행 쿼리 -->
+	<update id="updateQuery" parameterType="map">${queryString}</update>
+</mapper>

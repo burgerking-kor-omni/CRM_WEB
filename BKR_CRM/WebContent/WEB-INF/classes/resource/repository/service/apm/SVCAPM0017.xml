@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<serviceBuilder id="SVCAPM0017" isProtectedResource="false" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <serviceName>서비스관리 기본정보 조회(dummy)</serviceName>
+  <serviceType type="Read">
+    <paging isPaging="false" pagingCount="-1"/>
+    <isFindConditionSave>false</isFindConditionSave>
+  </serviceType>
+  <serviceComponentType type="Dummy">
+    <linkedFile>false</linkedFile>
+    <inducedEvent>false</inducedEvent>
+    <linkedWorkCategory></linkedWorkCategory>
+    <linkedActivity></linkedActivity>
+  </serviceComponentType>
+  <serviceCodes version="1.0">
+    <serviceCode id="FLAG_YN" includeSleep="false" alias="FLAG_YN"/>
+    <serviceCode id="APMD_CALL_TYPE" includeSleep="false" alias="APMD_CALL_TYPE"/>
+    <serviceCode id="APMD_SERVICE_TYPE" includeSleep="false" alias="APMD_SERVICE_TYPE"/>
+    <serviceCode id="WORKFLOW_ACTIVITY" includeSleep="false" alias="WORKFLOW_ACTIVITY"/>
+    <serviceCode id="WORK_CATEGORY" includeSleep="false" alias="WORK_CATEGORY"/>
+  </serviceCodes>
+  <serviceMasks version="1.0"/>
+</serviceBuilder>

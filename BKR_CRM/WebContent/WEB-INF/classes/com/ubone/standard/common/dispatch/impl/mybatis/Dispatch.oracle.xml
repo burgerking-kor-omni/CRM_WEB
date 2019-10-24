@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Dispatch">
+
+	<!--
+		QueryId     : Dispatch.getDispatchEmpTarget
+		Description : VOC 통보대상자 조회 - 직원
+	 -->
+	<select id="getDispatchEmpTarget" parameterType="map" resultType="lmap">
+		SELECT SU.USER_ID
+		     , SU.DEPT_ID
+		     , SU.EMAIL_DS
+		  FROM CRMADMIN.AP_ROLE_COMPOSITION AR
+		 INNER JOIN CRMADMIN.SYS_USER SU
+		    ON AR.ROLE_COMPOSITION_CODE = SU.USER_ID
+		 WHERE ROLE_ID = #{ROLE_ID}
+	</select>
+	
+	<!--
+		QueryId     : Dispatch.getVocDispatch
+		Description : 유형별 통보대상자 조회
+	 -->
+	<select id="getVocDispatch" parameterType="map" resultType="lmap">
+		SELECT TVD.ID_TARGET
+		     , TVD.NM_TARGET
+		     , TVD.DS_EMAIL
+		     , TVDC.CD_TARGET
+		     , TVDC.FG_CC
+		  FROM CRMADMIN.TBS_VOC_DISPATCH TVD
+		 INNER JOIN CRMADMIN.TBS_VOC_DISPATCH_CATEGORY TVDC
+		    ON TVD.ID_TARGET = TVDC.ID_TARGET
+		 WHERE TVDC.CD_TARGET = #{CD_TARGET}
+		   AND FG_USE = 'Y'
+
+	</select>
+	
+
+	<!--
+		QueryId     : Dispatch.insertDispatchRun
+		Description : 통보실행이력 저장
+	 -->
+	<insert id="insertDispatchRun" parameterType="map">
+
+		<selectKey keyProperty="ID_DISPATCH_RUN" resultType="String" order="BEFORE">
+			SELECT SEQ_TBS_DISPATCH_RUN.NEXTVAL FROM DUAL
+		</selectKey>
+		
+		INSERT INTO CRMADMIN.TBS_DISPATCH_RUN
+		(
+			  ID_DISPATCH_RUN         /* 통보실행ID */
+			, TP_BIZ                  /* 업무구분 */
+			, ID_BIZ_KEY              /* 업무별ID */
+			, TP_DISPATCH_METHOD      /* 통보방법 */
+			, ID_EMP_DISPATCH         /* 통보직원 */
+			, ID_DEPT_DISPATCH        /* 통보부서 */
+			, DS_EMAIL_SEND           /* 보내는메일 */
+			, ID_PHONE_SEND           /* 보내는전화 */
+			, DS_TITLE_DISPATCH       /* 통보제목 */
+			, ID_TEMPLATE             /* 템플릿ID */
+			, DT_DISPATCH_OCCUR       /* 통보원인 발생일시 */
+			, DT_DISPATCH_PLAN        /* 통보실행 예정일시 */
+			, DT_DISPATCH             /* 통보실행일시 */
+			, TP_STATUS_DISPATCH      /* 통보실행상태 */
+			, TP_DISPATCH_AUTO        /* 자동/수동여부 */
+			, DS_DISPATCH_RSLT        /* 실패사유 */
+			, FG_DEL                  /* 삭제여부 */
+			, DS_DISPATCH             /* 통보내용 */
+			, DS_CONTENT              /* 처리결과 */
+			, DS_URL                  /* URL 주소 */
+			, CD_DISPATCH_BIZ         /* 통보유형 구분(01:일반, 02:리스크) */
+			, DT_REG                  /* 최초등록일시 */
+			, ID_DEPT_REG             /* 최초등록부서 */
+			, ID_EMP_REG              /* 최초등록자 */
+			, DT_UPT                  /* 최근수정일시 */
+			, ID_DEPT_UPT             /* 최근수정부서 */
+			, ID_EMP_UPT              /* 최근수정자 */
+		) VALUES (
+		      #{ID_DISPATCH_RUN}
+		    , #{TP_BIZ}
+		    , #{ID_BIZ_KEY}
+		    , '01'
+		    , NULL
+		    , NULL
+		    , 'bkr-noreply@bkr.co.kr'
+		    , NULL
+		    , #{DS_TITLE_DISPATCH}
+		    , NULL
+		    , NULL
+		    , NULL
+		    , NULL
+		    , 'S0'
+		    , '01'
+		    , NULL
+		    , 'N'
+		    , #{DS_DISPATCH}
+		    , NULL
+		    , NULL
+		    , '01'
+		    , SYSDATE
+		    , 'SYSTEM'
+		    , 'SYSTEM'
+		    , SYSDATE
+		    , 'SYSTEM'
+		    , 'SYSTEM'
+		)
+		    
+	</insert>
+	
+	<!--
+		QueryId     : Dispatch.insertDispatchRunTarget
+		Description : 통보실행대상 저장
+	 -->
+	<insert id="insertDispatchRunTarget" parameterType="map">
+
+		<selectKey keyProperty="ID_DISPATCH_RUN_TARGET" resultType="String" order="BEFORE">
+			SELECT SEQ_TBS_DISPATCH_RUN_TARGET.NEXTVAL FROM DUAL
+		</selectKey>
+		
+		INSERT INTO CRMADMIN.TBS_DISPATCH_RUN_TARGET
+		(
+			   ID_DISPATCH_RUN_TARGET		/* 통보실행대상ID */
+			 , ID_DISPATCH_RUN              /* 통보실행ID */
+			 , TP_DISPATCH_TARGET           /* 통보대상자구분 */
+			 , ID_CUST_DISPATCH             /* 통보대상고객ID */
+			 , ID_EMP_DISPATCH_TARGET       /* 통보대상직원 */
+			 , ID_DEPT_DISPATCH_TARGET      /* 통보대상부서 */
+			 , DS_EMAIL_RECV                /* 받는메일 */
+			 , ID_PHONE_RECV                /* 받는전화 */
+			 , FAX_NUMBER                   /* 팩스번호 */
+			 , SEND_YN                      /* 전송여부 */
+			 , DT_REG                       /* 최초등록일시 */
+			 , ID_DEPT_REG                  /* 최초등록부서 */
+			 , ID_EMP_REG                   /* 최초등록자 */
+			 , DT_UPT                       /* 최근수정일시 */
+			 , ID_DEPT_UPT                  /* 최근수정부서 */
+			 , ID_EMP_UPT                   /* 최근수정자 */
+			 , NM_PARTNER                   /* 협력업체 명 */
+			 , FG_REFERENCES                /* 참조여부 */
+		) VALUES (
+		       #{ID_DISPATCH_RUN_TARGET}
+		     , #{ID_DISPATCH_RUN}
+		     , #{TP_DISPATCH_TARGET}
+		     , NULL
+		     , #{ID_EMP_DISPATCH_TARGET}
+		     , #{ID_DEPT_DISPATCH_TARGET}
+		     , #{DS_EMAIL_RECV}
+		     , NULL
+		     , NULL
+		     , 'N'
+		     , SYSDATE
+		     , 'SYSTEM'
+		     , 'SYSTEM'
+		     , SYSDATE
+		     , 'SYSTEM'
+		     , 'SYSTEM'
+		     , NULL
+		     , #{FG_REFERENCES}
+		)
+		    
+	</insert>
+
+</mapper>
+ 

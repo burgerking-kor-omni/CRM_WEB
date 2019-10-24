@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<screenBuilder id="APM0040" screenType="detail" screenLayoutType="Popup" isLoginCheck="false" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>다국어 리소스 데이터 등록 팝업</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0040</fileName>
+  <functions>
+    <function id="FNCAPM0090" isStartFunction="false" functionName="다국어 리소스 등록 호출" serviceId="SVCAPM0088" alias="REGIST"/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

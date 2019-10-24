@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="EXP8009" screenType="list" screenLayoutType="Default" isLoginCheck="false" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>FooterSum Grid Test</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/exp/</filePath>
+  <fileName>EXP8009</fileName>
+  <functions/>
+  <defaultParameters/>
+  <authorities/>
+</screenBuilder>

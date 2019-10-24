@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="UBS0005" screenType="detail" screenLayoutType="TabContent" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>게시판관리 / 게시판상세 유형정보 (TabContent)</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/ubs/</filePath>
+  <fileName>UBS0005</fileName>
+  <functions>
+    <function id="FNCUBS0301" isStartFunction="true" functionName="게시판관리 / 유형정보 상세 기본정보 로드 호출" serviceId="SVCUBS0285" alias="USERDEFINED1"/>
+    <function id="FNCUBS0305" isStartFunction="false" functionName="게시판상세 유형정보 수정 호출" serviceId="SVCUBS0289" alias="MODIFY"/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+  </authorities>
+</screenBuilder>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<serviceBuilder id="SVCAPM0003" isProtectedResource="false" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <serviceName>스크린 상세 조회</serviceName>
+  <serviceType type="Read">
+    <paging isPaging="false" pagingCount="-1"/>
+    <isFindConditionSave>true</isFindConditionSave>
+  </serviceType>
+  <serviceComponentType type="Custom">
+    <className>com.ubone.standard.system.screen.service.ScreenManageSO</className>
+    <methodName>getScreen</methodName>
+    <linkedFile>false</linkedFile>
+    <inducedEvent>false</inducedEvent>
+    <linkedWorkCategory></linkedWorkCategory>
+    <linkedActivity></linkedActivity>
+  </serviceComponentType>
+  <serviceCodes version="1.0">
+    <serviceCode id="APMD_FUNCTION_ALIAS" includeSleep="false" alias="APMD_FUNCTION_ALIAS"/>
+    <serviceCode id="APMD_FUNCTION_TYPE" includeSleep="false" alias="APMD_FUNCTION_TYPE"/>
+    <serviceCode id="APMD_LAYOUT_TYPE" includeSleep="false" alias="APMD_LAYOUT_TYPE"/>
+    <serviceCode id="APMD_SCREEN_TYPE" includeSleep="false" alias="APMD_SCREEN_TYPE"/>
+    <serviceCode id="APMD_SCREEN_VIEW_TYPE" includeSleep="false" alias="APMD_SCREEN_VIEW_TYPE"/>
+  </serviceCodes>
+  <serviceMasks version="1.0"/>
+</serviceBuilder>

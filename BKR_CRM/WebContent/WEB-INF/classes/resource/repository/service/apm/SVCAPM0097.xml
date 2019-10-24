@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<serviceBuilder id="SVCAPM0097" isProtectedResource="false" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <serviceName>메뉴 등록 (다국어용)</serviceName>
+  <serviceType type="Create"/>
+  <serviceComponentType type="Custom">
+    <className>com.ubone.standard.system.menu.service.MenuManageMLSO</className>
+    <methodName>insertMenu</methodName>
+    <linkedFile>false</linkedFile>
+    <inducedEvent>false</inducedEvent>
+    <linkedWorkCategory></linkedWorkCategory>
+    <linkedActivity></linkedActivity>
+  </serviceComponentType>
+  <serviceCodes version="1.0"/>
+  <serviceMasks version="1.0"/>
+</serviceBuilder>

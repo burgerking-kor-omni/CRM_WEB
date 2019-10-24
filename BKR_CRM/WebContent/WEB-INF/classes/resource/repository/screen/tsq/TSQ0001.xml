@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="TSQ0001" screenType="list" screenLayoutType="Default" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>Tools / SQL관리</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/tools/tsq/</filePath>
+  <fileName>TSQ0001</fileName>
+  <functions>
+    <function id="FNTSQ0001" isStartFunction="false" functionName="쿼리 실행 함수" serviceId="SVCTSQ0001" alias="EXECUTE"/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

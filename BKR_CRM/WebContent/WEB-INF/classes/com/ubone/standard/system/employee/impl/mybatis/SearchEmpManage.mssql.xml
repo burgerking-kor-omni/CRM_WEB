@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="SearchEmpManageInquiry">
+
+		<!-- 부서 트리 조회 -->
+	<select id="getEmpList" parameterType="map" resultType="lmap">
+			SELECT A.DEPT_ID        AS ID          /* 메뉴ID        */
+             , A.DEPT_NM      AS TITLE        /* 메뉴명        */
+             , A.DEPT_ID        AS DATA_KEY
+             , A.DEPT_NM    AS TOOL_TIP      /* 설명            */
+             , ISNULL(A.DEPT_ID_UP, 'ROOT') AS PARENT_ID   /* 상위메뉴        */
+             , A.ORDER_DS     AS SORT_ORDER       /* 순서            */
+             , A.LEVEL_DS          AS DEPTH            /* 레벨            */
+             , CASE WHEN B.DEPT_ID_UP = NULL THEN 'N'
+             		ELSE 'Y'
+             	END AS FOLDER_YN 
+        FROM SYS_DEPARTMENT A WITH( NOLOCK )
+        LEFT OUTER JOIN (SELECT DEPT_ID_UP
+        				   FROM SYS_DEPARTMENT WITH( NOLOCK )
+        				  GROUP BY DEPT_ID_UP
+        				) B
+          ON A.DEPT_ID = B.DEPT_ID_UP
+         WHERE 1=1
+		   AND A.LEVEL_DS = '1'
+		   AND A.STATUS = 'A'
+		ORDER BY SORT_ORDER ASC
+	</select>
+	
+	<!-- 메뉴 관리 트리 조회 (lazy)-->
+	<select id="getEmpListForLazy" parameterType="map" resultType="lmap">
+		SELECT A.DEPT_ID        AS ID          /* 메뉴ID        */
+             , A.DEPT_NM      AS TITLE        /* 메뉴명        */
+             , A.DEPT_ID        AS DATA_KEY
+             , A.DEPT_NM    AS TOOL_TIP      /* 설명            */
+             , ISNULL(A.DEPT_ID_UP, 'ROOT') AS PARENT_ID   /* 상위메뉴        */
+             , A.ORDER_DS     AS SORT_ORDER       /* 순서            */
+             , A.LEVEL_DS          AS DEPTH            /* 레벨            */
+          ,(SELECT CASE WHEN COUNT(DEPT_ID) > 0 THEN 'Y' ELSE 'N'  END  
+                 FROM SYS_DEPARTMENT WITH( NOLOCK )
+                WHERE  DEPT_ID_UP = A.DEPT_ID AND STATUS = 'A')  AS FOLDER_YN
+        FROM SYS_DEPARTMENT A WITH( NOLOCK )
+         WHERE 1=1
+		   AND A.DEPT_ID_UP = #{LAZY_KEY}
+		   AND A.STATUS = 'A'
+		ORDER BY SORT_ORDER ASC
+	
+	</select>
+	
+	<!-- 부서node선택시 직원 리스트 호출 -->
+	<sql id="getUserList_base">
+<!-- 페이징 공통 관련 쿼리 -->		  
+	   SELECT 
+	    <if test="ORDER_COLUMN == null or ORDER_COLUMN == ''">
+			  ROW_NUMBER() OVER( order by DUTY_CD ASC ) AS ROWNUM /* ROWNUM */
+		</if>
+		<if test="ORDER_COLUMN != null and ORDER_COLUMN != ''">
+			  ROW_NUMBER() OVER( order by ${ORDER_COLUMN} ${ORDER_ASC} ) AS ROWNUM /* ROWNUM */
+		</if>
+		    , SUB.*
+		 FROM (
+<!-- 업무 관련 쿼리 :: Begin -->
+			SELECT USER_ID    																			/* 사용자번호*/
+				, EMP_TP   																						 /* 직원구분*/
+				, USER_NM    																				/* 사용자명*/
+				, USER_NM_ENG    																		/* 사용자영문명*/
+				, DEPT_ID DEPT_ID_REAL    																		/* 실부서코드*/
+				, COMPANY_CD    																		/* 회사 코드*/
+				, DUTY_CD    																					/* 직무코드*/
+				,(SELECT CODE_NAME
+		            FROM SYS_CODE WITH( NOLOCK )
+		           WHERE CODE_CATEGORY_ID = 'CD_DUTY'
+		             AND CODE = DUTY_CD) AS DUTY_NM
+				, POSITION_CD    																			/* 직위코드*/
+				<!-- ,(SELECT CODE_NAME FROM SYS_CODE C WITH( NOLOCK ) WHERE C.CODE_CATEGORY_ID='DUTY_CD'
+			                	AND C.CODE=(SELECT DUTY_CD FROM SYS_USER WITH( NOLOCK ) WHERE USER_ID=SU.USER_ID)) DUTY_NM -->
+				,(SELECT CODE_NAME
+		            FROM SYS_CODE WITH( NOLOCK )
+		           WHERE CODE_CATEGORY_ID = 'POSITION_CD'
+		             AND CODE = POSITION_CD) AS POSITION_NM
+				,(SELECT DEPT_NM 
+				  FROM SYS_DEPARTMENT 
+				  WHERE DEPT_ID = SU.DEPT_ID) 	AS DEPT_NM             /*부서명*/
+			    FROM SYS_USER SU
+				WHERE 1=1
+		<!-- 		  AND USER_ID NOT IN (#{user.id}) -->
+				 <if test="NM_USER  != null and NM_USER  !=''">
+					AND USER_NM  LIKE '%' + #{NM_USER} + '%' 					 /* 직원이름 */
+				</if>
+				<if test="DEPT_ID_REAL != null and DEPT_ID_REAL !=''">
+					AND DEPT_ID_REAL=#{DEPT_ID_REAL}    							/* 실부서코드*/
+				</if>
+<!-- 업무 관련 쿼리 :: End -->		  
+			) SUB
+	</sql>
+	
+	<!-- 부서node선택시 직원 리스트 호출 -->
+	<select id="getUserList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getUserList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+		
+		<!-- 부서node선택시 직원 리스트 호출 - count -->
+	<select id="getUserList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getUserList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- 부서node선택시 직원 리스트 호출 - paging -->
+	<select id="getUserList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getUserList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+</mapper>

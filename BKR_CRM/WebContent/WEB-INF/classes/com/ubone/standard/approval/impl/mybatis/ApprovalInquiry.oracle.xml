@@ -1,0 +1,645 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ApprovalInquiry">
+
+	<!-- 나의상신 목록 조회 -->
+	<sql id="getMyApprovalList_base">	
+		SELECT ROW_NUMBER() OVER(ORDER BY ID_APPR ASC) LISTNUM
+			, ID_APPR								/* 결재ID */
+			, TP_BIZ										/* 업무구분 */
+			, (SELECT CODE_NAME
+                  FROM SYS_CODE
+                 WHERE CODE_CATEGORY_ID='TP_BIZ' AND CODE=TP_BIZ ) AS TP_BIZ_NAME
+			, ID_BIZ_KEY								/* 업무별ID */
+			, ID_BIZ_KEY_ETC						/* 기타업무별ID */
+			, TP_APPR									/* 결재종류 */
+			, (SELECT CODE_NAME
+                  FROM SYS_CODE
+                  WHERE CODE_CATEGORY_ID='TP_APPR' AND CODE=TP_APPR ) AS TP_APPR_NAME
+			, DS_TITLE_APPR							/* 결재제목 */
+			, DS_APPR									/* 결재내용 */
+			, DS_APPR_TEMP							/* 임시결재내용 */
+			, TO_CHAR(DT_SUBMIT,'YYYY-MM-DD HH24:MI') AS DT_SUBMIT			/* 상신일시 */
+			, ID_EMP_SUBMIT							/* 상신자 */
+			, NM_EMP_SUBMIT						/* 상신자명 */
+			, TP_STATUS_APPR						/* 결재상태 */
+			, (SELECT CODE_NAME
+                  FROM SYS_CODE
+                 WHERE CODE_CATEGORY_ID='TP_STATUS_APPR' AND CODE=TP_STATUS_APPR ) AS TP_STATUS_APPR_NAME
+			, TO_CHAR(DT_APPR,'YYYY-MM-DD HH24:MI') AS DT_APPR					/* 결재일시 */
+			, DT_END_APPR							/* 결재시한 */
+			, FG_DEL										/* 삭제여부 */
+			
+			FROM TBS_APPROVAL
+			WHERE 1=1 AND  ID_EMP_SUBMIT=#{user.id}
+				<if test="DT_SUBMIT_START != null and DT_SUBMIT_START !=''">
+					<![CDATA[ 
+						AND DT_SUBMIT >= TO_DATE (#{DT_SUBMIT_START} || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS')		/* 기간검색(from)		*/
+					]]>
+				</if>
+				<if test="DT_SUBMIT_END != null and DT_SUBMIT_END !=''">
+					<![CDATA[ 
+						AND DT_SUBMIT <= TO_DATE (#{DT_SUBMIT_END} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS')		/* 기간검색(to)		*/
+					]]>
+				</if>
+				<if test="TP_STATUS_APPR != null and TP_STATUS_APPR !=''">
+					AND TP_STATUS_APPR = #{TP_STATUS_APPR} 									/* 결재상태검색 */
+				</if>
+			ORDER BY LISTNUM DESC
+			
+	</sql>
+
+	<!-- 나의상신 목록 조회 -->
+	<select id="getMyApprovalList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getMyApprovalList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- 나의상신 목록 조회 - count -->
+	<select id="getMyApprovalList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getMyApprovalList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- 나의상신 목록 조회 - paging -->
+	<select id="getMyApprovalList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getMyApprovalList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+
+	<!-- 나의상신상세 결재내용 조회 (마스터테이블) -->
+	<select id="getMyApprovalDetail_content" parameterType="map" resultType="lmap">
+		SELECT ID_APPR
+			, TP_BIZ
+			, ID_BIZ_KEY
+			, ID_BIZ_KEY_ETC
+			, TP_APPR
+			, DS_TITLE_APPR
+			, DS_APPR
+			, DS_APPR_TEMP
+			, TO_CHAR(DT_SUBMIT, 'YYYY-MM-DD') AS DT_SUBMIT
+			, ID_EMP_SUBMIT
+			, NM_EMP_SUBMIT
+			, TP_STATUS_APPR AS TP_STATUS
+			,  (SELECT CODE_NAME
+                  FROM SYS_CODE
+                 WHERE CODE_CATEGORY_ID='TP_STATUS_APPR' AND CODE=TP_STATUS_APPR ) AS TP_STATUS_APPR
+			, TO_CHAR(DT_APPR, 'YYYY-MM-DD') AS DT_APPR
+			, DT_END_APPR
+			, FG_DEL
+			
+			FROM TBS_APPROVAL, SYS_CODE
+			WHERE 1=1 AND ID_APPR=#{ID_APPR}
+	</select>
+	
+	<!-- 나의상신상세 결재경로 조회 (상세테이블) -->
+	<select id="getMyApprovalDetail_line" parameterType="map" resultType="lmap">
+		SELECT SEQ_APPR 
+            , (SELECT CODE_NAME
+                     FROM SYS_CODE
+                     WHERE CODE=CD_DUTY AND CODE_CATEGORY_ID='CD_DUTY') AS CD_DUTY
+            , (SELECT USER_NM 
+                    FROM SYS_USER 
+                    WHERE USER_ID=ID_EMP_APPR) AS ID_EMP_APPR
+            , (SELECT CODE_NAME
+                  FROM SYS_CODE
+                  WHERE CODE_CATEGORY_ID='TP_APPR_PROC' AND CODE=TP_APPR_PROC ) AS TP_APPR_PROC
+            , DS_COMMENT
+            , (SELECT DEPT_NM 
+                    FROM SYS_DEPARTMENT
+                    WHERE DEPT_ID=ID_DEPT) AS ID_DEPT
+                    
+            , (SELECT DEPT_NM 
+                    FROM SYS_DEPARTMENT
+                    WHERE DEPT_ID IN (SELECT DEPT_ID_UP FROM SYS_DEPARTMENT WHERE DEPT_ID=ID_DEPT)) AS ID_DEPT_UP
+            , TO_CHAR(DT_ACT,'YYYY-MM-DD HH24:MI') AS DT_ACT
+            
+            FROM TBS_APPROVAL_DTL
+            WHERE 1=1 AND ID_APPR=#{ID_APPR}
+            ORDER BY SEQ_APPR ASC
+	</select>
+	
+	<!-- 결재상신등록창 로딩시 기본데이터 호출 -->
+	<select id="getApprovalSubmitData" parameterType="map" resultType="lmap">
+		SELECT
+			   USER_ID
+			 , USER_NM
+			 , DEPT_ID
+             , (SELECT DEPT_NM
+             		FROM SYS_DEPARTMENT
+             		WHERE DEPT_ID=#{user.partCode}) AS DEPT_NM
+             , POSITION_CD
+             , (SELECT CODE_NAME
+             		FROM SYS_CODE
+             		WHERE CODE=#{user.positionCode} AND CODE_CATEGORY_ID='POSITION_CD') AS CODE_NAME
+              , DUTY_CD
+              , (SELECT CODE_NAME
+             		FROM SYS_CODE
+             		WHERE CODE=#{user.dutyCode} AND CODE_CATEGORY_ID='CD_DUTY') AS DUTY_NM
+             FROM SYS_USER
+             WHERE USER_ID=#{user.id}
+	</select>
+	
+	<!-- 결재상신등록 기안(마스터테이블) -->
+	<insert id="insertApproval" parameterType="map">
+		
+		INSERT INTO TBS_APPROVAL(
+			ID_APPR
+			, TP_BIZ
+			, ID_BIZ_KEY
+			, ID_BIZ_KEY_ETC
+			, TP_APPR
+			, DS_TITLE_APPR
+			, DS_APPR
+			, DT_SUBMIT
+			, ID_EMP_SUBMIT
+			, NM_EMP_SUBMIT
+			, TP_STATUS_APPR
+			
+			, DT_END_APPR			/* 결제시한 */
+			, FG_DEL
+			, ID_EMP_REG
+			, ID_DEPT_REG
+			, DT_REG
+			, ID_EMP_UPT
+			, ID_DEPT_UPT
+			, DT_UPT
+		) VALUES(
+			#{ID_APPR}
+			, #{TP_BIZ}
+			, #{ID_BIZ_KEY}
+			, #{ID_BIZ_KEY_ETC}
+			, #{TP_APPR}
+			, #{DS_TITLE_APPR}
+			, #{DS_APPR}
+			, SYSDATE
+			, #{user.id}
+			, #{user.name}
+			, #{TP_STATUS_APPR}
+			
+			, #{DT_END_APPR}		/* 결제시한 */
+			, #{FG_DEL}
+			, #{user.id}
+			, #{user.partCode}		
+			, SYSDATE
+			, #{user.id}
+			, #{user.partCode}		
+			, SYSDATE
+		)
+	</insert>
+	
+	<!-- 결재상신등록 결재라인(상세테이블) -->
+	<insert id="insertApprovalLine" parameterType="map">
+		<selectKey keyProperty="ID_APPR_DTL_KEY" resultType="String" order="BEFORE">
+			SELECT SEQ_TBS_APPROVAL_DTL.NEXTVAL AS ID_APPR_DTL FROM DUAL
+		</selectKey>
+		INSERT INTO TBS_APPROVAL_DTL(
+ 			  ID_APPR_DTL
+			, ID_APPR
+			, TP_APPR_LINE
+			, SEQ_APPR
+			, ID_EMP_APPR
+			, CD_LEVEL
+			, CD_POSITION
+			, CD_DUTY
+			, ID_DEPT
+			, TP_APPR_PROC
+			, FG_USE
+			, FG_DEL
+			, ID_EMP_REG
+			, ID_DEPT_REG
+			, DT_REG
+			, ID_EMP_UPT
+			, ID_DEPT_UPT
+			, DT_UPT
+		) VALUES (
+			  #{ID_APPR_DTL_KEY}
+			, #{ID_APPR}
+			, #{TP_APPR_LINE}
+			, #{SEQ_APPR}
+			, #{ID_EMP_APPR}
+			, #{CD_LEVEL}
+			, #{CD_POSITION}
+			, #{CD_DUTY}
+			, #{ID_DEPT}
+			, #{TP_APPR_PROC}
+			, 'N'
+			, #{FG_DEL}
+			, #{user.id}
+			, #{user.partCode}		
+			, SYSDATE
+			, #{user.id}
+			, #{user.partCode}		
+			, SYSDATE
+		)
+	</insert>
+	
+	<!-- 결재라인 기안설정 -->
+	<update id="setApprovalLine" parameterType="map">
+		UPDATE TBS_APPROVAL_DTL SET 
+			DT_ARRIVAL=SYSDATE
+			, DT_ACT=SYSDATE
+			, TP_APPR_PROC='01'
+			, DS_COMMENT=#{DS_COMMENT}
+			WHERE ID_APPR=#{ID_APPR} AND SEQ_APPR=1
+	</update>
+	
+	<!-- 결재라인 첫 결재자 설정 -->
+	<update id="setApprovalFirstLine" parameterType="map">
+		UPDATE TBS_APPROVAL_DTL SET
+			DT_ARRIVAL=SYSDATE
+			, FG_USE='Y'
+			WHERE ID_APPR=#{ID_APPR} AND SEQ_APPR=2
+	</update>
+	
+	<!-- 기안취소 (마스터테이블) -->
+	<update id="cancleApproval_master" parameterType="map">
+		UPDATE TBS_APPROVAL SET
+			 FG_DEL='Y'
+			 ,TP_STATUS_APPR='04' 
+			 ,ID_EMP_UPT=#{user.id}
+			 ,ID_DEPT_UPT=#{user.partCode}
+			 ,DT_UPT=SYSDATE
+			 
+			 WHERE ID_APPR=#{ID_APPR}
+	</update>
+	
+	<!-- 기안취소 (상세테이블) -->
+	<update id="cancleApproval_detail" parameterType="map">
+		UPDATE TBS_APPROVAL_DTL SET 
+			FG_DEL='Y' 
+			,ID_EMP_UPT=#{user.id}
+			,ID_DEPT_UPT=#{user.partCode}
+			,DT_UPT=SYSDATE
+			
+			WHERE ID_APPR=#{ID_APPR}
+	</update>
+	
+	<!-- 나의 결재 목록 조회 ApprovalInquiry.getMyApproveListData -->
+	<sql id="getMyApproveListData_base">
+	   SELECT TA.ID_APPR AS ID_APPR 
+            , TA.TP_BIZ AS TP_BIZ
+            , TA.DS_TITLE_APPR AS DS_TITLE_APPR
+            , (SELECT CODE_NAME FROM SYS_CODE WHERE TP_APPR_PROC=CODE AND CODE_CATEGORY_ID = 'TP_APPR_PROC') AS TP_APPR_PROC
+            , TA.ID_EMP_SUBMIT AS ID_EMP_SUBMIT
+            , TA.NM_EMP_SUBMIT AS NM_EMP_SUBMIT
+            , TO_CHAR(TAD.DT_ACT, 'YYYY-MM-DD HH24:MI') AS DT_ACT
+            , TO_CHAR(TA.DT_SUBMIT, 'YYYY-MM-DD HH24:MI') AS DT_SUBMIT
+            , SU.USER_NM AS APPR_NM
+            , ID_APPR_DTL
+            , SEQ_APPR AS SEQ_APPR
+            , FG_USE 
+            , ROW_NUMBER() OVER(ORDER BY DT_ARRIVAL ASC) ROW_NUM                      
+        FROM TBS_APPROVAL TA
+        JOIN TBS_APPROVAL_DTL TAD 
+          ON TA.ID_APPR = TAD.ID_APPR  
+        JOIN SYS_USER SU
+          ON SU.USER_ID = TAD.ID_EMP_APPR
+       WHERE ID_EMP_APPR=#{user.id}
+         AND FG_USE='Y'
+         AND TP_STATUS_APPR!='04'
+
+                    
+ 		<!-- 결재일시 -->
+ 		<if test="DT_ACT_START != null and DT_ACT_START != ''">
+ 			<![CDATA[
+				AND DT_ACT >= TO_DATE (#{DT_ACT_START} || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS')
+			]]> 		
+ 		</if>
+ 		
+ 		<if test="DT_ACT_END != null and DT_ACT_END != ''">
+ 			<![CDATA[
+				AND DT_ACT <= TO_DATE (#{DT_ACT_END} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+			]]> 		
+ 		</if>
+ 		 		
+        <!-- 상신일시 -->
+ 		<if test="DT_SUBMIT_START != null and DT_SUBMIT_START != ''">
+ 			<![CDATA[
+				AND DT_SUBMIT >= TO_DATE (#{DT_SUBMIT_START} || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS')
+			]]> 		
+ 		</if>
+ 		
+ 		<if test="DT_SUBMIT_END != null and DT_SUBMIT_END != ''">
+ 			<![CDATA[
+				AND DT_SUBMIT <= TO_DATE (#{DT_SUBMIT_END} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+			]]> 		
+ 		</if>
+ 		 		 	
+ 		<!-- 결재처리구분 -->	
+		<if test="TP_APPR_PROC !='' and TP_APPR_PROC != null ">  
+		    AND TP_APPR_PROC = #{TP_APPR_PROC}
+		</if>
+
+		<!-- 제목 -->
+ 		<if test="DS_TITLE_APPR != null and DS_TITLE_APPR != ''">
+			AND DS_TITLE_APPR LIKE '%' || #{DS_TITLE_APPR} || '%'
+		</if>		
+				
+ 		ORDER BY ROW_NUM DESC
+	</sql>
+
+
+	<!-- 목록 조회 -->
+	<select id="getMyApproveListData" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getMyApproveListData_base" />
+		<include refid="common.order-bottom" />
+	</select>
+	
+	<!-- 목록 조회 - count -->
+	<select id="getMyApproveListData_count" parameterType="map" resultType="Integer">
+	    <include refid="common.count-top" />
+		<include refid="getMyApproveListData_base"/>
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- 목록 조회 - paging	 -->
+	<select id="getMyApproveListData_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getMyApproveListData_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	
+	
+	<!-- 나의 결재 상세 ApprovalInquiry.getMyApproveDetail -->
+	<select id="getMyApproveDetail" parameterType="map" resultType="lmap">
+	  SELECT 
+              TA.ID_APPR as ID_APPR 
+            , TA.TP_BIZ as TP_BIZ
+            , TA.ID_BIZ_KEY AS ID_VOC
+            , TA.ID_BIZ_KEY_ETC AS ID_SUB_VOC
+            , TA.DS_TITLE_APPR as DS_TITLE_APPR
+            , TAD.TP_APPR_PROC as TP_APPR_PROC
+            , TA.ID_EMP_SUBMIT as ID_EMP_SUBMIT
+            , TA.NM_EMP_SUBMIT as NM_EMP_SUBMIT
+            , TAD.DT_ARRIVAL as DT_ARRIVAL
+            , TA.DT_SUBMIT as DT_SUBMIT
+            , SU.USER_NM as APPR_NM                    
+            , TA.DS_APPR
+            , TAD.DS_COMMENT
+            , TAD.ID_APPR_DTL
+            , TAD.SEQ_APPR
+            , (SELECT CODE_NAME FROM SYS_CODE WHERE TP_APPR_PROC=CODE AND code_category_id = 'TP_APPR_PROC') as TP_APPR_PROC_NAME
+        FROM TBS_APPROVAL TA        
+        JOIN SYS_CODE SC 
+          ON TA.TP_APPR = SC.CODE
+        JOIN TBS_APPROVAL_DTL TAD 
+          ON TA.ID_APPR = TAD.ID_APPR  
+        JOIN SYS_USER SU
+          ON SU.USER_ID = TAD.id_emp_appr
+        WHERE SC.CODE_CATEGORY_ID='TP_APPR_PROC' AND TAD.ID_APPR_DTL=#{ID_APPR_DTL} 
+
+	</select>
+	
+	
+	<!-- 반려처리 : 반려의견 업뎃 및 문서종결-->
+	<update id="updateBanraeComm" parameterType="map">
+			UPDATE TBS_APPROVAL_DTL
+			   SET
+	      	  	     DS_COMMENT = #{DS_COMMENT}
+	      	  	   , TP_APPR_PROC = '04'
+	      	  	   	      	  	
+	      	  	   , DT_ACT = SYSDATE         <!--처리일시-->      	  	   
+	      	  	   , ID_EMP_UPT = #{user.id}  <!--최근수정직원-->
+				   , ID_DEPT_UPT = #{user.partCode} <!--최근수정부서-->
+				   , DT_UPT = SYSDATE	            <!--최근수정일시--> 				   
+			 WHERE
+			       ID_APPR_DTL=#{ID_APPR_DTL}
+
+	</update>
+
+	<update id="updateBanrae2" parameterType="map">
+		UPDATE TBS_APPROVAL
+			SET
+				TP_STATUS_APPR='03'
+				, DT_APPR=SYSDATE
+			WHERE ID_APPR=#{ID_APPR}
+	</update>
+
+	
+	<!--결재자 수 카운트 -->
+	<select id="countAppr" parameterType="map" resultType="lmap">
+		SELECT NVL(count(ID_APPR),0) AS CNT_APPR
+		  FROM TBS_APPROVAL_DTL
+		 WHERE ID_APPR=#{ID_APPR} AND TP_APPR_LINE != '03'
+	
+	</select>
+	
+	<!--다음결재자 정보를 가져옴 -->
+	<select id="getNextAppEmpId" parameterType="map" resultType="lmap">
+		SELECT ID_EMP_APPR 
+	  	  FROM TBS_APPROVAL_DTL 
+		 WHERE SEQ_APPR=#{SEQ_APPR}+1 
+		   AND ID_APPR=#{ID_APPR}
+	</select>
+	
+<!-- 	합의자 수 카운트 --> 
+<!-- 	<select id="countAppr2" parameterType="map" resultType="Integer"> -->
+<!-- 		SELECT NVL(count(ID_APPR),0)  -->
+<!-- 		  FROM TBS_APPROVAL_DTL -->
+<!-- 		 WHERE ID_APPR=#{ID_APPR} AND TP_APPR_LINE = '03' -->
+	
+<!-- 	</select> -->
+	
+	
+	<!-- 결재의견 업뎃 -->
+	<update id="updateInfoApprovalItMust" parameterType="map">
+			UPDATE TBS_APPROVAL_DTL
+			   SET
+	      	  	     DS_COMMENT = #{DS_COMMENT}
+	      	  	   , TP_APPR_PROC = '03'	  
+	      	  	   , DT_ACT = SYSDATE         <!--처리일시-->	
+	      	  	   	      	  	         	  	   
+	      	  	   , ID_EMP_UPT = #{user.id}  <!--최근수정직원-->
+				   , ID_DEPT_UPT = #{user.partCode} <!--최근수정부서-->
+				   , DT_UPT = SYSDATE	            <!--최근수정일시-->     	  	     	   
+			 WHERE
+			       ID_APPR_DTL = TO_NUMBER(#{ID_APPR_DTL})
+
+	</update>
+	
+	
+	<!-- TBS_APPROVAL TP_STATUS_APPR 업뎃 -->
+	<update id="updateInfoWhenLastApproval" parameterType="map">
+			UPDATE TBS_APPROVAL
+			   SET
+	      	  	     TP_STATUS_APPR = '02'
+	      	  	   , ID_EMP_UPT = #{user.id}        <!--최근수정직원-->
+				   , ID_DEPT_UPT = #{user.partCode} <!--최근수정부서-->
+				   , DT_UPT = SYSDATE	 <!--최근수정일시--> 
+				   , DT_APPR=SYSDATE     <!--결재일시-->				   	  	     	   
+			 WHERE
+			       ID_APPR=#{ID_APPR}
+
+	</update>
+	
+	
+	<!--  TBS_APPROVAL_DTL FG_USE 업뎃 -->
+	<update id="updateInfoNextApproval" parameterType="map">
+			UPDATE TBS_APPROVAL_DTL
+			   SET
+					 FG_USE = 'Y'
+				   , DT_ARRIVAL = SYSDATE    <!--도착일시-->				   
+	      	  	   , ID_EMP_UPT = #{user.id} <!--최근수정직원-->
+				   , ID_DEPT_UPT = #{user.partCode} <!--최근수정부서-->
+				   , DT_UPT = SYSDATE	            <!--최근수정일시--> 
+	      	  	     	   
+			 WHERE
+			       SEQ_APPR=#{SEQ_APPR}+1 AND ID_APPR=#{ID_APPR}
+
+	</update>
+	
+	
+	<!-- 중간 결재자의 합의처리-->
+	<update id="updateInfoNextApprovalWhenAgree" parameterType="map">
+			UPDATE TBS_APPROVAL_DTL
+			   SET
+					 FG_USE = 'Y'
+				   , DT_ARRIVAL = SYSDATE    <!--도착일시-->				   
+	      	  	   , ID_EMP_UPT = #{user.id} <!--최근수정직원-->
+				   , ID_DEPT_UPT = #{user.partCode} <!--최근수정부서-->
+				   , DT_UPT = SYSDATE	            <!--최근수정일시--> 
+	      	  	   , DT_ACT = SYSDATE               <!--처리일시-->		   
+			 WHERE
+			       SEQ_APPR=#{SEQ_APPR}+1      
+			       
+	</update>
+	
+	<update id="updateInfoAgreeItMust" parameterType="map">
+			UPDATE TBS_APPROVAL_DTL
+			   SET
+	      	  	     DS_COMMENT = #{DS_COMMENT}
+	      	  	   , TP_APPR_PROC = '05'	  
+	      	  	   , DT_ACT = SYSDATE         <!--처리일시-->	
+	      	  	   	      	  	         	  	   
+	      	  	   , ID_EMP_UPT = #{user.id}  <!--최근수정직원-->
+				   , ID_DEPT_UPT = #{user.partCode} <!--최근수정부서-->
+				   , DT_UPT = SYSDATE	            <!--최근수정일시-->     	  	     	   
+			 WHERE
+			       ID_APPR_DTL=#{ID_APPR_DTL}
+	</update>			       		       
+			       			       
+	<!-- 마지막 결재자의 합의처리 -->
+	<update id="updateInfoWhenLastAgree" parameterType="map">
+			UPDATE TBS_APPROVAL
+			   SET
+	      	  	     TP_STATUS_APPR = '02'
+	      	  	   , ID_EMP_UPT = #{user.id}        <!--최근수정직원-->
+				   , ID_DEPT_UPT = #{user.partCode} <!--최근수정부서-->
+				   , DT_UPT = SYSDATE	 <!--최근수정일시--> 
+				   , DT_APPR=SYSDATE     <!--결재일시-->				   	  	     	   
+			 WHERE
+			       ID_APPR=#{ID_APPR}
+
+	</update>
+	
+	<!-- 결재경로 ApprovalInquiry.getMyApproveLineListData -->
+	<select id="getMyApproveLineListData" parameterType="map" resultType="lmap">
+
+         SELECT 
+              TA.ID_APPR as ID_APPR
+            , TAD.ID_APPR_DTL as ID_APPR_DTL
+            , TAD.SEQ_APPR as SEQ_APPR           
+            , (SELECT CODE_NAME FROM SYS_CODE WHERE CODE_CATEGORY_ID='CD_DUTY' AND CODE=CD_DUTY) as CD_DUTY
+            , SU.USER_NM as ID_EMP_APPR            
+            , (SELECT CODE_NAME FROM SYS_CODE WHERE TP_APPR_PROC=CODE AND CODE_CATEGORY_ID = 'TP_APPR_PROC') as TP_APPR_PROC
+            , TAD.DS_COMMENT as DS_COMMENT            
+            , (SELECT DEPT_NM FROM SYS_DEPARTMENT WHERE DEPT_ID=ID_DEPT) as ID_DEPT    
+            , (SELECT DEPT_NM 
+                    FROM SYS_DEPARTMENT
+                    WHERE DEPT_ID IN (SELECT DEPT_ID_UP FROM SYS_DEPARTMENT WHERE DEPT_ID=ID_DEPT)) AS ID_DEPT_UP        
+            , TO_CHAR(TAD.DT_ACT, 'YYYY-MM-DD HH24:MI') as DT_ACT                                     
+        FROM TBS_APPROVAL TA
+        JOIN TBS_APPROVAL_DTL TAD 
+          ON TA.ID_APPR = TAD.ID_APPR  
+        JOIN SYS_USER SU
+          ON SU.USER_ID = TAD.id_emp_appr
+       WHERE TA.ID_APPR=#{ID_APPR}
+       ORDER BY TAD.SEQ_APPR
+	</select>
+	
+	<!-- 결재선관리 목록 -->
+	<select id ="getApprovalLineList" parameterType="map" resultType="lmap">
+		SELECT ID_APPR_LINE    	/* 결재선ID*/
+		 	 , TP_APPR    		/* 결재종류*/
+			 , TP_BIZ    		/* 업무구분*/
+			 , ID_BIZ_KEY    	/* 업무별ID*/
+			 , NM_APPR_LINE    	/* 결재선명*/
+			 , FG_USE    		/* 사용여부*/
+			 , DS_REMARK    	/* 비고*/
+			 , FG_DEL    		/* 삭제여부*/
+			 , ID_EMP_REG    	/* 최초등록직원*/
+		 	 , ID_DEPT_REG    	/* 최초등록부서*/
+	 		 , TO_CHAR(DT_REG, 'YYYY-MM-DD') AS DT_REG		/* 최초등록일시*/
+			 , ID_EMP_UPT    	/* 최근수정직원*/
+			 , ID_DEPT_UPT    	/* 최근수정부서*/
+			 , DT_UPT    		/* 최근수정일시*/
+	      FROM TBS_APPROVAL_LINE
+	  	 WHERE ID_EMP_REG=#{user.id}    /* 최초등록직원*/
+	  	   AND FG_DEL='N'
+	  	   <if test="NM_APPR_LINE != null and NM_APPR_LINE !=''"> 										/*	진행상태			*/
+		   AND NM_APPR_LINE LIKE '%' || #{NM_APPR_LINE} || '%' 
+		 </if>
+	       <if test="DT_REG_START != null and DT_REG_START != ''">
+		   <![CDATA[ 														 			 					
+		   AND DT_REG >= TO_DATE (#{DT_REG_START} || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS')  		/*	기간검색(FROM)		*/
+		   ]]>
+		 </if>
+		   <if test="DT_REG_END != null and DT_REG_END != ''">
+		   <![CDATA[ 
+		   AND DT_REG <= TO_DATE (#{DT_REG_END} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS')  			/*	기간검색(TO)		*/
+		   ]]>
+		 </if>
+		   ORDER BY DT_REG DESC
+	</select>
+	
+	<!-- 결재선관리 상세 -->
+	<select id ="getApprovalLineDetail" parameterType="map" resultType="lmap">
+		SELECT TAL.ID_APPR_LINE        /* 결재선ID*/
+              , TAL.TP_APPR            /* 결재종류*/
+              , TAL.TP_BIZ            /* 업무구분*/
+              , TAL.ID_BIZ_KEY        /* 업무별ID*/
+              , TAL.NM_APPR_LINE        /* 결재선명*/
+              , TAL.FG_USE            /* 사용여부*/
+              , TAL.DS_REMARK        /* 비고*/
+              , TAL.FG_DEL            /* 삭제여부*/
+              , TAL.ID_EMP_REG        /* 최초등록직원*/
+              , TAL.ID_DEPT_REG        /* 최초등록부서*/
+              , TO_CHAR(TAL.DT_REG, 'YYYY-MM-DD') AS DT_REG        /* 최초등록일시*/
+              , TAL.ID_EMP_UPT        /* 최근수정직원*/
+              , TAL.ID_DEPT_UPT        /* 최근수정부서*/
+              , TAL.DT_UPT            /* 최근수정일시*/
+              , TALD.ID_APPR_LINE_DTL
+              , TALD.TP_APPR_LINE
+              , <![CDATA[ (SELECT CODE_NAME FROM SYS_CODE WHERE CODE_CATEGORY_ID = 'TP_APPR_LINE' AND CODE = '02') ]]> TP_APPR_LINE_NM
+              , TALD.SEQ_APPR
+              , TALD.ID_EMP
+              , (SELECT USER_NM
+              	   FROM SYS_USER
+              	  WHERE USER_ID=TALD.ID_EMP) AS NM_EMP	
+              , TALD.CD_LEVEL
+              , TALD.CD_DUTY	DUTY_CD
+              , TALD.ID_DEPT
+              , (SELECT DEPT_NM
+              	   FROM SYS_DEPARTMENT
+              	  WHERE DEPT_ID = TALD.ID_DEPT) AS NM_DEPT
+              , (SELECT CODE_NAME
+            	   FROM SYS_CODE
+           	   	  WHERE CODE_CATEGORY_ID = 'CD_DUTY'
+             		AND CODE = TALD.CD_DUTY) AS DUTY_NM
+		   FROM TBS_APPROVAL_LINE TAL
+		   LEFT OUTER JOIN TBS_APPROVAL_LINE_DTL TALD
+		     ON TAL.ID_APPR_LINE=TALD.ID_APPR_LINE
+		  WHERE TAL.ID_APPR_LINE= #{ID_APPR_LINE}
+		  ORDER BY TALD.SEQ_APPR ASC
+	</select>
+
+	
+
+</mapper>

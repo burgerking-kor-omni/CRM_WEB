@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="BoardCommonDAO">
+	
+    <select id="getBoardUserInfo" parameterType="map" resultType="lmap">
+        SELECT SU.USER_ID		AS USER_ID
+		     , SU.EMP_NO		AS NO_EMP
+		     , SU.USER_NM		AS NM_USER
+		     , SU.DEPT_ID		AS ID_DEPT
+		     , SD.DEPT_NM		AS NM_DEPT
+		     , SU.TITLE_CD		AS CD_TITLE
+		     , SC.CODE_NAME		AS NM_TITLE
+		     , SU.EMAIL_DS		AS DS_EMAIL
+		     , SU.PHONE_NO		AS NO_PHONE
+		     , SU.MOBILE_NO		AS NO_MOBILE
+		     , SU.COMPANY_CD	AS CD_COMPANY
+		     , TC.NM_COMPANY	AS NM_COMPANY
+		  FROM SYS_USER SU
+		  LEFT OUTER JOIN SYS_DEPARTMENT SD
+		    ON SU.DEPT_ID = SD.DEPT_ID
+		  LEFT OUTER JOIN SYS_CODE SC
+		    ON SU.TITLE_CD = SC.CODE AND CODE_CATEGORY_ID = 'CD_TITLE'
+		  LEFT OUTER JOIN TBS_COMPANY TC
+		    ON SU.COMPANY_CD = TC.CD_COMPANY
+		 WHERE SU.USER_ID = #{USER_ID}
+    </select>
+	
+</mapper>

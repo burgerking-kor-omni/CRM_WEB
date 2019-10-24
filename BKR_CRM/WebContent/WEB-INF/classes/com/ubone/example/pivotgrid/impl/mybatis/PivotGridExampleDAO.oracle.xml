@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="PivotGridExample">
+
+    <sql id="getGridData_base">
+        SELECT ID_EXAMPLE  AS ID_EXAMPLE
+             , NM_CATEGORY AS CATEGORYNAME
+             , NM_PRODUCT  AS PRODUCTNAME
+             , NM_COUNTRY  AS COUNTRY
+             , PRICE       AS PRICE
+             , QUANTITY    AS QUANTITY
+          FROM TBS_EXAMPLE
+         WHERE 1=1
+        <if test="NM_CATEGORY != null and NM_CATEGORY != ''">
+            AND NM_CATEGORY LIKE '%' || #{NM_CATEGORY} || '%'
+        </if>
+    </sql>
+
+	<select id="getGridData" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getGridData_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<select id="getGridData_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getGridData_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<select id="getGridData_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getGridData_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	<select id="getGridDataAll" parameterType="map" resultType="lmap">
+        <include refid="getGridData_base" />
+    </select>
+	
+</mapper>

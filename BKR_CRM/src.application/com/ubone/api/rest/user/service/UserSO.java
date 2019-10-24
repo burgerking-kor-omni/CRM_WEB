@@ -7,8 +7,6 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 
 import com.ubone.api.rest.common.constant.ApiCommon;
@@ -47,8 +45,6 @@ public class UserSO {
 	
 	@Resource
 	private LoginLogDAO loginLogDAO;
-	
-	private static final Log logger = LogFactory.getLog(UserSO.class);
 	
 	/**
 	 * 회원가입  - (Web & APP)
@@ -335,8 +331,11 @@ public class UserSO {
 		result.addDataList(DataUtil.makeDataList("resultInfo", resultInfo));
 		
 		// 8. login 데이터
+//		Parameter endParam = DataUtil.makeParameter();
+//		endParam.setParameter("ID_MEMBER", dtData.getString(0, "ID_MEMBER"));
+//		DataList dtEndData = userDAO.getMember(endParam);
 		Parameter endParam = DataUtil.makeParameter();
-		endParam.setParameter("ID_MEMBER", dtData.getString(0, "ID_MEMBER"));
+		endParam.setParameter("DS_EMAIL", parameter.getParameter("DS_EMAIL"));
 		DataList dtEndData = userDAO.getMember(endParam);
 		
 		if (0 < dtEndData.getRowCount()) {
@@ -401,9 +400,14 @@ public class UserSO {
 		result.addDataList(DataUtil.makeDataList("resultInfo", resultInfo));
 		
 		// 6. login 데이터
+//		Parameter endParam = DataUtil.makeParameter();
+//		endParam.setParameter("ID_MEMBER", dtData.getString(0, "ID_MEMBER"));
+//		DataList dtEndData = userDAO.getMember(endParam);
+		
 		Parameter endParam = DataUtil.makeParameter();
-		endParam.setParameter("ID_MEMBER", dtData.getString(0, "ID_MEMBER"));
-		DataList dtEndData = userDAO.getMember(endParam);
+		endParam.setParameter("TP_SNS", parameter.getParameter("TP_SNS"));
+		endParam.setParameter("SN_SNS", parameter.getParameter("SN_SNS"));
+		DataList dtEndData = userDAO.getMemberSns(endParam);
 		
 		if (0 < dtEndData.getRowCount()) {
 			DataList dtResultData = DataUtil.makeDataList("resultData", this.commonMemberInfo(dtEndData));
@@ -464,8 +468,13 @@ public class UserSO {
 		
 		// 5. login 데이터
 		Parameter endParam = DataUtil.makeParameter();
-		endParam.setParameter("ID_MEMBER", dtData.getString(0, "ID_MEMBER"));
+		endParam.setParameter("ID_MEMBER", parameter.getParameter("ID_MEMBER"));
 		DataList dtEndData = userDAO.getMember(endParam);
+		
+//		Parameter endParam = DataUtil.makeParameter();
+//		endParam.setParameter("CONNECT_GUBUN", parameter.getParameter("CONNECT_GUBUN"));
+//		endParam.setParameter("APP_TOKEN", parameter.getParameter("APP_TOKEN"));
+//		DataList dtEndData = userDAO.getMemberAuto(endParam);
 		
 		if (0 < dtEndData.getRowCount()) {
 			DataList dtResultData = DataUtil.makeDataList("resultData", this.commonMemberInfo(dtEndData));

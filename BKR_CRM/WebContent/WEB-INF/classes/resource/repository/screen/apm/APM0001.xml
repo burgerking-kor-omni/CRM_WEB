@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="APM0001" screenType="list" screenLayoutType="Default" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>APMD /  화면관리 목록</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0001</fileName>
+  <functions>
+    <function id="FNCAPM0001" isStartFunction="false" functionName="화면 목록 조회 호출" serviceId="SVCAPM0001" alias="INQUIRY"/>
+    <function id="FNCAPM0002" isStartFunction="false" functionName="Screen 목록 조회 함수 (AutoComplete) 호출" serviceId="SVCAPM0002" alias="USERDEFINED1"/>
+    <function id="FNCAPM0003" isStartFunction="true" functionName="화면관리 기본정보 조회(dummy) 호출" serviceId="SVCAPM0016" alias=""/>
+    <function id="FNCAPM0077" isStartFunction="false" functionName="화면관리 화면 캐쉬 모두 삭제 호출" serviceId="SVCAPM0077" alias="USERDEFINED2"/>
+    <function id="FNCAPM0083" isStartFunction="false" functionName="Meta JSP파일 생성 호출" serviceId="SVCAPM0083" alias="USERDEFINED3"/>
+    <function id="FNCAPM0084" isStartFunction="false" functionName="Meta JSP파일 삭제 호출" serviceId="SVCAPM0084" alias="USERDEFINED4"/>
+    <function id="FNCAPM0081" isStartFunction="false" functionName="전체 XML파일 생성 호출" serviceId="SVCAPM0081" alias="USERDEFINED5"/>
+    <function id="FNCAPM0082" isStartFunction="false" functionName="전체 XML파일 삭제 호출" serviceId="SVCAPM0082" alias="USERDEFINED6"/>
+    <function id="FNCAPM0086" isStartFunction="false" functionName="화면관리 / 화면 XML 파일다운로드" serviceId="SVCAPM0086" alias="EXPORT"/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

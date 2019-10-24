@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="UBD2005" screenType="register" screenLayoutType="Board" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>UB-Board Notice 답변 등록 화면</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/ubd/</filePath>
+  <fileName>UBD2005</fileName>
+  <functions>
+    <function id="FNCUBD0003" isStartFunction="false" functionName="게시판 정보 조회 호출" serviceId="SVCUBD0003" alias="INQUIRY"/>
+    <function id="FNCUBD0011" isStartFunction="false" functionName="게시판 답글 등록 호출" serviceId="SVCUBD0011" alias="REGIST"/>
+    <function id="FNCUBD0014" isStartFunction="true"  functionName="게시판 정보 조회 호출" serviceId="SVCUBD0014" alias=""/>
+    <function id="FNCUBD0015" isStartFunction="false" functionName="게시물 첨부파일 조회 호출" serviceId="SVCUBD0015" alias="USERDEFINED7"/>
+  </functions>
+  <defaultParameters/>
+</screenBuilder>

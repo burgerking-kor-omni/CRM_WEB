@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+	<!--
+		================================================================================
+		Framework 관련 Configuration
+		================================================================================
+	-->
+	<context:annotation-config />
+
+	<!-- Properties 설정 : 외부 프로퍼티 파일 사용을 위한 설정 -->
+	<context:property-placeholder location="classpath:resource/config/config.xml"/>
+	
+	<!-- framework repository parent -->
+	<bean id="frameworkPropertyService" class="com.ubone.framework.util.property.DefaultPropertyService">
+		<constructor-arg index="0" value="class"/>
+		<constructor-arg index="1" value="resource/config/framework/framework-query-${app.db.databasetype}.xml"/>
+	</bean>
+	<bean id="frameworkRepository" abstract="true">
+		<property name="dataSource" ref="frameworkDataSource"/>
+		<property name="propertyService" ref="frameworkPropertyService"/>
+	</bean>
+	
+	<!-- framework site repository parent -->
+	<bean id="frameworkAppPropertyService" class="com.ubone.framework.util.property.DefaultPropertyService">
+		<constructor-arg index="0" value="class"/>
+		<constructor-arg index="1" value="resource/config/framework/application-query-${app.db.databasetype}.xml"/>
+	</bean>
+	<bean id="frameworkAppRepository" abstract="true">
+		<property name="dataSource" ref="applicationDataSource"/>
+		<property name="propertyService" ref="frameworkAppPropertyService"/>
+	</bean>
+
+	<!-- service repository declaration -->
+<!-- 	<bean id="serviceRepository" class="com.ubone.framework.engine.service.CachingServiceRepository"> -->
+<!-- 		<property name="parentServiceRepository"> -->
+<!-- 			<bean class="com.ubone.framework.engine.service.JdbcServiceRepository" parent="frameworkRepository"/> -->
+<!-- 		</property> -->
+<!-- 	</bean> -->
+		
+	<!-- service execution record repository declaration -->
+	<bean id="serviceRecordRepository" class="com.ubone.framework.engine.service.record.JdbcServiceRecordRepository" parent="frameworkRepository">
+		<property name="bufferSize" value="${framework.service.recordbufferlength}"/>
+	</bean>
+
+	<!-- service error record repository declaration -->
+	<bean id="serviceErrorRecordRepository" class="com.ubone.framework.engine.service.record.JdbcServiceErrorRecordRepository" parent="frameworkRepository"/>
+
+	<!-- 서비스 실행기 설정 -->
+	<bean id="serviceExecutor" class="com.ubone.framework.engine.service.BasicServiceExecutor">
+		<property name="serviceComponents">
+			<list>
+				<ref bean="customServiceComponent"/>
+<!-- 				<ref bean="sqlmapServiceComponent"/> -->
+				<ref bean="dummyServiceComponent"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="customServiceComponentParent" abstract="true">
+		<property name="converters">
+			<list>
+				<ref bean="basicConverter"/>
+				<ref bean="importerConverter"/>
+				<ref bean="exporterConverter"/>
+			</list>
+		</property>
+		<property name="resultConverters">
+			<list>
+				<ref bean="basicResultConverter"/>
+				<ref bean="unknownTypeResultConverter"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="basicConverter" class="com.ubone.framework.engine.service.converter.BasicConverter"/>
+	<bean id="importerConverter" class="com.ubone.framework.engine.service.converter.ImporterConverter">
+		<property name="importers">
+			<list>
+				<bean class="com.ubone.framework.util.importer.ExcelImporter"/>
+			</list>
+		</property>
+	</bean>
+	<bean id="exporterConverter" class="com.ubone.framework.engine.service.converter.ExporterConverter">
+		<property name="exporters">
+			<list>
+				<bean class="com.ubone.framework.util.exporter.HSSFExcelExporter"/>
+				<bean class="com.ubone.framework.util.exporter.XSSFExcelExporter"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="basicResultConverter"  class="com.ubone.framework.engine.service.converter.BasicResultConverter"/>
+	<bean id="unknownTypeResultConverter"  class="com.ubone.framework.engine.service.converter.UnknownTypeResultConverter"/>
+	
+	<!--  Custom Service Component 설정 -->
+	<bean id="customServiceComponent" class="com.ubone.framework.engine.service.component.CustomServiceComponent" parent="customServiceComponentParent" />
+	
+	<!--  Sqlmap Service Component 설정 -->
+<!-- 	<bean id="sqlmapServiceComponent" class="com.ubone.framework.engine.service.component.SqlmapServiceComponent"> -->
+<!-- 		<property name="transactionService"> -->
+<!-- 			<bean class="com.ubone.framework.engine.service.component.SqlmapTransactionService"/> -->
+<!-- 		</property> -->
+<!-- 	</bean> -->
+
+	<!--  Dummy Service Component 설정 -->
+	<bean id="dummyServiceComponent" class="com.ubone.framework.engine.service.component.DummyServiceComponent"/>
+	
+	<!--  Custom Service Finder 설정 -->
+	<bean id="customServiceFinder" class="com.ubone.framework.engine.service.component.BasicCustomServiceFinder"/>
+
+	<!-- screen repository declaration -->
+<!-- 	<bean id="screenRepository" class="com.ubone.framework.engine.screen.CachingScreenRepository"> -->
+<!-- 		<property name="parentScreenRepository"> -->
+<!-- 			<bean class="com.ubone.framework.engine.screen.JdbcScreenRepository" parent="frameworkRepository"/> -->
+<!-- 		</property> -->
+<!-- 	</bean> -->
+
+	<!-- screen execution record repository declaration -->
+	<bean id="screenRecordRepository" class="com.ubone.framework.engine.screen.record.JdbcScreenRecordRepository" parent="frameworkRepository">
+		<property name="bufferSize" value="${framework.service.recordbufferlength}"/>
+	</bean>
+
+	<!-- 화면 요청 관리기 설정 -->
+	<bean id="screenRequestManager" class="com.ubone.framework.engine.screen.BasicScreenRequestManager">
+		<property name="screenSupporters">
+			<list>
+				<bean class="com.ubone.framework.engine.screen.support.DefaultParameterMaker"/>
+				<bean class="com.ubone.framework.engine.screen.support.MetaScreenSupporter"/>
+				<bean class="com.ubone.framework.engine.screen.support.SyncServiceExecutor"/>
+				<bean class="com.ubone.framework.engine.screen.support.EnumCodeSupporter"/>
+			</list>
+		</property>
+	</bean>
+
+	<!-- file repository declaration -->
+	<bean id="fileRepository" class="com.ubone.framework.util.file.JdbcFileRepository" parent="frameworkAppRepository"/>
+<!-- 	<bean id="fileRepository" class="com.ubone.framework.util.file.BlobFileRepository" parent="frameworkAppRepository"/> -->
+
+	<!-- code repository declaration -->
+	<bean id="codeRepository" class="com.ubone.framework.util.code.CachingCodeRepository">
+		<property name="parentCodeRepository">
+			<bean class="com.ubone.framework.util.code.JdbcCodeRepository" parent="frameworkAppRepository"/>
+		</property>
+	</bean>
+
+	<!-- Menu repository declaration -->
+	<bean id="menuRepository" class="com.ubone.framework.util.menu.CachingMenuRepository">
+		<property name="parentMenuRepository">
+			<bean class="com.ubone.framework.util.menu.JdbcMenuRepository" parent="frameworkAppRepository"/>
+		</property>
+	</bean>
+
+	<!-- Mask repository declaration -->
+	<bean id="maskRepository" class="com.ubone.framework.repository.mask.CachingMaskRepository">
+		<property name="parentMaskRepository">
+			<bean class="com.ubone.framework.repository.mask.JdbcMaskRepository" parent="frameworkAppRepository"/>
+		</property>
+	</bean>
+
+	<!-- request resolver declaration -->
+	<bean id="requestResolver" 
+		class="com.ubone.framework.web.support.BasicRequestResolver"/>
+
+	<!-- Meta Screen Generator -->
+<!-- 	<bean id="metaScreenGenerator" -->
+<!-- 		class="com.ubone.framework.engine.screen.support.meta.VelocityMetaScreenGenerator"/> -->
+
+	<bean id="metaScreenGenerator"
+		class="com.ubone.framework.engine.screen.support.meta.jsp.MetaScreenJspGenerator"/>
+
+	<!-- Meta Page repository declaration -->
+	<bean id="metaPageRepository" class="com.ubone.framework.engine.screen.support.meta.JdbcMetaPageRepository">		
+		<property name="dataSource" ref="metaDataSource"/>
+	</bean>
+	
+	<!-- 계층간 정보 전송 -->
+	<bean id="propagation" class="com.ubone.framework.engine.PropagationByThredLocal" />
+	
+	<!-- 검색이력 Hold -->
+	<bean id="searchHistoryHoldStategy" class="com.ubone.framework.util.search.ThreadLocalSearchHistoryHoldStrategy" />
+
+	<!-- HotLink Service -->
+	<bean id="hotLinkRepository" class="com.ubone.framework.util.hotlink.JdbcHotLinkRepository" parent="frameworkRepository"/>
+
+</beans>

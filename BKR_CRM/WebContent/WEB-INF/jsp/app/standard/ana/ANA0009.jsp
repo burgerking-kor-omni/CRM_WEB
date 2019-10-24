@@ -337,8 +337,8 @@ function fnSearch(){
 						}else{
 							txtIndex = i;							
 						}
-						tdSum += $('#010'+ txtIndex +' td:eq('+eq+')').text()*1;
-						thSum += $('#010'+ txtIndex +' th:eq(1)').text()*1;
+						tdSum += $('#010'+ txtIndex +' td:eq('+eq+')').text().split(',').join('')*1;
+						thSum += $('#010'+ txtIndex +' th:eq(1)').text().split(',').join('')*1;
 					}
 					$('#TR01 th:eq(1)').html(uxl.setComma(thSum));
 					$('#TR01').append('<td>'+uxl.setComma(tdSum)+'</td>');
@@ -349,8 +349,8 @@ function fnSearch(){
 					var str_idx = "";
 					for(var i = 1; i < <%=cnt02+1%>;i++){
 						str_idx = i < 10? '0'+i:i;
-						tdSum += $('#020'+str_idx+' td:eq('+eq+')').text()*1;
-						thSum += $('#020'+str_idx+' th:eq(1)').text()*1;
+						tdSum += $('#020'+str_idx+' td:eq('+eq+')').text().split(',').join('')*1;
+						thSum += $('#020'+str_idx+' th:eq(1)').text().split(',').join('')*1;
 					}
 					$('#TR02 th:eq(1)').html(uxl.setComma(thSum));
 					$('#TR02').append('<td>'+uxl.setComma(tdSum)+'</td>');
@@ -359,8 +359,8 @@ function fnSearch(){
 					thSum = 0;
 					// cause 03* 개수
 					for(var i = 1; i < <%=cnt03+1%>;i++){
-						tdSum += $('#0300'+i+' td:eq('+eq+')').text()*1;
-						thSum += $('#0300'+i+' th:eq(1)').text()*1;
+						tdSum += $('#0300'+i+' td:eq('+eq+')').text().split(',').join('')*1;
+						thSum += $('#0300'+i+' th:eq(1)').text().split(',').join('')*1;
 					}
 					$('#TR03 th:eq(1)').html(uxl.setComma(thSum));
 					$('#TR03').append('<td>'+uxl.setComma(tdSum)+'</td>');
@@ -369,8 +369,8 @@ function fnSearch(){
 					thSum = 0;
 					// cause 04* 개수
 					for(var i = 1; i < <%=cnt04+1%>;i++){
-						tdSum += $('#0400'+i+' td:eq('+eq+')').text()*1;
-						thSum += $('#0400'+i+' th:eq(1)').text()*1;
+						tdSum += $('#0400'+i+' td:eq('+eq+')').text().split(',').join('')*1;
+						thSum += $('#0400'+i+' th:eq(1)').text().split(',').join('')*1;
 					}
 					$('#TR04 th:eq(1)').html(uxl.setComma(thSum));
 					$('#TR04').append('<td>'+uxl.setComma(tdSum)+'</td>');
@@ -379,7 +379,7 @@ function fnSearch(){
 					thSum = 0;
 					// cause 05* 개수
 					for(var i = 1; i < <%=cnt05+1%>;i++){
-						tdSum += $('#0500'+i+' td:eq('+eq+')').text()*1;
+						tdSum += $('#0500'+i+' td:eq('+eq+')').text().split(',').join('')*1;
 						thSum += Number($('#0500'+i+' th:eq(1)').text().split(',').join(''));
 					}
 					$('#TR05 th:eq(1)').html(uxl.setComma(thSum));

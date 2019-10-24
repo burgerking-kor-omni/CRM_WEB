@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="NoticeManageInquiry">
+
+	<!-- 공지사항 목록 조회 -->
+	
+	<sql id="getNoticeList_base">
+		SELECT ID_NOTICE       														/* 공지사항ID		*/
+			 , DS_TITLE        														/* 제목				*/	
+			 , DS_NOTICE  															/* 공지내용			*/	
+		  	 , DECODE(FG_OPEN_PORTAL,'Y','게시','미게시') AS FG_OPEN_PORTAL	/* 게시여부			*/
+		  	 , TO_CHAR(DT_START, 'YYYY-MM-DD') || ' ~ ' || TO_CHAR(DT_END, 'YYYY-MM-DD') AS DT_START	/* 공지기간 		*/
+		  	 <![CDATA[
+		  	 , CASE WHEN DT_START < SYSDATE AND SYSDATE < DT_END THEN 0 ELSE 1 END AS ORD
+		  	 ]]>
+		  	 , SU.USER_NM AS NM_REG_EMP
+		  	 , TO_CHAR(DT_REG, 'YYYY-MM-DD') AS DT_REG								/* 등록일			*/
+		  FROM TBS_NOTICE TN
+		  LEFT OUTER JOIN SYS_USER SU
+          ON SU.USER_ID = TN.ID_REG_EMP
+	  	 WHERE 1 = 1
+			<if test="DT_REG_START != null and DT_REG_START != ''">
+				<![CDATA[
+				AND DT_REG >= TO_DATE (#{DT_REG_START} || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS')  /* 기간검색(FROM)	*/
+				]]>
+			</if>
+			<if test="DT_REG_END != null and DT_REG_END != ''">
+				<![CDATA[
+				AND DT_REG <= TO_DATE (#{DT_REG_END} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS')    /* 기간검색(TO)	*/
+				]]>
+			</if>
+			<if test="DS_TITLE != null and DS_TITLE != ''">
+				AND (DS_TITLE LIKE '%' || #{DS_TITLE} || '%' OR DS_NOTICE LIKE '%' || #{DS_TITLE} || '%')
+			</if>
+			<if test="FG_OPEN_PORTAL != null and FG_OPEN_PORTAL != ''">
+				AND FG_OPEN_PORTAL = 'Y'
+				AND TO_CHAR(SYSDATE, 'YYYY-MM-DD') BETWEEN TO_CHAR(DT_START, 'YYYY-MM-DD') AND TO_CHAR(DT_END, 'YYYY-MM-DD')
+			</if>
+				AND FG_DEL = 'N'
+			  ORDER BY FG_OPEN_PORTAL, DT_REG DESC
+	</sql>
+	
+	
+	<!-- 공지사항 목록 조회 -->
+	<select id="getNoticeList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getNoticeList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- 공지사항 목록 조회 - count -->
+	<select id="getNoticeList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getNoticeList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- 공지사항 목록 조회 - paging -->
+	<select id="getNoticeList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getNoticeList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+	
+	<!-- 공지사항 상세 조회 -->
+	
+	<select id="getNoticeDetail" parameterType="map" resultType="lmap">
+		SELECT ID_NOTICE                                    /* 공지사항ID */
+             , DS_TITLE                                        /* 제목          */
+             , DS_NOTICE                                    /* 공지내용      */
+             , FG_OPEN_PORTAL                                /* 게시여부      */
+             , TO_CHAR(DT_START, 'YYYY-MM-DD') AS DT_START    /* 공지시작일 */
+             , TO_CHAR(DT_END, 'YYYY-MM-DD') AS DT_END      /* 공지종료일 */
+             , DT_REG                                          /* 등록일      */
+             , ID_REG_EMP                                      /* 등록자      */
+             , (SELECT USER_NM
+                  FROM SYS_USER SYSU 
+                 WHERE SYSU.USER_ID = TBN.ID_REG_EMP) AS NM_REG_EMP
+             , ID_REG_DEPT                                     /* 등록부서      */
+             , (SELECT DEPT_NM
+                  FROM SYS_DEPARTMENT SYSD 
+                 WHERE SYSD.DEPT_ID = TBN.ID_REG_DEPT) AS NM_REG_DEPT
+          FROM TBS_NOTICE TBN
+         WHERE 1 = 1
+		   AND ID_NOTICE = #{ID_NOTICE}
+	</select>
+	
+	<!--
+		Query id    : CustomerManageInquiry.getLoginProgramAccess
+		Description : login 프로그램 권한 조회
+	-->
+	<select id="getLoginProgramAccessList" parameterType="map" resultType="lmap">
+	
+		SELECT ROLE_ID
+		  FROM AP_ROLE_GROUP
+		 WHERE USER_ID=#{user.id}
+		 GROUP BY ROLE_ID
+ 
+	</select>
+	
+	<!-- 공지사항 상세 다음글 -->
+	
+	<select id="getNoticeNextDetail" parameterType="map" resultType="lmap">
+		SELECT ID_NOTICE                                    /* 공지사항ID */
+             , DS_TITLE                                        /* 제목          */
+             , DS_NOTICE                                    /* 공지내용      */
+             , FG_OPEN_PORTAL                                /* 게시여부      */
+             , TO_CHAR(DT_START, 'YYYY-MM-DD') AS DT_START    /* 공지시작일 */
+             , TO_CHAR(DT_END, 'YYYY-MM-DD') AS DT_END      /* 공지종료일 */
+             , DT_REG                                          /* 등록일      */
+             , ID_REG_EMP                                      /* 등록자      */
+             , (SELECT USER_NM
+             
+                  FROM SYS_USER SYSU 
+                 WHERE SYSU.USER_ID = TBN.ID_REG_EMP) AS NM_REG_EMP
+             , ID_REG_DEPT                                     /* 등록부서      */
+             , (SELECT DEPT_NM
+                  FROM SYS_DEPARTMENT SYSD 
+                 WHERE SYSD.DEPT_ID = TBN.ID_REG_DEPT) AS NM_REG_DEPT
+          FROM TBS_NOTICE TBN
+         WHERE 1 = 1
+           AND ID_NOTICE = (SELECT MAX(ID_NOTICE) 
+	           					  FROM TBS_NOTICE 
+	           					 <![CDATA[
+	           					 WHERE 1 = 1
+	           					   AND ID_NOTICE < #{ID_NOTICE}
+	           					 ]]>
+	           					   AND FG_DEL = 'N'
+	           					<if test='CD_FLAG =="P"'>
+	           					   AND FG_OPEN_PORTAL = 'Y'
+	           					   AND TO_CHAR(SYSDATE, 'YYYY-MM-DD') BETWEEN TO_CHAR(DT_START, 'YYYY-MM-DD') AND TO_CHAR(DT_END, 'YYYY-MM-DD')
+	           					</if>
+	          					<if test="DT_REG_START_H != null and DT_REG_START_H != ''">
+								   <![CDATA[
+								   AND DT_REG >= TO_DATE (#{DT_REG_START_H} || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS')  /* 기간검색(FROM)	*/
+								   ]]>
+								</if>
+								<if test="DT_REG_END_H != null and DT_REG_END_H != ''">
+									<![CDATA[
+									AND DT_REG <= TO_DATE (#{DT_REG_END_H} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS')    /* 기간검색(TO)	*/
+									]]>
+								</if>
+								<if test="DS_TITLE_H != null and DS_TITLE_H != ''">
+									AND (DS_TITLE LIKE '%' || #{DS_TITLE_H} || '%' OR DS_NOTICE LIKE '%' || #{DS_TITLE} || '%')
+								</if>
+           					  )
+           					  
+	</select>
+	
+	<!-- 공지사항 상세 이전글 -->
+	
+	<select id="getNoticePrevDetail" parameterType="map" resultType="lmap">
+		SELECT ID_NOTICE                                    /* 공지사항ID */
+             , DS_TITLE                                        /* 제목          */
+             , DS_NOTICE                                    /* 공지내용      */
+             , FG_OPEN_PORTAL                                /* 게시여부      */
+             , TO_CHAR(DT_START, 'YYYY-MM-DD') AS DT_START    /* 공지시작일 */
+             , TO_CHAR(DT_END, 'YYYY-MM-DD') AS DT_END      /* 공지종료일 */
+             , DT_REG                                          /* 등록일      */
+             , ID_REG_EMP                                      /* 등록자      */
+             , (SELECT USER_NM
+                  FROM SYS_USER SYSU 
+                 WHERE SYSU.USER_ID = TBN.ID_REG_EMP) AS NM_REG_EMP
+             , ID_REG_DEPT                                     /* 등록부서      */
+             , (SELECT DEPT_NM
+                  FROM SYS_DEPARTMENT SYSD 
+                 WHERE SYSD.DEPT_ID = TBN.ID_REG_DEPT) AS NM_REG_DEPT
+          FROM TBS_NOTICE TBN
+         WHERE 1 = 1
+           AND ID_NOTICE = (SELECT MIN(ID_NOTICE) 
+	           					  FROM TBS_NOTICE 
+	           					 <![CDATA[
+	           					 WHERE 1 = 1
+	           					   AND ID_NOTICE > #{ID_NOTICE}
+	           					 ]]>
+	           					   AND FG_DEL = 'N'
+	           					<if test='CD_FLAG =="P"'>
+	           					   AND FG_OPEN_PORTAL = 'Y'
+	           					   AND TO_CHAR(SYSDATE, 'YYYY-MM-DD') BETWEEN TO_CHAR(DT_START, 'YYYY-MM-DD') AND TO_CHAR(DT_END, 'YYYY-MM-DD')
+	           					</if>
+	          					<if test="DT_REG_START_H != null and DT_REG_START_H != ''">
+								   <![CDATA[
+								   AND DT_REG >= TO_DATE (#{DT_REG_START_H} || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS')  /* 기간검색(FROM)	*/
+								   ]]>
+								</if>
+								<if test="DT_REG_END_H != null and DT_REG_END_H != ''">
+									<![CDATA[
+									AND DT_REG <= TO_DATE (#{DT_REG_END_H} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS')    /* 기간검색(TO)	*/
+									]]>
+								</if>
+								<if test="DS_TITLE_H != null and DS_TITLE_H != ''">
+									AND (DS_TITLE LIKE '%' || #{DS_TITLE_H} || '%' OR DS_NOTICE LIKE '%' || #{DS_TITLE} || '%')
+								</if>
+           					  )
+	</select>
+	
+	<!-- 공지사항  로그인 화면 목록 조회 -->
+	
+	<sql id="getNoticeListLogin_base">
+		SELECT ID_NOTICE       														/* 공지사항ID		*/
+			 , DS_TITLE        														/* 제목				*/		
+		  	 , TO_CHAR(DT_START, 'YYYY-MM-DD') || ' ~ ' || TO_CHAR(DT_END, 'YYYY-MM-DD') AS DT_START /* 공지기간 		*/
+		  	 , TO_CHAR(DT_REG, 'YYYY-MM-DD') AS DT_REG								/* 등록일			*/
+		  FROM TBS_NOTICE
+	  	 WHERE 1 = 1
+				AND FG_DEL = 'N'
+			  ORDER BY ID_NOTICE DESC
+	</sql>
+	
+	
+	<!--  공지사항  로그인 화면 목록 조회 -->
+	<select id="getNoticeListLogin" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getNoticeListLogin_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!--  공지사항  로그인 화면 목록 조회 - count -->
+	<select id="getNoticeListLogin_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getNoticeListLogin_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!--  공지사항  로그인 화면 목록 조회 - paging -->
+	<select id="getNoticeListLogin_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getNoticeListLogin_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+
+	<!--
+	Query id    : NoticeManageInquiry.getExcelList
+	Description : 엑셀데이터 조회
+	-->
+	<select id="getExcelList" parameterType="map" resultType="lmap">
+		<include refid="getNoticeList_base" />
+	</select>	  
+</mapper>

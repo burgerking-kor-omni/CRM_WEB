@@ -103,13 +103,25 @@ uxl.onLoad(function(){
 		}
 	});
 	
+	$('#nmChange').click(function(){
+		fnChange();
+	});
+	
 // 	$("#delBtn").hide();
 	// 회원탈퇴 처리
 	$("#delBtn").click(function(){
 		fnDelete();
 	});
 	
-	
+	var flag = $('#CD_JOIN_SITE option:selected').val();
+	if(flag != '01'){
+		$('#emailChange').hide();
+	}
+	$('#emailChange').click(function(){
+		uxl.openWindow('POP4001', uxl.getScreenURL('POP4001')+'?ID_MEMBER='+$('#ID_MEMBER').val()+'&DS_EMAIL='+$('#DS_EMAIL').val(), {width:'600px',height:'200px'}, function(){
+			uxl.reload();
+		});
+	});
 	
 	fnTabgen();
 	fnSetPhone();
@@ -232,6 +244,11 @@ function fnSetPhone(){
 // 스탬프 추가 팝업
 function fnAddStamp(){
 	uxl.openWindow('POP0101', uxl.getScreenURL('POP0101')+'?ID_MEMBER='+$('#ID_MEMBER').val(), {width:'500px',height:'150px'}, function(){uxl.reload();});
+}
+
+// 이름 변경 팝업
+function fnChange(){
+	uxl.openWindow('POP0102', uxl.getScreenURL('POP0102')+'?ID_MEMBER='+$('#ID_MEMBER').val(), {width:'500px',height:'150px'}, function(){uxl.reload();});
 }
 
 </script>

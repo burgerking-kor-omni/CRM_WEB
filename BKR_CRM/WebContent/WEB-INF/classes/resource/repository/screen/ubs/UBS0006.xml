@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="UBS0006" screenType="detail" screenLayoutType="TabContent" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>게시판관리 / 게시판상세 관리자설정 (TabContent)</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/ubs/</filePath>
+  <fileName>UBS0006</fileName>
+  <functions>
+    <function id="FNCUBS0302" isStartFunction="true" functionName="게시판상세 관리자설정 기본 정보로드 (Dummy) 호출" serviceId="SVCUBS0286" alias=""/>
+    <function id="FNCUBS0303" isStartFunction="false" functionName="게시판상세 관리자 설정 목록 조회 호출" serviceId="SVCUBS0287" alias="INQUIRY"/>
+    <function id="FNCUBS0304" isStartFunction="false" functionName="게시판상세 관리자 설정 정보 등록 호출" serviceId="SVCUBS0288" alias="REGIST"/>
+    <function id="FNCUBS0308" isStartFunction="false" functionName="게시판상세 관리자 설정 정보 삭제 호출" serviceId="SVCUBS0292" alias="REMOVE"/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+  </authorities>
+</screenBuilder>

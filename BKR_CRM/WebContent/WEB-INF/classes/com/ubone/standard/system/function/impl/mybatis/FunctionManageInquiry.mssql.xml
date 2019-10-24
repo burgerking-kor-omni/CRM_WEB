@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="FunctionManageInquiry">
+	
+	<!--
+		QueryId     : FunctionManageInquiry.getFunc
+		Description : Function 상세정보를 조회하는 쿼리  
+	 -->
+	<select id="getFunc" parameterType="map" resultType="lmap">
+		select FNC.FUNCTION_ID     AS FUNCTION_ID
+		     , FNC.FUNCTION_NAME   AS FUNCTION_NAME
+		     , FNC.FUNCTION_TYPE   AS FUNCTION_TYPE
+		     , FNC.DESCRIPTION     AS DESCRIPTION
+		     , FNC.PROJECT_CODE    AS PROJECT_CODE
+		     , FNC.CATEGORY_CODE   AS CATEGORY_CODE
+		     , FNC.SERVICE_ID      AS SERVICE_ID
+			 , CASE WHEN FNC.SERVICE_ID = null THEN ''
+			        ELSE '[' + FNC.SERVICE_ID + ']  ' + SVC.SERVICE_NAME
+			    END AS SERVICE_NAME
+		     , FNC.SCREEN_ID       AS SCREEN_ID
+			 , CASE WHEN FNC.SCREEN_ID = null THEN ''
+			        ELSE '[' + FNC.SCREEN_ID + ']  ' + SCR.SCREEN_NAME
+			    END AS SCREEN_NAME
+		     , FNC.REG_USER_ID     AS REG_USER_ID 
+		     , FNC.REG_DATETIME    AS REG_DATETIME
+		     , FNC.UPD_USER_ID     AS UPD_USER_ID
+		     , FNC.UPD_DATETIME    AS UPD_DATETIME
+          from AP_FUNCTION FNC WITH( NOLOCK )
+          LEFT OUTER JOIN AP_SERVICE SVC
+            ON FNC.SERVICE_ID = SVC.SERVICE_ID
+          LEFT OUTER JOIN AP_SCREEN SCR
+            ON FNC.SCREEN_ID = SCR.SCREEN_ID
+		 where FNC.FUNCTION_ID = #{FUNCTION_ID}
+	</select>
+
+	<!--
+		QueryId     : FunctionManageInquiry.getListFuncByAuto
+		Description : Function 목록을 조회하는 쿼리 (AutoComplate)  
+	 -->
+	<select id="getListFuncByAuto" parameterType="map" resultType="lmap">
+		select F.FUNCTION_ID     AS FUNCTION_ID
+		     , F.FUNCTION_NAME   AS FUNCTION_NAME
+		     , F.FUNCTION_TYPE   AS FUNCTION_TYPE
+          from AP_FUNCTION F WITH( NOLOCK )
+          where 1=1
+         	AND F.PROJECT_CODE  = #{PROJECT_CODE}
+		<if test="searchKeyword != null and searchKeyword != ''">
+		   AND (UPPER(FUNCTION_ID) LIKE '%' + UPPER(#{searchKeyword}) + '%' OR
+		        UPPER(FUNCTION_NAME) LIKE '%' + UPPER(#{searchKeyword}) + '%')
+		</if>
+		<if test="FUNCTION_ID != null and FUNCTION_ID != ''">
+		   AND FUNCTION_ID LIKE '%' + UPPER(#{FUNCTION_ID}) + '%'
+		</if>
+		<if test="FUNCTION_NAME != null and FUNCTION_NAME != ''">
+		   AND FUNCTION_NAME LIKE '%' + UPPER(#{FUNCTION_NAME}) + '%'
+		</if>
+	     ORDER BY F.FUNCTION_NAME
+	</select>
+
+	<!--
+		QueryId     : FunctionManageInquiry.getListFunc
+		Description : Function 목록을 조회하는 쿼리  
+	 -->
+	<sql id="getListFunc_base">
+<!-- 페이징 공통 관련 쿼리 -->		  
+	   SELECT 
+	    <if test="ORDER_COLUMN == null or ORDER_COLUMN == ''">
+			  ROW_NUMBER() OVER( order by REG_DATETIME DESC ) AS ROWNUM /* ROWNUM */
+		</if>
+		<if test="ORDER_COLUMN != null and ORDER_COLUMN != ''">
+			  ROW_NUMBER() OVER( order by ${ORDER_COLUMN} ${ORDER_ASC} ) AS ROWNUM /* ROWNUM */
+		</if>
+		    , SUB.*
+		 FROM (
+<!-- 업무 관련 쿼리 :: Begin -->
+				select 
+				       FNC.FUNCTION_ID     AS FUNCTION_ID
+				     , FNC.FUNCTION_NAME   AS FUNCTION_NAME
+				     , FNC.FUNCTION_TYPE   AS FUNCTION_TYPE
+				     , FNC.DESCRIPTION     AS DESCRIPTION
+				     , FNC.PROJECT_CODE    AS PROJECT_CODE
+				     , FNC.CATEGORY_CODE   AS CATEGORY_CODE
+				     , CASE WHEN FUNCTION_TYPE = 'SE' THEN SERVICE_NAME
+				     		ELSE SCREEN_NAME
+				     	END AS MODULE_NAME
+				     , FNC.SERVICE_ID      AS SERVICE_ID
+					 , CASE WHEN FNC.SERVICE_ID = null THEN ''
+					 		ELSE '[' + FNC.SERVICE_ID + ']  ' + SVC.SERVICE_NAME
+					 	END AS SERVICE_NAME
+				     , FNC.SCREEN_ID       AS SCREEN_ID
+					 , CASE WHEN FNC.SCREEN_ID = null THEN ''
+					 		ELSE '[' + FNC.SCREEN_ID + ']  ' + SCR.SCREEN_NAME
+					 	END AS SCREEN_NAME
+				     , FNC.REG_USER_ID     AS REG_USER_ID 
+				     , FNC.REG_DATETIME    AS REG_DATETIME
+				     , FNC.UPD_USER_ID     AS UPD_USER_ID
+				     , FNC.UPD_DATETIME    AS UPD_DATETIME
+		          from AP_FUNCTION FNC WITH( NOLOCK )
+		          LEFT OUTER JOIN AP_SERVICE SVC
+		            ON FNC.SERVICE_ID = SVC.SERVICE_ID
+		          LEFT OUTER JOIN AP_SCREEN SCR
+		            ON FNC.SCREEN_ID = SCR.SCREEN_ID
+		          where 1=1
+				 	AND FNC.PROJECT_CODE = #{PROJECT_CODE}
+				<if test="FUNCTION_ID != null and FUNCTION_ID != ''" >
+				   and FNC.FUNCTION_ID like ('%' + UPPER(#{FUNCTION_ID}) + '%') 
+				</if>
+				<if test="FUNCTION_NAME != null and FUNCTION_NAME != ''" >
+				   and FNC.FUNCTION_NAME like ('%' + #{FUNCTION_NAME} + '%')
+				</if>
+				<if test="CATEGORY_CODE != null and CATEGORY_CODE != ''" >
+				   and FNC.CATEGORY_CODE = #{CATEGORY_CODE}
+				</if>
+				<if test="FUNCTION_TYPE != null and FUNCTION_TYPE != ''" >
+				   and FNC.FUNCTION_TYPE = #{FUNCTION_TYPE}
+				</if>
+				<if test="SEARCH_SERVICE != null and SEARCH_SERVICE != ''" >
+				   and FNC.SERVICE_ID like ('%' + UPPER(#{SEARCH_SERVICE}) + '%')
+				</if>
+				<if test="SEARCH_SCREEN != null and SEARCH_SCREEN != ''" >
+				   and FNC.SCREEN_ID like ('%' + UPPER(#{SEARCH_SCREEN}) + '%')
+				</if>
+<!-- 업무 관련 쿼리 :: End -->		  
+			) SUB
+		
+	</sql>
+	
+	<!-- Function 목록 조회 -->
+	<select id="getListFunc" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getListFunc_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- Function 목록 조회 - count -->
+	<select id="getListFunc_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getListFunc_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- Function 목록 조회 - paging -->
+	<select id="getListFunc_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getListFunc_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+		
+	<!--
+		QueryId     : FunctionManageInquiry.registFunc
+		Description : Function 정보를 등록하는 쿼리  
+	 -->
+	<insert id="registFunc" parameterType="map">
+		<selectKey keyProperty="FUNCTION_ID" resultType="string" order="BEFORE">
+            SELECT 'FNC'+#{CATEGORY_CODE}+
+			       CASE WHEN MAX(maxKey) > 999 THEN '' + CAST(MAX(maxKey) AS VARCHAR)
+			            WHEN MAX(maxKey) > 99  THEN '0' + CAST(MAX(maxKey) AS VARCHAR)            
+			            WHEN MAX(maxKey) > 9   THEN '00' + CAST(MAX(maxKey) AS VARCHAR)
+			            ELSE '000' + CAST(MAX(maxKey) AS VARCHAR)
+			       END
+			  FROM (
+				SELECT CAST(replace(FUNCTION_ID, 'FNC' + #{CATEGORY_CODE}, '') AS INT)+1 AS maxKey
+				  FROM AP_FUNCTION WITH( NOLOCK )
+				 WHERE FUNCTION_ID like 'FNC' + #{CATEGORY_CODE} + '%'
+				 UNION
+				SELECT 0 AS maxKey
+			       ) A
+		</selectKey>
+		insert into	AP_FUNCTION (
+			  FUNCTION_ID
+			, FUNCTION_NAME
+			, FUNCTION_TYPE
+			, DESCRIPTION
+			, PROJECT_CODE
+			, CATEGORY_CODE
+			, SERVICE_ID
+			, SCREEN_ID
+			, REG_USER_ID
+			, REG_DATETIME
+			, UPD_USER_ID
+			, UPD_DATETIME
+		)
+		values (
+			  #{FUNCTION_ID}
+			, #{FUNCTION_NAME}
+			, #{FUNCTION_TYPE}
+			, #{DESCRIPTION}
+			, #{PROJECT_CODE}
+			, #{CATEGORY_CODE}
+			, #{SERVICE_ID}
+			, #{SCREEN_ID}
+			, #{user.id}
+			, CURRENT_TIMESTAMP
+			, #{user.id}
+			, CURRENT_TIMESTAMP
+		)
+		
+	</insert>	
+	
+	<!--
+		QueryId     : FunctionManageInquiry.modifyFunc
+		Description : Function 정보를 수정하는 쿼리  
+	 -->
+	<update id="modifyFunc" parameterType="map">
+		update AP_FUNCTION
+		   set FUNCTION_NAME = #{FUNCTION_NAME}
+		     , FUNCTION_TYPE = #{FUNCTION_TYPE}
+		     , DESCRIPTION   = #{DESCRIPTION}
+		     , SERVICE_ID    = #{SERVICE_ID}
+		     , SCREEN_ID     = #{SCREEN_ID}
+		     , UPD_USER_ID   = #{user.id}
+		     , UPD_DATETIME  = CURRENT_TIMESTAMP
+		 where FUNCTION_ID   = #{FUNCTION_ID}
+	</update>
+
+	<!--
+		QueryId     : FunctionManageInquiry.removeFunc
+		Description : Function 삭제하는 쿼리  
+	 -->
+	<delete id="removeFunc" parameterType="map">
+		delete AP_FUNCTION
+		 where FUNCTION_ID = #{FUNCTION_ID}
+	</delete>
+
+	<!--
+		QueryId     : FunctionManageInquiry.removeAllScreenFuncAuth
+		Description : 매핑된 Function Auth 삭제하는 쿼리  
+	 -->
+	<delete id="removeAllScreenFuncAuth" parameterType="map">
+		delete AP_FUNCTION_AUTH
+			where FUNCTION_ID = #{FUNCTION_ID}
+	</delete>
+		
+	<!--
+		QueryId     : FunctionManageInquiry.removeAllScreenFunc
+		Description : 매핑된 Screen Function 삭제하는 쿼리  
+	 -->
+	<delete id="removeAllScreenFunc" parameterType="map">
+		delete AP_SCREEN_FUNCTION
+			where FUNCTION_ID = #{FUNCTION_ID}
+	</delete>
+
+	<!--
+		QueryId     : FunctionManageInquiry.getFuncAlias
+		Description : Function Alias 상세정보를 조회하는 쿼리  
+	 -->
+	<select id="getFuncAlias" parameterType="map" resultType="lmap">
+        select F.FUNCTION_ALIAS_ID    AS FUNCTION_ALIAS_ID
+		     , F.FUNCTION_ALIAS_NAME  AS FUNCTION_ALIAS_NAME
+		     , F.SORT_ORDER           AS SORT_ORDER
+		     , F.REG_USER_ID          AS REG_USER_ID 
+		     , F.REG_DATETIME         AS REG_DATETIME
+		     , F.UPD_USER_ID          AS UPD_USER_ID
+		     , F.UPD_DATETIME         AS UPD_DATETIME
+          from AP_FUNCTION_ALIAS F WITH( NOLOCK )
+		 where F.FUNCTION_ALIAS_ID = #{FUNCTION_ALIAS_ID}
+	</select>
+
+	<!--
+		QueryId     : FunctionManageInquiry.getListFuncAlias
+		Description : Function Alias 목록을 조회하는 쿼리  
+	 -->
+	<sql id="getListFuncAlias_base">
+<!-- 페이징 공통 관련 쿼리 -->		  
+	   SELECT 
+	    <if test="ORDER_COLUMN == null or ORDER_COLUMN == ''">
+			  ROW_NUMBER() OVER( order by SORT_ORDER ASC ) AS ROWNUM /* ROWNUM */
+		</if>
+		<if test="ORDER_COLUMN != null and ORDER_COLUMN != ''">
+			  ROW_NUMBER() OVER( order by ${ORDER_COLUMN} ${ORDER_ASC} ) AS ROWNUM /* ROWNUM */
+		</if>
+		    , SUB.*
+		 FROM (
+<!-- 업무 관련 쿼리 :: Begin -->
+	        select F.FUNCTION_ALIAS_ID    AS FUNCTION_ALIAS_ID
+			     , F.FUNCTION_ALIAS_NAME  AS FUNCTION_ALIAS_NAME
+			     , F.SORT_ORDER           AS SORT_ORDER
+			     , F.REG_USER_ID          AS REG_USER_ID 
+			     , F.REG_DATETIME         AS REG_DATETIME
+			     , F.UPD_USER_ID          AS UPD_USER_ID
+			     , F.UPD_DATETIME         AS UPD_DATETIME
+	          from AP_FUNCTION_ALIAS F WITH( NOLOCK )
+	          where 1=1
+	          <if test="FUNCTION_ALIAS_ID != null and FUNCTION_ALIAS_ID != ''" >
+			  	  and F.FUNCTION_ALIAS_ID like ('%' + UPPER(#{FUNCTION_ALIAS_ID}) + '%') 
+			  </if>
+			  <if test="FUNCTION_ALIAS_NAME != null and FUNCTION_ALIAS_NAME != ''" >
+			      and F.FUNCTION_ALIAS_NAME like ('%' + #{FUNCTION_ALIAS_NAME} + '%')
+		      </if>
+<!-- 업무 관련 쿼리 :: End -->		  
+			) SUB          
+	</sql>
+		
+	<!-- Function Alias 목록 조회 -->
+	<select id="getListFuncAlias" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getListFuncAlias_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- Function Alias 목록 조회 - count -->
+	<select id="getListFuncAlias_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getListFuncAlias_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- Function Alias 목록 조회 - paging -->
+	<select id="getListFuncAlias_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getListFuncAlias_base" />
+		<include refid="common.paging-bottom" />
+	</select>	
+	
+	<!--
+		QueryId     : FunctionManageInquiry.registFuncAlias
+		Description : Function Alias 정보를 등록하는 쿼리
+	 -->
+	 <insert id="registFuncAlias" parameterType="map">
+	 	insert into	AP_FUNCTION_ALIAS (
+			  FUNCTION_ALIAS_ID
+			, FUNCTION_ALIAS_NAME
+			, SORT_ORDER
+			, REG_USER_ID
+			, REG_DATETIME
+			, UPD_USER_ID
+			, UPD_DATETIME
+		)
+		values (
+			  #{FUNCTION_ALIAS_ID}
+			, #{FUNCTION_ALIAS_NAME}
+			, #{SORT_ORDER}
+			, #{user.id}
+			, CURRENT_TIMESTAMP
+			, #{user.id}
+			, CURRENT_TIMESTAMP
+		)
+	 </insert>
+	
+	<!--
+		QueryId     : FunctionManageInquiry.modifyFuncAlias
+		Description : Function Alias 정보를 수정하는 쿼리  
+	 -->
+	<update id="modifyFuncAlias" parameterType="map">
+		update AP_FUNCTION_ALIAS
+		   set FUNCTION_ALIAS_NAME = #{FUNCTION_ALIAS_NAME}
+		     , SORT_ORDER          = #{SORT_ORDER:INTEGER}
+		     , UPD_USER_ID         = #{user.id}
+		     , UPD_DATETIME        = CURRENT_TIMESTAMP
+		 where FUNCTION_ALIAS_ID   = #{FUNCTION_ALIAS_ID}
+	</update>
+
+	<!--
+		QueryId     : FunctionManageInquiry.removeFuncAlias
+		Description : Function Alias 삭제하는 쿼리  
+	 -->
+	<delete id="removeFuncAlias" parameterType="map">
+		delete AP_FUNCTION_ALIAS
+		 where FUNCTION_ALIAS_ID = #{FUNCTION_ALIAS_ID}
+	</delete>
+
+	<!--
+		QueryId     : FunctionManageInquiry.getFuncAliasCount
+		Description : Function Alias ID를 사용하는 Screen Count를 조회하는 쿼리  
+	 -->
+	<select id="getFuncAliasCount" parameterType="map" resultType="lmap">
+        SELECT COUNT(SCREEN_ID) AS SCREEN_COUNT
+        	FROM AP_SCREEN_FUNCTION WITH( NOLOCK )
+        	WHERE FUNCTION_ALIAS_ID = #{FUNCTION_ALIAS_ID}
+	</select>
+	
+	<!--
+		QueryId     : FunctionManageInquiry.getLinkScreenList
+		Description : Function 연결 화면 리스트 조회하는 쿼리  
+	 -->
+	<select id="getLinkScreenList" parameterType="map" resultType="lmap">
+		SELECT S.CATEGORY_CODE AS CATEGORY_CODE
+             , S.SCREEN_ID AS SCREEN_ID
+             , F.FUNCTION_ID AS FUNCTION_ID
+             , S.SCREEN_NAME AS SCREEN_NAME
+             , S.SCREEN_TYPE AS SCREEN_TYPE
+             , S.VIEW_TYPE AS VIEW_TYPE
+             , S.REG_DATETIME AS REG_DATETIME
+          FROM AP_SCREEN S WITH( NOLOCK )
+         INNER JOIN AP_SCREEN_FUNCTION SF WITH( NOLOCK )
+            ON S.SCREEN_ID = SF.SCREEN_ID
+         INNER JOIN AP_FUNCTION F WITH( NOLOCK )
+            ON SF.FUNCTION_ID = F.FUNCTION_ID
+         WHERE F.FUNCTION_ID = #{FUNCTION_ID}
+	</select>
+	
+	<!--
+		QueryId     : FunctionManageInquiry.removeFunctionScreenLink
+		Description : Function - Screen 연결을 제거하는 쿼리
+	 -->
+	<delete id="removeFunctionScreenLink" parameterType="map">
+	    DELETE
+	      FROM AP_SCREEN_FUNCTION
+	     WHERE SCREEN_ID = #{SCREEN_ID}
+	       AND FUNCTION_ID = #{FUNCTION_ID}
+	</delete>
+	
+</mapper>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="common">
+	<sql id="order-top">
+		<if test="ORDER_COLUMN != null and ORDER_COLUMN != ''">
+		select *
+		  from (
+		</if>
+		<if test="AccessQualifier != null">
+		select *
+		  from (
+		</if>
+	</sql>
+	<sql id="order-bottom">
+		<if test="AccessQualifier != null">
+		       ) sub_ac
+		 where ${AccessQualifier.qualifierStatement}
+		</if>
+		<if test="ORDER_COLUMN != null and ORDER_COLUMN != ''">
+		       ) sub_io
+		 order by ${ORDER_COLUMN} ${ORDER_ASC}
+		</if>
+	</sql>
+	
+	<sql id="count-top">
+		select count(*) AS totalCount
+		  from (
+		<if test="AccessQualifier != null">
+		select *
+		  from (
+		</if>
+	</sql>
+	<sql id="count-bottom">
+		<if test="AccessQualifier != null">
+		       ) sub_ac
+		 where ${AccessQualifier.qualifierStatement}
+		</if>
+		       ) sub
+	</sql>
+	
+	<sql id="paging-top">
+		with tempTable as 
+		(
+	</sql>	
+	<sql id="paging-bottom">
+	    )
+		select * 
+		  from tempTable
+		 where rownum between #{Paging.pageOffset,jdbcType=NUMERIC} + 1 and #{Paging.pageOffset,jdbcType=NUMERIC} + #{Paging.pageSize,jdbcType=NUMERIC}
+         order by rownum asc 
+	</sql>
+</mapper>

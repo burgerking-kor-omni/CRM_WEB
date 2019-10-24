@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="UBS0009" screenType="list" screenLayoutType="Popup" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>게시판 선택 팝업</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/ubs/</filePath>
+  <fileName>UBS0009</fileName>
+  <functions>
+    <function id="FNCUBS0295" isStartFunction="false" functionName="게시판관리 / 게시판목록 조회 호출" serviceId="SVCUBS0279" alias="INQUIRY"/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+  </authorities>
+</screenBuilder>

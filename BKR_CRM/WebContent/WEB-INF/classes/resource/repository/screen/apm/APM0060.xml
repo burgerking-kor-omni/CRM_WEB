@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<screenBuilder id="APM0060" screenType="list" screenLayoutType="Default" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>시스템관리 / 코드 유형 목록(다국어용)</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId>APM0060R00</metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0060</fileName>
+  <functions>
+    <function id="FNCAPM0110" isStartFunction="false" functionName="코드 유형 목록 호출(다국어용)" serviceId="SVCAPM0110" alias="INQUIRY"/>
+    <function id="FNCAPM0111" isStartFunction="true" functionName="코드 유형 목록 더미 호출(다국어용)" serviceId="SVCAPM0111" alias=""/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

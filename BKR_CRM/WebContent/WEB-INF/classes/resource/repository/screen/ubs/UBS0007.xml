@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="UBS0007" screenType="detail" screenLayoutType="TabContent" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>게시판관리 / 게시판상세 권한정보 (TabContent)</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/ubs/</filePath>
+  <fileName>UBS0007</fileName>
+  <functions>
+    <function id="FNCUBS0309" isStartFunction="true" functionName="게시판상세 권한정보 기본 정보 조회 (Dummy) 호출" serviceId="SVCUBS0293" alias=""/>
+    <function id="FNCUBS0310" isStartFunction="false" functionName="게시판상세 권한정보 권한리스트 조회 호출" serviceId="SVCUBS0294" alias="INQUIRY"/>
+    <function id="FNCUBS0311" isStartFunction="false" functionName="게시판상세 권한정보 권한 등록 호출" serviceId="SVCUBS0295" alias="REGIST"/>
+    <function id="FNCUBS0312" isStartFunction="false" functionName="게시판상세 권한정보 활성화여부 수정 호출" serviceId="SVCUBS0296" alias="MODIFY"/>
+    <function id="FNCUBS0313" isStartFunction="false" functionName="게시판상세 권한정보 권한 삭제 호출" serviceId="SVCUBS0297" alias="REMOVE"/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+  </authorities>
+</screenBuilder>

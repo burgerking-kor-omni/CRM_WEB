@@ -53,8 +53,12 @@
 <script type="text/javascript">
 
 // var absoluteUrl = '${pageContext.request.scheme}' + '://' + '${pageContext.request.serverName}' + ':' + '${pageContext.request.serverPort}' + '/file/image.ub?imageId=';
-var absoluteUrl = '<%=request.getContextPath()%>' + '/file/image.ub?imageId=';
-
+var imgPreViewUrl;
+if('<%=ConfigHolder.APPLICATION_MODE%>' == 'real'){
+	imgPreViewUrl = "https://an2-bkr-prd-omni.s3.ap-northeast-2.amazonaws.com/images/coupon";
+}else{
+	imgPreViewUrl = "https://an2-bkr-dev-omni.s3.ap-northeast-2.amazonaws.com/images/coupon";
+}
 uxl.onLoad(function(){
 	
 	// 레이블 두껍게
@@ -143,8 +147,8 @@ uxl.onLoadComplete(function(){
 	$('.lbl_import').append('<span class="required">*</span>');
 	
 	// 이미지 추가
-	$('#basicLayout #layout-1_5_11').append('<img width="200px" src="'+absoluteUrl+'<%=IMG_LIST%>'+'" alt="쿠폰 이미지(APP용)" />');
-	$('#basicLayout #layout-1_6_13').append('<img width="200px" src="'+absoluteUrl+'<%=IMG_DTL%>'+'" alt="쿠폰 이미지(WEB용)" />');
+	$('#basicLayout #layout-1_5_11').append('<img width="200px" src="'+imgPreViewUrl+'<%=IMG_LIST%>'+'" alt="쿠폰 이미지(APP용)" />');
+	$('#basicLayout #layout-1_6_13').append('<img width="200px" src="'+imgPreViewUrl+'<%=IMG_DTL%>'+'" alt="쿠폰 이미지(WEB용)" />');
 	
 	// 상세 이미지 td / 할인정책 숨김
 	$('#detailInfo #layout-1_2 ').hide();
@@ -306,12 +310,12 @@ function fnSetData(){
 	var NM_COUPON_OBJ = '<%=NM_COUPON_OBJ%>';
 	
 	// 쿠폰 대상이 매장일때
-	if(NM_COUPON_OBJ == '매장'){
+	if('<%=CD_COUPON_OBJ%>' == '3'){
 		$('input:radio[name=TP_MEMBER][value=2], #lbl_all').show();
 		$('#detailInfo #layout-1_4,#detailInfo #layout-1_5, #basicInfo #layout-1_6_10').hide();
 		$('#MENU_CD, #MENU_CD_REAL').attr('metaessential','0');
 		
-	}else if(NM_COUPON_OBJ == '리워드'){
+	}else if('<%=CD_COUPON_OBJ%>' == '4'){
 		$('input:radio[name=TP_MEMBER][value=2], #lbl_all, #basicInfo #layout-1_6_10').show();
 		$('#detailInfo #layout-1_4,#detailInfo #layout-1_5').hide();
 		$('#MENU_CD, #MENU_CD_REAL').attr('metaessential','0');
@@ -370,13 +374,13 @@ function fnSetData(){
 	$('input:radio[name="TP_MEMBER"][value="'+'<%=TP_MEMBER%>'+'"]').prop('checked',true);
 	$('#lbl_obj').html(NM_COUPON_OBJ);
 
-	if('<%=CD_COUPON_TARGET%>' == "1" || '<%=NM_COUPON_OBJ%>' == "매장" || '<%=NM_COUPON_OBJ%>' == "리워드" ){
+	if('<%=CD_COUPON_TARGET%>' != "2"){
 		$('#detailInfo #layout-1_4, #detailInfo #layout-1_5').hide();
 	}
 	
-	if('<%=NM_COUPON_OBJ%>' == "리워드"){
+	if('<%=CD_COUPON_TARGET%>' == "4"){
 		$('#basicLayout #layout-1_7_14,#basicLayout #layout-1_7_15').show();
-		$('#basicLayout #layout-1_7_15').append('<img width="200px" src="'+absoluteUrl+'<%=IMG_RWD%>'+'" alt="" />');
+		$('#basicLayout #layout-1_7_15').append('<img width="200px" src="'+imgPreViewUrl+'<%=IMG_RWD%>'+'" alt="" />');
 	}
 }
 

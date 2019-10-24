@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="MenuManageMLInquiry">
+	
+	<!--
+			Query id    : MenuManageInquiry.getMenuManageList
+			Description : 메뉴 관리 목록(공통) 검색
+	-->
+	<select id="getMenuManageList" parameterType="map" resultType="lmap">
+		SELECT 
+			   MENU_ID         /* 메뉴ID		*/
+			 , MENU_NAME       /* 메뉴명		*/
+			 , MENU_TYPE       /* 메뉴유형		*/
+			 , DESCRIPTION     /* 설명			*/
+			 , CONNECT_URL     /* 연결URL		*/
+			 , TARGET          /* 타겟			*/
+			 , HEIGHT          /* 높이	*/
+			 , WIDTH           /* 넓이	*/
+			 , PARENT_MENU_ID  /* 상위메뉴		*/
+			 , SORT_ORDER      /* 순서			*/
+			 , DEPTH           /* 레벨			*/
+			 , STATUS          /* 상태			*/
+		FROM AP_MENU WITH( NOLOCK )
+		WHERE 1=1
+		  AND STATUS = 'A'
+		<if test="LAZY_KEY != null and LAZY_KEY != ''">
+			AND DEPTH = ( SELECT CASE WHEN DEPTH = 1 THEN 1 ELSE DEPTH-1 END
+							FROM AP_MENU WITH( NOLOCK )
+		                   WHERE 1=1
+		                     AND MENU_ID = #{LAZY_KEY} )  
+		    AND MENU_ID != #{LAZY_KEY}                               
+		</if>	    
+	</select>
+
+	<!-- 메뉴 관리 목록(공통) 상세 조회 -->
+	<select id="getMenuManageDetail" parameterType="map" resultType="lmap">
+		SELECT 
+			   MENU_ID          /* 메뉴ID		*/
+			 , #{config.RESOURCE_PREFIX} + MENU_NAME_RES_ID AS MENU_NAME   /* 메뉴명		*/
+			 , MENU_NAME_RES_ID                         			/* 메뉴명리소스ID */
+			 , MENU_TYPE        /* 메뉴유형		*/
+			 , DESCRIPTION      /* 설명			*/
+			 , CONNECT_URL      /* 연결URL		*/
+			 , TARGET           /* 타겟			*/
+			 , HEIGHT           /* 높이	        */
+			 , WIDTH            /* 넓이	        */
+			 , PARENT_MENU_ID   /* 상위메뉴		*/
+			 , SORT_ORDER       /* 순서			*/
+			 , DEPTH            /* 레벨			*/
+			 , STATUS           /* 상태			*/
+		 FROM AP_MENU WITH( NOLOCK )
+		WHERE 1=1
+		  AND MENU_ID = #{MENU_ID}
+	</select>
+
+	
+	<!-- 메뉴 관리 트리 조회 -->
+	<select id="getMenuManageTree" parameterType="map" resultType="lmap">
+		SELECT A.MENU_ID        AS ID
+		     , '(' + A.STATUS + ') ' + A.MENU_NAME      AS TITLE
+		     , A.MENU_ID        AS DATA_KEY
+		     , A.MENU_NAME      AS TOOL_TIP
+<!--		     , ISNULL(A.PARENT_MENU_ID, 'ROOT') AS PARENT_ID -->
+			 , 'ROOT' AS PARENT_ID
+		     , A.DEPTH          AS DEPTH
+		     , A.SORT_ORDER     AS SORT_ORDER
+		     , CASE WHEN B.PARENT_MENU_ID = NULL THEN 'N' ELSE 'Y' END AS FOLDER_YN
+		  FROM AP_MENU A WITH( NOLOCK )
+		  LEFT OUTER JOIN (SELECT PARENT_MENU_ID 
+			              	 FROM AP_MENU WITH( NOLOCK )
+			             	GROUP BY PARENT_MENU_ID
+			          ) B ON A.MENU_ID = B.PARENT_MENU_ID
+		 WHERE A.DEPTH = '1'
+		   <if test="MENU_STRUCTURE != null and MENU_STRUCTURE != ''">
+		   		<choose>
+					<when test="MENU_STRUCTURE == 'WEB'">
+						AND A.PARENT_MENU_ID IS NULL
+					</when>
+					<otherwise>
+						AND A.PARENT_MENU_ID = UPPER(#{MENU_STRUCTURE})
+					</otherwise>
+				</choose>
+		   </if>
+		 ORDER BY DEPTH, SORT_ORDER ASC
+	</select>
+	
+	<!-- 메뉴 관리 트리 조회(Lazy 용) -->
+	<select id="getMenuManageTreeForLazy" parameterType="map" resultType="lmap">
+		SELECT A.MENU_ID        AS ID
+		     , '(' + A.STATUS + ') ' + A.MENU_NAME      AS TITLE
+		     , A.MENU_ID        AS DATA_KEY
+		     , A.MENU_NAME      AS TOOL_TIP
+		     , ISNULL(A.PARENT_MENU_ID, 'ROOT') AS PARENT_ID
+		     , A.DEPTH          AS DEPTH
+		     , A.SORT_ORDER     AS SORT_ORDER
+		     ,(SELECT CASE WHEN COUNT(MENU_ID) > 0 THEN 'Y' ELSE 'N'  END  
+                 FROM AP_MENU WITH( NOLOCK )
+                WHERE PARENT_MENU_ID = A.MENU_ID ) AS FOLDER_YN 
+		  FROM AP_MENU A WITH( NOLOCK )
+		 WHERE A.PARENT_MENU_ID = #{LAZY_KEY}
+		 ORDER BY DEPTH, SORT_ORDER ASC
+	</select>
+	
+	<!-- 메뉴 수정 -->
+	<update id="updateMenu" parameterType="map">
+		UPDATE AP_MENU                           
+		SET    MENU_ID        = #{MENU_ID}         /*메뉴ID      */
+		     , MENU_TYPE      = #{MENU_TYPE}       /*메뉴유형    */
+		     , MENU_NAME      = #{MENU_NAME}       /*메뉴명      */
+		     , MENU_NAME_RES_ID = #{MENU_NAME_RES_ID}  /*메뉴명리소스ID */
+		     , DESCRIPTION    = #{DESCRIPTION}     /*설명        */
+		     , CONNECT_URL    = #{CONNECT_URL}     /*연결URL     */
+		     , TARGET         = #{TARGET}          /*Target      */
+		     , HEIGHT         = #{HEIGHT}          /*높이        */
+		     , WIDTH          = #{WIDTH}           /*너비        */
+		     , PARENT_MENU_ID = #{PARENT_MENU_ID}  /*상위메뉴ID  */
+		     , SORT_ORDER     = #{SORT_ORDER}      /*정렬순서    */
+		     , DEPTH          = #{DEPTH}           /*깊이        */
+		     , STATUS         = #{STATUS}          /*상태        */
+		     , UPD_USER_ID    = #{user.id}         /*수정사용자ID*/
+		     , UPD_DATETIME   = GETDATE()  /*수정일시    */
+		WHERE  MENU_ID        = #{MENU_ID}
+	</update>
+	
+	<!-- 메뉴 등록 -->
+	<insert id="insertMenu" parameterType="map">
+		<selectKey keyProperty="KEY_MENU_ID" resultType="String" order="BEFORE">
+			SELECT  'MENU'+LPAD(MAX(MID(MENU_ID ,5,4 ))+1 , 4, 0)  FROM AP_MENU 
+		</selectKey>
+		INSERT INTO AP_MENU(
+			  MENU_ID    		/* 메뉴ID*/
+			, MENU_TYPE    		/* 메뉴유형*/
+			, MENU_NAME    		/* 메뉴명*/
+		    , MENU_NAME_RES_ID  /*메뉴명리소스ID */
+			, DESCRIPTION    	/* 설명*/
+			, CONNECT_URL    	/* 연결URL*/
+			, TARGET    		/* Target*/
+			, HEIGHT    	    /* 높이*/
+			, WIDTH    		    /* 너비*/
+			, PARENT_MENU_ID    /* 상위메뉴ID*/
+			, SORT_ORDER    	/* 정렬순서*/
+			, DEPTH    			/* 깊이*/
+			, STATUS    		/* 상태*/
+			, REG_USER_ID    	/* 등록사용자ID*/
+			, REG_DATETIME    	/* 등록일시*/
+			, UPD_USER_ID    	/* 수정사용자ID*/
+			, UPD_DATETIME    	/* 수정일시*/
+	    ) VALUES (
+			  #{KEY_MENU_ID}    /* 메뉴ID*/
+			, #{MENU_TYPE}    	/* 메뉴유형*/
+			, #{MENU_NAME}    	/* 메뉴명*/
+		    , #{MENU_NAME_RES_ID} /*메뉴명리소스ID */
+			, #{DESCRIPTION}    /* 설명*/
+			, #{CONNECT_URL}    /* 연결URL*/
+			, #{TARGET}    		/* Target*/
+			, #{HEIGHT}       	/* 높이*/
+			, #{WIDTH}    	    /* 너비*/
+			, #{PARENT_MENU_ID} /* 상위메뉴ID*/
+			, #{SORT_ORDER}    	/* 정렬순서*/
+			, #{DEPTH}    		/* 깊이*/
+			, #{STATUS}    		/* 상태*/
+			, #{user.id}   		/* 등록사용자ID*/
+			, GETDATE() /* 등록일시*/
+			, #{user.id}    	/* 수정사용자ID*/
+			, GETDATE() /* 수정일시*/
+	    )
+	</insert>
+	
+	<delete id="deleteMenu" parameterType="map">
+		DELETE FROM AP_MENU                           
+		 WHERE MENU_ID  = #{MENU_ID}
+	</delete>
+
+	<delete id="deleteMenuAuth" parameterType="map">
+		DELETE FROM AP_MENU_AUTH                           
+		 WHERE MENU_ID  = #{MENU_ID}
+	</delete>
+
+	<delete id="deleteMenuScreen" parameterType="map">
+		DELETE FROM AP_MENU_SCREEN                           
+		 WHERE MENU_ID  = #{MENU_ID}
+	</delete>
+</mapper>

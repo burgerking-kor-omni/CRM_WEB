@@ -602,21 +602,21 @@
           LEFT OUTER JOIN OMNI.OMNI_MENU_APP OMA_REAL
             ON OMA_REAL.MENU_CD = TO_CHAR(TC.PRODUCT_PK_REAL)
 
-          LEFT OUTER JOIN (SELECT SAL.ATTACH_ID, BIZ_KEY
+          LEFT OUTER JOIN (SELECT SUBSTR( SA.FILE_PATH, INSTR(SA.FILE_PATH,'/',-1), LENGTH(SA.FILE_PATH)) AS ATTACH_ID, BIZ_KEY
                              FROM CRMADMIN.SYS_ATTACH_LINK  SAL
                             INNER JOIN CRMADMIN.SYS_ATTACH SA
                                ON SA.ATTACH_ID = SAL.ATTACH_ID
                             WHERE BIZ_TP = 'COUPON'
                               AND SA.ATTACH_TYPE = 'IMG_APP') SA_LIST
             ON SA_LIST.BIZ_KEY = TC.CD_COUPON
-          LEFT OUTER JOIN (SELECT SAL.ATTACH_ID, BIZ_KEY
+          LEFT OUTER JOIN (SELECT SUBSTR( SA.FILE_PATH, INSTR(SA.FILE_PATH,'/',-1), LENGTH(SA.FILE_PATH)) AS ATTACH_ID, BIZ_KEY
                              FROM CRMADMIN.SYS_ATTACH_LINK  SAL
                             INNER JOIN CRMADMIN.SYS_ATTACH SA
                                ON SA.ATTACH_ID = SAL.ATTACH_ID
                             WHERE BIZ_TP = 'COUPON'
                               AND SA.ATTACH_TYPE = 'IMG_WEB') SA_DTL
             ON SA_DTL.BIZ_KEY = TC.CD_COUPON
-           LEFT OUTER JOIN (SELECT SAL.ATTACH_ID, BIZ_KEY
+           LEFT OUTER JOIN (SELECT SUBSTR( SA.FILE_PATH, INSTR(SA.FILE_PATH,'/',-1), LENGTH(SA.FILE_PATH)) AS ATTACH_ID, BIZ_KEY
                              FROM CRMADMIN.SYS_ATTACH_LINK  SAL
                             INNER JOIN CRMADMIN.SYS_ATTACH SA
                                ON SA.ATTACH_ID = SAL.ATTACH_ID

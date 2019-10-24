@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="AuthManage">
+
+	<!-- 
+		Menu Tree List
+		WHERE A.MENU_LEVEL in (0 , 1)
+	-->
+	<select id="listMenu" parameterType="map" resultType="lmap" >
+		SELECT A.MENU_ID        AS ID
+		     , '('+A.STATUS+') '+ A.MENU_NAME+' - ['+A.MENU_ID+']' AS TITLE
+		     , A.MENU_ID        AS DATA_KEY
+		     , A.MENU_NAME      AS TOOL_TIP
+		     , ISNULL(A.PARENT_MENU_ID, 'ROOT') AS PARENT_ID
+		     , A.DEPTH          AS DEPTH
+		     , A.SORT_ORDER     AS SORT_ORDER
+		     , CASE WHEN B.PARENT_MENU_ID = NULL THEN 'N'
+		            ELSE 'Y'
+		        END AS FOLDER_YN
+		     , CASE WHEN ISNULL(R.ROLE_ID, '-') = #{ROLE_ID} THEN 'Y'
+		     		ELSE 'N'
+		     	END AS CHECK_YN
+		  FROM AP_MENU A WITH( NOLOCK )
+		  LEFT OUTER JOIN AP_MENU_AUTH R WITH( NOLOCK )
+		    ON A.MENU_ID = R.MENU_ID AND #{ROLE_ID} = R.ROLE_ID
+		  LEFT OUTER JOIN (SELECT PARENT_MENU_ID
+		  					 FROM AP_MENU WITH( NOLOCK )
+		  					GROUP BY PARENT_MENU_ID
+		  				  ) B
+		 	ON A.MENU_ID = B.PARENT_MENU_ID
+		 WHERE 1=1
+		   <if test="MENU_STRUCTURE != null and MENU_STRUCTURE != ''">
+		   		<choose>
+					<when test="MENU_STRUCTURE == 'WEB'">
+						AND A.PARENT_MENU_ID IS NULL
+					</when>
+					<otherwise>
+						AND A.PARENT_MENU_ID = UPPER(#{MENU_STRUCTURE})
+					</otherwise>
+				</choose>
+		   </if>
+		 ORDER BY DEPTH, SORT_ORDER ASC
+	</select>
+
+	<!-- 
+	INQIRE MENU Sub LIST
+	-->
+	<select id="listMenuSub" parameterType="map" resultType="lmap" >
+		SELECT A.MENU_ID        AS ID
+		     , '('+A.STATUS+') '+ A.MENU_NAME+' - ['+A.MENU_ID+']' AS TITLE
+		     , A.MENU_ID        AS DATA_KEY
+		     , A.MENU_NAME      AS TOOL_TIP
+		     , ISNULL(A.PARENT_MENU_ID, 'ROOT') AS PARENT_ID
+		     , A.DEPTH          AS DEPTH
+		     , A.SORT_ORDER     AS SORT_ORDER
+		     , CASE WHEN B.PARENT_MENU_ID = NULL THEN 'N'
+		     		ELSE 'Y'
+		     	END AS FOLDER_YN
+		     , CASE WHEN ISNULL(R.ROLE_ID, '-') = #{ROLE_ID} THEN 'Y'
+		     		ELSE 'N'
+		     	END AS CHECK_YN
+		  FROM AP_MENU A WITH( NOLOCK )
+		  LEFT OUTER JOIN AP_MENU_AUTH R WITH( NOLOCK )
+		    ON A.MENU_ID = R.MENU_ID AND #{ROLE_ID} = R.ROLE_ID
+		  LEFT OUTER JOIN (SELECT PARENT_MENU_ID
+		  					 FROM AP_MENU WITH( NOLOCK )
+		  					WHERE PARENT_MENU_ID = #{LAZY_KEY}
+		  					GROUP BY PARENT_MENU_ID
+		  				  ) B
+		 	ON A.MENU_ID = B.PARENT_MENU_ID
+		 WHERE A.PARENT_MENU_ID = #{LAZY_KEY}
+		 ORDER BY DEPTH, SORT_ORDER ASC
+	</select>
+
+	<insert id="insertMenuRole" parameterType="map">
+		INSERT INTO AP_MENU_AUTH
+		           (
+		               ROLE_ID
+		             , MENU_ID
+		             , REG_DATETIME
+		             , REG_USER_ID
+		           )
+		  VALUES
+		           (
+		               #{ROLE_ID}
+		             , #{MENU_ID}
+		             , GETDATE()
+		             , #{user.id}
+		           )		
+	</insert>
+	
+	<delete id="deleteMenuRole" parameterType="map">
+		DELETE 
+		  FROM AP_MENU_AUTH
+		 WHERE ROLE_ID = #{ROLE_ID}
+		   AND MENU_ID = #{MENU_ID}
+	</delete>
+
+	<!--
+		Search Screen Role 
+	 -->
+	<select id="listScreenByMenuId" parameterType="map" resultType="lmap">
+        SELECT S.SCREEN_ID      AS SCREEN_ID
+             , S.CATEGORY_CODE  AS CATEGORY_CODE
+             , S.SCREEN_TYPE    AS SCREEN_TYPE
+             , S.LAYOUT_TYPE    AS LAYOUT_TYPE
+             , S.SCREEN_NAME    AS SCREEN_NAME
+             , CASE WHEN ISNULL(A.ROLE_ID, '-') = #{ROLE_ID} THEN 'Y'
+             		ELSE 'N'
+             	END AS CHECKED
+             , CAST(ISNULL(X.AUTH_CNT, 0) AS VARCHAR) + ' / ' + CAST(ISNULL(X.FUNC_CNT, 0) AS VARCHAR) AS CHK_CNT
+          FROM AP_SCREEN S WITH( NOLOCK )
+         INNER JOIN AP_MENU_SCREEN R WITH( NOLOCK )
+            ON S.SCREEN_ID = R.SCREEN_ID
+          LEFT OUTER JOIN AP_SCREEN_AUTH A WITH( NOLOCK )
+            ON S.SCREEN_ID = A.SCREEN_ID AND #{ROLE_ID} = A.ROLE_ID
+          LEFT OUTER JOIN (SELECT SF.SCREEN_ID
+          					    , COUNT(SF.FUNCTION_ID) AS FUNC_CNT
+          					    , COUNT(FA.FUNCTION_ID) AS AUTH_CNT
+          					 FROM AP_SCREEN_FUNCTION SF WITH( NOLOCK )
+          					 LEFT OUTER JOIN AP_FUNCTION_AUTH FA WITH( NOLOCK )
+          					   ON SF.SCREEN_ID = FA.SCREEN_ID AND SF.FUNCTION_ID = FA.FUNCTION_ID AND #{ROLE_ID} = FA.ROLE_ID
+          					GROUP BY SF.SCREEN_ID
+          				  ) X
+            ON S.SCREEN_ID = X.SCREEN_ID 
+         WHERE R.MENU_ID   = #{MENU_ID}
+
+	</select>
+
+	<insert id="insertScreenRole" parameterType="map">
+		INSERT INTO AP_SCREEN_AUTH
+		           (
+		               ROLE_ID
+		             , SCREEN_ID
+		           )
+		  VALUES
+		           (
+		               #{ROLE_ID}
+		             , #{SCREEN_ID}
+		           )		
+	</insert>
+	
+	<delete id="deleteScreenRole" parameterType="map">
+		DELETE 
+		  FROM AP_SCREEN_AUTH
+		 WHERE ROLE_ID   = #{ROLE_ID}
+		   AND SCREEN_ID = #{SCREEN_ID}
+	</delete>
+
+	<!--
+		Search Function Role 
+	 -->
+	<select id="listFunctionByScreenId" parameterType="map" resultType="lmap">
+        SELECT F.FUNCTION_ID         AS FUNCTION_ID
+             , SF.FUNCTION_ALIAS_ID  AS FUNCTION_ALIAS_ID
+             , F.FUNCTION_NAME       AS FUNCTION_NAME
+             , CASE WHEN ISNULL(FA.ROLE_ID, '-') = #{ROLE_ID} THEN 'Y'
+             		ELSE 'N'
+             	END AS CHECKED
+             , FA.RETRIVE_LEVEL      AS RETRIVE_LEVEL
+          FROM AP_FUNCTION F WITH( NOLOCK )
+         INNER JOIN AP_SCREEN_FUNCTION SF WITH( NOLOCK )
+            ON F.FUNCTION_ID = SF.FUNCTION_ID
+          LEFT OUTER JOIN AP_FUNCTION_AUTH FA WITH( NOLOCK )
+            ON SF.FUNCTION_ID = FA.FUNCTION_ID AND SF.SCREEN_ID = FA.SCREEN_ID AND #{ROLE_ID} = FA.ROLE_ID
+         WHERE SF.SCREEN_ID = #{SCREEN_ID}
+           
+	</select>
+
+	<insert id="insertFunctionRole" parameterType="map">
+		INSERT INTO AP_FUNCTION_AUTH
+		           (
+		               ROLE_ID
+		             , SCREEN_ID
+		             , FUNCTION_ID
+		             , RETRIVE_LEVEL
+		             , REG_DT
+		             , USER_ID_REG
+		           )
+		  VALUES
+		           (
+		               #{ROLE_ID}
+		             , #{SCREEN_ID}
+		             , #{FUNCTION_ID}
+		             , #{RETRIVE_LEVEL}
+		             , GETDATE()
+		             , #{user.id}
+		           )		
+	</insert>
+	
+	<delete id="deleteFunctionRole" parameterType="map">
+		DELETE 
+		  FROM AP_FUNCTION_AUTH
+		 WHERE ROLE_ID   = #{ROLE_ID}
+		   AND SCREEN_ID = #{SCREEN_ID}
+		<if test="FUNCTION_ID != null and FUNCTION_ID != ''">
+		   AND FUNCTION_ID = #{FUNCTION_ID}
+		</if>		   
+	</delete>
+	
+	<!--
+		Query id    : searchScreenByPopup
+		Description : 화면 조회 팝업
+	-->
+	<sql id="searchScreenByPopup_base">
+<!-- 페이징 공통 관련 쿼리 -->		  
+	   SELECT 
+	    <if test="ORDER_COLUMN == null or ORDER_COLUMN == ''">
+			  ROW_NUMBER() OVER( order by SCREEN_ID ) AS ROWNUM /* ROWNUM */
+		</if>
+		<if test="ORDER_COLUMN != null and ORDER_COLUMN != ''">
+			  ROW_NUMBER() OVER( order by ${ORDER_COLUMN} ${ORDER_ASC} ) AS ROWNUM /* ROWNUM */
+		</if>
+		    , SUB.*
+		 FROM (
+<!-- 업무 관련 쿼리 :: Begin -->
+			SELECT A.CATEGORY_CODE
+			     , A.SCREEN_ID
+			     , A.SCREEN_NAME
+			     , A.SCREEN_TYPE
+			     , A.VIEW_TYPE
+			     , A.REG_DATETIME
+			  FROM AP_SCREEN A WITH( NOLOCK )
+			     , (
+			        SELECT SCREEN_ID FROM AP_SCREEN WITH( NOLOCK )
+			        EXCEPT
+			        SELECT SCREEN_ID FROM AP_MENU_SCREEN WITH( NOLOCK )
+			       ) B
+			 WHERE A.SCREEN_ID = B.SCREEN_ID
+			<if test="SCREEN_ID != null and SCREEN_ID != ''">
+	 		   AND A.SCREEN_ID LIKE UPPER(#{SCREEN_ID}) + '%'
+			</if>
+			<if test="SCREEN_NAME != null and SCREEN_NAME != ''">
+			   AND A.SCREEN_NAME LIKE '%' + #{SCREEN_NAME} + '%'
+			</if>
+			<if test="SCREEN_TYPE != null and SCREEN_TYPE != ''">
+			   AND A.SCREEN_TYPE = #{SCREEN_TYPE}
+			</if>
+			<if test="VIEW_TYPE != null and VIEW_TYPE != ''">
+			   AND A.VIEW_TYPE = #{VIEW_TYPE}
+			</if>
+<!-- 업무 관련 쿼리 :: End -->		  
+			) SUB   
+	</sql>
+		
+	<!-- 배치 목록 조회 -->
+	<select id="searchScreenByPopup" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="searchScreenByPopup_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!-- 배치 목록 조회 - count -->
+	<select id="searchScreenByPopup_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="searchScreenByPopup_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!-- 배치 목록 조회 - paging -->
+	<select id="searchScreenByPopup_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="searchScreenByPopup_base" />
+		<include refid="common.paging-bottom" />
+	</select>	
+
+	<select id="checkMenuScreen" parameterType="map" resultType="lmap">
+		SELECT * 
+		  FROM AP_MENU_SCREEN WITH( NOLOCK )
+		 WHERE MENU_ID   = #{MENU_ID}
+		   AND SCREEN_ID = #{SCREEN_ID}
+	</select>
+
+	<insert id="insertMenuScreen" parameterType="map">
+		INSERT INTO AP_MENU_SCREEN
+		           (
+		               MENU_ID
+		             , SCREEN_ID
+		           )
+		  VALUES
+		           (
+		               #{MENU_ID}
+		             , #{SCREEN_ID}
+		           )		
+	</insert>
+
+	<delete id="deleteScreenRoleByScreenId" parameterType="map">
+		DELETE 
+		  FROM AP_SCREEN_AUTH
+		 WHERE SCREEN_ID = #{SCREEN_ID}
+	</delete>
+
+	<delete id="deleteScreenLink" parameterType="map">
+		DELETE 
+		  FROM AP_MENU_SCREEN
+		 WHERE MENU_ID   = #{MENU_ID}
+		   AND SCREEN_ID = #{SCREEN_ID}
+	</delete>
+	
+	<select id="registedListScreenByMenu" parameterType="map" resultType="lmap">
+	    SELECT SCREEN_ID	AS SCREEN_ID
+	      FROM AP_MENU_SCREEN WITH( NOLOCK )
+	     WHERE SCREEN_ID LIKE UPPER(#{CATEGORY_CODE})+'%'
+		 ORDER BY SCREEN_ID
+	</select>
+	
+	<select id="listScreenByMenuIdForXml" parameterType="map" resultType="lmap">
+	    SELECT AMS.MENU_ID 		AS MENU_ID
+		     , AMS.SCREEN_ID 	AS SCREEN_ID
+		     , CASE WHEN ISNULL(ASA.ROLE_ID, '-') = #{ROLE_ID} THEN 'Y' ELSE 'N' END AS CHECKED
+		     , (SELECT COUNT(*) FROM AP_FUNCTION_AUTH WITH( NOLOCK ) WHERE SCREEN_ID = AMS.SCREEN_ID) AS FUNC_AUTH_CNT
+		  FROM AP_MENU_SCREEN AMS WITH( NOLOCK )
+		  LEFT OUTER JOIN AP_SCREEN_AUTH ASA WITH( NOLOCK )
+		    ON AMS.SCREEN_ID = ASA.SCREEN_ID AND ASA.ROLE_ID = #{ROLE_ID}
+		 WHERE AMS.MENU_ID = #{MENU_ID}
+		 ORDER BY AMS.SCREEN_ID 
+	</select>
+	
+	<select id="listFunctionAuthByScreenIdForXml" parameterType="map" resultType="lmap">
+	    SELECT FUNCTION_ID
+		     , RETRIVE_LEVEL
+		  FROM AP_FUNCTION_AUTH WITH( NOLOCK )
+		 WHERE SCREEN_ID = #{SCREEN_ID}
+		   AND ROLE_ID = #{ROLE_ID}
+	</select>
+</mapper>

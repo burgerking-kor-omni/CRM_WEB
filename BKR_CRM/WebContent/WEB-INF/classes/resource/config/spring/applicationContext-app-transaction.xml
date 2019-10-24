@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
+
+	<!--
+		================================================================================
+		Transaction 관련 Configuration
+		================================================================================
+	-->
+	<!-- This tells Spring to activate annotation-driven transactions -->
+	<tx:annotation-driven transaction-manager="applicationTxManager" />
+	
+	<!-- =================================================================================== -->
+	<!-- framework transaction manager -->
+	<!-- =================================================================================== -->
+	<bean id="frameworkTxManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+		p:dataSource-ref="frameworkDataSource" />
+
+	<!-- framework transaction advice 설정 -->
+	<tx:advice id="frameworkTxAdvice" transaction-manager="frameworkTxManager">
+		<tx:attributes>
+			<tx:method name="get*" propagation="NOT_SUPPORTED" read-only="true" />
+			<tx:method name="find*" propagation="NOT_SUPPORTED" read-only="true" />
+			<tx:method name="search*" propagation="NOT_SUPPORTED" read-only="true" />
+			<tx:method name="check*" propagation="NOT_SUPPORTED" read-only="true" />
+			<tx:method name="is*" propagation="NOT_SUPPORTED" read-only="true" />
+			<tx:method name="save*" propagation="REQUIRES_NEW" />
+			<tx:method name="insert*" propagation="REQUIRES_NEW" />
+			<tx:method name="import*" propagation="REQUIRES_NEW" />
+			<tx:method name="update*" propagation="REQUIRES_NEW" />
+			<tx:method name="delete*" propagation="REQUIRES_NEW" />
+			<tx:method name="execute*" propagation="REQUIRES_NEW" />
+			<tx:method name="batch*" propagation="REQUIRES_NEW" />
+			<tx:method name="*" propagation="REQUIRES_NEW" />
+		</tx:attributes>
+	</tx:advice>
+	
+	<!-- framework transaction pointcut 설정 -->
+	<aop:config>
+		<aop:pointcut id="frameworkRepositoryMethod"
+			expression="execution(public * com.ubone.framework..*Repository.*(..))" />
+		<aop:advisor advice-ref="frameworkTxAdvice" pointcut-ref="frameworkRepositoryMethod" />
+	</aop:config>
+
+	<!-- =================================================================================== -->
+	<!-- application transaction manager -->
+	<!-- =================================================================================== -->
+	<bean id="applicationTxManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+		p:dataSource-ref="applicationDataSource" />
+
+	<!-- application transaction advice 설정 -->
+	<tx:advice id="txAdvice" transaction-manager="applicationTxManager">
+		<tx:attributes>
+			<tx:method name="get*" propagation="SUPPORTS" read-only="true" />
+			<tx:method name="find*" propagation="SUPPORTS" read-only="true" />
+			<tx:method name="search*" propagation="SUPPORTS" read-only="true" />
+			<tx:method name="check*" propagation="SUPPORTS" read-only="true" />
+			<tx:method name="is*" propagation="SUPPORTS" read-only="true" />
+			<tx:method name="save*" propagation="REQUIRED" />
+			<tx:method name="insert*" propagation="REQUIRED" />
+			<tx:method name="import*" propagation="REQUIRED" />
+			<tx:method name="update*" propagation="REQUIRED" />
+			<tx:method name="delete*" propagation="REQUIRED" />
+			<tx:method name="execute*" propagation="REQUIRED" />
+			<tx:method name="batch*" propagation="REQUIRED" />
+			<tx:method name="invoke*" propagation="REQUIRED" />
+			<tx:method name="*" propagation="REQUIRED" />
+		</tx:attributes>
+	</tx:advice>
+
+	<!-- application transaction pointcut 설정 -->
+	<aop:config>
+		<aop:pointcut id="applicationServiceMethod"
+			expression="execution(public * *..*SO.*(..)) and @target(org.springframework.stereotype.Service)" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="applicationServiceMethod" />
+	</aop:config>
+
+	<!-- =================================================================================== -->
+	<!-- extend1 transaction manager -->
+	<!-- =================================================================================== -->
+	<!-- <bean id="extend1TxManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+		p:dataSource-ref="extend1DataSource" /> -->
+
+	<!-- extend1 transaction advice 설정 -->
+	<!-- <tx:advice id="extend1TxAdvice" transaction-manager="extend1TxManager">
+		<tx:attributes>
+			<tx:method name="get*" propagation="NOT_SUPPORTED" read-only="true" />
+			<tx:method name="find*" propagation="NOT_SUPPORTED" read-only="true" />
+			<tx:method name="search*" propagation="NOT_SUPPORTED" read-only="true" />
+			<tx:method name="check*" propagation="NOT_SUPPORTED" read-only="true" />
+			<tx:method name="is*" propagation="NOT_SUPPORTED" read-only="true" />
+			<tx:method name="save*" propagation="REQUIRES_NEW" />
+			<tx:method name="insert*" propagation="REQUIRES_NEW" />
+			<tx:method name="import*" propagation="REQUIRES_NEW" />
+			<tx:method name="update*" propagation="REQUIRES_NEW" />
+			<tx:method name="delete*" propagation="REQUIRES_NEW" />
+			<tx:method name="execute*" propagation="REQUIRES_NEW" />
+			<tx:method name="batch*" propagation="REQUIRES_NEW" />
+			<tx:method name="*" propagation="REQUIRES_NEW" />
+		</tx:attributes>
+	</tx:advice> -->
+	
+	<!-- extend1 transaction pointcut 설정 -->
+	<!-- <aop:config>
+		<aop:pointcut id="extend1RepositoryMethod"
+			expression="execution(public * *..*SO.*(..)) and @target(org.springframework.stereotype.Service)" />
+		<aop:advisor advice-ref="extend1TxAdvice" pointcut-ref="extend1RepositoryMethod" />
+	</aop:config> -->
+</beans>

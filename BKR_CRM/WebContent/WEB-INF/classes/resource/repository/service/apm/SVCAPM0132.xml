@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<serviceBuilder id="SVCAPM0132" isProtectedResource="false" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <serviceName>프로그램 권한 관리 - Screen 권한 설정</serviceName>
+  <serviceType type="Update"/>
+  <serviceComponentType type="Custom">
+    <className>com.ubone.standard.system.auth.service.AuthManageSO</className>
+    <methodName>updateScreenRole</methodName>
+    <linkedFile>false</linkedFile>
+    <inducedEvent>false</inducedEvent>
+    <linkedWorkCategory></linkedWorkCategory>
+    <linkedActivity></linkedActivity>
+  </serviceComponentType>
+  <serviceCodes version="1.0"/>
+  <serviceMasks version="1.0"/>
+</serviceBuilder>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="BoardPushDAO">
+	
+    <select id="getPushTarget" parameterType="map" resultType="lmap">
+        SELECT SBPT.ID_USER  AS ID_TARGET
+		     , SU.USER_NM AS NM_TARGET
+		     , SU.PHONE_NO AS DS_TELNO
+		     , SU.EMAIL_DS AS DS_EMAIL
+		     , SMPM.ID_PUSH AS ID_PUSH
+		     , SMD.TP_OS AS TP_OS
+		  FROM SYS_BOARD_PUSH_TARGET SBPT
+		 INNER JOIN SYS_MOBILE_DEVICE SMD
+		    ON SBPT.ID_USER = SMD.ID_LOGIN_LAST
+		 INNER JOIN SYS_MOBILE_PUSH_MAPP SMPM
+		    ON SMD.ID_DEVICE = SMPM.ID_DEVICE
+		 INNER JOIN SYS_USER SU
+		    ON SBPT.ID_USER = SU.USER_ID    
+		 WHERE SBPT.ID_BOARD = #{ID_BOARD}
+		   AND SBPT.ID_SUB   = #{ID_SUB}
+		 <if test="ID_USER != null and ID_USER != ''">
+		     AND SU.USER_ID = #{ID_USER}
+		 </if>
+    </select>
+	
+    <select id="getMessageInfo" parameterType="map" resultType="lmap">
+        SELECT DS_MESSAGE
+		     , FG_USE
+		  FROM SYS_BOARD_MESSAGE_INFO
+		 WHERE ID_BOARD = #{ID_BOARD}
+		   AND TP_MESSAGE = #{TP_MESSAGE}
+    </select>
+    
+    <select id="getArticleRegistUserId" parameterType="map" resultType="lmap">
+        SELECT ID_REG_EMP 
+		  FROM SYS_BOARD_ARTICLE 
+		 WHERE ID_BOARD = #{ID_BOARD}
+		   AND ID_ARTICLE = #{ID_ARTICLE}
+		   AND ID_SUB = #{ID_SUB}
+    </select>
+    
+</mapper>

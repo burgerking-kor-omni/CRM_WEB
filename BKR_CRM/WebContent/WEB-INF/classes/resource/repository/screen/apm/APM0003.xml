@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="APM0003" screenType="register" screenLayoutType="Default" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>APMD /  화면관리 등록</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0003</fileName>
+  <functions>
+    <function id="FNCAPM0003" isStartFunction="true" functionName="화면관리 기본정보 조회(dummy) 호출" serviceId="SVCAPM0016" alias=""/>
+    <function id="FNCAPM0016" isStartFunction="false" functionName="스크린 상세 조회 호출" serviceId="SVCAPM0003" alias="INQUIRY"/>
+    <function id="FNCAPM0017" isStartFunction="false" functionName="스크린 등록 호출" serviceId="SVCAPM0008" alias="REGIST"/>
+    <function id="FNCAPM0085" isStartFunction="false" functionName="화면읽기 호출" serviceId="SVCAPM0085" alias="USERDEFINED1"/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

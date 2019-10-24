@@ -201,17 +201,26 @@ public class AddressSO {
 		DataList dtOmni = addressDAO.getOmniStorInfo(parameter);
 		
 		if (0 < dtOmni.getRowCount()) {
-			resultData.put("STOR_CD", dtOmni.getString(0, "STOR_CD"));
-			resultData.put("STOR_NM", dtOmni.getString(0, "STOR_NM"));
-			resultData.put("TEL_NO", dtOmni.getString(0, "TEL_NO"));
-			resultData.put("DELIVERY_TEL_NO", dtOmni.getString(0, "DELIVERY_TEL_NO"));
-
-			DataList dtRims = custManageRimsDAO.getPosSchedule(parameter);
-			
-			if (0 < dtRims.getRowCount()) {
-				resultData.put("STOR_TYPE", dtRims.getString(0, "STOR_TYPE"));
+			// 24시 매장은 무조건 전개매장으로 판단
+			if (ApiConstantHolder.FLAG_Y.equals(dtOmni.getString(0, "FG_YN"))) {
+				resultData.put("STOR_CD", dtOmni.getString(0, "STOR_CD"));
+				resultData.put("STOR_NM", dtOmni.getString(0, "STOR_NM"));
+				resultData.put("TEL_NO", dtOmni.getString(0, "TEL_NO"));
+				resultData.put("DELIVERY_TEL_NO", dtOmni.getString(0, "DELIVERY_TEL_NO"));
+				resultData.put("STOR_TYPE", "1");
 			} else {
-				resultData.put("STOR_TYPE", "0");
+				resultData.put("STOR_CD", dtOmni.getString(0, "STOR_CD"));
+				resultData.put("STOR_NM", dtOmni.getString(0, "STOR_NM"));
+				resultData.put("TEL_NO", dtOmni.getString(0, "TEL_NO"));
+				resultData.put("DELIVERY_TEL_NO", dtOmni.getString(0, "DELIVERY_TEL_NO"));
+
+				DataList dtRims = custManageRimsDAO.getPosSchedule(parameter);
+				
+				if (0 < dtRims.getRowCount()) {
+					resultData.put("STOR_TYPE", dtRims.getString(0, "STOR_TYPE"));
+				} else {
+					resultData.put("STOR_TYPE", "0");
+				}
 			}
 			resultCode = ApiConstantHolder.RESULT_SELECT_SUCCESS;
 			resultMessage = "정상적으로 조회되었습니다.";

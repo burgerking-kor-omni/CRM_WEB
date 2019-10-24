@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="APM0035" screenType="list" screenLayoutType="Popup" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>APMD / 서비스관리 상세코드보기</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0035</fileName>
+  <functions>
+    <function id="FNCAPM0080" isStartFunction="false" functionName="서비스관리 상세코드 목록 조회 호출" serviceId="SVCAPM0076" alias="INQUIRY"/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

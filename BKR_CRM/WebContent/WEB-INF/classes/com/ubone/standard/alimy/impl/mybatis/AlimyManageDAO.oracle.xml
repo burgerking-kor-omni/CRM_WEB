@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="euc-kr" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="AlimyManage">
+	
+	<!--
+		QueryId     : AlimyManage.getTargetList
+		Description : 알리미 대상자 정보 조회
+	 -->
+	<sql id="getTargetList_base">
+		SELECT A.LOGIN_ID
+		     , C.USER_NM
+		     , A.CLIENT_IP
+		     , A.CLIENT_PORT
+		     , A.LOGIN_TOKEN
+		     , A.LOGIN_DT 
+		  FROM SYS_LOGIN_ALIMY A
+		     , SYS_LOGIN B
+		           LEFT OUTER JOIN SYS_USER C ON C.USER_ID = B.USER_ID
+		 WHERE A.LOGIN_ID = B.LOGIN_ID
+		 <if test="USER_ID != null and USER_ID != ''">
+		 AND A.LOGIN_ID = #{USER_ID}
+		 </if>
+		 ORDER BY LOGIN_DT DESC 
+	</sql>
+	
+	<!--  알리미 대상자 정보 조회 목록 조회 -->
+	<select id="getTargetList" parameterType="map" resultType="lmap">
+		<include refid="common.order-top" />
+		<include refid="getTargetList_base" />
+		<include refid="common.order-bottom" />
+	</select>
+
+	<!--  알리미 대상자 정보 조회 - count -->
+	<select id="getTargetList_count" parameterType="map" resultType="Integer">
+		<include refid="common.count-top" />
+		<include refid="getTargetList_base" />
+		<include refid="common.count-bottom" />
+	</select>
+
+	<!--  알리미 대상자 정보 조회 - paging -->
+	<select id="getTargetList_paging" parameterType="map" resultType="lmap">
+		<include refid="common.paging-top" />
+		<include refid="getTargetList_base" />
+		<include refid="common.paging-bottom" />
+	</select>
+	
+
+	<!--
+		QueryId     : AlimyManage.getTarget
+		Description : 알리미 대상자 정보 조회
+	 --> 
+	<select id="getTarget" parameterType="map" resultType="lmap">
+		SELECT LOGIN_ID
+		     , CLIENT_IP
+		     , CLIENT_PORT
+		     , LOGIN_TOKEN
+		     , LOGIN_DT 
+		  FROM SYS_LOGIN_ALIMY
+		WHERE LOGIN_ID = #{LOGIN_ID}
+	</select>
+	
+</mapper>
+ 

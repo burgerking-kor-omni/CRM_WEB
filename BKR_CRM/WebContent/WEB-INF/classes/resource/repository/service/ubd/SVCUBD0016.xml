@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<serviceBuilder id="SVCUBD0016" isProtectedResource="false" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <serviceName>게시판 이전게시물ID 조회</serviceName>
+  <serviceType type="Read">
+  	<paging isPaging="false" pagingCount="-1"/>
+    <isFindConditionSave>false</isFindConditionSave>
+  </serviceType>
+  <serviceComponentType type="Custom">
+    <className>com.ubone.standard.ubboard.board.base.service.BoardSO</className>
+    <methodName>getPreArticle</methodName>
+    <linkedFile>false</linkedFile>
+    <inducedEvent>false</inducedEvent>
+    <linkedWorkCategory></linkedWorkCategory>
+    <linkedActivity></linkedActivity>
+  </serviceComponentType>
+  <serviceCodes version="1.0"/>
+  <serviceMasks version="1.0"/>
+</serviceBuilder>

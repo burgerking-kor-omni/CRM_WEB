@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<serviceBuilder id="SVCAPM0020" isProtectedResource="false" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <serviceName>기능관리 상세정보 조회</serviceName>
+  <serviceType type="Read">
+    <paging isPaging="false" pagingCount="-1"/>
+    <isFindConditionSave>false</isFindConditionSave>
+  </serviceType>
+  <serviceComponentType type="Custom">
+    <className>com.ubone.standard.system.function.service.FunctionManageSO</className>
+    <methodName>getFunc</methodName>
+    <linkedFile>false</linkedFile>
+    <inducedEvent>false</inducedEvent>
+    <linkedWorkCategory></linkedWorkCategory>
+    <linkedActivity></linkedActivity>
+  </serviceComponentType>
+  <serviceCodes version="1.0">
+    <serviceCode id="APMD_FUNCTION_TYPE" includeSleep="false" alias="APMD_FUNCTION_TYPE"/>
+  </serviceCodes>
+  <serviceMasks version="1.0"/>
+</serviceBuilder>

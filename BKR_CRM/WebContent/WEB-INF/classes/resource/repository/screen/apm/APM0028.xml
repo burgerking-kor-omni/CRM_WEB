@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screenBuilder id="APM0028" screenType="detail" screenLayoutType="Default" isLoginCheck="true" version="1.0">
+  <applicationId>P000000002</applicationId>
+  <screenName>APMD /  마스크 관리 / 마스크 상세</screenName>
+  <screenViewType>Jsp</screenViewType>
+  <metaPageId></metaPageId>
+  <filePath>/standard/apm/</filePath>
+  <fileName>APM0028</fileName>
+  <functions>
+    <function id="FNCAPM0056" isStartFunction="false" functionName="마스크관리 마스크 수정 호출" serviceId="SVCAPM0051" alias="MODIFY"/>
+    <function id="FNCAPM0057" isStartFunction="false" functionName="마스크관리 마스크 정보 삭제 호출" serviceId="SVCAPM0052" alias="REMOVE"/>
+    <function id="FNCAPM0058" isStartFunction="false" functionName="마스크관리 권한 리스트 조회 호출" serviceId="SVCAPM0053" alias="USERDEFINED1"/>
+    <function id="FNCAPM0059" isStartFunction="false" functionName="마스크관리 권한 정보 업데이트 호출" serviceId="SVCAPM0054" alias="USERDEFINED2"/>
+    <function id="FNCAPM0060" isStartFunction="false" functionName="마스크관리 서비스 리스트 조회 호출" serviceId="SVCAPM0055" alias="USERDEFINED3"/>
+    <function id="FNCAPM0061" isStartFunction="true" functionName="마스크관리 마스크 상세 조회 호출" serviceId="SVCAPM0049" alias=""/>
+  </functions>
+  <defaultParameters/>
+  <authorities>
+    <auth id="6"/>
+  </authorities>
+</screenBuilder>

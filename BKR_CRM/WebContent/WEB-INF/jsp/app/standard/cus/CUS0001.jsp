@@ -132,11 +132,22 @@ function fnSearch(){
 	dtStartLater.addMonths(6);
 	
 	if(dtStartLater < dtEnd){
-		dtStartLater.setDate(0);
-		if(dtStart.getDate() != dtStartLater.getDate() && dtEnd.getDate() != 31){
+		
+        var FirstDate = new Date($('#DT_START').val());
+        var SecondDate = new Date($('#DT_END').val());
+
+		var calDate = SecondDate - FirstDate;
+		
+		var calDateDays = calDate / ( 24*60*60*1000); 
+		 
+		if(calDateDays > 186){
 			alert('가입일자 최대 검색기간은 6개월입니다. 다시 입력해주세요.');
 			return;
 		};
+		
+// 		dtStartLater.setDate(0);
+// 		if(dtEnd.getDate() != dtStartLater.getDate() && dtEnd.getDate() != 31){
+// 		};
 		
 	};
 	

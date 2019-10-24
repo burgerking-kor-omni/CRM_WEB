@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<white-url>
+	<src>
+		<domain name="http://www.naver.com" desc="네이버">
+			<pattern>http://serviceapi.nmv.naver.com*</pattern>
+			<pattern>http://scrap.ad.naver.com/*</pattern>
+		</domain>
+	</src>
+</white-url>
