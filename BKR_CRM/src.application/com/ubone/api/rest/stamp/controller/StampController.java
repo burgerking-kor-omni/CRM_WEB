@@ -199,6 +199,8 @@ public class StampController {
 			// 1. 비즈니스 구현을 위한  parameter 셋팅
 			Parameter parameter = DataUtil.makeParameter();
 			parameter.setParameter("ID_STORE", request.getParameter("id_store"));			/* 매장ID */
+
+			logger.info("/stamp/getStampExcept request : " + request.getRemoteAddr() + " : " + parameter);
 			
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("ID_STORE"))) {
@@ -211,6 +213,8 @@ public class StampController {
 			
 			// 4. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
+
+			logger.info("/stamp/getStampExcept response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);
@@ -244,6 +248,8 @@ public class StampController {
 			parameter.setParameter("CD_MTH_PURCHS", request.getParameter("cd_mth_purchs"));		/* 구매방법 */
 			parameter.setParameter("CD_ORDER_CHNN", request.getParameter("cd_order_chnn"));		/* 주문채널 */
 			parameter.setParameter("PRODUCT_LIST", request.getParameter("product_list"));		/* 상품목록 */
+
+			logger.info("/stamp/insertStampKiosk request : " + request.getRemoteAddr() + " : " + parameter);
 			
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("BRCD_MEMBER"))
@@ -260,6 +266,8 @@ public class StampController {
 			
 			// 3. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
+
+			logger.info("/stamp/insertStampKiosk response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);
@@ -293,6 +301,8 @@ public class StampController {
 			parameter.setParameter("CD_MTH_PURCHS", request.getParameter("cd_mth_purchs"));		/* 구매방법 */
 			parameter.setParameter("CD_ORDER_CHNN", request.getParameter("cd_order_chnn"));		/* 주문채널 */
 			parameter.setParameter("PRODUCT_LIST", request.getParameter("product_list"));		/* 상품목록 */
+
+			logger.info("/stamp/insertStamp request : " + request.getRemoteAddr() + " : " + parameter);
 			
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("ID_MEMBER"))
@@ -310,6 +320,8 @@ public class StampController {
 			
 			// 4. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
+
+			logger.info("/stamp/insertStamp response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);
@@ -339,6 +351,8 @@ public class StampController {
 			Parameter parameter = DataUtil.makeParameter();
 			parameter.setParameter("ORDER_NO", request.getParameter("order_no"));                  /* 주문번호 */
 			parameter.setParameter("ID_MEMBER", request.getParameter("id_member"));                /* 회원PK */
+
+			logger.info("/stamp/checkStamp request : " + request.getRemoteAddr() + " : " + parameter);
 			
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("ID_MEMBER"))
@@ -352,6 +366,8 @@ public class StampController {
 			
 			// 4. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
+
+			logger.info("/stamp/checkStamp response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);
@@ -381,6 +397,8 @@ public class StampController {
 			Parameter parameter = DataUtil.makeParameter();
 			parameter.setParameter("ORDER_NO", request.getParameter("order_no"));                  /* 주문번호 */
 			parameter.setParameter("ID_MEMBER", request.getParameter("id_member"));                /* 회원PK */
+
+			logger.info("/stamp/deleteStamp request : " + request.getRemoteAddr() + " : " + parameter);
 			
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("ID_MEMBER"))
@@ -394,6 +412,8 @@ public class StampController {
 			
 			// 4. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
+
+			logger.info("/stamp/deleteStamp response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);

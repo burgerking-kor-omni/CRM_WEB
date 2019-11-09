@@ -203,6 +203,8 @@ public class CouponController {
 			parameter.setParameter("USEDATE", request.getParameter("usedate"));			// 사용일자
 			parameter.setParameter("USE_AMT", request.getParameter("use_amt"));			// 사용가격
 			parameter.setParameter("CANCEL_AMT", request.getParameter("cancel_amt"));	// 취소가격
+
+			logger.info("/coupon/updateCouponUseDau request : " + request.getRemoteAddr() + " : " + parameter);
 			
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("SITE_ID"))
@@ -219,6 +221,8 @@ public class CouponController {
 			
 			DataList dtResultInfo = result.getDataList("resultInfo");
 			returnMsg = dtResultInfo.getString(0, "result_code") + "|" + dtResultInfo.getString(0, "result_message");
+
+			logger.info("/coupon/updateCouponUseDau response : " + returnMsg);
 		} catch (Exception e) {
 			// API Error 저장
 			returnMsg = ApiConstantHolder.DAU_ERROR + "|시스템오류";
@@ -253,6 +257,8 @@ public class CouponController {
 			parameter.setParameter("ORDER_NO", request.getParameter("order_no"));			// 사용한주문번호
 			parameter.setParameter("AMT_USE", request.getParameter("amt_use"));				// 사용가격
 			parameter.setParameter("AMT_CANCEL", request.getParameter("amt_cancel"));		// 취소가격
+
+			logger.info("/coupon/updateCouponUse request : " + request.getRemoteAddr() + " : " + parameter);
 			
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("NO_PIN"))
@@ -268,6 +274,8 @@ public class CouponController {
 			
 			// 4. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
+
+			logger.info("/coupon/updateCouponUse response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);
@@ -310,6 +318,8 @@ public class CouponController {
 			parameter.setParameter("FG_APP", request.getParameter("fg_app"));		// APP 여부
 			parameter.setParameter("CD_COUPON", request.getParameter("cd_coupon"));	// 쿠폰
 //			parameter.setParameter("NO_PIN", request.getParameter("no_pin"));		// 핀일련번호
+
+			logger.info("/coupon/getCouponDetail request : " + request.getRemoteAddr() + " : " + parameter);
 			
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("CD_COUPON"))) {
@@ -324,6 +334,8 @@ public class CouponController {
 			
 			// 4. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
+
+			logger.info("/coupon/response response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);
@@ -353,6 +365,8 @@ public class CouponController {
 			parameter.setParameter("NO_MEMBER_STAMP_REWARD", request.getParameter("no_member_stamp_reward"));	// 회원스템프리워드일련번호
 			parameter.setParameter("CD_COUPON", request.getParameter("cd_coupon"));								// 쿠폰
 			parameter.setParameter("ID_MEMBER", request.getParameter("id_member"));								// 회원PK
+
+			logger.info("/coupon/updateRewardCoupon request : " + request.getRemoteAddr() + " : " + parameter);
 			
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("NO_MEMBER_STAMP_REWARD"))
@@ -369,6 +383,8 @@ public class CouponController {
 			
 			// 4. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
+
+			logger.info("/coupon/updateRewardCoupon response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);
@@ -396,6 +412,8 @@ public class CouponController {
 			// 1. 비즈니스 구현을 위한  parameter 셋팅
 			Parameter parameter = DataUtil.makeParameter();
 			parameter.setParameter("PIN_NUM", request.getParameter("pin_num"));	// 핀번호
+
+			logger.info("/coupon/checkUseCoupon request : " + request.getRemoteAddr() + " : " + parameter);
 			
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("PIN_NUM"))) {
@@ -410,6 +428,8 @@ public class CouponController {
 			
 			// 4. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
+
+			logger.info("/coupon/checkUseCoupon response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);
@@ -440,6 +460,8 @@ public class CouponController {
 			parameter.setParameter("CD_COUPON", request.getParameter("cd_coupon"));			// 쿠폰번호
 			parameter.setParameter("ID_STORE_USE", request.getParameter("id_store_use"));	// 사용매장코드
 			parameter.setParameter("PIN_NUM", request.getParameter("pin_num"));				// 핀번호
+
+			logger.info("/coupon/checkCouponStore request : " + request.getRemoteAddr() + " : " + parameter);
 			
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("CD_CHNN"))
@@ -455,6 +477,8 @@ public class CouponController {
 			
 			// 4. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
+
+			logger.info("/coupon/checkCouponStore response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);

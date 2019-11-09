@@ -295,7 +295,9 @@ public class UserController {
 			parameter.setParameter("SN_SNS", request.getParameter("sn_sns"));		// SNS SECRET 값
 			parameter.setParameter("CD_GENDER", request.getParameter("cd_gender"));	// SNS 성별
 			parameter.setParameter("BIRTHDAY", request.getParameter("birthday"));	// SNS 생일
-			
+
+			logger.info("/user/login request : " + request.getRemoteAddr() + " : " + parameter);
+
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("CHK_GUBUN"))
 					|| StringUtils.isEmpty(parameter.getParameter("CONNECT_GUBUN"))) {
@@ -348,6 +350,9 @@ public class UserController {
 				
 			// 3. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
+
+			logger.info("/user/login response : " + mv);
+
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);
