@@ -246,6 +246,7 @@ public class CouponController {
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
+				logger.info("/coupon/updateCouponUse response error 1 : " + mv + " : " + request.getParameter("no_pin"));
 				return mv;
 			}
 
@@ -264,6 +265,7 @@ public class CouponController {
 			if (StringUtils.isEmpty(parameter.getParameter("NO_PIN"))
 					|| StringUtils.isEmpty(parameter.getParameter("STATUS"))) {
 				mv = this.ApiRequiredCheck();
+				logger.info("/coupon/updateCouponUse response error 2 : " + mv);
 				return mv;
 			}
 			
@@ -297,6 +299,7 @@ public class CouponController {
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
+				logger.info("/coupon/getCouponDetail response error 1 : " + mv + " : " + request.getParameter("no_pin"));
 				return mv;
 			}
 
@@ -324,6 +327,7 @@ public class CouponController {
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("CD_COUPON"))) {
 				mv = this.ApiRequiredCheck();
+				logger.info("/coupon/getCouponDetail response error 2 : " + mv);
 				return mv;
 			}
 			
@@ -357,6 +361,7 @@ public class CouponController {
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
+				logger.info("/coupon/updateRewardCoupon response error 1 : " + mv + " : " + request.getParameter("id_member"));
 				return mv;
 			}
 
@@ -373,6 +378,7 @@ public class CouponController {
 					|| StringUtils.isEmpty(parameter.getParameter("CD_COUPON"))
 					|| StringUtils.isEmpty(parameter.getParameter("ID_MEMBER"))) {
 				mv = this.ApiRequiredCheck();
+				logger.info("/coupon/updateRewardCoupon response error 2 : " + mv);
 				return mv;
 			}
 			
@@ -406,6 +412,7 @@ public class CouponController {
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
+				logger.info("/coupon/checkUseCoupon response error 1 : " + mv + " : " + request.getParameter("pin_num"));
 				return mv;
 			}
 
@@ -418,6 +425,7 @@ public class CouponController {
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("PIN_NUM"))) {
 				mv = this.ApiRequiredCheck();
+				logger.info("/coupon/checkUseCoupon response error 2 : " + mv);
 				return mv;
 			}
 			
@@ -451,6 +459,7 @@ public class CouponController {
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
+				logger.info("/coupon/checkCouponStore response error 1 : " + mv + " : " + request.getParameter("pin_num"));
 				return mv;
 			}
 
@@ -467,6 +476,7 @@ public class CouponController {
 			if (StringUtils.isEmpty(parameter.getParameter("CD_CHNN"))
 					|| StringUtils.isEmpty(parameter.getParameter("ID_STORE_USE"))) {
 				mv = this.ApiRequiredCheck();
+				logger.info("/coupon/checkCouponStore response error 2 : " + mv);
 				return mv;
 			}
 			

@@ -192,6 +192,7 @@ public class UserController {
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
+				logger.info("/user/insertMember response error 1 : " + mv + " : " + request.getParameter("ds_email"));
 				return mv;
 			}
 			
@@ -217,25 +218,31 @@ public class UserController {
 			parameter.setParameter("YN_PRIVACY_AGREE", request.getParameter("yn_privacy_agree"));	// 개인정보수집동의여부
 			parameter.setParameter("YN_BKR_AGREE", request.getParameter("yn_bkr_agree"));			// 버거킹이용약관동의여부
 			parameter.setParameter("TOKEN_PK", request.getParameter("token_pk"));					// 푸시토큰PK
+
+			logger.info("/user/insertMember request : " + request.getRemoteAddr() + " : " + parameter);
 			
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("JOIN_GUBUN"))) {
 				mv = this.ApiRequiredCheck();
+				logger.info("/user/insertMember response error 2 : " + mv);
 				return mv;
 			} else {
 				if (ApiConstantHolder.JOIN_BKR.equals(parameter.getParameter("JOIN_GUBUN"))) {
 					if (StringUtils.isEmpty(parameter.getParameter("PASSWD"))) {
 						mv = this.ApiRequiredCheck();
+						logger.info("/user/insertMember response error 3 : " + mv);
 						return mv;
 					}
 				} else if (ApiConstantHolder.JOIN_SNS.equals(parameter.getParameter("JOIN_GUBUN"))) {
 					if (StringUtils.isEmpty(parameter.getParameter("TP_SNS"))
 							|| StringUtils.isEmpty(parameter.getParameter("SN_SNS"))) {
 						mv = this.ApiRequiredCheck();
+						logger.info("/user/insertMember response error 4 : " + mv);
 						return mv;
 					}
 				} else {
 					mv = this.ApiRequiredCheck();
+					logger.info("/user/insertMember response error 5 : " + mv);
 					return mv;
 				}
 				
@@ -244,6 +251,7 @@ public class UserController {
 						|| StringUtils.isEmpty(parameter.getParameter("NO_PHONE"))
 						|| StringUtils.isEmpty(parameter.getParameter("DI"))) {
 					mv = this.ApiRequiredCheck();
+					logger.info("/user/insertMember response error 6 : " + mv);
 					return mv;
 				}
 			}
@@ -259,6 +267,8 @@ public class UserController {
 
 			// 4. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
+
+			logger.info("/user/insertMember response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);
@@ -280,6 +290,7 @@ public class UserController {
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
+				logger.info("/user/login response error 1 : " + mv + " : " + request.getParameter("id_member"));
 				return mv;
 			}
 			
@@ -302,18 +313,21 @@ public class UserController {
 			if (StringUtils.isEmpty(parameter.getParameter("CHK_GUBUN"))
 					|| StringUtils.isEmpty(parameter.getParameter("CONNECT_GUBUN"))) {
 				mv = this.ApiRequiredCheck();
+				logger.info("/user/login response error 2 : " + mv);
 				return mv;
 			} else {
 				if (ApiConstantHolder.LOGIN_GUBUN_EMAIL.equals(parameter.getParameter("CHK_GUBUN"))) {
 					if (StringUtils.isEmpty(parameter.getParameter("DS_EMAIL"))
 							|| StringUtils.isEmpty(parameter.getParameter("PASSWD"))) {
 						mv = this.ApiRequiredCheck();
+						logger.info("/user/login response error 3 : " + mv);
 						return mv;
 					}
 				} else if (ApiConstantHolder.LOGIN_GUBUN_TOKEN.equals(parameter.getParameter("CHK_GUBUN"))) {
 					if (StringUtils.isEmpty(parameter.getParameter("APP_TOKEN"))
 							|| StringUtils.isEmpty(parameter.getParameter("ID_MEMBER"))) {
 						mv = this.ApiRequiredCheck();
+						logger.info("/user/login response error 4 : " + mv);
 						return mv;
 					}
 				} else if (ApiConstantHolder.LOGIN_GUBUN_SNS.equals(parameter.getParameter("CHK_GUBUN"))) {
@@ -321,16 +335,19 @@ public class UserController {
 							|| StringUtils.isEmpty(parameter.getParameter("TP_SNS"))
 							|| StringUtils.isEmpty(parameter.getParameter("SN_SNS"))) {
 						mv = this.ApiRequiredCheck();
+						logger.info("/user/login response error 5 : " + mv);
 						return mv;
 					}
 				} else if (ApiConstantHolder.LOGIN_GUBUN_TOKEN_F.equals(parameter.getParameter("CHK_GUBUN"))) {
 					if (StringUtils.isEmpty(parameter.getParameter("DS_EMAIL"))
 							|| StringUtils.isEmpty(parameter.getParameter("APP_TOKEN"))) {
 						mv = this.ApiRequiredCheck();
+						logger.info("/user/login response error 6 : " + mv);
 						return mv;
 					}
 				} else {
 					mv = this.ApiRequiredCheck();
+					logger.info("/user/login response error 7 : " + mv);
 					return mv;
 				}
 			}
@@ -352,7 +369,6 @@ public class UserController {
 			mv = this.ApiResultReturn(result);
 
 			logger.info("/user/login response : " + mv);
-
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);
@@ -374,18 +390,23 @@ public class UserController {
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
+				logger.info("/user/loginKiosk response error 1 : " + mv + " : " + request.getParameter("brcd_member"));
 				return mv;
 			}
 
 			// 1. 비즈니스 구현을 위한  parameter 셋팅
 			Parameter parameter = DataUtil.makeParameter();
 			parameter.setParameter("BRCD_MEMBER", request.getParameter("brcd_member"));	// 회원바코드
+
+			logger.info("/user/loginKiosk request : " + request.getRemoteAddr() + " : " + parameter);
 			
 			// 2. 비즈니스 로직 구현
 			Result result = userSO.loginKiosk(parameter);
 			
 			// 3. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
+
+			logger.info("/user/loginKiosk response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);
@@ -407,18 +428,23 @@ public class UserController {
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
+				logger.info("/user/member response error 1 : " + mv + " : " + request.getParameter("brcd_member"));
 				return mv;
 			}
 
 			// 1. 비즈니스 구현을 위한  parameter 셋팅
 			Parameter parameter = DataUtil.makeParameter();
 			parameter.setParameter("BRCD_MEMBER", request.getParameter("brcd_member"));	// 회원바코드
+
+			logger.info("/user/member request : " + request.getRemoteAddr() + " : " + parameter);
 			
 			// 2. 비즈니스 로직 구현
 			Result result = userSO.getMemberInfo(parameter);
 			
 			// 3. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
+
+			logger.info("/user/member response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);
@@ -440,6 +466,7 @@ public class UserController {
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
+				logger.info("/user/updateMember response error 1 : " + mv + " : " + request.getParameter("id_member"));
 				return mv;
 			}
 
@@ -450,6 +477,8 @@ public class UserController {
 			parameter.setParameter("NO_PHONE", request.getParameter("no_phone"));			// 전화번호
 			parameter.setParameter("YN_SMS_RECV", request.getParameter("yn_sms_recv"));		// SMS 수신여부
 			parameter.setParameter("YN_EMAIL_RECV", request.getParameter("yn_email_recv"));	// EMail 수신여부
+
+			logger.info("/user/updateMember request : " + request.getRemoteAddr() + " : " + parameter);
 			
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("ID_MEMBER"))
@@ -457,6 +486,7 @@ public class UserController {
 					|| StringUtils.isEmpty(parameter.getParameter("YN_SMS_RECV"))
 					|| StringUtils.isEmpty(parameter.getParameter("YN_EMAIL_RECV"))) {
 				mv = this.ApiRequiredCheck();
+				logger.info("/user/updateMember response error 2 : " + mv);
 				return mv;
 			}
 			
@@ -467,6 +497,8 @@ public class UserController {
 			
 			// 4. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
+
+			logger.info("/user/updateMember response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);
@@ -488,6 +520,7 @@ public class UserController {
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
+				logger.info("/user/chkPw response error 1 : " + mv + " : " + request.getParameter("id_member"));
 				return mv;
 			}
 
@@ -495,11 +528,14 @@ public class UserController {
 			Parameter parameter = DataUtil.makeParameter();
 			parameter.setParameter("ID_MEMBER", request.getParameter("id_member"));	// 회원PK
 			parameter.setParameter("PASSWD", request.getParameter("passwd"));		// 비밀번호
+
+			logger.info("/user/chkPw request : " + request.getRemoteAddr() + " : " + parameter);
 			
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("ID_MEMBER"))
 					|| StringUtils.isEmpty(parameter.getParameter("PASSWD"))) {
 				mv = this.ApiRequiredCheck();
+				logger.info("/user/chkPw response error 2 : " + mv);
 				return mv;
 			}
 			
@@ -508,6 +544,8 @@ public class UserController {
 			
 			// 4. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
+
+			logger.info("/user/chkPw response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);
@@ -529,6 +567,7 @@ public class UserController {
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
+				logger.info("/user/updateMemberPw response error 1 : " + mv + " : " + request.getParameter("id_member"));
 				return mv;
 			}
 			
@@ -536,11 +575,14 @@ public class UserController {
 			Parameter parameter = DataUtil.makeParameter();
 			parameter.setParameter("ID_MEMBER", request.getParameter("id_member"));	// 회원PK
 			parameter.setParameter("PASSWD", request.getParameter("passwd"));		// 비밀번호
+
+			logger.info("/user/updateMemberPw request : " + request.getRemoteAddr() + " : " + parameter);
 			
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("ID_MEMBER"))
 					|| StringUtils.isEmpty(parameter.getParameter("PASSWD"))) {
 				mv = this.ApiRequiredCheck();
+				logger.info("/user/updateMemberPw response error 2 : " + mv);
 				return mv;
 			}
 			
@@ -549,6 +591,8 @@ public class UserController {
 			
 			// 3. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
+
+			logger.info("/user/updateMemberPw response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);
@@ -570,6 +614,7 @@ public class UserController {
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
+				logger.info("/user/chkJoin response error 1 : " + mv + " : " + request.getParameter("chk_value01"));
 				return mv;
 			}
 			
@@ -583,26 +628,32 @@ public class UserController {
 			parameter.setParameter("CHK_VALUE05", request.getParameter("chk_value05"));	// chk_gubun 이 '04' 일때 필수 / SNS 구분 값 셋팅
 			parameter.setParameter("CHK_VALUE06", request.getParameter("chk_value06"));	// chk_gubun 이 '04' 일때 필수 / SNS KEY 값 셋팅
 			parameter.setParameter("CHK_VALUE07", request.getParameter("chk_value07"));	// chk_gubun 이 '04' 일때 필수 / SNS 이메일 값 셋팅
+
+			logger.info("/user/chkJoin request : " + request.getRemoteAddr() + " : " + parameter);
 			
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("CHK_GUBUN"))) {
 				mv = this.ApiRequiredCheck();
+				logger.info("/user/chkJoin response error 2 : " + mv);
 				return mv;
 			} else {
 				if (ApiConstantHolder.JOIN_CHK_GUBUN_EMAIL.equals(parameter.getParameter("CHK_GUBUN"))) {
 					if (StringUtils.isEmpty(parameter.getParameter("CHK_VALUE01"))) {
 						mv = this.ApiRequiredCheck();
+						logger.info("/user/chkJoin response error 3 : " + mv);
 						return mv;
 					}
 				} else if (ApiConstantHolder.JOIN_CHK_GUBUN_NAME.equals(parameter.getParameter("CHK_GUBUN"))) {
 					if (StringUtils.isEmpty(parameter.getParameter("CHK_VALUE02"))
 							|| StringUtils.isEmpty(parameter.getParameter("CHK_VALUE03"))) {
 						mv = this.ApiRequiredCheck();
+						logger.info("/user/chkJoin response error 4 : " + mv);
 						return mv;
 					}
 				} else if (ApiConstantHolder.JOIN_CHK_GUBUN_DI.equals(parameter.getParameter("CHK_GUBUN"))) {
 					if (StringUtils.isEmpty(parameter.getParameter("CHK_VALUE04"))) {
 						mv = this.ApiRequiredCheck();
+						logger.info("/user/chkJoin response error 5 : " + mv);
 						return mv;
 					}
 				} else if (ApiConstantHolder.JOIN_CHK_GUBUN_SNS.equals(parameter.getParameter("CHK_GUBUN"))) {
@@ -610,10 +661,12 @@ public class UserController {
 							|| StringUtils.isEmpty(parameter.getParameter("CHK_VALUE06"))
 							||StringUtils.isEmpty(parameter.getParameter("CHK_VALUE07"))) {
 						mv = this.ApiRequiredCheck();
+						logger.info("/user/chkJoin response error 6 : " + mv);
 						return mv;
 					}
 				} else {
 					mv = this.ApiRequiredCheck();
+					logger.info("/user/chkJoin response error 7 : " + mv);
 					return mv;
 				}
 			}
@@ -632,6 +685,8 @@ public class UserController {
 			
 			// 4. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
+
+			logger.info("/user/chkJoin response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);
@@ -653,6 +708,7 @@ public class UserController {
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
+				logger.info("/user/findId response error 1 : " + mv + " : " + request.getParameter("no_phone"));
 				return mv;
 			}
 			
@@ -660,11 +716,14 @@ public class UserController {
 			Parameter parameter = DataUtil.makeParameter();
 			parameter.setParameter("NM_MEMBER", request.getParameter("nm_member"));		// 회원명
 			parameter.setParameter("NO_PHONE", request.getParameter("no_phone"));		// 회원전화번호
+
+			logger.info("/user/findId request : " + request.getRemoteAddr() + " : " + parameter);
 			
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("NM_MEMBER"))
 					|| StringUtils.isEmpty(parameter.getParameter("NO_PHONE"))) {
 				mv = this.ApiRequiredCheck();
+				logger.info("/user/findId response error 2 : " + mv);
 				return mv;
 			}
 			
@@ -673,6 +732,8 @@ public class UserController {
 			
 			// 4. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
+
+			logger.info("/user/findId response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);
@@ -694,6 +755,7 @@ public class UserController {
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
+				logger.info("/user/resetPw response error 1 : " + mv + " : " + request.getParameter("ds_email"));
 				return mv;
 			}
 			
@@ -701,11 +763,14 @@ public class UserController {
 			Parameter parameter = DataUtil.makeParameter();
 			parameter.setParameter("NM_MEMBER", request.getParameter("nm_member"));		// 회원명
 			parameter.setParameter("DS_EMAIL", request.getParameter("ds_email"));		// 회원이메일
+
+			logger.info("/user/resetPw request : " + request.getRemoteAddr() + " : " + parameter);
 			
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("NM_MEMBER"))
 					|| StringUtils.isEmpty(parameter.getParameter("DS_EMAIL"))) {
 				mv = this.ApiRequiredCheck();
+				logger.info("/user/resetPw response error 2 : " + mv);
 				return mv;
 			}
 			
@@ -714,6 +779,8 @@ public class UserController {
 			
 			// 4. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
+
+			logger.info("/user/resetPw response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);
@@ -735,16 +802,20 @@ public class UserController {
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
+				logger.info("/user/releaseDormancy response error 1 : " + mv + " : " + request.getParameter("id_member"));
 				return mv;
 			}
 			
 			// 1. 비즈니스 구현을 위한  parameter 셋팅
 			Parameter parameter = DataUtil.makeParameter();
 			parameter.setParameter("ID_MEMBER", request.getParameter("id_member"));		// 회원PK
+
+			logger.info("/user/releaseDormancy request : " + request.getRemoteAddr() + " : " + parameter);
 			
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("ID_MEMBER"))) {
 				mv = this.ApiRequiredCheck();
+				logger.info("/user/releaseDormancy response error 2 : " + mv);
 				return mv;
 			}
 
@@ -753,6 +824,8 @@ public class UserController {
 			
 			// 4. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
+
+			logger.info("/user/releaseDormancy response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);
@@ -774,16 +847,20 @@ public class UserController {
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
+				logger.info("/user/changeLater response error 1 : " + mv + " : " + request.getParameter("id_member"));
 				return mv;
 			}
 			
 			// 1. 비즈니스 구현을 위한  parameter 셋팅
 			Parameter parameter = DataUtil.makeParameter();
 			parameter.setParameter("ID_MEMBER", request.getParameter("id_member"));		// 회원PK
+
+			logger.info("/user/changeLater request : " + request.getRemoteAddr() + " : " + parameter);
 			
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("ID_MEMBER"))) {
 				mv = this.ApiRequiredCheck();
+				logger.info("/user/changeLater response error 2 : " + mv);
 				return mv;
 			}
 
@@ -792,6 +869,8 @@ public class UserController {
 
 			// 4. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
+
+			logger.info("/user/changeLater response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);
@@ -814,16 +893,20 @@ public class UserController {
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
+				logger.info("/user/addTermsAgree response error 1 : " + mv + " : " + request.getParameter("id_member"));
 				return mv;
 			}
 			
 			// 1. 비즈니스 구현을 위한  parameter 셋팅
 			Parameter parameter = DataUtil.makeParameter();
 			parameter.setParameter("ID_MEMBER", request.getParameter("id_member"));		// 회원PK
+
+			logger.info("/user/addTermsAgree request : " + request.getRemoteAddr() + " : " + parameter);
 			
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("ID_MEMBER"))) {
 				mv = this.ApiRequiredCheck();
+				logger.info("/user/addTermsAgree response error 2 : " + mv);
 				return mv;
 			}
 
@@ -832,6 +915,8 @@ public class UserController {
 			
 			// 4. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
+
+			logger.info("/user/addTermsAgree response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);
@@ -853,6 +938,7 @@ public class UserController {
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
+				logger.info("/user/deleteMember response error 1 : " + mv + " : " + request.getParameter("id_member"));
 				return mv;
 			}
 			
@@ -862,10 +948,13 @@ public class UserController {
 			parameter.setParameter("TP_DEL", request.getParameter("tp_del"));		// 탈퇴구분
 			parameter.setParameter("DS_DEL", request.getParameter("ds_del"));		// 탈퇴사유
 
+			logger.info("/user/deleteMember request : " + request.getRemoteAddr() + " : " + parameter);
+
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("ID_MEMBER"))
 					|| StringUtils.isEmpty(parameter.getParameter("TP_DEL"))) {
 				mv = this.ApiRequiredCheck();
+				logger.info("/user/deleteMember response error 2 : " + mv);
 				return mv;
 			}
 			
@@ -873,7 +962,9 @@ public class UserController {
 			Result result = userSO.deleteMember(parameter);
 
 			// 4. Return 데이터 공통 처리
-			mv = this.ApiResultReturn(result);			
+			mv = this.ApiResultReturn(result);
+
+			logger.info("/user/deleteMember response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);

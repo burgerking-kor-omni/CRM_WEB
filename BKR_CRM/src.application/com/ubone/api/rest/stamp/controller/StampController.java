@@ -193,6 +193,7 @@ public class StampController {
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
+				logger.info("/stamp/getStampExcept response error 1 : " + mv + " : " + request.getParameter("id_store"));
 				return mv;
 			}
 			
@@ -205,6 +206,7 @@ public class StampController {
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("ID_STORE"))) {
 				mv = this.ApiRequiredCheck();
+				logger.info("/stamp/getStampExcept response error 2 : " + mv);
 				return mv;
 			}
 			
@@ -237,6 +239,7 @@ public class StampController {
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
+				logger.info("/stamp/insertStampKiosk response error 1 : " + mv + " : " + request.getParameter("order_no"));
 				return mv;
 			}
 			
@@ -258,6 +261,7 @@ public class StampController {
 					|| StringUtils.isEmpty(parameter.getParameter("CD_MTH_PURCHS"))
 					|| StringUtils.isEmpty(parameter.getParameter("CD_ORDER_CHNN"))) {
 				mv = this.ApiRequiredCheck();
+				logger.info("/stamp/insertStampKiosk response error 2 : " + mv);
 				return mv;
 			}
 			
@@ -290,6 +294,7 @@ public class StampController {
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
+				logger.info("/stamp/insertStamp response error 1 : " + mv + " : " + request.getParameter("id_member"));
 				return mv;
 			}
 			
@@ -312,6 +317,7 @@ public class StampController {
 					|| StringUtils.isEmpty(parameter.getParameter("CD_ORDER_CHNN"))
 					|| StringUtils.isEmpty(parameter.getParameter("PRODUCT_LIST"))) {
 				mv = this.ApiRequiredCheck();
+				logger.info("/stamp/insertStamp response error 2 : " + mv);
 				return mv;
 			}
 			
@@ -344,6 +350,7 @@ public class StampController {
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
+				logger.info("/stamp/checkStamp response error 1 : " + mv + " : " + request.getParameter("id_member"));
 				return mv;
 			}
 			
@@ -358,6 +365,7 @@ public class StampController {
 			if (StringUtils.isEmpty(parameter.getParameter("ID_MEMBER"))
 					|| StringUtils.isEmpty(parameter.getParameter("ORDER_NO"))) {
 				mv = this.ApiRequiredCheck();
+				logger.info("/stamp/checkStamp response error 2 : " + mv);
 				return mv;
 			}
 			
@@ -390,6 +398,7 @@ public class StampController {
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
+				logger.info("/stamp/deleteStamp response error 1 : " + mv + " : " + request.getParameter("id_member"));
 				return mv;
 			}
 			
@@ -404,6 +413,7 @@ public class StampController {
 			if (StringUtils.isEmpty(parameter.getParameter("ID_MEMBER"))
 					|| StringUtils.isEmpty(parameter.getParameter("ORDER_NO"))) {
 				mv = this.ApiRequiredCheck();
+				logger.info("/stamp/deleteStamp response error 2 : " + mv);
 				return mv;
 			}
 			
