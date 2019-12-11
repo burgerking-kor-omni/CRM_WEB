@@ -287,10 +287,12 @@ public class UserController {
 		ModelAndView mv = new ModelAndView("jsonView");	// 이곳에서 JSON으로 변환
 		
 		try {
+			String iwt_log_id = StringUtils.nvl(request.getParameter("iwt_log_id"), "");
+					
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
-				logger.info("/user/login response error 1 : " + mv + " : " + request.getParameter("id_member"));
+				logger.info(iwt_log_id + " ===> /user/login response error 1 : " + mv + " : " + request.getParameter("id_member"));
 				return mv;
 			}
 			
@@ -307,27 +309,27 @@ public class UserController {
 			parameter.setParameter("CD_GENDER", request.getParameter("cd_gender"));	// SNS 성별
 			parameter.setParameter("BIRTHDAY", request.getParameter("birthday"));	// SNS 생일
 
-			logger.info("/user/login request : " + request.getRemoteAddr() + " : " + parameter);
+			logger.info(iwt_log_id + " ===> /user/login request : " + request.getRemoteAddr() + " : " + parameter);
 
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("CHK_GUBUN"))
 					|| StringUtils.isEmpty(parameter.getParameter("CONNECT_GUBUN"))) {
 				mv = this.ApiRequiredCheck();
-				logger.info("/user/login response error 2 : " + mv);
+				logger.info(iwt_log_id + " ===> /user/login response error 2 : " + mv);
 				return mv;
 			} else {
 				if (ApiConstantHolder.LOGIN_GUBUN_EMAIL.equals(parameter.getParameter("CHK_GUBUN"))) {
 					if (StringUtils.isEmpty(parameter.getParameter("DS_EMAIL"))
 							|| StringUtils.isEmpty(parameter.getParameter("PASSWD"))) {
 						mv = this.ApiRequiredCheck();
-						logger.info("/user/login response error 3 : " + mv);
+						logger.info(iwt_log_id + " ===> /user/login response error 3 : " + mv);
 						return mv;
 					}
 				} else if (ApiConstantHolder.LOGIN_GUBUN_TOKEN.equals(parameter.getParameter("CHK_GUBUN"))) {
 					if (StringUtils.isEmpty(parameter.getParameter("APP_TOKEN"))
 							|| StringUtils.isEmpty(parameter.getParameter("ID_MEMBER"))) {
 						mv = this.ApiRequiredCheck();
-						logger.info("/user/login response error 4 : " + mv);
+						logger.info(iwt_log_id + " ===> /user/login response error 4 : " + mv);
 						return mv;
 					}
 				} else if (ApiConstantHolder.LOGIN_GUBUN_SNS.equals(parameter.getParameter("CHK_GUBUN"))) {
@@ -335,19 +337,19 @@ public class UserController {
 							|| StringUtils.isEmpty(parameter.getParameter("TP_SNS"))
 							|| StringUtils.isEmpty(parameter.getParameter("SN_SNS"))) {
 						mv = this.ApiRequiredCheck();
-						logger.info("/user/login response error 5 : " + mv);
+						logger.info(iwt_log_id + " ===> /user/login response error 5 : " + mv);
 						return mv;
 					}
 				} else if (ApiConstantHolder.LOGIN_GUBUN_TOKEN_F.equals(parameter.getParameter("CHK_GUBUN"))) {
 					if (StringUtils.isEmpty(parameter.getParameter("DS_EMAIL"))
 							|| StringUtils.isEmpty(parameter.getParameter("APP_TOKEN"))) {
 						mv = this.ApiRequiredCheck();
-						logger.info("/user/login response error 6 : " + mv);
+						logger.info(iwt_log_id + " ===> /user/login response error 6 : " + mv);
 						return mv;
 					}
 				} else {
 					mv = this.ApiRequiredCheck();
-					logger.info("/user/login response error 7 : " + mv);
+					logger.info(iwt_log_id + " ===> /user/login response error 7 : " + mv);
 					return mv;
 				}
 			}
@@ -368,7 +370,7 @@ public class UserController {
 			// 3. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
 
-			logger.info("/user/login response : " + mv);
+			logger.info(iwt_log_id + " ===> /user/login response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);

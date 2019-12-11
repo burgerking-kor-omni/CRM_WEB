@@ -160,7 +160,7 @@
 		  FROM CRMADMIN.SYS_CODE A
 		  LEFT OUTER JOIN (SELECT TP_REWARD, COUNT(*) AS CNT
 		                     FROM CRMADMIN.TBS_MEMBER_STAMP_REWARD
-		                    WHERE ID_MEMBER = #{ID_MEMBER}
+		                    WHERE ID_MEMBER = #{ID_MEMBER} AND FG_ISSUE='N'
 		                    GROUP BY TP_REWARD
 		                   ) B
 		    ON A.CODE = B.TP_REWARD

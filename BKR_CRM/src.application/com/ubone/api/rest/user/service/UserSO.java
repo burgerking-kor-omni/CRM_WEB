@@ -642,6 +642,7 @@ public class UserSO {
 			Map<String, Object> resultData = new HashMap<String, Object>();
 			resultData.put("id_member", dtData.getString(0, "ID_MEMBER"));
 			resultData.put("nm_member", IwtCrypt.aesDecryptHex(dtData.getString(0, "NM_MEMBER")));
+			resultData.put("no_phone", IwtCrypt.aesDecryptHex(dtData.getString(0, "NO_PHONE")));
 			resultData.put("cnt_stamp", dtData.getString(0, "CNT_STAMP"));
 			DataList dtResultData = DataUtil.makeDataList("resultData", resultData);
 			result.addDataList(dtResultData);
@@ -1075,8 +1076,24 @@ public class UserSO {
 //			tempPwParam.setParameter("PASSWD", dcryptTempPassword);
 //			userDAO.updateTempPassword(tempPwParam);
 			
-			resultCode = ApiConstantHolder.RESULT_SELECT_SUCCESS;
-			resultMessage = "회원정보가 존재합니다.";
+			if("01".equals(dtData.getString(0, "CD_JOIN_SITE"))) {
+				resultCode = ApiConstantHolder.RESULT_SELECT_SUCCESS;
+				resultMessage = "회원정보가 존재합니다.";
+			}
+			else {
+				String siteTitle = "간편가입으";
+				if("02".equals(dtData.getString(0, "CD_JOIN_SITE"))) {
+					siteTitle = "네이버 아이디";
+				}
+				else if("03".equals(dtData.getString(0, "CD_JOIN_SITE"))) {
+					siteTitle = "삼성카드 앱으";
+				}
+				else if("04".equals(dtData.getString(0, "CD_JOIN_SITE"))) {
+					siteTitle = "카카오톡 아이디";
+				}
+				resultCode = "03";
+				resultMessage = siteTitle + "로 회원가입 하셨습니다. 버거킹에서는 비밀번호를 변경 하실 수 없습니다.";
+			}
 		} else {
 			resultCode = ApiConstantHolder.RESULT_SELECT_FAIL;
 			resultMessage = "회원정보가 존재하지 않습니다.";

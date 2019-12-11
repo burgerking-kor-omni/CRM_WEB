@@ -296,10 +296,12 @@ public class CouponController {
 		ModelAndView mv = new ModelAndView("jsonView");	// 이곳에서 JSON으로 변환
 		
 		try {
+			String iwt_log_id = StringUtils.nvl(request.getParameter("iwt_log_id"), "");
+
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
 				mv = this.ApiResultFail();
-				logger.info("/coupon/getCouponDetail response error 1 : " + mv + " : " + request.getParameter("no_pin"));
+				logger.info(iwt_log_id + " ===> /coupon/getCouponDetail response error 1 : " + mv + " : " + request.getParameter("no_pin"));
 				return mv;
 			}
 
@@ -322,12 +324,12 @@ public class CouponController {
 			parameter.setParameter("CD_COUPON", request.getParameter("cd_coupon"));	// 쿠폰
 //			parameter.setParameter("NO_PIN", request.getParameter("no_pin"));		// 핀일련번호
 
-			logger.info("/coupon/getCouponDetail request : " + request.getRemoteAddr() + " : " + parameter);
+			logger.info(iwt_log_id + " ===> /coupon/getCouponDetail request : " + request.getRemoteAddr() + " : " + parameter);
 			
 			// 2. 필수 체크
 			if (StringUtils.isEmpty(parameter.getParameter("CD_COUPON"))) {
 				mv = this.ApiRequiredCheck();
-				logger.info("/coupon/getCouponDetail response error 2 : " + mv);
+				logger.info(iwt_log_id + " ===> /coupon/getCouponDetail response error 2 : " + mv);
 				return mv;
 			}
 			
@@ -339,7 +341,7 @@ public class CouponController {
 			// 4. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
 
-			logger.info("/coupon/response response : " + mv);
+			logger.info(iwt_log_id + " ===> /coupon/response response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);
