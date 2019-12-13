@@ -96,6 +96,87 @@ public class StampSO {
 	}
 	
 	/**
+	 * 스템프적립 가능여부 확인 - (KIOSK)
+	 * @param HTTP 요청 파라미터  
+	 * @return 
+	 */
+	public Result checkSaveStamp(Parameter parameter) throws Exception {
+		Result result = DataUtil.makeResult();
+		Map<String, Object> resultInfo = new HashMap<String, Object>();
+		Map<String, Object> resultData = new HashMap<String, Object>();
+		
+		// 0. 스템프 사용가능 정보 확인
+		DataList dtUse = stampDAO.getStampUse(parameter);
+		
+		if (0 >= dtUse.getRowCount()) {
+			resultInfo.put("result_code", ApiConstantHolder.STAMP_NONE_STAMP);
+			resultInfo.put("result_message", "적립가능한 스템프 정보가 없습니다.");
+			result.addDataList(DataUtil.makeDataList("resultInfo", resultInfo));
+			result.addDataList(DataUtil.makeDataList("resultData", resultData));
+			return result;
+		}
+		
+		// 1. 스템프 이벤트 적용여부 확인
+		// 1-1. 회원등급 조회
+		int cntStampIncre = 0;
+		DataList dtGrede = stampDAO.getMemberGrade(parameter);
+		String cdGrade = 0 < dtGrede.getRowCount() ? dtGrede.getString(0, "CD_GRADE") : "01";
+
+		// 1-2. 상품, 등급, 기간에 해당하는 스템프이벤트 확인
+		JSONArray productList = new JSONArray(parameter.getParameter("PRODUCT_LIST").toString());
+		
+		if (0 < productList.length()) {
+			String fgEvent = "N";
+			
+			for (int i=0; i<productList.length(); i++) {
+				JSONObject product = productList.getJSONObject(i);
+				Parameter stampParam = DataUtil.makeParameter();
+				stampParam.setParameter("CD_MTH_PURCHS", parameter.getParameter("CD_MTH_PURCHS"));		// 구매방법
+				stampParam.setParameter("CD_ORDER_CHNN", parameter.getParameter("CD_ORDER_CHNN"));		// 주문채널
+				stampParam.setParameter("ID_MENU", product.getString("product_pk"));					// 상품
+				stampParam.setParameter("CNT_BUY", product.getString("cnt_buy"));						// 구매수량
+				stampParam.setParameter("TP_SET", ApiConstantHolder.STAMP_EVENT);						// 설정구분
+				stampParam.setParameter("CD_GRADE", cdGrade);					// 회원등급
+				
+				// 무료인 상품은 적립대상이 아님
+				if (ApiConstantHolder.FLAG_N.equals(product.getString("fg_free"))) {
+					DataList dtEventStamp = stampDAO.getCntStamp(stampParam);
+					
+					// 1-3. 이벤트 여부에 따른 분기처리
+					if (0 < dtEventStamp.getRowCount()) {
+						cntStampIncre += Integer.parseInt(dtEventStamp.getString(0, "CNT_STAMP"));
+						fgEvent = "Y";	// 이벤트 설정에 포함되었을때 이벤트설정여부를 Y 로 변경한다.
+					} else {
+						// 1-4. 이벤트가 없으면 스템프적립 기본설정정보 조회
+						stampParam.setParameter("TP_SET", ApiConstantHolder.STAMP_DEFAULT);					// 설정구분
+						
+						DataList dtDefaultStamp = stampDAO.getCntStamp(stampParam);
+						
+						if (0 < dtDefaultStamp.getRowCount()) {
+							cntStampIncre += Integer.parseInt(dtDefaultStamp.getString(0, "CNT_STAMP"));
+						}
+					}
+				}
+			}
+		} else {
+			resultInfo.put("result_code", ApiConstantHolder.STAMP_NONE_PRODUCT);
+			resultInfo.put("result_message", "적립관련 상품이 존재하지 않습니다.");
+			result.addDataList(DataUtil.makeDataList("resultInfo", resultInfo));
+			result.addDataList(DataUtil.makeDataList("resultData", resultData));
+			return result;
+		}
+		
+		// 3. 정상처리
+		resultData.put("stampCount", cntStampIncre);
+		resultInfo.put("result_code", ApiConstantHolder.RESULT_INSERT_SUCCESS);
+		resultInfo.put("result_message", "정상적으로 조회되었습니다.");
+		result.addDataList(DataUtil.makeDataList("resultData", resultData));
+		result.addDataList(DataUtil.makeDataList("resultInfo", resultInfo));
+		
+		return result;
+	}
+	
+	/**
 	 * 스템프적립 - (KIOSK)
 	 * @param HTTP 요청 파라미터  
 	 * @return 

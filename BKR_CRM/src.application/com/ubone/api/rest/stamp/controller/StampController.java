@@ -225,6 +225,61 @@ public class StampController {
 	}
 	
 	/**
+	 * 스템프적립 가능여부 확인 - (KIOSK)
+	 * @param request Http Request Instance
+	 * @param response Http Reqponse Instance
+	 */
+	@RequestMapping(value="/checkSaveStamp", method=RequestMethod.POST)
+	public ModelAndView checkSaveStamp(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// 클라이언트로 넘길 Response 셋팅
+		Result result = DataUtil.makeResult();
+		ModelAndView mv = new ModelAndView("jsonView");	// 이곳에서 JSON으로 변환
+
+		try {
+			// 0. Access Token 체크
+			if (!this.chkHeader(request)) {
+				mv = this.ApiResultFail();
+				logger.info("/stamp/checkSaveStamp response error 1 : " + mv + " : " + request.getParameter("stor_cd"));
+				return mv;
+			}
+			
+			// 1. 비즈니스 구현을 위한  parameter 셋팅
+			Parameter parameter = DataUtil.makeParameter();
+			parameter.setParameter("BRCD_MEMBER", StringUtils.nvl(request.getParameter("brcd_member"), "0000000028"));			/* 바코드번호 */
+			parameter.setParameter("STOR_CD", request.getParameter("stor_cd"));				    /* 주문매장 */
+			parameter.setParameter("CD_MTH_PURCHS", request.getParameter("cd_mth_purchs"));		/* 구매방법 */
+			parameter.setParameter("CD_ORDER_CHNN", request.getParameter("cd_order_chnn"));		/* 주문채널 */
+			parameter.setParameter("PRODUCT_LIST", request.getParameter("product_list"));		/* 상품목록 */
+
+			logger.info("/stamp/checkSaveStamp request : " + request.getRemoteAddr() + " : " + parameter);
+			
+			// 2. 필수 체크
+			if (StringUtils.isEmpty(parameter.getParameter("BRCD_MEMBER"))
+					|| StringUtils.isEmpty(parameter.getParameter("STOR_CD"))
+					|| StringUtils.isEmpty(parameter.getParameter("CD_MTH_PURCHS"))
+					|| StringUtils.isEmpty(parameter.getParameter("CD_ORDER_CHNN"))) {
+				mv = this.ApiRequiredCheck();
+				logger.info("/stamp/checkSaveStamp response error 2 : " + mv);
+				return mv;
+			}
+			
+			// 3. 비즈니스 로직 구현
+			result = stampSO.checkSaveStamp(parameter);
+			
+			// 3. Return 데이터 공통 처리
+			mv = this.ApiResultReturn(result);
+
+			logger.info("/stamp/checkSaveStamp response : " + mv);
+		} catch (Exception e) {
+			logger.info("/stamp/checkSaveStamp error : ", e);
+			e.printStackTrace();
+			// API Error 저장
+			return this.ApiError(e);
+		}
+		return mv;
+	}
+	
+	/**
 	 * 스템프적립 - (KIOSK)
 	 * @param request Http Request Instance
 	 * @param response Http Reqponse Instance
