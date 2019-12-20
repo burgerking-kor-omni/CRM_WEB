@@ -315,6 +315,7 @@
 	 -->
 	<select id="getResetMember" parameterType="map" resultType="lmap">
 		SELECT TM.ID_MEMBER           /* 회원PK */
+				,TM.CD_JOIN_SITE /* 가입경로 */
 		  FROM CRMADMIN.TBS_MEMBER TM
 		 WHERE TM.NM_MEMBER = #{NM_MEMBER}
 		   AND TM.DS_EMAIL = #{DS_EMAIL} 
