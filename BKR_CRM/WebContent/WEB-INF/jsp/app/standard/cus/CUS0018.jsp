@@ -42,19 +42,22 @@ uxl.onLoad(function(){
 			          
 			          ,'실제 판매금액','할인 판매금액','할인율'
 			          
-			          ,'쿠폰유효기간','쿠폰핀PK']
+			          ,'쿠폰유효기간','쿠폰핀PK'
+			          ,'쿠폰핀','사용일시']
 			//mapping column
 			,colModel:[
-			          {name:'NM_COUPON',width:40,align:'center'}
-			         ,{name:'CD_COUPON_OBJ',width:10,align:'center',codeCategory:'CD_COUPON_OBJ'}
-					 ,{name:'CD_COUPON_TARGET' ,width:10,align:'center',codeCategory:'CD_COUPON_TARGET'}
+			          {name:'NM_COUPON',width:20,align:'center'}
+			         ,{name:'CD_COUPON_OBJ',width:8,align:'center',codeCategory:'CD_COUPON_OBJ'}
+					 ,{name:'CD_COUPON_TARGET' ,width:8,align:'center',codeCategory:'CD_COUPON_TARGET'}
 
 					 ,{name:'REAL_CUP_PRICE',width:10,align:'center',formatter:'integer'}
 					 ,{name:'SALE_CUP_PRICE',width:10,align:'center',formatter:'integer'}
 					 ,{name:'SALE_CUP_RATE',width:10,align:'center'}
 					 
-					 ,{name:'DT_EXPIRY',width:20,align:'center'}
+					 ,{name:'DT_EXPIRY',width:18,align:'center'}
 					 ,{name:'NO_PIN', hidden:true}
+					 ,{name:'PIN_NUM',width:12,align:'center'}
+					 ,{name:'DT_USE',width:14,align:'center'}
 			]
 			, height:290
 			,autowidth:true
