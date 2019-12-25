@@ -341,7 +341,7 @@ public class CouponController {
 			// 4. Return 데이터 공통 처리
 			mv = this.ApiResultReturn(result);
 
-			logger.info(iwt_log_id + " ===> /coupon/response response : " + mv);
+			logger.info(iwt_log_id + " ===> /coupon/getCouponDetail response : " + mv);
 		} catch (Exception e) {
 			// API Error 저장
 			return this.ApiError(e);
