@@ -294,9 +294,9 @@ public class CouponController {
 	public ModelAndView getCouponDetail(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		// 클라이언트로 넘길 Response 셋팅
 		ModelAndView mv = new ModelAndView("jsonView");	// 이곳에서 JSON으로 변환
+		String iwt_log_id = StringUtils.nvl(request.getParameter("iwt_log_id"), "");
 		
 		try {
-			String iwt_log_id = StringUtils.nvl(request.getParameter("iwt_log_id"), "");
 
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
@@ -343,6 +343,7 @@ public class CouponController {
 
 			logger.info(iwt_log_id + " ===> /coupon/getCouponDetail response : " + mv);
 		} catch (Exception e) {
+			logger.info(iwt_log_id + " ===> /coupon/getCouponDetail exception : " + mv);
 			// API Error 저장
 			return this.ApiError(e);
 		}
@@ -492,6 +493,59 @@ public class CouponController {
 
 			logger.info("/coupon/checkCouponStore response : " + mv);
 		} catch (Exception e) {
+			// API Error 저장
+			return this.ApiError(e);
+		}
+		return mv;
+	}
+	
+	/**
+	 * 이벤트용 쿠폰 발행
+	 * @param request Http Request Instance
+	 * @param response Http Reqponse Instance
+	 */
+	@RequestMapping(value="/publishCoupon", method=RequestMethod.POST)
+	public ModelAndView publishCoupon(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// 클라이언트로 넘길 Response 셋팅
+		ModelAndView mv = new ModelAndView("jsonView");	// 이곳에서 JSON으로 변환
+		String iwt_log_id = StringUtils.nvl(request.getParameter("iwt_log_id"), "");
+		
+		try {
+
+			// 0. Access Token 체크
+			if (!this.chkHeader(request)) {
+				mv = this.ApiResultFail();
+				logger.info(iwt_log_id + " ===> /coupon/publishCoupon response error 1 : " + mv + " : " + request.getParameter("cd_coupon") + " : " + request.getParameter("id_member"));
+				return mv;
+			}
+
+			// 1. 비즈니스 구현을 위한  parameter 셋팅
+			Parameter parameter = DataUtil.makeParameter();
+			parameter.setParameter("ID_MEMBER", request.getParameter("id_member"));	// 회원PK	
+			parameter.setParameter("CD_COUPON", request.getParameter("cd_coupon"));	// 핀일련번호
+			parameter.setParameter("DT_EXPIRY_START", request.getParameter("dt_expiry_start"));			// 쿠폰 유효기간 시작일
+			parameter.setParameter("DT_EXPIRY_END", request.getParameter("dt_expiry_end"));			// 쿠폰 유효기간 종료일
+
+			logger.info(iwt_log_id + " ===> /coupon/publishCoupon request : " + request.getRemoteAddr() + " : " + parameter);
+			
+			// 2. 필수 체크
+			if (StringUtils.isEmpty(parameter.getParameter("ID_MEMBER")) || StringUtils.isEmpty(parameter.getParameter("CD_COUPON"))) {
+				mv = this.ApiRequiredCheck();
+				logger.info(iwt_log_id + " ===> /coupon/publishCoupon response error 2 : " + mv);
+				return mv;
+			}
+			
+			// 3. 비즈니스 로직 구현
+			Result result = DataUtil.makeResult();
+
+			result = couponSO.publishCoupon(parameter);
+			
+			// 4. Return 데이터 공통 처리
+			mv = this.ApiResultReturn(result);
+
+			logger.info(iwt_log_id + " ===> /coupon/publishCoupon response : " + mv);
+		} catch (Exception e) {
+			logger.info(iwt_log_id + " ===> /coupon/publishCoupon exception : " + mv);
 			// API Error 저장
 			return this.ApiError(e);
 		}

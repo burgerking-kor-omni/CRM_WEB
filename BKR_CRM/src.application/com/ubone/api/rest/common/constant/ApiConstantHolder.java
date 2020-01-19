@@ -207,6 +207,7 @@ public final class ApiConstantHolder {
 	// ========================================================
 	public static final String COUPON_SUCCESS				= "01";	// 성공
 	public static final String COUPON_NOT_VALID				= "11"; // 유효하지 않음
+	public static final String COUPON_ALREADY_PUBLISH				= "21"; // 이미 발행된 쿠폰
 	
 	// ========================================================
 	// 메일 전송

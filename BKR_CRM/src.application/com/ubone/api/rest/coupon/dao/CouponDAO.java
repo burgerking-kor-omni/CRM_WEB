@@ -12,7 +12,7 @@ public interface CouponDAO {
 	 * @return 
 	 */
 	public DataList getCoupon(Parameter parameter);
-	
+
 	/**
 	 * 기존에 발급내역 확인
 	 * @param 
@@ -73,6 +73,13 @@ public interface CouponDAO {
 	 * @return  
 	 */
 	public String insertCouponPin(Parameter parameter);
+	
+	/**
+	 * 다우 쿠폰핀 생성
+	 * @param param
+	 * @return  
+	 */
+	public String insertDaouCouponPin(Parameter parameter);
 	
 	/**
 	 * 쿠폰 매핑

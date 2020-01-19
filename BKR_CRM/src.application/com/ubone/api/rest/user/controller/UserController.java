@@ -285,9 +285,9 @@ public class UserController {
 	public ModelAndView login(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		// 클라이언트로 넘길 Response 셋팅
 		ModelAndView mv = new ModelAndView("jsonView");	// 이곳에서 JSON으로 변환
+		String iwt_log_id = StringUtils.nvl(request.getParameter("iwt_log_id"), "");
 		
 		try {
-			String iwt_log_id = StringUtils.nvl(request.getParameter("iwt_log_id"), "");
 					
 			// 0. Access Token 체크
 			if (!this.chkHeader(request)) {
@@ -372,6 +372,7 @@ public class UserController {
 
 			logger.info(iwt_log_id + " ===> /user/login response : " + mv);
 		} catch (Exception e) {
+			logger.info(iwt_log_id + " ===> /user/login exception : " + mv);
 			// API Error 저장
 			return this.ApiError(e);
 		}

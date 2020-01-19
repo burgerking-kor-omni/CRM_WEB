@@ -19,6 +19,23 @@
 		   AND TC.DT_EXPIRY_END >= TO_DATE (TO_CHAR(SYSDATE, 'YYYYMMDD') || '235959', 'YYYYMMDDHH24MISS')
 
 	</select>
+
+	<!--
+		QueryId     : ApiCoupon.getCouponByNoReq
+		Description : 쿠폰 조회 
+	 -->
+	<select id="getCouponByNoReq" parameterType="map" resultType="lmap">
+		SELECT TC.CD_COUPON            /* 쿠폰코드 */
+		     , TC.NO_REQ               /* 다우계약번호 */
+		     , TC.TP_EXPIRY_DATE       /* 유효기간구분 */
+		     , TO_CHAR(TC.DT_EXPIRY_START, 'YYYYMMDD') AS DT_EXPIRY_START      /* 유효기간시작일 */
+		     , TO_CHAR(TC.DT_EXPIRY_END, 'YYYYMMDD') AS DT_EXPIRY_END          /* 유효기간종료일 */
+		  FROM CRMADMIN.TBS_COUPON TC
+		 WHERE TC.NO_REQ = #{NO_REQ}
+		   AND TC.DT_EXPIRY_START <![CDATA[<=]]> TO_DATE (TO_CHAR(SYSDATE, 'YYYYMMDD') || '000000', 'YYYYMMDDHH24MISS')
+		   AND TC.DT_EXPIRY_END >= TO_DATE (TO_CHAR(SYSDATE, 'YYYYMMDD') || '235959', 'YYYYMMDDHH24MISS')
+
+	</select>
 	
 	<!--
 		QueryId     : ApiCoupon.getCouponMapping
@@ -282,6 +299,43 @@
 		</choose>
 			 , #{PIN_NUM}
 			 , #{UDID}
+			 , 0
+			 , 0
+		)
+	</insert>
+	
+	<insert id="insertDaouCouponPin" parameterType="map">
+		INSERT INTO CRMADMIN.TBS_COUPON_PIN
+		(
+			   NO_PIN            /* 핀일련번호 */
+			 , CD_COUPON         /* 쿠폰코드 */
+			 , ID_MEMBER         /* 회원PK */
+			 , STATUS            /* 상태(발급,사용,취소) */
+			 , ID_STORE_USE      /* 사용매장코드 */
+			 , ORDER_NO          /* 사용한주문번호 */
+			 , DT_PUBLISH        /* 발행일자 */
+			 , DT_USE            /* 사용일자 */
+			 , DT_REG            /* 등록일 */
+			 , DT_EXPIRY_START   /* 유효시작일자 */
+			 , DT_EXPIRY_END     /* 유효종료일 */
+			 , PIN_NUM           /* 핀번호 */
+			 , UDID              /* 기기ID */
+			 , AMT_USE           /* 사용금액 */
+			 , AMT_CANCEL        /* 취소금액 */
+		) VALUES (
+		       CRMADMIN.SEQ_TBS_COUPON_PIN.NEXTVAL
+			 , #{CD_COUPON}
+			 , NULL
+			 , 'N'
+			 , NULL
+			 , NULL
+			 , NULL
+			 , NULL
+			 , SYSDATE
+			 , TO_DATE(#{DT_EXPIRY_START} || '000000', 'YYYYMMDDHH24MISS')
+			 , TO_DATE(#{DT_EXPIRY_END} || '235959', 'YYYYMMDDHH24MISS')
+			 , #{PIN_NUM}
+			 , NULL
 			 , 0
 			 , 0
 		)

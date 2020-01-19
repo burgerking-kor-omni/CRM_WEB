@@ -1,11 +1,20 @@
 package com.ubone.api.rest.coupon.service;
 
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.annotation.Resource;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.springframework.stereotype.Service;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.ubone.api.rest.common.constant.ApiConstantHolder;
 import com.ubone.api.rest.coupon.dao.CouponDAO;
@@ -498,6 +507,132 @@ public class CouponSO {
   		}
 
 		return couponPinBuilder.toString();
+	}
+
+	
+	/**
+	 * 이벤트용 쿠폰 발행
+	 * @param HTTP 요청 파라미터  
+	 * @return 
+	 */
+	public Result publishCoupon(Parameter parameter) throws Exception {
+		
+		Result result = DataUtil.makeResult();
+		Map<String, Object> resultInfo = new HashMap<String, Object>();
+		Map<String, Object> resultData = new HashMap<String, Object>();
+		
+		// 1. 쿠폰 조회
+		DataList dtData = couponDAO.getCoupon(parameter);
+		
+		// 2. 조회된 쿠폰에 따른 체크
+		if (0 < dtData.getRowCount()) {
+			// 3. 쿠폰 매핑 확인
+			DataList dtMapping = couponDAO.getCouponMapping(parameter);
+			
+			// 3-1. 매핑 여부에 따른 체크 - 이미 발행된 쿠폰 있음
+			if (0 < dtMapping.getRowCount()) {
+				resultInfo.put("result_code", ApiConstantHolder.COUPON_SUCCESS);
+				resultInfo.put("result_message", "정상적으로 조회되었습니다.");
+				result.addDataList(DataUtil.makeDataList("resultInfo", resultInfo));
+				result.addDataList(DataUtil.makeDataList("resultData", this.commonCouponInfo(dtMapping)));
+				return result;
+			} else {
+				parameter.setParameter("VALID_START", StringUtils.isEmpty(parameter.getParameter("DT_EXPIRY_START")) ? dtData.getString(0, "DT_EXPIRY_START").substring(0, 8) : parameter.getParameter("DT_EXPIRY_START"));
+				parameter.setParameter("VALID_END", StringUtils.isEmpty(parameter.getParameter("DT_EXPIRY_END")) ? dtData.getString(0, "DT_EXPIRY_END").substring(0, 8) : parameter.getParameter("DT_EXPIRY_END"));
+				
+				// 4. 쿠폰 매핑이 안되었을경우 - 다우에서 쿠폰핀을 하나 받아와 회원에게 매핑
+				Document doc = getCouponPinXmlDocumentFromDoau(parameter);
+				NodeList nl = doc.getElementsByTagName("CPN_LIST");
+				Element docEle = doc.getDocumentElement();
+				String rt = docEle.getElementsByTagName("RT").item(0).getTextContent();
+
+			    if (nl != null && nl.getLength() > 0 && "S000001".equals(rt)) {
+		            if (nl.item(0).getNodeType() == Node.ELEMENT_NODE) {
+		                Element el = (Element) nl.item(0);
+		                
+		                Parameter insertParam = DataUtil.makeParameter();
+		                insertParam.setParameter("CD_COUPON", dtData.getString(0, "CD_COUPON"));
+		                insertParam.setParameter("PIN_NUM", el.getElementsByTagName("NO_CPN").item(0).getTextContent());
+		                insertParam.setParameter("DT_EXPIRY_START", parameter.getParameter("VALID_START"));
+		                insertParam.setParameter("DT_EXPIRY_END", parameter.getParameter("VALID_END"));
+		                
+		                couponDAO.insertDaouCouponPin(insertParam);
+		            }
+			    }
+			}
+		} else {
+			resultInfo.put("result_code", ApiConstantHolder.COUPON_NOT_VALID);
+			resultInfo.put("result_message", "유효하지 않은 쿠폰입니다.");
+			result.addDataList(DataUtil.makeDataList("resultInfo", resultInfo));
+			result.addDataList(DataUtil.makeDataList("resultData", resultData));
+			return result;
+		}
+
+		// 3. 정상처리
+		resultInfo.put("result_code", ApiConstantHolder.COUPON_SUCCESS);
+		resultInfo.put("result_message", "정상적으로 조회되었습니다.");
+		result.addDataList(DataUtil.makeDataList("resultInfo", resultInfo));
+		
+		// 4. 쿠폰 데이터
+		DataList dtData2 = couponDAO.getCouponMapping(parameter);
+
+		if (0 < dtData2.getRowCount()) {
+			DataList dtResultData = DataUtil.makeDataList("resultData", this.commonCouponInfo(dtData2));
+			result.addDataList(dtResultData);
+		}
+		
+		return result;
+	}
+	
+	
+	/**
+	 * 신규 쿠폰 초기 핀 발행
+	 * @param 
+	 * @return 
+	 */
+	public Document getCouponPinXmlDocumentFromDoau(Parameter parameter) {
+		Document doc = null;
+		try {
+			String daouProductListApiUrl = "/B2CCoupon/B2CService.aspx?ACTION=CI112_ONLY_ISSUECPN_WITHPAY";
+			StringBuilder urlBuilder = new StringBuilder();
+			if ("real".equals(ConfigHolder.APPLICATION_MODE)) {	// 운영모드
+				urlBuilder.append(ConfigHolder.get("dau.dev.domain"));
+				urlBuilder.append(daouProductListApiUrl);
+				urlBuilder.append("&COOPER_ID=" + URLEncoder.encode(ConfigHolder.get("dau.real.cooper.id"), "UTF-8"));
+				urlBuilder.append("&COOPER_PW=" + URLEncoder.encode(ConfigHolder.get("dau.real.cooper.pw"), "UTF-8"));
+				urlBuilder.append("&SITE_ID=" + URLEncoder.encode(ConfigHolder.get("dau.real.site.id"), "UTF-8"));
+				urlBuilder.append("&SITE_URL=" + URLEncoder.encode(ConfigHolder.get("dau.real.pin_url"), "UTF-8"));
+			}
+			else {
+				urlBuilder.append(ConfigHolder.get("dau.dev.domain"));
+				urlBuilder.append(daouProductListApiUrl);
+				urlBuilder.append("&COOPER_ID=" + URLEncoder.encode(ConfigHolder.get("dau.dev.cooper.id"), "UTF-8"));
+				urlBuilder.append("&COOPER_PW=" + URLEncoder.encode(ConfigHolder.get("dau.dev.cooper.pw"), "UTF-8"));
+				urlBuilder.append("&SITE_ID=" + URLEncoder.encode(ConfigHolder.get("dau.dev.site.id"), "UTF-8"));
+				urlBuilder.append("&SITE_URL=" + URLEncoder.encode(ConfigHolder.get("dau.dev.pin_url"), "UTF-8"));
+			}
+
+			urlBuilder.append("&NO_REQ=" + URLEncoder.encode(parameter.getParameter("NO_REQ").toString(), "UTF-8"));
+			urlBuilder.append("&COOPER_ORDER=" + URLEncoder.encode(UUID.randomUUID().toString(), "UTF-8"));
+			urlBuilder.append("&VALID_START=" + URLEncoder.encode(parameter.getParameter("VALID_START").toString(), "UTF-8"));
+			urlBuilder.append("&VALID_END=" + URLEncoder.encode(parameter.getParameter("VALID_END").toString(), "UTF-8"));
+			urlBuilder.append("&SEND_MSG=" + URLEncoder.encode(ConfigHolder.get("dau.pin.send_msg"), "UTF-8"));
+			urlBuilder.append("&ISSUE_COUNT=" + URLEncoder.encode(ConfigHolder.get("dau.pin.issue_count"), "UTF-8"));
+			urlBuilder.append("&CALL_CTN=" + URLEncoder.encode(ConfigHolder.get("dau.pin.call_ctn"), "UTF-8"));
+			urlBuilder.append("&RCV_CTN=" + URLEncoder.encode(ConfigHolder.get("dau.pin.rcv_ctn"), "UTF-8"));
+			urlBuilder.append("&PAY_ID=" + URLEncoder.encode(ConfigHolder.get("dau.pin.pay_id"), "UTF-8"));
+			urlBuilder.append("&BOOKING_NO=" + URLEncoder.encode(ConfigHolder.get("dau.pin.booking_no"), "UTF-8"));
+			
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+
+			URL url = new URL(urlBuilder.toString());
+			doc = dBuilder.parse(url.openStream());
+			
+		} catch(Exception e) {
+			
+		}
+		return doc;
 	}
 	
 }

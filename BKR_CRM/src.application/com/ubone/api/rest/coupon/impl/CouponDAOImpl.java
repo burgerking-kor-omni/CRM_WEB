@@ -16,7 +16,7 @@ public class CouponDAOImpl extends UbSqlSessionDaoSupport implements CouponDAO  
 	public DataList getCoupon(Parameter parameter) {
 		return queryForDataList(this.queryPrefix + "getCoupon", parameter);
 	}
-	
+
 	@Override
 	public DataList getCouponMapping(Parameter parameter) {
 		return queryForDataList(this.queryPrefix + "getCouponMapping", parameter);
@@ -60,6 +60,11 @@ public class CouponDAOImpl extends UbSqlSessionDaoSupport implements CouponDAO  
 	@Override
 	public String insertCouponPin(Parameter parameter) {
 		return insert(this.queryPrefix + "insertCouponPin", parameter);
+	}
+	
+	@Override
+	public String insertDaouCouponPin(Parameter parameter) {
+		return insert(this.queryPrefix + "insertDaouCouponPin", parameter);
 	}
 	
 	@Override
