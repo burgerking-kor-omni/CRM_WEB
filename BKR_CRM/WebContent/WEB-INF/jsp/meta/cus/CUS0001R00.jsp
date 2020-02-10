@@ -27,7 +27,7 @@
 
 
 <!-- layout-1 Start -->
-<h1 class="ub-control title">고객 목록</h1>
+<h1 class="ub-control title">회원 목록</h1>
 <div class="ub-layout search">
     <span class="search-ltbg"></span>
     <span class="search-rtbg"></span>
@@ -35,23 +35,37 @@
     <span class="search-rbbg"></span>
 <form id="searchForm" name="searchForm"><table class="ub-control table normal ">
 <colgroup>
-<col width="12%"/>
-<col width="38%"/>
-<col width="12%"/>
-<col width="38%"/>
+<col width="100px"/>
+<col width="260px"/>
+<col width="100px"/>
+<col width="260px"/>
+<col width="100px"/>
+<col />
 </colgroup>
 <tbody>
 <tr id="layout-1_1">
-<th id="layout-1_1_1"><label class="ub-control label">고객명</label></th>
-<td id="layout-1_1_2"><input type=text  class="ub-control input-text " id="NM_CUST" name="NM_CUST"       value="${paramMap.NM_CUST}"                  style="ime-mode:inactive;text-align:left;width:100px;"></td>
-<th id="layout-1_1_3"><label class="ub-control label">전화번호</label></th>
-<td id="layout-1_1_4"><input type=text  class="ub-control input-text " id="ID_PHONE" name="ID_PHONE"       value="${paramMap.ID_PHONE}"                style="text-align:left;width:100px;"></td>
+<th id="layout-1_1_1"><label class="ub-control label">회원명</label></th>
+<td id="layout-1_1_2"><input type=text  class="ub-control input-text " id="NM_MEMBER_SEARCH" name="NM_MEMBER_SEARCH" maxLength="10" metalength="10"       value="${paramMap.NM_MEMBER_SEARCH}"                  style="ime-mode:active;text-align:left;width:100px;"></td>
+<th id="layout-1_1_3"><label class="ub-control label">회원이메일</label></th>
+<td id="layout-1_1_4"><input type=text  class="ub-control input-text " id="DS_EMAIL" name="DS_EMAIL" maxLength="50" metalength="50"       value="${paramMap.DS_EMAIL}"                  style="ime-mode:inactive;text-align:left;width:200px;"></td>
+<th id="layout-1_1_5"><label class="ub-control label">전화번호</label></th>
+<td id="layout-1_1_6"><input type=text  class="ub-control input-text " id="NO_PHONE_SEARCH" name="NO_PHONE_SEARCH"       value="${paramMap.NO_PHONE_SEARCH}"                  style="ime-mode:disabled;text-align:left;width:90px;"></td>
 </tr>
 <tr id="layout-1_2">
-<th id="layout-1_2_5"><label class="ub-control label">고객 ID</label></th>
-<td id="layout-1_2_6"><input type=text  class="ub-control input-text " id="ID_CUST" name="ID_CUST"       value="${paramMap.ID_CUST}"                  style="ime-mode:inactive;text-align:left;width:100px;"></td>
-<th id="layout-1_2_7"><label class="ub-control label">고객등급</label></th>
-<td id="layout-1_2_8"><select id="CD_GRADE" name="CD_GRADE" class="ub-control select "     style="width:115px;" size="1"  defaultvalue="${paramMap.CD_GRADE}"></select></td>
+<th id="layout-1_2_7"><label class="ub-control label">회원PK</label></th>
+<td id="layout-1_2_8"><input type=text  class="ub-control input-text " id="ID_MEMBER" name="ID_MEMBER" maxLength="10" metalength="10"       value="${paramMap.ID_MEMBER}"                style="text-align:left;width:100px;"></td>
+<th id="layout-1_2_9"><label class="ub-control label">회원등급</label></th>
+<td id="layout-1_2_10"><select id="CD_GRADE" name="CD_GRADE" class="ub-control select "     style="width:115px;" size="1"  defaultvalue="${paramMap.CD_GRADE}"></select></td>
+<th id="layout-1_2_11"><label class="ub-control label">가입사이트</label></th>
+<td id="layout-1_2_12"><select id="CD_JOIN_SITE" name="CD_JOIN_SITE" class="ub-control select "     style="width:115px;" size="1"  defaultvalue="${paramMap.CD_JOIN_SITE}"></select></td>
+</tr>
+<tr id="layout-1_3">
+<th id="layout-1_3_13"><label class="ub-control label">회원상태</label></th>
+<td id="layout-1_3_14"><select id="CD_STATUS" name="CD_STATUS" class="ub-control select "     style="width:115px;" size="1"  defaultvalue="${paramMap.CD_STATUS}"></select></td>
+<th id="layout-1_3_15"><label class="ub-control label">가입경로</label></th>
+<td id="layout-1_3_16"><select id="CD_JOIN_PATH" name="CD_JOIN_PATH" class="ub-control select "     style="width:115px;" size="1"  defaultvalue="${paramMap.CD_JOIN_PATH}"></select></td>
+<th id="layout-1_3_17"><label class="ub-control label"             for="DT_START,DT_END">가입일</label></th>
+<td id="layout-1_3_18"><input type=text class="ub-control input-text calendar " id="DT_START" name="DT_START"       metaformat="date" value="${paramMap.DT_START}"     metaessential="1"           style="text-align:left;width:65px;"><label class="ub-control label"> ~ </label><input type=text class="ub-control input-text calendar " id="DT_END" name="DT_END"       metaformat="date" value="${paramMap.DT_END}"     metaessential="1"           style="text-align:left;width:65px;"></td>
 </tr>
 </tbody>
 </table>
@@ -62,7 +76,7 @@
 </form>
 
 </div>
-<div class="ub-layout button inner"  style="text-align:right;"><span class="ub-control button inner icon">
+<div class="ub-layout button inner" id="excel_layout" name="excel_layout"  style="text-align:right;"><span class="ub-control button inner icon">
     <a href="#none" title="엑셀 다운로드"><span class="ico-excel"></span>엑셀 다운로드</a>
 </span>
 </div>

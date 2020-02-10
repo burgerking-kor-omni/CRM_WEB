@@ -47,9 +47,9 @@
 <tbody>
 <tr id="layout-1_1">
 <th id="layout-1_1_1"><label class="ub-control label">제목+내용</label></th>
-<td id="layout-1_1_2"><input type=text  class="ub-control input-text " id="DS_TITLE" name="DS_TITLE"       value="${paramMap.DS_TITLE}"                style="text-align:left;width:180px;"></td>
+<td id="layout-1_1_2"><input type=text  class="ub-control input-text " id="DS_TITLE" name="DS_TITLE" maxLength="50" metalength="50"       value="${paramMap.DS_TITLE}"                style="text-align:left;width:180px;"></td>
 <th id="layout-1_1_3"><label class="ub-control label">등록일자</label></th>
-<td id="layout-1_1_4"><input type=text class="ub-control input-text calendar " id="DT_REG_START" name="DT_REG_START"       metaformat="date" value="${paramMap.DT_REG_START}"                style="text-align:left;width:100px;"><label class="ub-control label">~</label><input type=text class="ub-control input-text calendar " id="DT_REG_END" name="DT_REG_END"       metaformat="date" value="${paramMap.DT_REG_END}"                style="text-align:left;width:100px;"></td>
+<td id="layout-1_1_4"><input type=text class="ub-control input-text calendar " id="DT_REG_START" name="DT_REG_START"       metaformat="date" value="${paramMap.DT_REG_START}"                style="text-align:left;width:70px;"><label class="ub-control label">~</label><input type=text class="ub-control input-text calendar " id="DT_REG_END" name="DT_REG_END"       metaformat="date" value="${paramMap.DT_REG_END}"                style="text-align:left;width:70px;"></td>
 </tr>
 </tbody>
 </table>

@@ -40,11 +40,11 @@
 <tbody>
 <tr id="layout-1_1">
 <th id="layout-1_1_1"><label class="ub-control label"             for="DS_TITLE">제목</label></th>
-<td id="layout-1_1_2"><input type=text  class="ub-control input-text " id="DS_TITLE" name="DS_TITLE"            metaessential="1"           style="text-align:left;width:620px;"></td>
+<td id="layout-1_1_2"><input type=text  class="ub-control input-text " id="DS_TITLE" name="DS_TITLE" maxLength="100" metalength="100"            metaessential="1"           style="text-align:left;width:620px;"></td>
 </tr>
 <tr id="layout-1_2">
 <th id="layout-1_2_3"><label class="ub-control label"             for="DS_CONTENT">내용</label></th>
-<td id="layout-1_2_4"><textarea class="ub-control textarea " id="DS_CONTENT" name="DS_CONTENT"       style="width:620px;" rows="20"      metaessential="1"            rows="20"></textarea></td>
+<td id="layout-1_2_4"><textarea class="ub-control textarea " id="DS_CONTENT" name="DS_CONTENT"       style="width:620px;" rows="14"      metaessential="1"            rows="14"></textarea></td>
 </tr>
 <tr id="layout-1_3">
 <th id="layout-1_3_5"><label class="ub-control label">첨부파일</label></th>

@@ -31,6 +31,10 @@
 <table class="ub-control grid" id="list" name="list"></table> 
 	
 </div>
-<div class="ub-layout pagging"></div>
+<div class="ub-layout pagging"><div class="ub-control temp" style="border:2px solid gray;width:100%;height:30px;text-align:center;"><h3 style="padding-top:3px;">Paging Navigation</h3></div>
+<div class="ub-control pagging" for="list" formId="listForm" function="fnSearch"></div>
+</div>
+<form id="listForm" name="listForm"><input type=hidden id="ID_CUST" name="ID_CUST">
+</form>
 
 <!-- layout-1 End -->

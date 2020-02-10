@@ -35,30 +35,30 @@
 </div>
 <div class="ub-layout details"><form id="detailForm" name="detailForm"><table class="ub-control table normal ">
 <colgroup>
-<col />
-<col />
-<col />
+<col width="100px"/>
+<col width="260px"/>
+<col width="100px"/>
 <col />
 </colgroup>
 <tbody>
 <tr id="layout-1_1">
-<th id="layout-1_1_1"><label class="ub-control label">제목</label></th>
-<td id="layout-1_1_2" colspan=3><input type=text  class="ub-control input-text " id="DS_TITLE" name="DS_TITLE"       value="<%=JspUtils.getDefaultValue(_dl_NoticeManageInquiry_getNoticeDetail, "DS_TITLE") %>"                style="text-align:left;width:620px;"><input type=hidden id="ID_NOTICE" name="ID_NOTICE"    value="${paramMap.ID_NOTICE}"><input type=hidden id="DS_TITLE_H" name="DS_TITLE_H"    value="${paramMap.DS_TITLE_H}"><input type=hidden id="DT_REG_START_H" name="DT_REG_START_H"    value="${paramMap.DT_REG_START_H}"><input type=hidden id="DT_REG_END_H" name="DT_REG_END_H"    value="${paramMap.DT_REG_END_H}"><input type=hidden id="CD_FLAG" name="CD_FLAG"    value="W"></td>
+<th id="layout-1_1_1"><label class="ub-control label"             for="DS_TITLE">제목</label></th>
+<td id="layout-1_1_2" colspan=3><input type=text  class="ub-control input-text " id="DS_TITLE" name="DS_TITLE" maxLength="100" metalength="100"       value="<%=JspUtils.getDefaultValue(_dl_NoticeManageInquiry_getNoticeDetail, "DS_TITLE") %>"     metaessential="1"           style="text-align:left;width:650px;"><input type=hidden id="ID_NOTICE" name="ID_NOTICE"    value="${paramMap.ID_NOTICE}"></td>
 </tr>
 <tr id="layout-1_2">
-<th id="layout-1_2_3"><label class="ub-control label">내용</label></th>
-<td id="layout-1_2_4" colspan=3><textarea class="ub-control textarea " id="DS_NOTICE" name="DS_NOTICE"       style="width:620px;" rows="20"                  rows="20"><%=JspUtils.getDefaultValue(_dl_NoticeManageInquiry_getNoticeDetail, "DS_NOTICE") %></textarea></td>
+<th id="layout-1_2_3"><label class="ub-control label"             for="DS_NOTICE">내용</label></th>
+<td id="layout-1_2_4" colspan=3><textarea class="ub-control textarea " id="DS_NOTICE" name="DS_NOTICE"       style="width:650px;" rows="14"      metaessential="1"            rows="14"><%=JspUtils.getDefaultValue(_dl_NoticeManageInquiry_getNoticeDetail, "DS_NOTICE") %></textarea></td>
 </tr>
 <tr id="layout-1_3">
 <th id="layout-1_3_5"><label class="ub-control label">게시여부</label></th>
-<td id="layout-1_3_6"><input class="ub-control input-checkbox" type="checkbox" id="FG_OPEN_PORTAL" name="FG_OPEN_PORTAL"    <%= ("Y".equals(JspUtils.getDefaultValue(_dl_NoticeManageInquiry_getNoticeDetail, "FG_OPEN_PORTAL")))?"checked":"" %> value="Y"><label>게시여부</label></input></td>
-<th id="layout-1_3_7"><label class="ub-control label">공지기간</label></th>
+<td id="layout-1_3_6"><input class="ub-control input-checkbox" type="checkbox" id="FG_OPEN" name="FG_OPEN"><label>게시여부</label></input><input type=hidden id="FG_OPEN_PORTAL" name="FG_OPEN_PORTAL"    value="<%=JspUtils.getDefaultValue(_dl_NoticeManageInquiry_getNoticeDetail, "FG_OPEN_PORTAL") %>"></td>
+<th id="layout-1_3_7"><label class="ub-control label"             for="DT_START,DT_END">공지기간</label></th>
 <td id="layout-1_3_8"><input type=text class="ub-control input-text calendar " id="DT_START" name="DT_START"       metaformat="date" value="<%=JspUtils.getDefaultValue(_dl_NoticeManageInquiry_getNoticeDetail, "DT_START") %>"                style="text-align:left;width:100px;"><label class="ub-control label">~</label><input type=text class="ub-control input-text calendar " id="DT_END" name="DT_END"       metaformat="date" value="<%=JspUtils.getDefaultValue(_dl_NoticeManageInquiry_getNoticeDetail, "DT_END") %>"                style="text-align:left;width:100px;"></td>
 </tr>
 <tr id="layout-1_4">
 <th id="layout-1_4_9"><label class="ub-control label"             for="ID_REG_EMP">등록자</label></th>
 <td id="layout-1_4_10"><input type=text  class="ub-control input-text "       value="<%=JspUtils.getDefaultValue(_dl_NoticeManageInquiry_getNoticeDetail, "NM_REG_EMP") %>"                style="text-align:left;width:100px;"   disabled><input type=hidden id="ID_REG_EMP" name="ID_REG_EMP"    value="<%=JspUtils.getDefaultValue(_dl_NoticeManageInquiry_getNoticeDetail, "ID_REG_EMP") %>"></td>
-<th id="layout-1_4_11"><label class="ub-control label"             for="ID_REG_DEPT">등록팀/지점</label></th>
+<th id="layout-1_4_11"><label class="ub-control label"             for="ID_REG_DEPT">등록부서</label></th>
 <td id="layout-1_4_12"><input type=text  class="ub-control input-text "       value="<%=JspUtils.getDefaultValue(_dl_NoticeManageInquiry_getNoticeDetail, "NM_REG_DEPT") %>"                style="text-align:left;width:100px;"   disabled><input type=hidden id="ID_REG_DEPT" name="ID_REG_DEPT"    value="<%=JspUtils.getDefaultValue(_dl_NoticeManageInquiry_getNoticeDetail, "ID_REG_DEPT") %>"></td>
 </tr>
 <tr id="layout-1_5">

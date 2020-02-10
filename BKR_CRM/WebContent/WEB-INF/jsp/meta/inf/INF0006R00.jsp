@@ -12,6 +12,7 @@
 <%@ taglib uri="http://www.ubqone.com/tags" prefix="ub" %>
 <%
 	DataList _dataList = null;		/* List Table default dataTable */ 
+	DataList _dl_CD_ORG_1 = ViewUtil.getResult().getDataList("Code.CD_ORG_1");
 %>
 
 
@@ -27,7 +28,7 @@
 
 
 <!-- layout-1 Start -->
-<h1 class="ub-control title">자유게시판 등록</h1>
+<h1 class="ub-control title">FAQ - 등록</h1>
 <div class="ub-layout button top"><span class="ub-control button top icon" id="list">
     <a href="#none" title="목록"><span class="ico-list"></span>목록</a>
 </span>
@@ -39,12 +40,16 @@
 </colgroup>
 <tbody>
 <tr id="layout-1_1">
-<th id="layout-1_1_1"><label class="ub-control label"             for="DS_TITLE">제목</label></th>
-<td id="layout-1_1_2"><input type=text  class="ub-control input-text " id="DS_TITLE" name="DS_TITLE"            metaessential="1"           style="text-align:left;width:620px;"></td>
+<th id="layout-1_1_1"><label class="ub-control label"             for="TP_CATEGORY_2">카테고리</label></th>
+<td id="layout-1_1_2"><select id="CD_COMP" name="CD_COMP" class="ub-control select "     style="width:120px;" size="1" datacid="CD_ORG_1"><%    if(!"선택".equals("")){        out.println("<OPTION VALUE=\"\">선택</OPTION>\r\n");    }    if(_dl_CD_ORG_1 != null){        for(int codeIdx=0; codeIdx < _dl_CD_ORG_1.getRowCount(); codeIdx++){            String code = _dl_CD_ORG_1.getString(codeIdx, ConstantHolder.CODE_COLUMN_CODE);            String name = _dl_CD_ORG_1.getString(codeIdx, ConstantHolder.CODE_COLUMN_NAME);            out.println("<option VALUE=\""+code+"\">"+name+"</option>\r\n");        }    }%></select><select id="CD_BRAND" name="CD_BRAND" class="ub-control select "     style="width:120px;" size="1"       metaessential="1"></select><select id="CD_SUB_BRAND" name="CD_SUB_BRAND" class="ub-control select "     style="width:120px;" size="1"  defaultvalue="${paramMap.CD_SUB_BRAND}"     metaessential="1"></select></td>
 </tr>
 <tr id="layout-1_2">
-<th id="layout-1_2_3"><label class="ub-control label"             for="DS_CONTENT">내용</label></th>
-<td id="layout-1_2_4"><textarea class="ub-control textarea " id="DS_CONTENT" name="DS_CONTENT"       style="width:620px;" rows="20"                  rows="20"></textarea></td>
+<th id="layout-1_2_3"><label class="ub-control label"             for="DS_TITLE">제목</label></th>
+<td id="layout-1_2_4"><input type=text  class="ub-control input-text " id="DS_TITLE" name="DS_TITLE"            metaessential="1"           style="text-align:left;width:835px;"></td>
+</tr>
+<tr id="layout-1_3">
+<th id="layout-1_3_5"><label class="ub-control label"             for="DS_CONTENT">세부내용</label></th>
+<td id="layout-1_3_6"><textarea class="ub-control textarea " id="DS_CONTENT" name="DS_CONTENT"       style="width:0;" rows="0"                  rows="0"></textarea></td>
 </tr>
 </tbody>
 </table>

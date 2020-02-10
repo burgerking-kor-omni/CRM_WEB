@@ -14,9 +14,9 @@
 	DataSource 관련 Configuration
 	================================================================================
 	-->	
-	<bean id="metaDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+<!-- 	<bean id="metaDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
 		<property name="jndiName" value="${com.ubone.meta.jdbc.ds}"/>
-	</bean>
+	</bean> -->
     	
 	<bean id="frameworkDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
 		<property name="jndiName" value="${app.db.jndi}"/>

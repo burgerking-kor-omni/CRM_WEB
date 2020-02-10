@@ -105,14 +105,14 @@
 	ui-meta 관련 설정
 	================================================
 	-->
-	<entry key="uimeta.file.path">/meta</entry>
-	<entry key="com.ubone.system.logger.dir">c:/log/ub_base/meta</entry>
+<!-- 	<entry key="uimeta.file.path">/meta</entry>
+	<entry key="com.ubone.system.logger.dir">c:/log/ub_base/meta</entry> -->
 	
 	<!--
 		com.ubone.meta.jdbc properties는 선택사항 일반적으로 WAS에서 제공하는 풀을 사용
 	 -->
-	<entry key="com.ubone.meta.jdbc.ds">java:comp/env/jdbc/meta</entry>
-	<entry key="com.ubone.meta.dbms">hsqldb</entry>
+<!-- 	<entry key="com.ubone.meta.jdbc.ds">java:comp/env/jdbc/meta</entry>
+	<entry key="com.ubone.meta.dbms">hsqldb</entry> -->
 	
 	<!--
 		WebSphere 에서 HSQL Connection Pool Provider 를 제공하지 않아 자체 풀을 사용
@@ -130,10 +130,7 @@
 	-->
 	<!-- application db datasource jndi name  -->
 	<entry key="app.db.jndi">java:comp/env/jdbc/application</entry>
-	<!-- application db type oracle/mssql/hsql/db2  -->
-<!-- 	<entry key="app.db.databasetype">pgsql</entry> -->
 	<entry key="app.db.databasetype">oracle</entry>
-<!-- 	<entry key="app.db.databasetype">mssql</entry> -->
 
 	<!-- 2019.03.05 rims 연동관련 추가 -->
 	<entry key="rims.db.jndi">java:comp/env/jdbc/rims</entry>

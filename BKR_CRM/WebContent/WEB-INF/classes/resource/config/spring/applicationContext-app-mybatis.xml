@@ -46,22 +46,6 @@
 	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
 		<constructor-arg ref="sqlSessionFactory"/>
 	</bean>
-	<!-- UB 세션 템플릿 - 서비스 정보 추가 -->
-<!-- 	<bean id="sqlSessionTemplate" class="com.ubone.framework.dao.UbSqlSessionTemplate"> -->
-<!-- 		<constructor-arg ref="sqlSessionFactory"/> -->
-<!-- 	</bean> -->
-	
-
-	<!-- meta Session Factory -->
-	<bean id="metaSessionFactory" class="com.ubone.framework.dao.RefreshableSqlSessionFactoryBean"		
-		p:mapperLocations="classpath*:com/ubone/**/mybatis/*.meta.xml" 
-		p:configLocation="classpath:/resource/config/mybatis/mybatis-config-meta.xml" 
-		p:dataSource-ref="metaDataSource" />
-
-	<!-- MyBatis 기본 템플릿 -->
-	<bean id="metaSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
-		<constructor-arg ref="metaSessionFactory"/>
-	</bean>
 	
 	<!-- 2019.03.05 rims 연동관련 추가 -->
 	<bean id="rimsSessionFactory" class="com.ubone.framework.dao.RefreshableSqlSessionFactoryBean"		
@@ -71,7 +55,23 @@
 	<bean id="rimsSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
 		<constructor-arg ref="rimsSessionFactory"/>
 	</bean>
+	
+	<!-- UB 세션 템플릿 - 서비스 정보 추가 -->
+<!-- 	<bean id="sqlSessionTemplate" class="com.ubone.framework.dao.UbSqlSessionTemplate"> -->
+<!-- 		<constructor-arg ref="sqlSessionFactory"/> -->
+<!-- 	</bean> -->
+	
 
+	<!-- meta Session Factory -->
+<!-- 	<bean id="metaSessionFactory" class="com.ubone.framework.dao.RefreshableSqlSessionFactoryBean"		 -->
+<!-- 		p:mapperLocations="classpath*:com/ubone/**/mybatis/*.meta.xml"  -->
+<!-- 		p:configLocation="classpath:/resource/config/mybatis/mybatis-config-meta.xml"  -->
+<!-- 		p:dataSource-ref="metaDataSource" /> -->
+
+	<!-- MyBatis 기본 템플릿 -->
+<!-- 	<bean id="metaSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate"> -->
+<!-- 		<constructor-arg ref="metaSessionFactory"/> -->
+<!-- 	</bean> -->
 	<!-- UB 세션 템플릿 - 서비스 정보 추가 -->
 <!-- 	<bean id="sqlSessionTemplate" class="com.ubone.framework.dao.UbSqlSessionTemplate"> -->
 <!-- 		<constructor-arg ref="sqlSessionFactory"/> -->

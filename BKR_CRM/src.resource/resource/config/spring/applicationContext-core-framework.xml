@@ -132,7 +132,7 @@
 		<property name="screenSupporters">
 			<list>
 				<bean class="com.ubone.framework.engine.screen.support.DefaultParameterMaker"/>
-				<bean class="com.ubone.framework.engine.screen.support.MetaScreenSupporter"/>
+				<!-- <bean class="com.ubone.framework.engine.screen.support.MetaScreenSupporter"/> -->
 				<bean class="com.ubone.framework.engine.screen.support.SyncServiceExecutor"/>
 				<bean class="com.ubone.framework.engine.screen.support.EnumCodeSupporter"/>
 			</list>
@@ -172,13 +172,13 @@
 <!-- 	<bean id="metaScreenGenerator" -->
 <!-- 		class="com.ubone.framework.engine.screen.support.meta.VelocityMetaScreenGenerator"/> -->
 
-	<bean id="metaScreenGenerator"
-		class="com.ubone.framework.engine.screen.support.meta.jsp.MetaScreenJspGenerator"/>
+<!-- 	<bean id="metaScreenGenerator"
+		class="com.ubone.framework.engine.screen.support.meta.jsp.MetaScreenJspGenerator"/> -->
 
 	<!-- Meta Page repository declaration -->
-	<bean id="metaPageRepository" class="com.ubone.framework.engine.screen.support.meta.JdbcMetaPageRepository">		
+<!-- 	<bean id="metaPageRepository" class="com.ubone.framework.engine.screen.support.meta.JdbcMetaPageRepository">		
 		<property name="dataSource" ref="metaDataSource"/>
-	</bean>
+	</bean> -->
 	
 	<!-- 계층간 정보 전송 -->
 	<bean id="propagation" class="com.ubone.framework.engine.PropagationByThredLocal" />

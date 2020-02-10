@@ -29,7 +29,6 @@ import com.ubone.framework.engine.domain.Function;
 import com.ubone.framework.engine.domain.Screen;
 import com.ubone.framework.engine.screen.ScreenRepository;
 import com.ubone.framework.engine.screen.support.meta.MetaPageException;
-import com.ubone.framework.engine.screen.support.meta.MetaScreenGenerator;
 import com.ubone.framework.engine.service.ResultUtils;
 import com.ubone.framework.engine.service.ServiceException;
 import com.ubone.framework.engine.service.ServiceRepository;
@@ -65,9 +64,6 @@ public class ScreenManageSO {
 	
 	@Resource
 	private ServiceCacheService serviceCacheService;
-	
-	@Resource
-	private MetaScreenGenerator metaScreenGenerator;
 	
 	@Resource
 	private ScreenRepository screenRepository;
@@ -366,7 +362,6 @@ public class ScreenManageSO {
 			logger.info("------------------------------------------------------------------------------------");
 			
 			try {
-				metaScreenGenerator.generate(metaPageId);
 				isSuccess = true;
 			} catch (EmptyResultDataAccessException ex) {
 				logger.error("#########     Meta DB에 존재하지 않는 페이지 입니다.     #########");

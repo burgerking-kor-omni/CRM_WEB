@@ -1,7 +1,6 @@
 package com.ubone.standard.system.metadata.impl;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
@@ -27,9 +26,6 @@ import com.ubone.standard.system.metadata.dao.HsqlDataInquiryDAO;
 public class HsqlDataInquiryDAOImpl extends UbSqlSessionDaoSupport implements HsqlDataInquiryDAO{
 
 	private String queryPrefix = "HsqlDataInquiry.";
-	
-	// 추가한 SessionTemplate 명 기술
-	@Resource(name="metaSessionTemplate")             
     private SqlSessionTemplate sqlSessionTemplate;
 	
 	// 클래스 생성시 생성자 실행후 @PostConstruct 지정된 함수 실행하여 지정한 SessionTemplate으로 변경

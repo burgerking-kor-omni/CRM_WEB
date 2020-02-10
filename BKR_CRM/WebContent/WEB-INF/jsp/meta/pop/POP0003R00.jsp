@@ -74,7 +74,7 @@
 </table>
  
 <div class="ub-layout button bottom"><span class="ub-control button bottom icon" id="confirm">
-    <a href="#none" title="저장"><span></span>저장</a>
+    <a href="#none" title="확인"><span></span>확인</a>
 </span>
 </div>
 

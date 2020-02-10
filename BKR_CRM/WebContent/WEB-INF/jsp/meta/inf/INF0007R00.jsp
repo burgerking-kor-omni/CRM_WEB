@@ -47,13 +47,13 @@
 <tbody>
 <tr id="layout-1_1">
 <th id="layout-1_1_1"><label class="ub-control label">등록일자</label></th>
-<td id="layout-1_1_2"><input type=text class="ub-control input-text calendar " id="DT_REG_START" name="DT_REG_START"       metaformat="date" value="${paramMap.DT_REG_START}"                style="text-align:left;width:100px;"><label class="ub-control label">~</label><input type=text class="ub-control input-text calendar " id="DT_REG_END" name="DT_REG_END"       metaformat="date" value="${paramMap.DT_REG_END}"                style="text-align:left;width:100px;"></td>
+<td id="layout-1_1_2"><input type=text class="ub-control input-text calendar " id="DT_REG_START" name="DT_REG_START"       metaformat="date" value="${paramMap.DT_REG_START}"                style="text-align:left;width:70px;"><label class="ub-control label">~</label><input type=text class="ub-control input-text calendar " id="DT_REG_END" name="DT_REG_END"       metaformat="date" value="${paramMap.DT_REG_END}"                style="text-align:left;width:70px;"></td>
 <th id="layout-1_1_3"></th>
 <td id="layout-1_1_4"></td>
 </tr>
 <tr id="layout-1_2">
 <th id="layout-1_2_5"><label class="ub-control label">제목 + 내용</label></th>
-<td id="layout-1_2_6"><input type=text  class="ub-control input-text " id="DS_TITLE_CONTENT" name="DS_TITLE_CONTENT"                       style="text-align:left;width:280px;"></td>
+<td id="layout-1_2_6"><input type=text  class="ub-control input-text " id="DS_TITLE_CONTENT" name="DS_TITLE_CONTENT" maxLength="50" metalength="50"                       style="text-align:left;width:280px;"></td>
 <th id="layout-1_2_7"><label class="ub-control label">등록자</label></th>
 <td id="layout-1_2_8"><input type=text  class="ub-control input-text readonly" id="NM_REG_EMP" name="NM_REG_EMP"         readonly              style="text-align:left;width:100px;"><a href="#none" title="search" class="ub-control button imgBtn img-search" id="empSearch" name="empSearch"><span>@@</span></a><input type=hidden id="ID_REG_EMP" name="ID_REG_EMP"></td>
 </tr>
