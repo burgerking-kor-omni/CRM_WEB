@@ -400,7 +400,7 @@ function fnPopupMenuReal(){
 	
 	var menu_tp = '<%=CD_COUPON_OBJ%>';
 	if(menu_tp == '1' || menu_tp == '2'){
-		uxl.openWindow('PopupMenuList', uxl.getScreenURL('POP0096')+"?MENU_TYPE="+menu_tp+"&MANAGE_TYPE=1&USE_YN=1", {width:'800',height:'620'}, fnSetMenuReal)		
+		uxl.openWindow('PopupMenuList', uxl.getScreenURL('POP0096')+"?MENU_TYPE="+menu_tp+"&MANAGE_TYPE=1", {width:'800',height:'620'}, fnSetMenuReal)		
 	}else{
 		alert("쿠폰 대상을 선택해주세요");
 		return ;
